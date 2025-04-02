@@ -12,63 +12,28 @@ interface AuthError {
 }
 
 export function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // For development - always authenticate as admin
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [user, setUser] = useState<User>({
+    id: 'dev-admin-1',
+    email: 'admin@accessweb.dev',
+    role: 'admin'
+  });
+  const [loading, setLoading] = useState(false);
 
+  // No authentication check needed for development
   useEffect(() => {
-    // Simulated authentication check
-    const checkAuth = () => {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        setIsAuthenticated(true);
-      }
-      setLoading(false);
-    };
-
-    checkAuth();
+    // No-op for development
   }, []);
 
   const login = async (username: string, password: string): Promise<{ success: boolean; error?: AuthError }> => {
-    try {
-      // Simulated login - replace with actual API call
-      if (username === 'admin' && password === 'admin123') {
-        const adminUser = {
-          id: 'admin-1',
-          email: username,
-          role: 'admin' as const
-        };
-        localStorage.setItem('user', JSON.stringify(adminUser));
-        setUser(adminUser);
-        setIsAuthenticated(true);
-        return { success: true };
-      }
-
-      // Return specific error for invalid credentials
-      return {
-        success: false,
-        error: {
-          code: 'auth/invalid-credentials',
-          message: 'Invalid username or password. Please try again.'
-        }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: 'auth/unexpected-error',
-          message: 'An unexpected error occurred. Please try again.'
-        }
-      };
-    }
+    // Always succeed in development mode
+    return { success: true };
   };
 
   const logout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
-    setIsAuthenticated(false);
+    // No-op in development mode
+    // We're always authenticated
   };
 
   return {
