@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { URLInput } from '../components/URLInput';
 import { ResultsSummary } from '../components/ResultsSummary';
@@ -12,16 +12,11 @@ import {
   Download, 
   AlertTriangle, 
   CheckCircle, 
-  Users, 
-  Scale, 
-  Award,
   FileSearch,
   Zap,
   Globe,
-  Shield,
-  BookOpen,
-  ArrowRight,
-  Palette
+  Palette,
+  HelpCircle
 } from 'lucide-react';
 
 type TabType = 'issues' | 'warnings' | 'passes' | 'contrast';
@@ -32,20 +27,38 @@ export function WCAGCheckerPage() {
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<TestResult | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('issues');
+  const [enableDocumentTesting, setEnableDocumentTesting] = useState(true);
+  const [enablePDFAccessibility, setEnablePDFAccessibility] = useState(true);
 
   const handleSubmit = async (url: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      const testResults = await testAccessibility(url, selectedRegion);
+      // Configure testing options
+      const options = enableDocumentTesting ? {
+        documentTesting: {
+          enabled: true,
+          pdfAccessibility: enablePDFAccessibility
+        }
+      } : undefined;
+
+      const testResults = await testAccessibility(url, selectedRegion, options);
       setResults(testResults);
+      
+      // Check for PDF-specific issues
+      const hasPDFIssues = testResults.issues.some(issue => 
+        issue.documentType === 'pdf'
+      );
       
       // Check if there are color contrast issues
       const hasContrastIssues = testResults.issues.some(issue => 
         issue.id === 'color-contrast' || issue.wcagCriteria.includes('1.4.3')
       );
       
-      if (hasContrastIssues) {
+      if (hasPDFIssues) {
+        // PDF issues are prioritized in the display
+        setActiveTab('issues');
+      } else if (hasContrastIssues) {
         setActiveTab('contrast');
       } else if (testResults.issues.length > 0) {
         setActiveTab('issues');
@@ -129,6 +142,50 @@ export function WCAGCheckerPage() {
               selectedRegion={selectedRegion}
               onRegionChange={setSelectedRegion}
             />
+            
+            {/* Document testing options */}
+            <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-blue-50 rounded-lg">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="documentTesting"
+                  checked={enableDocumentTesting}
+                  onChange={(e) => setEnableDocumentTesting(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="documentTesting" className="ml-2 text-sm font-medium text-gray-700">
+                  Enable Document Testing
+                </label>
+              </div>
+              
+              {enableDocumentTesting && (
+                <div className="flex items-center ml-0 sm:ml-6">
+                  <input
+                    type="checkbox"
+                    id="pdfAccessibility"
+                    checked={enablePDFAccessibility}
+                    onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="pdfAccessibility" className="ml-2 text-sm font-medium text-gray-700">
+                    Test PDF Accessibility
+                  </label>
+                  <div className="ml-1 group relative">
+                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute hidden group-hover:block z-10 w-72 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                      <p className="font-semibold mb-1">PDF Accessibility Testing:</p>
+                      <ul className="list-disc list-inside">
+                        <li>Analyzes PDF documents for accessibility issues</li>
+                        <li>Checks tags, reading order, and alt text</li>
+                        <li>Works with directly linked PDFs and PDFs linked on pages</li>
+                        <li>Provides remediation instructions</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
             <div className="mt-6">
               <URLInput onSubmit={handleSubmit} isLoading={isLoading} />
             </div>
@@ -264,7 +321,7 @@ export function WCAGCheckerPage() {
 
         {/* Features Section - Only show when no results */}
         {!results && (
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="bg-white rounded-xl shadow-sm p-6">
               <FileSearch className="w-8 h-8 text-blue-600 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -292,6 +349,16 @@ export function WCAGCheckerPage() {
               </h3>
               <p className="text-gray-600">
                 Support for WCAG 2.1 & 2.2, ADA, and Section 508
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <Download className="w-8 h-8 text-blue-600 mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                PDF Accessibility
+              </h3>
+              <p className="text-gray-600">
+                Test PDFs for tags, reading order, and document structure
               </p>
             </div>
           </div>

@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, PenTool as Tool, BookOpen, Maximize2, Minimize2, Info } from 'lucide-react';
-import type { AccessibilityIssue } from '../types';
+import { useState } from 'react';
+import { ChevronDown, ChevronUp, PenTool as Tool, Maximize2, Minimize2, Info, FileText, CheckCircle } from 'lucide-react';
+import type { AccessibilityIssue, WCAGInfo } from '../types';
 import { Modal } from './Modal';
-import { useApproval } from '../hooks/useApproval';
 import { getWCAGInfo } from '../utils/wcagHelper';
 import { AIRecommendations } from './AIRecommendations'; 
-import { LoadingSpinner } from './LoadingSpinner';
 import { EmptyState } from './EmptyState';
 
 type ModalView = 'info' | 'fix' | null;
@@ -18,9 +16,7 @@ interface IssuesListProps {
 export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
   const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
   const [selectedIssue, setSelectedIssue] = useState<AccessibilityIssue | null>(null);
-  const { rollback } = useApproval();
   const [modalView, setModalView] = useState<ModalView>(null);
-  const [previousState, setPreviousState] = useState<string | null>(null);
 
   const getImpactColor = (impact: AccessibilityIssue['impact']) => {
     if (type === 'passes') return 'bg-emerald-50 border-emerald-200';
@@ -46,45 +42,24 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
   };
 
   const toggleIssue = (id: string) => {
-    // Save current state before toggling
-    if (expandedIssue !== id) {
-      setPreviousState(JSON.stringify({ expandedIssue, selectedIssue, modalView }));
-    }
     setExpandedIssue(expandedIssue === id ? null : id);
   };
 
-  const handleRollback = async () => {
-    if (!previousState) return;
-    
-    const result = await rollback('IssuesList');
-    if (result.success && result.data) {
-      const state = JSON.parse(previousState);
-      setExpandedIssue(state.expandedIssue);
-      setSelectedIssue(state.selectedIssue);
-      setModalView(state.modalView);
-      setPreviousState(null);
-    }
-  };
-
   const toggleAllIssues = (shouldExpand: boolean) => {
-    setPreviousState(JSON.stringify({ expandedIssue, selectedIssue, modalView }));
     setExpandedIssue(shouldExpand ? issues[0]?.id || null : null);
   };
 
   const openIssueDetails = (issue: AccessibilityIssue) => {
-    setPreviousState(JSON.stringify({ expandedIssue, selectedIssue, modalView }));
     setSelectedIssue(issue);
     setModalView('info');
   };
 
   const openIssueFix = (issue: AccessibilityIssue) => {
-    setPreviousState(JSON.stringify({ expandedIssue, selectedIssue, modalView }));
     setSelectedIssue(issue);
     setModalView('fix');
   };
 
   const closeModal = () => {
-    setPreviousState(JSON.stringify({ expandedIssue, selectedIssue, modalView }));
     setModalView(null);
     setSelectedIssue(null);
   };
@@ -148,7 +123,6 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
       <div className="space-y-3">
         {issues.map((issue) => {
           const isExpanded = expandedIssue === issue.id;
-          const wcagInfo = getIssueWCAGInfo(issue);
           
           return (
             <div
@@ -215,6 +189,76 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                             {criteria}
                           </span>
                         ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* PDF-specific information */}
+                  {issue.documentType === 'pdf' && issue.documentDetails && (
+                    <div className="mt-4 bg-purple-50 p-4 rounded-lg">
+                      <div className="flex items-center">
+                        <FileText className="w-5 h-5 text-purple-600 mr-2" />
+                        <h4 className="font-medium text-purple-800">PDF Document Details</h4>
+                      </div>
+                      
+                      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {issue.documentDetails.filename && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Filename</p>
+                            <p className="text-sm text-gray-600">{issue.documentDetails.filename}</p>
+                          </div>
+                        )}
+                        
+                        {issue.documentDetails.pageCount !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Pages</p>
+                            <p className="text-sm text-gray-600">{issue.documentDetails.pageCount}</p>
+                          </div>
+                        )}
+                        
+                        <div className="bg-white p-3 rounded-md">
+                          <p className="text-sm font-medium text-gray-700">Document Tags</p>
+                          <p className="text-sm text-gray-600">
+                            {issue.documentDetails.hasTags ? '✅ Present' : '❌ Missing'}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white p-3 rounded-md">
+                          <p className="text-sm font-medium text-gray-700">Document Language</p>
+                          <p className="text-sm text-gray-600">
+                            {issue.documentDetails.hasLanguage ? '✅ Defined' : '❌ Not defined'}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white p-3 rounded-md">
+                          <p className="text-sm font-medium text-gray-700">Structure</p>
+                          <p className="text-sm text-gray-600">
+                            {issue.documentDetails.hasStructure ? '✅ Proper' : '❌ Missing/Incorrect'}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white p-3 rounded-md">
+                          <p className="text-sm font-medium text-gray-700">Reading Order</p>
+                          <p className="text-sm text-gray-600">
+                            {issue.documentDetails.readingOrder ? '✅ Logical' : '❌ Problematic'}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white p-3 rounded-md">
+                          <p className="text-sm font-medium text-gray-700">Alternative Text</p>
+                          <p className="text-sm text-gray-600">
+                            {issue.documentDetails.hasAltText ? '✅ Present' : '❌ Missing'}
+                          </p>
+                        </div>
+                        
+                        {issue.documentDetails.formAccessibility !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Form Accessibility</p>
+                            <p className="text-sm text-gray-600">
+                              {issue.documentDetails.formAccessibility ? '✅ Accessible' : '❌ Not accessible'}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -289,6 +333,72 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                     ))}
                   </div>
                 </div>
+                
+                {/* PDF document details in modal */}
+                {selectedIssue.documentType === 'pdf' && selectedIssue.documentDetails && (
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-2">PDF Document Details</h4>
+                    <div className="bg-purple-50 p-4 rounded-lg">
+                      <div className="flex items-center mb-3">
+                        <FileText className="w-5 h-5 text-purple-600 mr-2" />
+                        {selectedIssue.documentDetails.filename && (
+                          <span className="text-sm font-medium text-purple-800">
+                            {selectedIssue.documentDetails.filename}
+                            {selectedIssue.documentDetails.pageCount && 
+                              ` (${selectedIssue.documentDetails.pageCount} pages)`
+                            }
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="bg-white p-3 rounded-md">
+                          <p className="text-sm font-medium text-gray-700">Document Tags</p>
+                          <p className="text-sm text-gray-600">
+                            {selectedIssue.documentDetails.hasTags ? '✅ Present' : '❌ Missing'}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white p-3 rounded-md">
+                          <p className="text-sm font-medium text-gray-700">Document Language</p>
+                          <p className="text-sm text-gray-600">
+                            {selectedIssue.documentDetails.hasLanguage ? '✅ Defined' : '❌ Not defined'}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white p-3 rounded-md">
+                          <p className="text-sm font-medium text-gray-700">Structure</p>
+                          <p className="text-sm text-gray-600">
+                            {selectedIssue.documentDetails.hasStructure ? '✅ Proper' : '❌ Missing/Incorrect'}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white p-3 rounded-md">
+                          <p className="text-sm font-medium text-gray-700">Reading Order</p>
+                          <p className="text-sm text-gray-600">
+                            {selectedIssue.documentDetails.readingOrder ? '✅ Logical' : '❌ Problematic'}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white p-3 rounded-md">
+                          <p className="text-sm font-medium text-gray-700">Alternative Text</p>
+                          <p className="text-sm text-gray-600">
+                            {selectedIssue.documentDetails.hasAltText ? '✅ Present' : '❌ Missing'}
+                          </p>
+                        </div>
+                        
+                        {selectedIssue.documentDetails.formAccessibility !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Form Accessibility</p>
+                            <p className="text-sm text-gray-600">
+                              {selectedIssue.documentDetails.formAccessibility ? '✅ Accessible' : '❌ Not accessible'}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <>
@@ -307,16 +417,108 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Suggested Fix</h4>
                           <div className="bg-gray-50 p-4 rounded-lg">
-                            <p className="text-gray-600">
-                              {wcagInfo?.suggestedFix || 'Review the specific issue and apply appropriate accessibility fixes.'}
-                            </p>
-                            {wcagInfo?.codeExample && (
-                              <pre className="mt-4 p-4 bg-gray-800 text-white rounded-lg overflow-x-auto">
-                                <code>{wcagInfo.codeExample}</code>
-                              </pre>
+                            {selectedIssue.documentType === 'pdf' ? (
+                              <div>
+                                <h5 className="font-medium text-purple-800 mb-2">PDF Accessibility Improvement</h5>
+                                <ul className="list-disc list-inside space-y-2 text-gray-600">
+                                  {!selectedIssue.documentDetails?.hasStructure && (
+                                    <li>
+                                      <strong>Add document structure:</strong> Use Adobe Acrobat Pro or similar professional 
+                                      tools to add proper document structure. Add tags to define headings, paragraphs, lists, 
+                                      tables, and other content elements.
+                                    </li>
+                                  )}
+                                  {!selectedIssue.documentDetails?.hasLanguage && (
+                                    <li>
+                                      <strong>Define document language:</strong> Set the document language in the document 
+                                      properties to ensure proper pronunciation by screen readers.
+                                    </li>
+                                  )}
+                                  {!selectedIssue.documentDetails?.hasAltText && (
+                                    <li>
+                                      <strong>Add alternative text:</strong> Provide descriptive alternative text for all 
+                                      images, figures, and graphics in the document.
+                                    </li>
+                                  )}
+                                  {!selectedIssue.documentDetails?.readingOrder && (
+                                    <li>
+                                      <strong>Fix reading order:</strong> Ensure the reading order matches the visual 
+                                      order of content using the Order panel in Acrobat Pro.
+                                    </li>
+                                  )}
+                                  {!selectedIssue.documentDetails?.hasTags && (
+                                    <li>
+                                      <strong>Add document tags:</strong> Make sure all content is properly tagged 
+                                      to ensure screen readers can interpret the document structure.
+                                    </li>
+                                  )}
+                                  {selectedIssue.documentDetails?.formAccessibility === false && (
+                                    <li>
+                                      <strong>Make forms accessible:</strong> Ensure all form fields have proper labels 
+                                      and instructions that screen readers can interpret.
+                                    </li>
+                                  )}
+                                </ul>
+                                <p className="mt-4 text-purple-700">
+                                  For comprehensive PDF remediation, we recommend using Adobe Acrobat Pro DC, CommonLook, 
+                                  or other specialized PDF accessibility tools.
+                                </p>
+                              </div>
+                            ) : (
+                              <p className="text-gray-600 whitespace-pre-line">
+                                {wcagInfo?.suggestedFix || selectedIssue.fixSuggestion || 
+                                  'Please refer to the WCAG documentation for fixing this issue.'}
+                              </p>
                             )}
                           </div>
                         </div>
+                        
+                        {wcagInfo?.codeExample && !selectedIssue.documentType && (
+                          <div className="mt-4">
+                            <h4 className="font-medium text-gray-900 mb-2">Code Example</h4>
+                            <pre className="bg-gray-800 text-white p-4 rounded-lg text-sm font-mono overflow-x-auto">
+                              {wcagInfo.codeExample}
+                            </pre>
+                          </div>
+                        )}
+                        
+                        {selectedIssue.documentType === 'pdf' && (
+                          <div className="mt-4">
+                            <h4 className="font-medium text-gray-900 mb-2">Resources</h4>
+                            <ul className="list-disc list-inside space-y-1 text-gray-600">
+                              <li>
+                                <a 
+                                  href="https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Adobe PDF Accessibility Overview
+                                </a>
+                              </li>
+                              <li>
+                                <a 
+                                  href="https://www.w3.org/TR/WCAG-TECHS/pdf.html" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  W3C PDF Techniques for WCAG 2.0
+                                </a>
+                              </li>
+                              <li>
+                                <a 
+                                  href="https://www.section508.gov/create/pdfs/" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Section508.gov PDF Accessibility Guidance
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                        )}
                       </>
                     </div>
                   );

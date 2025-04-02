@@ -3,6 +3,7 @@ import { parse } from 'node-html-parser';
 import type { TestResult, AccessibilityIssue } from '../types';
 import { addLegislationRefs } from './legislationMapper';
 import { getWCAGInfo } from './wcagHelper';
+import { testPDFAccessibility } from './pdfAccessibilityTester';
 import Color from 'color';
 
 // Configure axe-core rules based on selected region
@@ -255,7 +256,11 @@ async function checkColorContrast(container: HTMLElement): Promise<Accessibility
   return issues;
 }
 
-export async function testAccessibility(url: string, region: string = 'global'): Promise<TestResult> {
+export async function testAccessibility(
+  url: string, 
+  region: string = 'global', 
+  options?: { documentTesting?: { enabled: boolean; pdfAccessibility?: boolean } }
+): Promise<TestResult> {
   // Validate URL format
   try {
     new URL(url);
@@ -263,7 +268,42 @@ export async function testAccessibility(url: string, region: string = 'global'):
     throw new Error('Please enter a valid URL (e.g., https://example.com)');
   }
 
-  // Create container for testing
+  // Check if it's a PDF first
+  const isPDF = url.toLowerCase().endsWith('.pdf');
+  
+  // If PDF testing is enabled and this is a PDF
+  if (isPDF && options?.documentTesting?.enabled && options.documentTesting.pdfAccessibility) {
+    try {
+      const pdfIssues = await testPDFAccessibility(url);
+      
+      const summary = {
+        critical: pdfIssues.filter(i => i.impact === 'critical').length,
+        serious: pdfIssues.filter(i => i.impact === 'serious').length,
+        moderate: pdfIssues.filter(i => i.impact === 'moderate').length,
+        minor: pdfIssues.filter(i => i.impact === 'minor').length,
+        passes: 0,
+        warnings: 0,
+        documentIssues: pdfIssues.length,
+        pdfIssues: pdfIssues.length
+      };
+
+      const testResults: TestResult = {
+        url,
+        timestamp: new Date().toISOString(),
+        issues: pdfIssues,
+        passes: [],
+        warnings: [],
+        summary
+      };
+
+      return addLegislationRefs(testResults);
+    } catch (error) {
+      console.error('PDF testing error:', error);
+      throw new Error('Failed to analyze PDF document. Please ensure it is a valid PDF file.');
+    }
+  }
+
+  // If not a PDF or PDF testing is disabled, proceed with HTML testing
   const container = document.createElement('div');
   container.style.position = 'absolute';
   container.style.left = '-9999px';
@@ -285,8 +325,9 @@ export async function testAccessibility(url: string, region: string = 'global'):
     const root = parse(html);
     container.innerHTML = root.toString();
 
-    // Run accessibility tests
-    const axeResults = await axe.run(container, getAxeConfig(region));
+    // Run accessibility tests with axe-core
+    const axeConfig = getAxeConfig(region);
+    const axeResults = await axe.run(container, axeConfig);
     console.log('Axe Results:', axeResults);
 
     // Process axe results
@@ -294,7 +335,25 @@ export async function testAccessibility(url: string, region: string = 'global'):
     const passes = axeResults.passes.map(convertAxeResultToIssue);
     const warnings = axeResults.incomplete.map(convertAxeResultToIssue);
 
-    // Add color contrast issues
+    // Check for PDF links in the page
+    if (options?.documentTesting?.enabled && options.documentTesting.pdfAccessibility) {
+      const pdfLinks = Array.from(container.querySelectorAll('a[href$=".pdf"]'));
+      
+      if (pdfLinks.length > 0) {
+        // Add a warning about PDF links
+        issues.push({
+          id: 'pdf-links-found',
+          impact: 'moderate',
+          description: `Found ${pdfLinks.length} PDF link(s) on the page. Each PDF should be tested for accessibility compliance.`,
+          nodes: pdfLinks.map(link => (link as HTMLElement).outerHTML),
+          wcagCriteria: ['1.1.1', '2.4.5'],
+          autoFixable: false,
+          fixSuggestion: 'Ensure all linked PDFs are accessible and include appropriate alternative formats or descriptions.'
+        });
+      }
+    }
+
+    // Add color contrast issues if they exist
     const contrastIssues = axeResults.violations
       .filter(v => v.id === 'color-contrast')
       .map(v => v.nodes)
@@ -307,6 +366,7 @@ export async function testAccessibility(url: string, region: string = 'global'):
         wcagCriteria: ['1.4.3']
       }));
 
+    // Compile summary
     const summary = {
       critical: issues.filter(i => i.impact === 'critical').length,
       serious: issues.filter(i => i.impact === 'serious').length,

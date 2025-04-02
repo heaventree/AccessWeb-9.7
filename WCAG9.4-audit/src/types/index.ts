@@ -104,7 +104,18 @@ export interface AccessibilityIssue {
   fixSuggestion?: string;
   codeExample?: string;
   legislationRefs?: string[];
-  legislationRefs?: string[];
+  documentType?: 'pdf' | 'word' | 'excel' | 'powerpoint' | 'other';
+  documentDetails?: {
+    filename?: string;
+    pageCount?: number;
+    hasStructure?: boolean;
+    hasTags?: boolean;
+    hasAltText?: boolean;
+    hasLanguage?: boolean;
+    readingOrder?: boolean;
+    bookmarks?: boolean;
+    formAccessibility?: boolean;
+  };
 }
 
 export interface LegislationCompliance {
@@ -131,6 +142,8 @@ export interface TestResult {
     minor: number;
     passes: number;
     warnings: number;
+    documentIssues?: number;
+    pdfIssues?: number;
   };
   legislationCompliance?: LegislationCompliance;
 }
