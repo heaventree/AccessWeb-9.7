@@ -41,11 +41,11 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
         ></div>
 
         {/* Modal Panel */}
-        <div className="relative inline-block w-full max-w-3xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-xl">
+        <div className="relative inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
           <div className="flex justify-between items-center mb-4">
             <h3 
               id="modal-title" 
-              className="text-xl font-semibold leading-6 text-gray-900"
+              className="text-lg font-medium leading-6 text-gray-900"
             >
               {title}
             </h3>
@@ -57,7 +57,7 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
               <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
-          <div className="mt-4">{children}</div>
+          <div className="mt-2">{children}</div>
         </div>
       </div>
     </div>
