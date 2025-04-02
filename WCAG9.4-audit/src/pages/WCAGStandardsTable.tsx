@@ -1,20 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search, X, ExternalLink, Eye, Ear, MousePointer, Info, Filter } from 'lucide-react';
 import { masterRequirements } from '../data/wcag-requirements-master';
 import { motion } from 'framer-motion';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 import { BackToTop } from '../components/BackToTop';
-
-interface Requirement {
-  id: string;
-  description: string;
-  disabilitiesAffected: ('Blind' | 'Hearing' | 'Mobility')[];
-  standard: {
-    name: string;
-    level: 'A' | 'AA' | 'AAA';
-  };
-}
 
 const DisabilityIcon = ({ type }: { type: 'Blind' | 'Hearing' | 'Mobility' }) => {
   switch (type) {
@@ -108,65 +98,57 @@ export function WCAGStandardsTable() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-lg shadow-sm p-6 mb-8"
+            className="bg-white rounded-lg shadow-sm p-4 mb-8"
           >
-            <div className="flex gap-4 max-w-2xl mx-auto">
-              <div className="flex-1 relative">
+            <div className="flex items-center gap-3">
+              {/* Search Input - Smaller */}
+              <div className="relative w-64">
                 <input
                   type="text"
-                  placeholder="Search requirements..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-2.5 top-2 text-gray-400 w-4 h-4" />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                    className="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="flex items-center px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Clear Filters
-                </button>
-              )}
-            </div>
-
-            {/* Filter Tags */}
-            <div className="flex items-center gap-2 mt-4">
+              
+              <div className="h-5 w-px bg-gray-300 mx-1"></div>
+              
               <div className="flex items-center">
                 <Filter className="w-4 h-4 text-gray-500 mr-2" />
               </div>
               
-              {/* Disability Filters */}
+              {/* Disability Filters - Compact */}
               {(['Blind', 'Hearing', 'Mobility'] as const).map(disability => (
                 <button
                   key={disability}
                   onClick={() => toggleDisability(disability)}
-                  className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
                     selectedDisabilities.has(disability)
                       ? disabilityColors[disability]
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   <DisabilityIcon type={disability} />
-                  <span className="ml-1.5">{disability}</span>
+                  <span className="ml-1">{disability}</span>
                 </button>
               ))}
 
-              {/* Level Filters */}
+              {/* Level Filters - Compact */}
               {(['A', 'AA', 'AAA'] as const).map(level => (
                 <button
                   key={level}
                   onClick={() => toggleLevel(level)}
-                  className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
                     selectedLevels.has(level)
                       ? levelColors[level]
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -175,6 +157,16 @@ export function WCAGStandardsTable() {
                   Level {level}
                 </button>
               ))}
+              
+              {/* Clear Filters - Right Aligned */}
+              {hasActiveFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="ml-auto flex items-center px-2 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Clear
+                </button>
+              )}
             </div>
           </motion.div>
 
