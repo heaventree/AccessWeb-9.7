@@ -30,11 +30,20 @@ The application is approximately 90% complete. The focus is on restoring full fu
 
 ### UI/UX Improvements
 
+- [x] Add WCAG version filters (2.1 and 2.2) to both table views
+- [x] Make filter bars more compact with search moved to the left
+- [x] Add subtle dividers between filter sections
+- [x] Add Info icons for requirements for better context
 - [ ] Fix responsive design issues across different screen sizes
 - [ ] Optimize component rendering performance
 - [ ] Implement consistent error handling across components
 - [ ] Enhance accessibility features within the application itself
 - [ ] Improve navigation UX for better discoverability
+- [ ] Add filter count indicator showing number of active filters
+- [ ] Implement per-column filtering options in tables
+- [ ] Add filter persistence across sessions using localStorage
+- [ ] Create filter presets for common requirement combinations
+- [ ] Implement tooltips for filter options explaining their purpose
 
 ### Core Testing Functionality
 
@@ -80,6 +89,7 @@ The application is approximately 90% complete. The focus is on restoring full fu
 
 ## Technical Debt Management
 
+- [x] Fix LSP warnings in WCAGStandardsTable.tsx and WCAGRequirementsTable.tsx
 - [ ] Address LSP issues in useAuth.ts
 - [ ] Fix type errors in accessibilityTester.ts
 - [ ] Remove unused imports in component files
