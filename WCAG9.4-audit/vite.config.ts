@@ -8,5 +8,10 @@ export default defineConfig(({ mode }) => {
     define: {
       'process.env.OPENAI_API_KEY': JSON.stringify(env.VITE_OPENAI_API_KEY),
     },
+    server: {
+      host: '0.0.0.0',
+      port: 5000,
+      strictPort: true,
+    },
   };
 });
