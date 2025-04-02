@@ -30,6 +30,11 @@
 - Enhanced reporting with visual indicators
 - AI-powered accessibility fix suggestions
 - Browser extension for on-demand testing
+- Content Improvements and SEO:
+  - Add structured metadata to all WCAG resource articles
+  - Enhance SEO with schema.org markup
+  - Improve article search discoverability
+  - Implement article ratings and user feedback system
 
 ## Technical Debt
 - Reduce type warnings in codebase
