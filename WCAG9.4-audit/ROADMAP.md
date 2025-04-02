@@ -33,7 +33,9 @@ The application is approximately 90% complete. The focus is on restoring full fu
 - [x] Add WCAG version filters (2.1 and 2.2) to both table views
 - [x] Make filter bars more compact with search moved to the left
 - [x] Add subtle dividers between filter sections
-- [x] Add Info icons for requirements for better context
+- [x] Add Info icons for requirements for better context (in header row only)
+- [x] Increase size of external link icons for better visibility
+- [x] Fix positioning of information icons in table headers
 - [ ] Fix responsive design issues across different screen sizes
 - [ ] Optimize component rendering performance
 - [ ] Implement consistent error handling across components
@@ -44,6 +46,9 @@ The application is approximately 90% complete. The focus is on restoring full fu
 - [ ] Add filter persistence across sessions using localStorage
 - [ ] Create filter presets for common requirement combinations
 - [ ] Implement tooltips for filter options explaining their purpose
+- [ ] Improve table header alignment and spacing
+- [ ] Add hover effects for interactive table elements
+- [ ] Enhance table row highlighting for better readability
 
 ### Core Testing Functionality
 
@@ -105,4 +110,4 @@ The application is approximately 90% complete. The focus is on restoring full fu
 - Implement changes with backward compatibility in mind
 - Document all changes thoroughly for knowledge transfer
 
-*Last updated: April 2, 2025*
+*Last updated: April 2, 2025 at 1:00 PM*

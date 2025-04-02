@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, X, ExternalLink, Eye, Ear, MousePointer, Filter } from 'lucide-react';
+import { Search, X, ExternalLink, Eye, Ear, MousePointer, Filter, Info } from 'lucide-react';
 import { masterRequirements } from '../data/wcag-requirements-master';
 import { motion } from 'framer-motion';
 
