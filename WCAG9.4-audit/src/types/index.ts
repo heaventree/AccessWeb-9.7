@@ -116,6 +116,21 @@ export interface AccessibilityIssue {
     bookmarks?: boolean;
     formAccessibility?: boolean;
   };
+  mediaType?: 'audio' | 'video' | 'embedded';
+  mediaDetails?: {
+    source?: string;
+    duration?: number;
+    hasCaptions?: boolean;
+    hasTranscript?: boolean;
+    hasAudioDescription?: boolean;
+    hasAccessibleControls?: boolean;
+    autoplay?: boolean;
+    playerType?: string;
+    format?: string;
+    fileSize?: number;
+    hasSignLanguage?: boolean;
+    keyboardAccessible?: boolean;
+  };
 }
 
 export interface LegislationCompliance {
@@ -144,6 +159,9 @@ export interface TestResult {
     warnings: number;
     documentIssues?: number;
     pdfIssues?: number;
+    mediaIssues?: number;
+    audioIssues?: number;
+    videoIssues?: number;
   };
   legislationCompliance?: LegislationCompliance;
 }

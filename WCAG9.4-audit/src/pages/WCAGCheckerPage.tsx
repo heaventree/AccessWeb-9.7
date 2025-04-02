@@ -16,7 +16,9 @@ import {
   Zap,
   Globe,
   Palette,
-  HelpCircle
+  HelpCircle,
+  Video,
+  Headphones
 } from 'lucide-react';
 
 type TabType = 'issues' | 'warnings' | 'passes' | 'contrast';
@@ -29,18 +31,26 @@ export function WCAGCheckerPage() {
   const [activeTab, setActiveTab] = useState<TabType>('issues');
   const [enableDocumentTesting, setEnableDocumentTesting] = useState(true);
   const [enablePDFAccessibility, setEnablePDFAccessibility] = useState(true);
+  const [enableMediaTesting, setEnableMediaTesting] = useState(true);
 
   const handleSubmit = async (url: string) => {
     setIsLoading(true);
     setError(null);
     try {
       // Configure testing options
-      const options = enableDocumentTesting ? {
-        documentTesting: {
-          enabled: true,
-          pdfAccessibility: enablePDFAccessibility
-        }
-      } : undefined;
+      const options = {
+        ...(enableDocumentTesting ? {
+          documentTesting: {
+            enabled: true,
+            pdfAccessibility: enablePDFAccessibility
+          }
+        } : {}),
+        ...(enableMediaTesting ? {
+          mediaTesting: {
+            enabled: true
+          }
+        } : {})
+      };
 
       const testResults = await testAccessibility(url, selectedRegion, options);
       setResults(testResults);
@@ -50,6 +60,11 @@ export function WCAGCheckerPage() {
         issue.documentType === 'pdf'
       );
       
+      // Check for media-specific issues
+      const hasMediaIssues = testResults.issues.some(issue => 
+        issue.mediaType === 'audio' || issue.mediaType === 'video' || issue.mediaType === 'embedded'
+      );
+      
       // Check if there are color contrast issues
       const hasContrastIssues = testResults.issues.some(issue => 
         issue.id === 'color-contrast' || issue.wcagCriteria.includes('1.4.3')
@@ -57,6 +72,9 @@ export function WCAGCheckerPage() {
       
       if (hasPDFIssues) {
         // PDF issues are prioritized in the display
+        setActiveTab('issues');
+      } else if (hasMediaIssues) {
+        // Media issues are prioritized after PDF issues
         setActiveTab('issues');
       } else if (hasContrastIssues) {
         setActiveTab('contrast');
@@ -143,47 +161,77 @@ export function WCAGCheckerPage() {
               onRegionChange={setSelectedRegion}
             />
             
-            {/* Document testing options */}
-            <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-blue-50 rounded-lg">
+            {/* Testing options */}
+            <div className="mt-4 flex flex-col gap-4 p-4 bg-blue-50 rounded-lg">
+              {/* Document testing */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="documentTesting"
+                    checked={enableDocumentTesting}
+                    onChange={(e) => setEnableDocumentTesting(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="documentTesting" className="ml-2 text-sm font-medium text-gray-700">
+                    Enable Document Testing
+                  </label>
+                </div>
+                
+                {enableDocumentTesting && (
+                  <div className="flex items-center ml-0 sm:ml-6">
+                    <input
+                      type="checkbox"
+                      id="pdfAccessibility"
+                      checked={enablePDFAccessibility}
+                      onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <label htmlFor="pdfAccessibility" className="ml-2 text-sm font-medium text-gray-700">
+                      Test PDF Accessibility
+                    </label>
+                    <div className="ml-1 group relative">
+                      <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                      <div className="absolute hidden group-hover:block z-10 w-72 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                        <p className="font-semibold mb-1">PDF Accessibility Testing:</p>
+                        <ul className="list-disc list-inside">
+                          <li>Analyzes PDF documents for accessibility issues</li>
+                          <li>Checks tags, reading order, and alt text</li>
+                          <li>Works with directly linked PDFs and PDFs linked on pages</li>
+                          <li>Provides remediation instructions</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Media testing */}
               <div className="flex items-center">
                 <input
                   type="checkbox"
-                  id="documentTesting"
-                  checked={enableDocumentTesting}
-                  onChange={(e) => setEnableDocumentTesting(e.target.checked)}
+                  id="mediaTesting"
+                  checked={enableMediaTesting}
+                  onChange={(e) => setEnableMediaTesting(e.target.checked)}
                   className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <label htmlFor="documentTesting" className="ml-2 text-sm font-medium text-gray-700">
-                  Enable Document Testing
+                <label htmlFor="mediaTesting" className="ml-2 text-sm font-medium text-gray-700">
+                  Test Media Accessibility
                 </label>
-              </div>
-              
-              {enableDocumentTesting && (
-                <div className="flex items-center ml-0 sm:ml-6">
-                  <input
-                    type="checkbox"
-                    id="pdfAccessibility"
-                    checked={enablePDFAccessibility}
-                    onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <label htmlFor="pdfAccessibility" className="ml-2 text-sm font-medium text-gray-700">
-                    Test PDF Accessibility
-                  </label>
-                  <div className="ml-1 group relative">
-                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
-                    <div className="absolute hidden group-hover:block z-10 w-72 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
-                      <p className="font-semibold mb-1">PDF Accessibility Testing:</p>
-                      <ul className="list-disc list-inside">
-                        <li>Analyzes PDF documents for accessibility issues</li>
-                        <li>Checks tags, reading order, and alt text</li>
-                        <li>Works with directly linked PDFs and PDFs linked on pages</li>
-                        <li>Provides remediation instructions</li>
-                      </ul>
-                    </div>
+                <div className="ml-1 group relative">
+                  <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                  <div className="absolute hidden group-hover:block z-10 w-72 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                    <p className="font-semibold mb-1">Media Accessibility Testing:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Checks audio, video, and embedded media elements</li>
+                      <li>Verifies presence of captions and transcripts</li>
+                      <li>Tests for audio descriptions in videos</li>
+                      <li>Checks keyboard accessibility of media controls</li>
+                      <li>Detects autoplay issues that may impact accessibility</li>
+                    </ul>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
             
             <div className="mt-6">
@@ -321,7 +369,7 @@ export function WCAGCheckerPage() {
 
         {/* Features Section - Only show when no results */}
         {!results && (
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white rounded-xl shadow-sm p-6">
               <FileSearch className="w-8 h-8 text-blue-600 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -359,6 +407,26 @@ export function WCAGCheckerPage() {
               </h3>
               <p className="text-gray-600">
                 Test PDFs for tags, reading order, and document structure
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <Video className="w-8 h-8 text-blue-600 mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Video Accessibility
+              </h3>
+              <p className="text-gray-600">
+                Check for captions, audio descriptions, and accessible controls
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <Headphones className="w-8 h-8 text-blue-600 mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Audio Accessibility
+              </h3>
+              <p className="text-gray-600">
+                Verify transcripts and keyboard-accessible audio controls
               </p>
             </div>
           </div>

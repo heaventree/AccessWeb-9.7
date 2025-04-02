@@ -4,6 +4,7 @@ import type { TestResult, AccessibilityIssue } from '../types';
 import { addLegislationRefs } from './legislationMapper';
 import { getWCAGInfo } from './wcagHelper';
 import { testPDFAccessibility } from './pdfAccessibilityTester';
+import { testMediaAccessibility } from './mediaAccessibilityTester';
 import Color from 'color';
 
 // Configure axe-core rules based on selected region
@@ -282,7 +283,17 @@ async function checkColorContrast(container: HTMLElement): Promise<Accessibility
 export async function testAccessibility(
   url: string, 
   region: string = 'global', 
-  options?: { documentTesting?: { enabled: boolean; pdfAccessibility?: boolean } }
+  options?: { 
+    documentTesting?: { 
+      enabled: boolean; 
+      pdfAccessibility?: boolean 
+    },
+    mediaTesting?: {
+      enabled: boolean;
+      audioTesting?: boolean;
+      videoTesting?: boolean;
+    } 
+  }
 ): Promise<TestResult> {
   // Validate URL format
   try {
@@ -376,6 +387,30 @@ export async function testAccessibility(
       }
     }
 
+    // Run media accessibility tests if enabled
+    let mediaIssues: AccessibilityIssue[] = [];
+    if (options?.mediaTesting?.enabled) {
+      try {
+        console.log('Running media accessibility tests...');
+        mediaIssues = await testMediaAccessibility(container);
+        
+        // Add media issues to main issues array
+        issues.push(...mediaIssues);
+        
+        console.log(`Found ${mediaIssues.length} media accessibility issues`);
+      } catch (mediaError) {
+        console.error('Error during media accessibility testing:', mediaError);
+        issues.push({
+          id: 'media-testing-error',
+          impact: 'moderate',
+          description: 'An error occurred during media accessibility testing. Some media accessibility issues may not be reported.',
+          nodes: ['<error>Media testing failed</error>'],
+          wcagCriteria: ['1.2.1', '1.2.2', '1.2.3', '1.2.5'],
+          fixSuggestion: 'Please check all media elements manually to ensure they have proper captions, transcripts, and audio descriptions.'
+        });
+      }
+    }
+
     // Commented out the unused contrastIssues variable but keeping for future use
     /* 
     const contrastIssues = axeResults.violations
@@ -391,6 +426,12 @@ export async function testAccessibility(
       }));
     */
 
+    // Count media-specific issues
+    const audioIssues = mediaIssues.filter(i => i.mediaType === 'audio').length;
+    const videoIssues = mediaIssues.filter(i => i.mediaType === 'video').length;
+    const embeddedMediaIssues = mediaIssues.filter(i => i.mediaType === 'embedded').length;
+    const totalMediaIssues = audioIssues + videoIssues + embeddedMediaIssues;
+
     // Compile summary
     const summary = {
       critical: issues.filter(i => i.impact === 'critical').length,
@@ -398,7 +439,10 @@ export async function testAccessibility(
       moderate: issues.filter(i => i.impact === 'moderate').length,
       minor: issues.filter(i => i.impact === 'minor').length,
       passes: passes.length,
-      warnings: warnings.length
+      warnings: warnings.length,
+      mediaIssues: totalMediaIssues > 0 ? totalMediaIssues : undefined,
+      audioIssues: audioIssues > 0 ? audioIssues : undefined,
+      videoIssues: videoIssues > 0 ? videoIssues : undefined
     };
 
     const testResults: TestResult = {

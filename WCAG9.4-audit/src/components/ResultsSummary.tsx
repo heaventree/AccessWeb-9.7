@@ -1,5 +1,5 @@
 
-import { AlertTriangle, AlertOctagon, AlertCircle, Info, CheckCircle, AlertCircle as Warning, FileText } from 'lucide-react';
+import { AlertTriangle, AlertOctagon, AlertCircle, Info, CheckCircle, AlertCircle as Warning, FileText, Headphones, Video, MonitorSmartphone } from 'lucide-react';
 import type { TestResult } from '../types';
 
 interface ResultsSummaryProps {
@@ -10,6 +10,9 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
   const { summary } = results;
   const hasPDFIssues = summary.pdfIssues && summary.pdfIssues > 0;
   const hasDocumentIssues = summary.documentIssues && summary.documentIssues > 0;
+  const hasMediaIssues = summary.mediaIssues && summary.mediaIssues > 0;
+  const hasAudioIssues = summary.audioIssues && summary.audioIssues > 0;
+  const hasVideoIssues = summary.videoIssues && summary.videoIssues > 0;
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
@@ -84,6 +87,37 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
           <p className="text-xs text-purple-600 mt-1">
             Issues with documents across all formats
           </p>
+        </div>
+      )}
+      
+      {hasMediaIssues && (
+        <div className="bg-indigo-50 p-3 rounded-lg sm:col-span-3 lg:col-span-2">
+          <div className="flex items-center">
+            <MonitorSmartphone className="w-5 h-5 text-indigo-600 mr-2" />
+            <h4 className="text-indigo-800 text-sm font-semibold">Media Issues</h4>
+          </div>
+          <p className="text-xl font-bold text-indigo-600 mt-1">{summary.mediaIssues}</p>
+          <p className="text-xs text-indigo-600 mt-1">
+            Issues with audio, video, and embedded media
+          </p>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            {hasAudioIssues && (
+              <div className="bg-indigo-100 p-2 rounded-md">
+                <div className="flex items-center">
+                  <Headphones className="w-4 h-4 text-indigo-700 mr-1" />
+                  <span className="text-xs font-medium text-indigo-700">Audio: {summary.audioIssues}</span>
+                </div>
+              </div>
+            )}
+            {hasVideoIssues && (
+              <div className="bg-indigo-100 p-2 rounded-md">
+                <div className="flex items-center">
+                  <Video className="w-4 h-4 text-indigo-700 mr-1" />
+                  <span className="text-xs font-medium text-indigo-700">Video: {summary.videoIssues}</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

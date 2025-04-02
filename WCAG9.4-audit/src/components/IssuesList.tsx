@@ -1,5 +1,17 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, PenTool as Tool, Maximize2, Minimize2, Info, FileText, CheckCircle } from 'lucide-react';
+import { 
+  ChevronDown, 
+  ChevronUp, 
+  PenTool as Tool, 
+  Maximize2, 
+  Minimize2, 
+  Info, 
+  FileText, 
+  CheckCircle, 
+  Video, 
+  Headphones, 
+  MonitorSmartphone 
+} from 'lucide-react';
 import type { AccessibilityIssue, WCAGInfo } from '../types';
 import { Modal } from './Modal';
 import { getWCAGInfo } from '../utils/wcagHelper';
@@ -262,6 +274,110 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                       </div>
                     </div>
                   )}
+                  
+                  {/* Media-specific information */}
+                  {issue.mediaType && issue.mediaDetails && (
+                    <div className="mt-4 bg-indigo-50 p-4 rounded-lg">
+                      <div className="flex items-center">
+                        {issue.mediaType === 'audio' ? (
+                          <Headphones className="w-5 h-5 text-indigo-600 mr-2" />
+                        ) : issue.mediaType === 'video' ? (
+                          <Video className="w-5 h-5 text-indigo-600 mr-2" />
+                        ) : (
+                          <MonitorSmartphone className="w-5 h-5 text-indigo-600 mr-2" />
+                        )}
+                        <h4 className="font-medium text-indigo-800">
+                          {issue.mediaType === 'audio' ? 'Audio' : 
+                           issue.mediaType === 'video' ? 'Video' : 
+                           'Embedded Media'} Details
+                        </h4>
+                      </div>
+                      
+                      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {issue.mediaDetails.source && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Source</p>
+                            <p className="text-sm text-gray-600 truncate">{issue.mediaDetails.source}</p>
+                          </div>
+                        )}
+                        
+                        {issue.mediaDetails.playerType && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Player Type</p>
+                            <p className="text-sm text-gray-600">{issue.mediaDetails.playerType}</p>
+                          </div>
+                        )}
+                        
+                        {issue.mediaDetails.duration !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Duration</p>
+                            <p className="text-sm text-gray-600">{issue.mediaDetails.duration}s</p>
+                          </div>
+                        )}
+                        
+                        {issue.mediaDetails.format && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Format</p>
+                            <p className="text-sm text-gray-600">{issue.mediaDetails.format}</p>
+                          </div>
+                        )}
+                        
+                        {issue.mediaDetails.hasCaptions !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Captions</p>
+                            <p className="text-sm text-gray-600">
+                              {issue.mediaDetails.hasCaptions ? '✅ Present' : '❌ Missing'}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {issue.mediaDetails.hasTranscript !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Transcript</p>
+                            <p className="text-sm text-gray-600">
+                              {issue.mediaDetails.hasTranscript ? '✅ Present' : '❌ Missing'}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {issue.mediaDetails.hasAudioDescription !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Audio Description</p>
+                            <p className="text-sm text-gray-600">
+                              {issue.mediaDetails.hasAudioDescription ? '✅ Present' : '❌ Missing'}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {issue.mediaDetails.hasAccessibleControls !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Accessible Controls</p>
+                            <p className="text-sm text-gray-600">
+                              {issue.mediaDetails.hasAccessibleControls ? '✅ Present' : '❌ Missing'}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {issue.mediaDetails.keyboardAccessible !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Keyboard Accessible</p>
+                            <p className="text-sm text-gray-600">
+                              {issue.mediaDetails.keyboardAccessible ? '✅ Yes' : '❌ No'}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {issue.mediaDetails.autoplay !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Autoplay</p>
+                            <p className="text-sm text-gray-600">
+                              {issue.mediaDetails.autoplay ? '⚠️ Enabled' : '✅ Disabled'}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {type !== 'passes' && (
                     <>
@@ -399,6 +515,90 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                     </div>
                   </div>
                 )}
+                
+                {/* Media details in modal */}
+                {selectedIssue.mediaType && selectedIssue.mediaDetails && (
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-2">
+                      {selectedIssue.mediaType === 'audio' ? 'Audio' : 
+                      selectedIssue.mediaType === 'video' ? 'Video' : 
+                      'Embedded Media'} Details
+                    </h4>
+                    <div className="bg-indigo-50 p-4 rounded-lg">
+                      <div className="flex items-center mb-3">
+                        {selectedIssue.mediaType === 'audio' ? (
+                          <Headphones className="w-5 h-5 text-indigo-600 mr-2" />
+                        ) : selectedIssue.mediaType === 'video' ? (
+                          <Video className="w-5 h-5 text-indigo-600 mr-2" />
+                        ) : (
+                          <MonitorSmartphone className="w-5 h-5 text-indigo-600 mr-2" />
+                        )}
+                        {selectedIssue.mediaDetails.playerType && (
+                          <span className="text-sm font-medium text-indigo-800">
+                            {selectedIssue.mediaDetails.playerType}
+                            {selectedIssue.mediaType === 'video' ? ' Video Player' : 
+                             selectedIssue.mediaType === 'audio' ? ' Audio Player' : 
+                             ' Player'}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {selectedIssue.mediaDetails.source && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Source</p>
+                            <p className="text-sm text-gray-600 truncate">{selectedIssue.mediaDetails.source}</p>
+                          </div>
+                        )}
+                        
+                        {selectedIssue.mediaDetails.hasCaptions !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Captions</p>
+                            <p className="text-sm text-gray-600">
+                              {selectedIssue.mediaDetails.hasCaptions ? '✅ Present' : '❌ Missing'}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {selectedIssue.mediaDetails.hasTranscript !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Transcript</p>
+                            <p className="text-sm text-gray-600">
+                              {selectedIssue.mediaDetails.hasTranscript ? '✅ Present' : '❌ Missing'}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {selectedIssue.mediaDetails.hasAudioDescription !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Audio Description</p>
+                            <p className="text-sm text-gray-600">
+                              {selectedIssue.mediaDetails.hasAudioDescription ? '✅ Present' : '❌ Missing'}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {selectedIssue.mediaDetails.hasAccessibleControls !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Accessible Controls</p>
+                            <p className="text-sm text-gray-600">
+                              {selectedIssue.mediaDetails.hasAccessibleControls ? '✅ Present' : '❌ Missing'}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {selectedIssue.mediaDetails.keyboardAccessible !== undefined && (
+                          <div className="bg-white p-3 rounded-md">
+                            <p className="text-sm font-medium text-gray-700">Keyboard Accessible</p>
+                            <p className="text-sm text-gray-600">
+                              {selectedIssue.mediaDetails.keyboardAccessible ? '✅ Yes' : '❌ No'}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <>
@@ -464,6 +664,58 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                                   or other specialized PDF accessibility tools.
                                 </p>
                               </div>
+                            ) : selectedIssue.mediaType ? (
+                              <div>
+                                <h5 className="font-medium text-indigo-800 mb-2">
+                                  {selectedIssue.mediaType === 'audio' ? 'Audio' : 
+                                   selectedIssue.mediaType === 'video' ? 'Video' : 
+                                   'Embedded Media'} Accessibility Improvement
+                                </h5>
+                                <ul className="list-disc list-inside space-y-2 text-gray-600">
+                                  {selectedIssue.mediaType === 'video' && selectedIssue.mediaDetails?.hasCaptions === false && (
+                                    <li>
+                                      <strong>Add captions:</strong> Provide synchronized captions for all video content. 
+                                      Captions should include dialogue and important sound effects.
+                                    </li>
+                                  )}
+                                  {(selectedIssue.mediaType === 'audio' || selectedIssue.mediaType === 'video') && 
+                                   selectedIssue.mediaDetails?.hasTranscript === false && (
+                                    <li>
+                                      <strong>Provide a transcript:</strong> Include a text transcript that contains all 
+                                      spoken information and relevant non-speech sounds from the {selectedIssue.mediaType}.
+                                    </li>
+                                  )}
+                                  {selectedIssue.mediaType === 'video' && selectedIssue.mediaDetails?.hasAudioDescription === false && (
+                                    <li>
+                                      <strong>Add audio descriptions:</strong> Include audio descriptions for important 
+                                      visual content that is not conveyed through the main audio track.
+                                    </li>
+                                  )}
+                                  {selectedIssue.mediaDetails?.hasAccessibleControls === false && (
+                                    <li>
+                                      <strong>Ensure accessible controls:</strong> Media player controls must be accessible 
+                                      with keyboard navigation and properly labeled for screen readers.
+                                    </li>
+                                  )}
+                                  {selectedIssue.mediaDetails?.keyboardAccessible === false && (
+                                    <li>
+                                      <strong>Make it keyboard accessible:</strong> Ensure all player functionality is 
+                                      operable through a keyboard, including play, pause, volume, and seeking controls.
+                                    </li>
+                                  )}
+                                  {selectedIssue.mediaDetails?.autoplay === true && (
+                                    <li>
+                                      <strong>Disable autoplay:</strong> Avoid automatically playing media content, or provide 
+                                      a way to pause, stop, or mute it within 3 seconds of starting.
+                                    </li>
+                                  )}
+                                </ul>
+                                <p className="mt-4 text-indigo-700">
+                                  For {selectedIssue.mediaType === 'video' ? 'video' : 'audio'} content, use players that 
+                                  support accessibility features like {selectedIssue.mediaType === 'video' ? 'captions, audio descriptions,' : ''} 
+                                  keyboard controls, and screen reader compatibility.
+                                </p>
+                              </div>
                             ) : (
                               <p className="text-gray-600 whitespace-pre-line">
                                 {wcagInfo?.suggestedFix || selectedIssue.fixSuggestion || 
@@ -514,6 +766,119 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                                   className="text-blue-600 hover:underline"
                                 >
                                   Section508.gov PDF Accessibility Guidance
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                        )}
+                        
+                        {selectedIssue.mediaType && (
+                          <div className="mt-4">
+                            <h4 className="font-medium text-gray-900 mb-2">Resources</h4>
+                            <ul className="list-disc list-inside space-y-1 text-gray-600">
+                              {selectedIssue.mediaType === 'video' && (
+                                <>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/media/av/" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      W3C Web Accessibility Initiative - Media Accessibility
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/WCAG21/Understanding/captions-prerecorded.html" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      Understanding WCAG 1.2.2: Captions (Prerecorded)
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/WCAG21/Understanding/audio-description-or-media-alternative-prerecorded.html" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      Understanding WCAG 1.2.3: Audio Description
+                                    </a>
+                                  </li>
+                                </>
+                              )}
+                              
+                              {selectedIssue.mediaType === 'audio' && (
+                                <>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/WCAG21/Understanding/audio-only-and-video-only-prerecorded.html" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      Understanding WCAG 1.2.1: Audio-only and Video-only (Prerecorded)
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/TR/WCAG20-TECHS/G158.html" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      G158: Providing an alternative for time-based media for audio-only content
+                                    </a>
+                                  </li>
+                                </>
+                              )}
+                              
+                              {selectedIssue.mediaType === 'embedded' && (
+                                <>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/media/av/planning/" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      Planning Media Accessibility
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      Understanding WCAG 4.1.2: Name, Role, Value
+                                    </a>
+                                  </li>
+                                </>
+                              )}
+                              
+                              <li>
+                                <a 
+                                  href="https://www.w3.org/WAI/WCAG21/Understanding/audio-control.html" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Understanding WCAG 1.4.2: Audio Control
+                                </a>
+                              </li>
+                              <li>
+                                <a 
+                                  href="https://www.w3.org/WAI/WCAG21/Understanding/keyboard.html" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Understanding WCAG 2.1.1: Keyboard
                                 </a>
                               </li>
                             </ul>
