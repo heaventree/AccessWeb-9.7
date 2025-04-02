@@ -37,6 +37,7 @@ import { ShopifyAppSetup } from './components/integrations/ShopifyAppSetup';
 import { ShopifyDashboard } from './components/integrations/ShopifyDashboard';
 import { BlogPage } from './pages/BlogPage';
 import { ArticlePage } from './pages/ArticlePage';
+import { WcagResourcesPage } from './pages/WcagResourcesPage';
 import { BackToTop } from './components/BackToTop';
 import { Toaster } from 'react-hot-toast';
 import { ScrollToTop } from './components/ScrollToTop';
@@ -91,6 +92,7 @@ function App() {
               <Route path="/knowledge-base" element={<><Navigation /><main id="main-content"><KnowledgeBasePage /></main><Footer /><BackToTop /></>} />
               <Route path="/blog" element={<><Navigation /><main id="main-content"><BlogPage /></main><Footer /><BackToTop /></>} />
               <Route path="/blog/:slug" element={<><Navigation /><main id="main-content"><ArticlePage /></main><Footer /><BackToTop /></>} />
+              <Route path="/wcag-resources" element={<><Navigation /><main id="main-content"><WcagResourcesPage /></main><Footer /><BackToTop /></>} />
               <Route path="/help" element={<HelpCenter />} />
               <Route path="/help/:slug" element={<HelpArticle />} />
               <Route path="/login" element={<AuthPage />} />

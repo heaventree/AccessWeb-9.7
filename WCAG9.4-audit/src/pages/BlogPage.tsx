@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, BookOpen, X } from 'lucide-react';
+import { Search, BookOpen, X, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { ArticleCategory } from '../types/blog';
 import { ArticleCard } from '../components/blog/ArticleCard';
 import { articles, featuredArticles } from '../data/articles';
@@ -84,6 +85,26 @@ export function BlogPage() {
           </motion.p>
         </div>
 
+        {/* WCAG Resources Banner */}
+        <div className="mb-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+          <div className="px-6 py-8 flex flex-col md:flex-row items-center justify-between">
+            <div className="mb-4 md:mb-0 md:max-w-2xl">
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-2">
+                Explore Our Complete WCAG Resources Library
+              </h2>
+              <p className="text-blue-100 mb-0">
+                Browse our comprehensive collection of 50 educational resources covering all WCAG principles, guidelines, and success criteria.
+              </p>
+            </div>
+            <Link
+              to="/wcag-resources"
+              className="inline-flex items-center px-6 py-3 bg-white text-blue-600 hover:text-blue-800 font-medium rounded-lg shadow transition-colors"
+            >
+              Browse Resources <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+        
         {/* Search and Filters */}
         <div className="mb-12">
           <div className="flex gap-4 max-w-2xl mx-auto">

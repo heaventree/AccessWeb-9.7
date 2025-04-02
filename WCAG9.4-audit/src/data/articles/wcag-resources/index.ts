@@ -23,6 +23,31 @@ import { wcagResource22 } from './wcag-resource-22';
 import { wcagResource23 } from './wcag-resource-23';
 import { wcagResource24 } from './wcag-resource-24';
 import { wcagResource25 } from './wcag-resource-25';
+import { wcagResource26 } from './wcag-resource-26';
+import { wcagResource27 } from './wcag-resource-27';
+import { wcagResource28 } from './wcag-resource-28';
+import { wcagResource29 } from './wcag-resource-29';
+import { wcagResource30 } from './wcag-resource-30';
+import { wcagResource31 } from './wcag-resource-31';
+import { wcagResource32 } from './wcag-resource-32';
+import { wcagResource33 } from './wcag-resource-33';
+import { wcagResource34 } from './wcag-resource-34';
+import { wcagResource35 } from './wcag-resource-35';
+import { wcagResource36 } from './wcag-resource-36';
+import { wcagResource37 } from './wcag-resource-37';
+import { wcagResource38 } from './wcag-resource-38';
+import { wcagResource39 } from './wcag-resource-39';
+import { wcagResource40 } from './wcag-resource-40';
+import { wcagResource41 } from './wcag-resource-41';
+import { wcagResource42 } from './wcag-resource-42';
+import { wcagResource43 } from './wcag-resource-43';
+import { wcagResource44 } from './wcag-resource-44';
+import { wcagResource45 } from './wcag-resource-45';
+import { wcagResource46 } from './wcag-resource-46';
+import { wcagResource47 } from './wcag-resource-47';
+import { wcagResource48 } from './wcag-resource-48';
+import { wcagResource49 } from './wcag-resource-49';
+import { wcagResource50 } from './wcag-resource-50';
 import type { Article } from '../../../types/blog';
 
 // Export all WCAG resource articles as an array
@@ -51,13 +76,65 @@ export const wcagResourceArticles: Article[] = [
   wcagResource22,
   wcagResource23,
   wcagResource24,
-  wcagResource25
+  wcagResource25,
+  wcagResource26,
+  wcagResource27,
+  wcagResource28,
+  wcagResource29,
+  wcagResource30,
+  wcagResource31,
+  wcagResource32,
+  wcagResource33,
+  wcagResource34,
+  wcagResource35,
+  wcagResource36,
+  wcagResource37,
+  wcagResource38,
+  wcagResource39,
+  wcagResource40,
+  wcagResource41,
+  wcagResource42,
+  wcagResource43,
+  wcagResource44,
+  wcagResource45,
+  wcagResource46,
+  wcagResource47,
+  wcagResource48,
+  wcagResource49,
+  wcagResource50
 ];
 
-// Export some featured WCAG resource articles
+// Group articles by WCAG principles for organization
+export const perceivableArticles = wcagResourceArticles.filter(article => 
+  article.tags.includes('Perceivable') || 
+  article.title.includes('Perceivable') || 
+  article.content.includes('Perceivable principle')
+);
+
+export const operableArticles = wcagResourceArticles.filter(article => 
+  article.tags.includes('Operable') || 
+  article.title.includes('Operable') || 
+  article.content.includes('Operable principle')
+);
+
+export const understandableArticles = wcagResourceArticles.filter(article => 
+  article.tags.includes('Understandable') || 
+  article.title.includes('Understandable') || 
+  article.content.includes('Understandable principle')
+);
+
+export const robustArticles = wcagResourceArticles.filter(article => 
+  article.tags.includes('Robust') || 
+  article.title.includes('Robust') || 
+  article.content.includes('Robust principle')
+);
+
+// Export featured WCAG resource articles from various categories
 export const featuredWcagResourceArticles: Article[] = [
-  wcagResource1, // Introduction to Web Accessibility
-  wcagResource2, // WCAG Principles and Guidelines
-  wcagResource7, // Keyboard Accessibility
-  wcagResource12 // Designing for Color Blindness
+  wcagResource1,  // Introduction to Web Accessibility
+  wcagResource2,  // WCAG Principles and Guidelines
+  wcagResource7,  // Keyboard Accessibility
+  wcagResource12, // Designing for Color Blindness
+  wcagResource28, // ARIA Landmarks and Document Structure
+  wcagResource42  // WCAG 2.2 Updates: What's New
 ];
