@@ -1,4 +1,4 @@
-import axe, { AxeResults, Result, RunOptions } from 'axe-core';
+import axe, { Result, RunOptions } from 'axe-core';
 import { parse } from 'node-html-parser';
 import type { TestResult, AccessibilityIssue } from '../types';
 import { addLegislationRefs } from './legislationMapper';
@@ -7,7 +7,7 @@ import { testPDFAccessibility } from './pdfAccessibilityTester';
 import Color from 'color';
 
 // Configure axe-core rules based on selected region
-function getAxeConfig(region: string): RunOptions {
+function getAxeConfig(_region: string): RunOptions {
   const baseConfig: RunOptions = {
     rules: {
       // Core WCAG 2.1 Rules
@@ -147,17 +147,20 @@ function convertAxeResultToIssue(result: Result): AccessibilityIssue {
   // Get WCAG info for the issue
   const wcagInfo = getWCAGInfo(result.id);
 
+  // Map the impact level, with a type-safe approach
+  const impact = result.impact ? mapAxeImpactLevel(result.impact) : 'minor';
+
   return {
     id: result.id,
-    impact: mapAxeImpactLevel(result.impact),
+    impact,
     description: result.help,
     helpUrl: result.helpUrl,
     nodes,
     wcagCriteria,
     autoFixable: result.id === 'color-contrast' || result.id === 'image-alt' || result.id === 'button-name',
     fixSuggestion: wcagInfo?.suggestedFix || result.help,
-    codeExample: wcagInfo?.codeExample,
-    legislationRefs: wcagInfo?.legislationRefs
+    codeExample: wcagInfo?.codeExample
+    // Removed the legislationRefs property that doesn't exist in WCAGInfo
   };
 }
 
@@ -183,37 +186,55 @@ async function fetchWithTimeout(url: string, timeout = 15000): Promise<Response>
 
 async function fetchWithRetry(url: string, maxRetries = 3): Promise<Response> {
   const corsProxies = [
+    'https://corsproxy.io/?',
     'https://api.allorigins.win/raw?url=',
     'https://api.codetabs.com/v1/proxy?quest=',
-    'https://proxy.cors.sh/',
-    'https://cors-anywhere.herokuapp.com/'
+    'https://thingproxy.freeboard.io/fetch/',
   ];
 
   // Try direct fetch first
   try {
+    console.log('Attempting direct fetch for:', url);
     const response = await fetchWithTimeout(url);
-    if (response.ok) return response;
+    if (response.ok) {
+      console.log('Direct fetch successful');
+      return response;
+    }
+    console.warn('Direct fetch returned non-OK status:', response.status);
   } catch (error) {
-    console.warn('Direct fetch failed, trying proxies:', error);
+    console.warn('Direct fetch failed, will try proxies:', error instanceof Error ? error.message : String(error));
   }
 
   // Try each proxy with retries
+  let lastError: any = null;
   for (const proxy of corsProxies) {
     for (let retry = 0; retry < maxRetries; retry++) {
       try {
-        const proxyUrl = `${proxy}${encodeURIComponent(url)}`;
+        const encodedUrl = encodeURIComponent(url);
+        const proxyUrl = `${proxy}${encodedUrl}`;
+        console.log(`Trying proxy (attempt ${retry + 1}):`, proxy);
+        
         const response = await fetchWithTimeout(proxyUrl);
-        if (response.ok) return response;
+        if (response.ok) {
+          console.log('Proxy fetch successful with:', proxy);
+          return response;
+        }
+        console.warn(`Proxy ${proxy} returned non-OK status:`, response.status);
       } catch (error) {
-        console.warn(`Proxy ${proxy} attempt ${retry + 1} failed:`, error);
+        lastError = error;
+        console.warn(`Proxy ${proxy} attempt ${retry + 1} failed:`, error instanceof Error ? error.message : String(error));
         if (retry < maxRetries - 1) {
           // Exponential backoff
-          await new Promise(resolve => setTimeout(resolve, Math.pow(2, retry) * 1000));
+          const backoffTime = Math.pow(2, retry) * 1000;
+          console.log(`Backing off for ${backoffTime}ms before next attempt`);
+          await new Promise(resolve => setTimeout(resolve, backoffTime));
         }
       }
     }
   }
 
+  console.error('All fetch attempts failed. Last error:', lastError);
+  
   throw new Error(
     'Failed to access the website. This could be due to:\n' +
     '• The website blocking automated access\n' +
@@ -224,7 +245,8 @@ async function fetchWithRetry(url: string, maxRetries = 3): Promise<Response> {
   );
 }
 
-// Check color contrast for all text elements
+// Check color contrast for all text elements (Kept for future use but commented out)
+/*
 async function checkColorContrast(container: HTMLElement): Promise<AccessibilityIssue[]> {
   const issues: AccessibilityIssue[] = [];
   const textElements = container.querySelectorAll('h1, h2, h3, h4, h5, h6, p, a, span, li, td, th, label, button');
@@ -255,6 +277,7 @@ async function checkColorContrast(container: HTMLElement): Promise<Accessibility
 
   return issues;
 }
+*/
 
 export async function testAccessibility(
   url: string, 
@@ -353,7 +376,8 @@ export async function testAccessibility(
       }
     }
 
-    // Add color contrast issues if they exist
+    // Commented out the unused contrastIssues variable but keeping for future use
+    /* 
     const contrastIssues = axeResults.violations
       .filter(v => v.id === 'color-contrast')
       .map(v => v.nodes)
@@ -365,6 +389,7 @@ export async function testAccessibility(
         nodes: [node.html],
         wcagCriteria: ['1.4.3']
       }));
+    */
 
     // Compile summary
     const summary = {
