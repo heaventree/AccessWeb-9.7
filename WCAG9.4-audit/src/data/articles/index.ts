@@ -21,9 +21,11 @@ import { shopifyIntegrationGuide } from './integrations/shopify-integration-guid
 import { customApiGuide } from './integrations/custom-api-guide';
 // WCAG Resources (Educational Content)
 import { wcagPerceivablePrincipleGuide } from './wcag-resources/wcag-perceivable-principle';
+import { wcagResourceArticles, featuredWcagResourceArticles } from './wcag-resources';
 import type { Article } from '../../types/blog';
 
-export const articles: Article[] = [
+// Regular articles
+const regularArticles: Article[] = [
   perceivableArticle,
   operableArticle,
   understandableArticle,
@@ -45,15 +47,25 @@ export const articles: Article[] = [
   wordpressIntegrationGuide,
   shopifyIntegrationGuide,
   customApiGuide,
-  // WCAG Resources (Educational Content)
   wcagPerceivablePrincipleGuide
 ];
 
-// Include the WCAG resource article in featured articles
-export const featuredArticles = [
-  wcagPerceivablePrincipleGuide,
-  ...articles.filter(article => article.id !== wcagPerceivablePrincipleGuide.id).slice(0, 1)
+// Combine regular articles with WCAG resource articles
+export const articles: Article[] = [
+  ...regularArticles,
+  ...wcagResourceArticles
 ];
+
+// Featured articles should include a mix of regular and resource articles
+export const featuredArticles = [
+  // First featured WCAG resource
+  featuredWcagResourceArticles[0],
+  // Then one of the original featured articles 
+  wcagPerceivablePrincipleGuide,
+  // Additional featured WCAG resources
+  ...featuredWcagResourceArticles.slice(1, 3)
+];
+
 export const latestArticles = articles.sort(
   (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
 );

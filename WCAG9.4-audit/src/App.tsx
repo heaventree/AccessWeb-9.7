@@ -89,6 +89,8 @@ function App() {
               <Route path="/integrations/enterprise" element={<><Navigation /><main id="main-content"><EnterpriseIntegrationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/docs/api" element={<><Navigation /><main id="main-content"><APIGuide /></main><Footer /><BackToTop /></>} />
               <Route path="/knowledge-base" element={<><Navigation /><main id="main-content"><KnowledgeBasePage /></main><Footer /><BackToTop /></>} />
+              <Route path="/blog" element={<><Navigation /><main id="main-content"><BlogPage /></main><Footer /><BackToTop /></>} />
+              <Route path="/blog/:slug" element={<><Navigation /><main id="main-content"><ArticlePage /></main><Footer /><BackToTop /></>} />
               <Route path="/help" element={<HelpCenter />} />
               <Route path="/help/:slug" element={<HelpArticle />} />
               <Route path="/login" element={<AuthPage />} />
