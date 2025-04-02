@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, Calendar, Share2, ChevronLeft } from 'lucide-react';
+import { Clock, Calendar, Share2, ChevronLeft, RefreshCw } from 'lucide-react';
 import { URLInput } from '../URLInput';
 import type { Article } from '../../types/blog';
 
@@ -78,10 +78,16 @@ export function ArticleLayout({ article, children }: ArticleLayoutProps) {
                 </h1>
                 
                 <div className="flex flex-wrap items-center gap-4 text-gray-600 dark:text-gray-400 mt-4">
-                  <div className="flex items-center">
+                  <div className="flex items-center" title={`Published on ${new Date(article.publishedAt).toLocaleDateString('en-GB')}`}>
                     <Calendar className="w-4 h-4 mr-2" />
                     {new Date(article.publishedAt).toLocaleDateString('en-GB')}
                   </div>
+                  {article.updatedAt && (
+                    <div className="flex items-center" title={`Last updated on ${new Date(article.updatedAt).toLocaleDateString('en-GB')}`}>
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Updated {new Date(article.updatedAt).toLocaleDateString('en-GB')}
+                    </div>
+                  )}
                   <div className="flex items-center">
                     <Clock className="w-4 h-4 mr-2" />
                     {article.readingTime}

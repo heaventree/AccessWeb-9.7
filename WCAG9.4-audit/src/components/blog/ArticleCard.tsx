@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Clock, Calendar, BookOpen, FileText } from 'lucide-react';
+import { Clock, Calendar, BookOpen, FileText, RefreshCw } from 'lucide-react';
 import type { Article } from '../../types/blog';
 
 interface ArticleCardProps {
@@ -68,12 +68,22 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
           {article.description}
         </p>
 
-        <div className="flex items-center text-sm text-gray-500">
+        <div className="flex flex-wrap items-center text-sm text-gray-500 gap-x-4 gap-y-2">
           <div className="flex items-center">
             <Calendar className="w-4 h-4 mr-1" />
-            {new Date(article.publishedAt).toLocaleDateString('en-GB')}
+            <span title={`Published on ${new Date(article.publishedAt).toLocaleDateString('en-GB')}`}>
+              {new Date(article.publishedAt).toLocaleDateString('en-GB')}
+            </span>
           </div>
-          <div className="flex items-center ml-4">
+          {article.updatedAt && (
+            <div className="flex items-center">
+              <RefreshCw className="w-4 h-4 mr-1" />
+              <span title={`Updated on ${new Date(article.updatedAt).toLocaleDateString('en-GB')}`}>
+                Updated {new Date(article.updatedAt).toLocaleDateString('en-GB')}
+              </span>
+            </div>
+          )}
+          <div className="flex items-center">
             <Clock className="w-4 h-4 mr-1" />
             {article.readingTime}
           </div>

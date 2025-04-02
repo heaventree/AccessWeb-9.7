@@ -18,7 +18,8 @@ export const wcagResource10: Article = {
     "avatar": "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
     "role": "WCAG Specialists"
   },
-  "publishedAt": "2025-04-02T19:32:05.205Z",
+  "publishedAt": "2024-04-03T04:32:06.286Z",
+  "updatedAt": "2024-09-20T01:18:27.243Z",
   "readingTime": "3 min read",
   "vectorImage": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
   "isResource": true,

@@ -12,6 +12,7 @@ interface Article {
     role: string;
   };
   publishedAt: string;
+  updatedAt?: string; // Date when the article was last updated
   readingTime: string;
   vectorImage: string;
   relatedArticles?: string[];
