@@ -11,43 +11,43 @@ const regions: Region[] = [
   {
     id: 'eu',
     name: 'EU',
-    standards: ['EN 301 549', 'EAA', 'WCAG 2.1'],
+    standards: ['EN 301 549', 'EAA', 'WCAG 2.1', 'WCAG 2.2'],
     color: 'bg-blue-100 text-blue-800 border-blue-200'
   },
   {
     id: 'uk',
     name: 'UK',
-    standards: ['WCAG 2.1', 'GDS', 'EN 301 549'],
+    standards: ['WCAG 2.1', 'WCAG 2.2', 'GDS', 'EN 301 549'],
     color: 'bg-red-100 text-red-800 border-red-200'
   },
   {
     id: 'usa',
     name: 'USA',
-    standards: ['ADA', 'Section 508', 'WCAG 2.1'],
+    standards: ['ADA', 'Section 508', 'WCAG 2.1', 'WCAG 2.2'],
     color: 'bg-emerald-100 text-emerald-800 border-emerald-200'
   },
   {
     id: 'canada',
     name: 'Canada',
-    standards: ['AODA', 'WCAG 2.1'],
+    standards: ['AODA', 'WCAG 2.1', 'WCAG 2.2'],
     color: 'bg-red-100 text-red-800 border-red-200'
   },
   {
     id: 'australia',
     name: 'Australia',
-    standards: ['DDA', 'WCAG 2.1'],
+    standards: ['DDA', 'WCAG 2.1', 'WCAG 2.2'],
     color: 'bg-green-100 text-green-800 border-green-200'
   },
   {
     id: 'japan',
     name: 'Japan',
-    standards: ['JIS X 8341-3', 'WCAG 2.1'],
+    standards: ['JIS X 8341-3', 'WCAG 2.1', 'WCAG 2.2'],
     color: 'bg-rose-100 text-rose-800 border-rose-200'
   },
   {
     id: 'global',
     name: 'Global',
-    standards: ['WCAG 2.1', 'ISO/IEC 40500'],
+    standards: ['WCAG 2.1', 'WCAG 2.2', 'ISO/IEC 40500'],
     color: 'bg-purple-100 text-purple-800 border-purple-200'
   }
 ];

@@ -113,10 +113,10 @@ export function WCAGCheckerPage() {
             className="text-center mb-8"
           >
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              WCAG 2.1 Accessibility Checker
+              WCAG Accessibility Checker
             </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Test your website against WCAG 2.1 standards
+              Test your website against WCAG 2.1 and 2.2 standards
             </p>
           </motion.div>
 
@@ -234,7 +234,7 @@ export function WCAGCheckerPage() {
                             Color Contrast Issues
                           </h3>
                           <p className="text-purple-700">
-                            WCAG 2.1 requires a contrast ratio of at least:
+                            WCAG 2.1 and 2.2 require a contrast ratio of at least:
                           </p>
                           <ul className="mt-2 space-y-1 text-purple-700">
                             <li>• 4.5:1 for normal text</li>
