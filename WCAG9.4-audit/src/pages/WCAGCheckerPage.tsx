@@ -240,6 +240,7 @@ export function WCAGCheckerPage() {
                             <li>• 4.5:1 for normal text</li>
                             <li>• 3:1 for large text (18pt or 14pt bold)</li>
                             <li>• 3:1 for graphical objects and user interface components</li>
+                            <li>• 3:1 for focus indicators (WCAG 2.2)</li>
                           </ul>
                         </div>
                         <IssuesList issues={contrastIssues} type="issues" />
@@ -290,7 +291,7 @@ export function WCAGCheckerPage() {
                 Global Standards
               </h3>
               <p className="text-gray-600">
-                Support for WCAG, ADA, and Section 508
+                Support for WCAG 2.1 & 2.2, ADA, and Section 508
               </p>
             </div>
           </div>
