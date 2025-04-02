@@ -13,6 +13,7 @@ import {
   AlertTriangle, 
   CheckCircle, 
   FileSearch,
+  FileText,
   Zap,
   Globe,
   Palette,
@@ -31,6 +32,7 @@ export function WCAGCheckerPage() {
   const [activeTab, setActiveTab] = useState<TabType>('issues');
   const [enableDocumentTesting, setEnableDocumentTesting] = useState(true);
   const [enablePDFAccessibility, setEnablePDFAccessibility] = useState(true);
+  const [enableOfficeDocuments, setEnableOfficeDocuments] = useState(true);
   const [enableMediaTesting, setEnableMediaTesting] = useState(true);
 
   const handleSubmit = async (url: string) => {
@@ -42,7 +44,8 @@ export function WCAGCheckerPage() {
         ...(enableDocumentTesting ? {
           documentTesting: {
             enabled: true,
-            pdfAccessibility: enablePDFAccessibility
+            pdfAccessibility: enablePDFAccessibility,
+            officeDocuments: enableOfficeDocuments
           }
         } : {}),
         ...(enableMediaTesting ? {
@@ -55,9 +58,13 @@ export function WCAGCheckerPage() {
       const testResults = await testAccessibility(url, selectedRegion, options);
       setResults(testResults);
       
-      // Check for PDF-specific issues
+      // Check for document-specific issues
       const hasPDFIssues = testResults.issues.some(issue => 
         issue.documentType === 'pdf'
+      );
+      
+      const hasOfficeDocIssues = testResults.issues.some(issue => 
+        issue.documentType === 'word' || issue.documentType === 'excel' || issue.documentType === 'powerpoint'
       );
       
       // Check for media-specific issues
@@ -73,8 +80,11 @@ export function WCAGCheckerPage() {
       if (hasPDFIssues) {
         // PDF issues are prioritized in the display
         setActiveTab('issues');
+      } else if (hasOfficeDocIssues) {
+        // Office document issues are prioritized next
+        setActiveTab('issues');  
       } else if (hasMediaIssues) {
-        // Media issues are prioritized after PDF issues
+        // Media issues are prioritized after document issues
         setActiveTab('issues');
       } else if (hasContrastIssues) {
         setActiveTab('contrast');
@@ -179,27 +189,54 @@ export function WCAGCheckerPage() {
                 </div>
                 
                 {enableDocumentTesting && (
-                  <div className="flex items-center ml-0 sm:ml-6">
-                    <input
-                      type="checkbox"
-                      id="pdfAccessibility"
-                      checked={enablePDFAccessibility}
-                      onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <label htmlFor="pdfAccessibility" className="ml-2 text-sm font-medium text-gray-700">
-                      Test PDF Accessibility
-                    </label>
-                    <div className="ml-1 group relative">
-                      <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
-                      <div className="absolute hidden group-hover:block z-10 w-72 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
-                        <p className="font-semibold mb-1">PDF Accessibility Testing:</p>
-                        <ul className="list-disc list-inside">
-                          <li>Analyzes PDF documents for accessibility issues</li>
-                          <li>Checks tags, reading order, and alt text</li>
-                          <li>Works with directly linked PDFs and PDFs linked on pages</li>
-                          <li>Provides remediation instructions</li>
-                        </ul>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex items-center ml-0 sm:ml-6">
+                      <input
+                        type="checkbox"
+                        id="pdfAccessibility"
+                        checked={enablePDFAccessibility}
+                        onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="pdfAccessibility" className="ml-2 text-sm font-medium text-gray-700">
+                        Test PDF Accessibility
+                      </label>
+                      <div className="ml-1 group relative">
+                        <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                        <div className="absolute hidden group-hover:block z-10 w-72 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                          <p className="font-semibold mb-1">PDF Accessibility Testing:</p>
+                          <ul className="list-disc list-inside">
+                            <li>Analyzes PDF documents for accessibility issues</li>
+                            <li>Checks tags, reading order, and alt text</li>
+                            <li>Works with directly linked PDFs and PDFs linked on pages</li>
+                            <li>Provides remediation instructions</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center ml-0 sm:ml-6">
+                      <input
+                        type="checkbox"
+                        id="officeDocuments"
+                        checked={enableOfficeDocuments}
+                        onChange={(e) => setEnableOfficeDocuments(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="officeDocuments" className="ml-2 text-sm font-medium text-gray-700">
+                        Test Office Documents
+                      </label>
+                      <div className="ml-1 group relative">
+                        <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                        <div className="absolute hidden group-hover:block z-10 w-72 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                          <p className="font-semibold mb-1">Office Document Testing:</p>
+                          <ul className="list-disc list-inside">
+                            <li>Analyzes Word, Excel, and PowerPoint documents</li>
+                            <li>Checks for headings, alt text, and table headers</li>
+                            <li>Evaluates reading order and document structure</li>
+                            <li>Detects documents linked from web pages</li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -407,6 +444,16 @@ export function WCAGCheckerPage() {
               </h3>
               <p className="text-gray-600">
                 Test PDFs for tags, reading order, and document structure
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <FileText className="w-8 h-8 text-blue-600 mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Office Document Testing
+              </h3>
+              <p className="text-gray-600">
+                Check Word, Excel, and PowerPoint files for accessibility
               </p>
             </div>
             

@@ -5,6 +5,7 @@ import { addLegislationRefs } from './legislationMapper';
 import { getWCAGInfo } from './wcagHelper';
 import { testPDFAccessibility } from './pdfAccessibilityTester';
 import { testMediaAccessibility } from './mediaAccessibilityTester';
+import { testDocumentAccessibility, checkDocumentLinks } from './documentFormatTester';
 import Color from 'color';
 
 // Configure axe-core rules based on selected region
@@ -286,7 +287,8 @@ export async function testAccessibility(
   options?: { 
     documentTesting?: { 
       enabled: boolean; 
-      pdfAccessibility?: boolean 
+      pdfAccessibility?: boolean;
+      officeDocuments?: boolean;
     },
     mediaTesting?: {
       enabled: boolean;
@@ -302,38 +304,83 @@ export async function testAccessibility(
     throw new Error('Please enter a valid URL (e.g., https://example.com)');
   }
 
-  // Check if it's a PDF first
-  const isPDF = url.toLowerCase().endsWith('.pdf');
+  // Check if it's a document file that needs direct testing
+  const urlLower = url.toLowerCase();
+  const isPDF = urlLower.endsWith('.pdf');
   
-  // If PDF testing is enabled and this is a PDF
-  if (isPDF && options?.documentTesting?.enabled && options.documentTesting.pdfAccessibility) {
-    try {
-      const pdfIssues = await testPDFAccessibility(url);
-      
-      const summary = {
-        critical: pdfIssues.filter(i => i.impact === 'critical').length,
-        serious: pdfIssues.filter(i => i.impact === 'serious').length,
-        moderate: pdfIssues.filter(i => i.impact === 'moderate').length,
-        minor: pdfIssues.filter(i => i.impact === 'minor').length,
-        passes: 0,
-        warnings: 0,
-        documentIssues: pdfIssues.length,
-        pdfIssues: pdfIssues.length
-      };
+  // Document extensions to check
+  const documentExtensions = [
+    'docx', 'doc', 'odt', 'rtf', // Word
+    'xlsx', 'xls', 'ods', 'csv', // Excel
+    'pptx', 'ppt', 'odp'         // PowerPoint
+  ];
+  
+  const isOfficeDocument = documentExtensions.some(ext => urlLower.endsWith(`.${ext}`));
+  
+  // If it's a document and document testing is enabled
+  if (options?.documentTesting?.enabled) {
+    // Test PDF if it's a PDF file and PDF testing is enabled
+    if (isPDF && options.documentTesting.pdfAccessibility) {
+      try {
+        const pdfIssues = await testPDFAccessibility(url);
+        
+        const summary = {
+          critical: pdfIssues.filter(i => i.impact === 'critical').length,
+          serious: pdfIssues.filter(i => i.impact === 'serious').length,
+          moderate: pdfIssues.filter(i => i.impact === 'moderate').length,
+          minor: pdfIssues.filter(i => i.impact === 'minor').length,
+          passes: 0,
+          warnings: 0,
+          documentIssues: pdfIssues.length,
+          pdfIssues: pdfIssues.length
+        };
 
-      const testResults: TestResult = {
-        url,
-        timestamp: new Date().toISOString(),
-        issues: pdfIssues,
-        passes: [],
-        warnings: [],
-        summary
-      };
+        const testResults: TestResult = {
+          url,
+          timestamp: new Date().toISOString(),
+          issues: pdfIssues,
+          passes: [],
+          warnings: [],
+          summary
+        };
 
-      return addLegislationRefs(testResults);
-    } catch (error) {
-      console.error('PDF testing error:', error);
-      throw new Error('Failed to analyze PDF document. Please ensure it is a valid PDF file.');
+        return addLegislationRefs(testResults);
+      } catch (error) {
+        console.error('PDF testing error:', error);
+        throw new Error('Failed to analyze PDF document. Please ensure it is a valid PDF file.');
+      }
+    }
+    
+    // Test Office documents if it's an office document and office document testing is enabled
+    if (isOfficeDocument && options.documentTesting.officeDocuments) {
+      try {
+        console.log('Testing Office document accessibility...');
+        const docIssues = await testDocumentAccessibility(url);
+        
+        const summary = {
+          critical: docIssues.filter(i => i.impact === 'critical').length,
+          serious: docIssues.filter(i => i.impact === 'serious').length,
+          moderate: docIssues.filter(i => i.impact === 'moderate').length,
+          minor: docIssues.filter(i => i.impact === 'minor').length,
+          passes: 0,
+          warnings: 0,
+          documentIssues: docIssues.length
+        };
+
+        const testResults: TestResult = {
+          url,
+          timestamp: new Date().toISOString(),
+          issues: docIssues,
+          passes: [],
+          warnings: [],
+          summary
+        };
+
+        return addLegislationRefs(testResults);
+      } catch (error) {
+        console.error('Document testing error:', error);
+        throw new Error('Failed to analyze document. Please ensure it is a valid Office document file.');
+      }
     }
   }
 
@@ -383,6 +430,29 @@ export async function testAccessibility(
           wcagCriteria: ['1.1.1', '2.4.5'],
           autoFixable: false,
           fixSuggestion: 'Ensure all linked PDFs are accessible and include appropriate alternative formats or descriptions.'
+        });
+      }
+    }
+
+    // Check for Office document links on the page
+    if (options?.documentTesting?.enabled && options.documentTesting.officeDocuments) {
+      try {
+        console.log('Checking for document links...');
+        const documentIssues = checkDocumentLinks(container);
+        
+        // Add document issues to main issues array
+        issues.push(...documentIssues);
+        
+        console.log(`Found ${documentIssues.length} document accessibility issues`);
+      } catch (documentError) {
+        console.error('Error during document link checking:', documentError);
+        issues.push({
+          id: 'document-testing-error',
+          impact: 'moderate',
+          description: 'An error occurred during document link testing. Some document accessibility issues may not be reported.',
+          nodes: ['<e>Document link testing failed</e>'],
+          wcagCriteria: ['1.1.1', '1.3.1'],
+          fixSuggestion: 'Please check all document links manually to ensure they point to accessible documents or provide appropriate alternatives.'
         });
       }
     }
