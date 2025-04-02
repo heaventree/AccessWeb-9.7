@@ -705,6 +705,89 @@ export const masterRequirements: Requirement[] = [
     }
   },
 
+  // WCAG 2.2 New Success Criteria
+  {
+    id: '2.4.11',
+    description: 'Focus Appearance: The focus indicator has sufficient area, contrast ratio, and is not obscured',
+    disabilitiesAffected: ['Blind', 'Mobility'],
+    standard: {
+      name: 'WCAG 2.2',
+      level: 'AA'
+    }
+  },
+  {
+    id: '2.4.12',
+    description: 'Focus Not Obscured (Minimum): Focused user interface components are not entirely hidden by author-created content',
+    disabilitiesAffected: ['Blind', 'Mobility'],
+    standard: {
+      name: 'WCAG 2.2',
+      level: 'AA'
+    }
+  },
+  {
+    id: '2.4.13',
+    description: 'Focus Not Obscured (Enhanced): Focused user interface components are not entirely hidden by any content',
+    disabilitiesAffected: ['Blind', 'Mobility'],
+    standard: {
+      name: 'WCAG 2.2',
+      level: 'AAA'
+    }
+  },
+  {
+    id: '2.5.7',
+    description: 'Dragging Movements: All functionality that uses a dragging movement can be operated by a single pointer without dragging',
+    disabilitiesAffected: ['Mobility'],
+    standard: {
+      name: 'WCAG 2.2',
+      level: 'AA'
+    }
+  },
+  {
+    id: '2.5.8',
+    description: 'Target Size (Minimum): Target size is at least 24 by 24 CSS pixels',
+    disabilitiesAffected: ['Mobility'],
+    standard: {
+      name: 'WCAG 2.2',
+      level: 'AA'
+    }
+  },
+  {
+    id: '3.2.6',
+    description: 'Consistent Help: Help mechanisms that are repeated on multiple pages appear in the same relative order',
+    disabilitiesAffected: ['Blind', 'Mobility'],
+    standard: {
+      name: 'WCAG 2.2',
+      level: 'A'
+    }
+  },
+  {
+    id: '3.3.7',
+    description: 'Redundant Entry: Information previously entered by or provided to the user is either auto-populated or available for selection',
+    disabilitiesAffected: ['Blind', 'Mobility'],
+    standard: {
+      name: 'WCAG 2.2',
+      level: 'A'
+    }
+  },
+  {
+    id: '3.3.8',
+    description: 'Accessible Authentication (Minimum): Cognitive function tests are not required for authentication',
+    disabilitiesAffected: ['Blind', 'Mobility'],
+    standard: {
+      name: 'WCAG 2.2',
+      level: 'AA'
+    }
+  },
+  {
+    id: '3.3.9',
+    description: 'Accessible Authentication (Enhanced): Authentication processes require no more than one cognitive function test',
+    disabilitiesAffected: ['Blind', 'Mobility'],
+    standard: {
+      name: 'WCAG 2.2',
+      level: 'AAA'
+    }
+  },
+
   // Japanese JIS X 8341-3:2016 Standards
   {
     id: 'JIS-1.1',
