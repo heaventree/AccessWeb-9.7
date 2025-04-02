@@ -77,16 +77,16 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-3xl mx-auto">
       <form onSubmit={handleSubmit} className="w-full">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="flex items-stretch w-full bg-white p-3 rounded-xl shadow-md border border-gray-200">
+        <div className="flex flex-col items-center">
+          <div className="flex items-stretch w-full bg-white rounded-md border border-gray-200 overflow-hidden">
             <input
               type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Enter website URL (e.g., example.com)"
-              className="flex-1 px-6 py-3 text-base text-gray-700 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all"
+              className="flex-1 px-4 py-3 text-sm text-gray-600 bg-white focus:outline-none"
               disabled={isLoading}
               required
               aria-invalid={!!error}
@@ -95,16 +95,16 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
             <button
               type="submit"
               disabled={isLoading}
-              className="ml-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg flex items-center transition-colors disabled:opacity-50 disabled:hover:bg-blue-600"
+              className="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center transition-colors disabled:opacity-50 disabled:hover:bg-blue-600"
             >
               {isLoading ? (
                 <div className="flex items-center">
-                  <div className="animate-spin mr-2 h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
                   <span>Checking...</span>
                 </div>
               ) : (
                 <div className="flex items-center">
-                  <Gauge className="w-5 h-5 mr-2" />
+                  <Gauge className="w-4 h-4 mr-2" />
                   <span>Check Site</span>
                 </div>
               )}

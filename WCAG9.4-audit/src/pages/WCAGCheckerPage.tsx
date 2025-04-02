@@ -34,9 +34,9 @@ export function WCAGCheckerPage() {
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<TestResult | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('issues');
-  const [enableDocumentTesting, setEnableDocumentTesting] = useState(true);
-  const [enablePDFAccessibility, setEnablePDFAccessibility] = useState(true);
-  const [enableMediaTesting, setEnableMediaTesting] = useState(true);
+  const [enableDocumentTesting, setEnableDocumentTesting] = useState(false);
+  const [enablePDFAccessibility, setEnablePDFAccessibility] = useState(false);
+  const [enableMediaTesting, setEnableMediaTesting] = useState(false);
 
   const handleSubmit = async (url: string) => {
     setIsLoading(true);
@@ -181,96 +181,87 @@ export function WCAGCheckerPage() {
             </div>
             
             {/* Testing options */}
-            <div className="mt-6 flex flex-col gap-6 p-4 border border-gray-200 rounded-lg shadow-sm">
-              <div className="text-center mb-2">
-                <h3 className="text-lg font-medium text-gray-800">Testing Options</h3>
+            <div className="mt-6 p-4 border border-gray-200 rounded-lg">
+              <div className="text-center mb-4">
+                <h3 className="text-base font-medium text-gray-600">Advanced Tests</h3>
               </div>
               
-              {/* Document testing */}
-              <div className="flex flex-col items-center gap-5">
-                <div className="flex items-center justify-center w-full">
-                  <div className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      id="documentTesting"
-                      checked={enableDocumentTesting}
-                      onChange={(e) => setEnableDocumentTesting(e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
-                    <span className="ms-3 text-sm font-medium text-gray-700">Enable Document Testing</span>
-                    <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-gradient-to-r from-purple-600 to-blue-500 text-white rounded-full">PRO</span>
+              <div className="flex flex-col gap-3">
+                {/* Document testing */}
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        id="documentTesting"
+                        checked={enableDocumentTesting}
+                        onChange={(e) => setEnableDocumentTesting(e.target.checked)}
+                        className="sr-only"
+                      />
+                      <div className="w-10 h-5 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
+                    </label>
+                    <span className="ml-3 text-sm font-medium text-gray-600">Enable Document Testing</span>
+                    <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-blue-600 text-white rounded-full">PRO</span>
                   </div>
                   
-                  <div className="ml-2 group relative">
-                    <HelpCircle className="w-5 h-5 text-gray-400 cursor-help" />
-                    <div className="absolute hidden group-hover:block z-10 w-96 p-4 bg-white rounded-lg shadow-lg border border-gray-200 text-sm text-gray-600 bottom-full mb-2 right-0">
-                      <p className="font-semibold mb-2">Document Accessibility Testing:</p>
-                      <ul className="list-disc list-inside space-y-1">
-                        <li>Tests PDFs, documents, and other file formats for accessibility</li>
-                        <li>Available in PRO plans only</li>
-                      </ul>
+                  <div className="group relative">
+                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute hidden group-hover:block z-10 w-64 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 right-0">
+                      <p className="font-semibold mb-1">Document Accessibility Testing:</p>
+                      <p>Tests PDFs, documents, and other file formats for accessibility. Available in PRO plans only.</p>
                     </div>
                   </div>
                 </div>
                 
                 {enableDocumentTesting && (
-                  <div className="flex items-center justify-center">
-                    <div className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        id="pdfAccessibility"
-                        checked={enablePDFAccessibility}
-                        onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      <span className="ms-3 text-sm font-medium text-gray-700">Test PDF Accessibility</span>
+                  <div className="flex items-center justify-between ml-6">
+                    <div className="flex items-center">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          id="pdfAccessibility"
+                          checked={enablePDFAccessibility}
+                          onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
+                          className="sr-only"
+                        />
+                        <div className="w-9 h-4 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-500"></div>
+                      </label>
+                      <span className="ml-3 text-sm font-medium text-gray-600">Test PDF Accessibility</span>
                     </div>
                     
-                    <div className="ml-2 group relative">
-                      <HelpCircle className="w-5 h-5 text-gray-400 cursor-help" />
-                      <div className="absolute hidden group-hover:block z-10 w-96 p-4 bg-white rounded-lg shadow-lg border border-gray-200 text-sm text-gray-600 bottom-full mb-2 right-0">
-                        <p className="font-semibold mb-2">PDF Accessibility Testing:</p>
-                        <ul className="list-disc list-inside space-y-1">
-                          <li>Analyzes PDF documents for accessibility issues</li>
-                          <li>Checks tags, reading order, and alt text</li>
-                          <li>Works with directly linked PDFs and PDFs linked on pages</li>
-                          <li>Provides detailed remediation instructions</li>
-                        </ul>
+                    <div className="group relative">
+                      <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                      <div className="absolute hidden group-hover:block z-10 w-64 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 right-0">
+                        <p className="font-semibold mb-1">PDF Accessibility Testing:</p>
+                        <p>Analyzes PDF documents for accessibility issues including tags, reading order, and alt text.</p>
                       </div>
                     </div>
                   </div>
                 )}
-              </div>
-              
-              {/* Media testing */}
-              <div className="flex items-center justify-center">
-                <div className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    id="mediaTesting"
-                    checked={enableMediaTesting}
-                    onChange={(e) => setEnableMediaTesting(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
-                  <span className="ms-3 text-sm font-medium text-gray-700">Test Media Accessibility</span>
-                  <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-gradient-to-r from-purple-600 to-blue-500 text-white rounded-full">PRO</span>
-                </div>
                 
-                <div className="ml-2 group relative">
-                  <HelpCircle className="w-5 h-5 text-gray-400 cursor-help" />
-                  <div className="absolute hidden group-hover:block z-10 w-96 p-4 bg-white rounded-lg shadow-lg border border-gray-200 text-sm text-gray-600 bottom-full mb-2 right-0">
-                    <p className="font-semibold mb-2">Media Accessibility Testing:</p>
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>Checks audio, video, and embedded media elements</li>
-                      <li>Verifies presence of captions and transcripts</li>
-                      <li>Tests for audio descriptions in videos</li>
-                      <li>Checks keyboard accessibility of media controls</li>
-                      <li>Detects autoplay issues that may impact accessibility</li>
-                      <li>Available in PRO plans only</li>
-                    </ul>
+                {/* Media testing */}
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        id="mediaTesting"
+                        checked={enableMediaTesting}
+                        onChange={(e) => setEnableMediaTesting(e.target.checked)}
+                        className="sr-only"
+                      />
+                      <div className="w-10 h-5 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
+                    </label>
+                    <span className="ml-3 text-sm font-medium text-gray-600">Test Media Accessibility</span>
+                    <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-blue-600 text-white rounded-full">PRO</span>
+                  </div>
+                  
+                  <div className="group relative">
+                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute hidden group-hover:block z-10 w-64 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 right-0">
+                      <p className="font-semibold mb-1">Media Accessibility Testing:</p>
+                      <p>Checks audio, video, and embedded media elements for captions, transcripts, and accessible controls.</p>
+                    </div>
                   </div>
                 </div>
               </div>
