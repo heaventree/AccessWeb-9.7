@@ -27,6 +27,13 @@ const categories: ArticleCategory[] = [
     description: 'Implementation guides and technical tutorials',
     slug: 'best-practices',
     count: articles.filter(a => a.category === 'best-practices').length
+  },
+  {
+    id: 'wcag-resources',
+    name: 'WCAG Resources',
+    description: 'Educational resources covering all WCAG principles and guidelines',
+    slug: 'wcag-resources',
+    count: articles.filter(a => a.category === 'wcag-resources').length
   }
 ];
 

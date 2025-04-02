@@ -4,7 +4,7 @@ interface Article {
   title: string;
   description: string;
   content: string;
-  category: 'wcag' | 'accessibility' | 'best-practices';
+  category: 'wcag' | 'accessibility' | 'best-practices' | 'wcag-resources';
   tags: string[];
   author: {
     name: string;
@@ -16,6 +16,7 @@ interface Article {
   vectorImage: string;
   relatedArticles?: string[];
   wcagReference?: string;
+  isResource?: boolean; // Flag to identify educational WCAG resource articles
   tableOfContents: {
     id: string;
     title: string;
