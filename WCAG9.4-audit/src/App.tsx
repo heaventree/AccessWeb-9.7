@@ -55,6 +55,7 @@ import { SettingsPage } from './pages/settings/SettingsPage';
 import { TeamPage } from './pages/team/TeamPage';
 import { HelpCenter } from './pages/HelpCenter';
 import { HelpArticle } from './pages/HelpArticle';
+import { KnowledgeBasePage } from './pages/KnowledgeBasePage';
 import { ErrorPage } from './components/ErrorPage';
 
 function App() {
@@ -87,6 +88,7 @@ function App() {
               <Route path="/integrations/compliance" element={<><Navigation /><main id="main-content"><ComplianceIntegrationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/integrations/enterprise" element={<><Navigation /><main id="main-content"><EnterpriseIntegrationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/docs/api" element={<><Navigation /><main id="main-content"><APIGuide /></main><Footer /><BackToTop /></>} />
+              <Route path="/knowledge-base" element={<><Navigation /><main id="main-content"><KnowledgeBasePage /></main><Footer /><BackToTop /></>} />
               <Route path="/help" element={<HelpCenter />} />
               <Route path="/help/:slug" element={<HelpArticle />} />
               <Route path="/login" element={<AuthPage />} />

@@ -144,4 +144,35 @@ The application is approximately 90% complete. The focus is on restoring full fu
 - Document all changes thoroughly for knowledge transfer
 - Always add new suggestions to this roadmap document
 
-*Last updated: April 2, 2025 at 1:04 PM*
+## Knowledge Base Insights
+
+Based on the accessibility resources we've compiled, here are key areas to consider for future development:
+
+1. **Document Accessibility**:
+   - Add support for PDF accessibility testing and remediation
+   - Implement document structure analysis for Word, PDF, and other document formats
+   - Create document accessibility checklists and repair tools
+
+2. **Media Accessibility**:
+   - Add support for video caption validation
+   - Implement audio description testing
+   - Create tools for analyzing media player accessibility
+
+3. **Mobile Accessibility**:
+   - Extend testing capabilities to mobile interfaces
+   - Implement specific checks for touch targets, gestures, and orientation
+   - Create mobile-specific guidelines and checklists
+
+4. **Regional Compliance**:
+   - Expand support for region-specific standards beyond WCAG
+   - Add EAA compliance checking
+   - Implement UK-specific accessibility regulations
+
+5. **Accessibility Tools**:
+   - Add an accessibility statement generator
+   - Implement automated remediation suggestions
+   - Create exportable reports for compliance documentation
+
+These insights are collected from multiple authoritative sources on accessibility best practices and should inform our future development priorities.
+
+*Last updated: April 2, 2025 at 1:25 PM*
