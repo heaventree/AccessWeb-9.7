@@ -24,6 +24,7 @@ import { CustomAPIPage } from './pages/connections/CustomAPIPage';
 import { ShopifyAPIPage } from './pages/connections/ShopifyAPIPage';
 import { WordPressAPIPage } from './pages/connections/WordPressAPIPage';
 import { APIGuide } from './pages/docs/APIGuide';
+import { DocumentationPage } from './pages/docs/DocumentationPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AccessibilityToolbar } from './components/AccessibilityToolbar';
 import { WCAGCheckerPage } from './pages/WCAGCheckerPage';
@@ -88,6 +89,7 @@ function App() {
               <Route path="/integrations/api" element={<><Navigation /><main id="main-content"><APIIntegrationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/integrations/compliance" element={<><Navigation /><main id="main-content"><ComplianceIntegrationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/integrations/enterprise" element={<><Navigation /><main id="main-content"><EnterpriseIntegrationPage /></main><Footer /><BackToTop /></>} />
+              <Route path="/docs" element={<><Navigation /><main id="main-content"><DocumentationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/docs/api" element={<><Navigation /><main id="main-content"><APIGuide /></main><Footer /><BackToTop /></>} />
               <Route path="/knowledge-base" element={<><Navigation /><main id="main-content"><KnowledgeBasePage /></main><Footer /><BackToTop /></>} />
               <Route path="/blog" element={<><Navigation /><main id="main-content"><BlogPage /></main><Footer /><BackToTop /></>} />
