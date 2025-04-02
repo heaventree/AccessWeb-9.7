@@ -102,6 +102,39 @@ The application is approximately 90% complete. The focus is on restoring full fu
 - [ ] Add proper documentation for all major functions
 - [ ] Set up automated testing for core functionality
 
+## Next Priority Tasks
+
+1. **Authentication System Disabling**: 
+   - Disable authentication completely during development to allow unrestricted access
+   - Review the `useAuth.ts` hook to add a "dev mode" option that bypasses all authentication checks
+   - Add clear visual indicator when running in dev mode with authentication disabled
+   - Document how to toggle between auth and no-auth modes for development
+
+2. **WCAG 2.2 Data Implementation**:
+   - Complete the addition of WCAG 2.2 success criteria to the wcag-requirements-master.ts data
+   - Ensure proper categorization and conformance levels for all new criteria
+   - Add appropriate disability tags and metadata for filtering
+   - Cross-reference with official W3C documentation for accuracy
+
+3. **Error Handling Improvements**:
+   - Implement consistent error handling across all components
+   - Add proper fallback UI for error states
+   - Create a centralized error reporting system
+   - Improve error messages to be more user-friendly and actionable
+
+4. **Accessibility Improvements**:
+   - Conduct an audit of the application with its own testing tools
+   - Fix any identified accessibility issues
+   - Add keyboard navigation support where missing
+   - Enhance focus management throughout the application
+   - Implement ARIA attributes where appropriate
+
+5. **Filter Enhancement**:
+   - Add filter count indicator showing number of active filters
+   - Implement per-column filtering in tables
+   - Add filter persistence across page refreshes using localStorage
+   - Create preset filters for common use cases
+
 ## Notes for Developers
 
 - Authentication should remain disabled during development to allow unrestricted access
@@ -109,5 +142,6 @@ The application is approximately 90% complete. The focus is on restoring full fu
 - WCAG functionality is the primary purpose and should be prioritized
 - Implement changes with backward compatibility in mind
 - Document all changes thoroughly for knowledge transfer
+- Always add new suggestions to this roadmap document
 
-*Last updated: April 2, 2025 at 1:00 PM*
+*Last updated: April 2, 2025 at 1:04 PM*

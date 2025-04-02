@@ -9,8 +9,13 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, isAdmin }: ProtectedRouteProps) {
-  const { isAuthenticated, user, loading } = useAuth();
+  const { isAuthenticated, user, loading, isDevelopmentMode } = useAuth();
   const location = useLocation();
+
+  // In development mode, always render children without authentication checks
+  if (isDevelopmentMode) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (
