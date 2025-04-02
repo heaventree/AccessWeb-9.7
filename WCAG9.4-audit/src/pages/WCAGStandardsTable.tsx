@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, X, ExternalLink, Eye, Ear, MousePointer, Filter } from 'lucide-react';
+import { Search, X, ExternalLink, Eye, Ear, MousePointer, Filter, Info } from 'lucide-react';
 import { masterRequirements } from '../data/wcag-requirements-master';
 import { motion } from 'framer-motion';
 import { Navigation } from '../components/Navigation';
@@ -231,8 +231,9 @@ export function WCAGStandardsTable() {
                     <th scope="col" className="w-64 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Disabilities Affected
                     </th>
-                    <th scope="col" className="w-64 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Standard Level
+                    <th scope="col" className="w-64 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center justify-between">
+                      <span>Standard Level</span>
+                      <Info className="w-4 h-4 text-gray-400" />
                     </th>
                   </tr>
                 </thead>
