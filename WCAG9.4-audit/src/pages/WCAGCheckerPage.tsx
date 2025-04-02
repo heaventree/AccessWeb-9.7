@@ -30,10 +30,10 @@ export function WCAGCheckerPage() {
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<TestResult | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('issues');
-  const [enableDocumentTesting, setEnableDocumentTesting] = useState(true);
-  const [enablePDFAccessibility, setEnablePDFAccessibility] = useState(true);
-  const [enableOfficeDocuments, setEnableOfficeDocuments] = useState(true);
-  const [enableMediaTesting, setEnableMediaTesting] = useState(true);
+  const [enableDocumentTesting, setEnableDocumentTesting] = useState(false);
+  const [enablePDFAccessibility, setEnablePDFAccessibility] = useState(false);
+  const [enableOfficeDocuments, setEnableOfficeDocuments] = useState(false);
+  const [enableMediaTesting, setEnableMediaTesting] = useState(false);
 
   const handleSubmit = async (url: string) => {
     setIsLoading(true);
@@ -172,9 +172,10 @@ export function WCAGCheckerPage() {
             />
             
             {/* Testing options */}
-            <div className="mt-4 flex flex-col gap-4 p-4 bg-blue-50 rounded-lg">
-              {/* Document testing */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+              {/* Pro features row */}
+              <div className="flex flex-row justify-center items-center gap-6 flex-wrap">
+                {/* Document Testing */}
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -184,88 +185,92 @@ export function WCAGCheckerPage() {
                     className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <label htmlFor="documentTesting" className="ml-2 text-sm font-medium text-gray-700">
-                    Enable Document Testing
+                    Document Testing
                   </label>
-                </div>
-                
-                {enableDocumentTesting && (
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex items-center ml-0 sm:ml-6">
-                      <input
-                        type="checkbox"
-                        id="pdfAccessibility"
-                        checked={enablePDFAccessibility}
-                        onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="pdfAccessibility" className="ml-2 text-sm font-medium text-gray-700">
-                        Test PDF Accessibility
-                      </label>
-                      <div className="ml-1 group relative">
-                        <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
-                        <div className="absolute hidden group-hover:block z-10 w-72 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
-                          <p className="font-semibold mb-1">PDF Accessibility Testing:</p>
-                          <ul className="list-disc list-inside">
-                            <li>Analyzes PDF documents for accessibility issues</li>
-                            <li>Checks tags, reading order, and alt text</li>
-                            <li>Works with directly linked PDFs and PDFs linked on pages</li>
-                            <li>Provides remediation instructions</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center ml-0 sm:ml-6">
-                      <input
-                        type="checkbox"
-                        id="officeDocuments"
-                        checked={enableOfficeDocuments}
-                        onChange={(e) => setEnableOfficeDocuments(e.target.checked)}
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="officeDocuments" className="ml-2 text-sm font-medium text-gray-700">
-                        Test Office Documents
-                      </label>
-                      <div className="ml-1 group relative">
-                        <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
-                        <div className="absolute hidden group-hover:block z-10 w-72 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
-                          <p className="font-semibold mb-1">Office Document Testing:</p>
-                          <ul className="list-disc list-inside">
-                            <li>Analyzes Word, Excel, and PowerPoint documents</li>
-                            <li>Checks for headings, alt text, and table headers</li>
-                            <li>Evaluates reading order and document structure</li>
-                            <li>Detects documents linked from web pages</li>
-                          </ul>
-                        </div>
-                      </div>
+                  <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">PRO</span>
+                  <div className="ml-1 group relative">
+                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                      <p className="font-semibold mb-1">Document Testing:</p>
+                      <ul className="list-disc list-inside">
+                        <li>Advanced testing for document formats beyond HTML</li>
+                      </ul>
                     </div>
                   </div>
-                )}
-              </div>
-              
-              {/* Media testing */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="mediaTesting"
-                  checked={enableMediaTesting}
-                  onChange={(e) => setEnableMediaTesting(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <label htmlFor="mediaTesting" className="ml-2 text-sm font-medium text-gray-700">
-                  Test Media Accessibility
-                </label>
-                <div className="ml-1 group relative">
-                  <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
-                  <div className="absolute hidden group-hover:block z-10 w-72 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
-                    <p className="font-semibold mb-1">Media Accessibility Testing:</p>
-                    <ul className="list-disc list-inside">
-                      <li>Checks audio, video, and embedded media elements</li>
-                      <li>Verifies presence of captions and transcripts</li>
-                      <li>Tests for audio descriptions in videos</li>
-                      <li>Checks keyboard accessibility of media controls</li>
-                      <li>Detects autoplay issues that may impact accessibility</li>
-                    </ul>
+                </div>
+                
+                {/* PDF Accessibility */}
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="pdfAccessibility"
+                    checked={enablePDFAccessibility}
+                    onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="pdfAccessibility" className="ml-2 text-sm font-medium text-gray-700">
+                    PDF Accessibility
+                  </label>
+                  <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">PRO</span>
+                  <div className="ml-1 group relative">
+                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                      <p className="font-semibold mb-1">PDF Accessibility:</p>
+                      <ul className="list-disc list-inside">
+                        <li>Analyzes PDF documents for accessibility issues</li>
+                        <li>Checks tags, reading order, and alt text</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Office Documents */}
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="officeDocuments"
+                    checked={enableOfficeDocuments}
+                    onChange={(e) => setEnableOfficeDocuments(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="officeDocuments" className="ml-2 text-sm font-medium text-gray-700">
+                    Test Office Documents
+                  </label>
+                  <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">PRO</span>
+                  <div className="ml-1 group relative">
+                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                      <p className="font-semibold mb-1">Office Document Testing:</p>
+                      <ul className="list-disc list-inside">
+                        <li>Analyzes Word, Excel, and PowerPoint documents</li>
+                        <li>Checks for headings, alt text, and table headers</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Media Testing */}
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="mediaTesting"
+                    checked={enableMediaTesting}
+                    onChange={(e) => setEnableMediaTesting(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="mediaTesting" className="ml-2 text-sm font-medium text-gray-700">
+                    Test Media
+                  </label>
+                  <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">PRO</span>
+                  <div className="ml-1 group relative">
+                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                      <p className="font-semibold mb-1">Media Testing:</p>
+                      <ul className="list-disc list-inside">
+                        <li>Checks audio, video, and embedded media elements</li>
+                        <li>Verifies presence of captions and transcripts</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
