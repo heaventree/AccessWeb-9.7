@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, X, ExternalLink, Eye, Ear, MousePointer, Info, Filter } from 'lucide-react';
+import { Search, X, ExternalLink, Eye, Ear, MousePointer, Filter } from 'lucide-react';
 import { masterRequirements } from '../data/wcag-requirements-master';
 import { motion } from 'framer-motion';
 import { Navigation } from '../components/Navigation';
@@ -29,10 +29,16 @@ const levelColors = {
   'AAA': 'bg-fuchsia-50 text-fuchsia-800 border-fuchsia-200'
 };
 
+const versionColors = {
+  '2.1': 'bg-blue-50 text-blue-800 border-blue-200',
+  '2.2': 'bg-green-50 text-green-800 border-green-200'
+};
+
 export function WCAGStandardsTable() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDisabilities, setSelectedDisabilities] = useState<Set<string>>(new Set());
   const [selectedLevels, setSelectedLevels] = useState<Set<string>>(new Set());
+  const [selectedVersions, setSelectedVersions] = useState<Set<string>>(new Set());
 
   const toggleDisability = (disability: string) => {
     const newSelection = new Set(selectedDisabilities);
@@ -53,11 +59,22 @@ export function WCAGStandardsTable() {
     }
     setSelectedLevels(newSelection);
   };
+  
+  const toggleVersion = (version: string) => {
+    const newSelection = new Set(selectedVersions);
+    if (newSelection.has(version)) {
+      newSelection.delete(version);
+    } else {
+      newSelection.add(version);
+    }
+    setSelectedVersions(newSelection);
+  };
 
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedDisabilities(new Set());
     setSelectedLevels(new Set());
+    setSelectedVersions(new Set());
   };
 
   const filteredRequirements = masterRequirements.filter(req => {
@@ -69,11 +86,18 @@ export function WCAGStandardsTable() {
     
     const matchesLevel = selectedLevels.size === 0 || 
       selectedLevels.has(req.standard.level);
+      
+    // Check if requirement matches the selected WCAG version(s)
+    const matchesVersion = selectedVersions.size === 0 || 
+      (req.standard.name && 
+        ((selectedVersions.has('2.1') && req.standard.name.includes('2.1')) || 
+         (selectedVersions.has('2.2') && req.standard.name.includes('2.2'))));
     
-    return matchesSearch && matchesDisabilities && matchesLevel;
+    return matchesSearch && matchesDisabilities && matchesLevel && matchesVersion;
   });
 
-  const hasActiveFilters = searchQuery || selectedDisabilities.size > 0 || selectedLevels.size > 0;
+  const hasActiveFilters = searchQuery || selectedDisabilities.size > 0 || 
+    selectedLevels.size > 0 || selectedVersions.size > 0;
 
   return (
     <>
@@ -158,6 +182,23 @@ export function WCAGStandardsTable() {
                 </button>
               ))}
               
+              <div className="h-5 w-px bg-gray-300 mx-1"></div>
+              
+              {/* Version Filters - Compact */}
+              {(['2.1', '2.2'] as const).map(version => (
+                <button
+                  key={version}
+                  onClick={() => toggleVersion(version)}
+                  className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    selectedVersions.has(version)
+                      ? versionColors[version]
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  WCAG {version}
+                </button>
+              ))}
+              
               {/* Clear Filters - Right Aligned */}
               {hasActiveFilters && (
                 <button
@@ -191,10 +232,7 @@ export function WCAGStandardsTable() {
                       Disabilities Affected
                     </th>
                     <th scope="col" className="w-64 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <div className="flex items-center">
-                        Standard Level
-                        <Info className="w-4 h-4 ml-1 text-gray-400" />
-                      </div>
+                      Standard Level
                     </th>
                   </tr>
                 </thead>
