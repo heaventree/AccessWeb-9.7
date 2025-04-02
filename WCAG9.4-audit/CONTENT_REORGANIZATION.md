@@ -1,6 +1,6 @@
 # Content Reorganization Plan
 
-This document outlines our strategy for reorganizing content across the WCAG 9.4 Audit platform to improve user experience, reduce duplication, and enhance information architecture.
+This document outlines a practical approach for improving content organization across the WCAG 9.4 Audit platform while minimizing disruptive changes.
 
 ## Current Content Structure
 
@@ -22,43 +22,14 @@ Currently, our content is spread across several sections:
 
 ## Reorganization Strategy
 
-### 1. Unified Content Model
+### 1. Metadata Enhancement (Non-destructive)
 
-Implement a unified content model with standardized metadata:
+Add consistent metadata to content without changing file structure:
 
-```typescript
-interface ContentItem {
-  id: string;
-  title: string;
-  description: string;
-  content: string;
-  section: ContentSection;
-  type: ContentType;
-  tags: string[];
-  relatedContent: string[]; // IDs of related content
-  path: string;
-  createdAt: string;
-  updatedAt: string;
-  authors: string[];
-}
-
-enum ContentSection {
-  DOCS = 'docs',
-  HELP = 'help',
-  BLOG = 'blog',
-  INTEGRATIONS = 'integrations',
-  WCAG_RESOURCES = 'wcag-resources'
-}
-
-enum ContentType {
-  ARTICLE = 'article',
-  GUIDE = 'guide',
-  TUTORIAL = 'tutorial',
-  FAQ = 'faq',
-  REFERENCE = 'reference',
-  RESOURCE = 'resource'
-}
-```
+- Add "related articles" section to each content file
+- Standardize tags across all content
+- Add clear categorization fields
+- Maintain backward compatibility with existing content structure
 
 ### 2. Content Audit and Classification
 

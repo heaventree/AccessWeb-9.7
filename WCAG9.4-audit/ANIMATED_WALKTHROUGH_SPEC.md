@@ -127,9 +127,9 @@ The Animated WCAG Compliance Walkthrough is an interactive, step-by-step guide t
 
 ### Front-end Components
 - React-based SPA with TypeScript
-- Animation libraries: Framer Motion, React Spring
-- Visualization: D3.js for complex data visualization
-- Code editing: Monaco Editor or CodeMirror
+- Animation library: Framer Motion (as per project guidelines)
+- Simple SVG-based visualizations (avoid complex libraries)
+- Lightweight code snippets display
 - Accessibility testing: Integrated with axe-core
 
 ### Back-end Services
@@ -188,29 +188,23 @@ interface PathwayStep {
 
 ## Implementation Phases
 
-### Phase 1: Foundation (Sprint 1-2)
-- Core pathway engine
-- Basic progress tracking
-- Initial content for key WCAG principles
-- Simple animations and transitions
+### Phase 1: Foundation
+- Simple walkthrough content with minimal animations
+- Static examples of good vs. bad accessibility practices
+- Basic progress tracking using localStorage
+- Focus on educational value with minimal technical complexity
 
-### Phase 2: Interactivity (Sprint 3-4)
-- Interactive examples implementation
-- Code editing capabilities
-- Before/after comparison components
-- Progress visualization improvements
+### Phase 2: Enhanced Visuals
+- Before/after comparison sliders for accessibility examples
+- Simple animated transitions between steps
+- Improved progress visualization
+- Integration with existing accessibility testing tools
 
-### Phase 3: Gamification (Sprint 5-6)
-- Achievement system
-- Points and rewards
-- Challenge system
-- Team competition features
-
-### Phase 4: Personalization (Sprint 7-8)
-- Custom pathway creation
-- Advanced content recommendation
-- User preferences and settings
-- Bookmarking and favorites
+### Phase 3: User Engagement
+- Basic achievement system for completing sections
+- Bookmarking functionality for resuming progress
+- Shareable completion certificates
+- User preferences for walkthrough style
 
 ## Success Metrics
 
