@@ -19,6 +19,8 @@ import { section508BestPractices } from './best-practices/section-508-best-pract
 import { wordpressIntegrationGuide } from './integrations/wordpress-integration-guide';
 import { shopifyIntegrationGuide } from './integrations/shopify-integration-guide';
 import { customApiGuide } from './integrations/custom-api-guide';
+// WCAG Resources (Educational Content)
+import { wcagPerceivablePrincipleGuide } from './wcag-resources/wcag-perceivable-principle';
 import type { Article } from '../../types/blog';
 
 export const articles: Article[] = [
@@ -42,10 +44,16 @@ export const articles: Article[] = [
   section508BestPractices,
   wordpressIntegrationGuide,
   shopifyIntegrationGuide,
-  customApiGuide
+  customApiGuide,
+  // WCAG Resources (Educational Content)
+  wcagPerceivablePrincipleGuide
 ];
 
-export const featuredArticles = articles.slice(0, 2);
+// Include the WCAG resource article in featured articles
+export const featuredArticles = [
+  wcagPerceivablePrincipleGuide,
+  ...articles.filter(article => article.id !== wcagPerceivablePrincipleGuide.id).slice(0, 1)
+];
 export const latestArticles = articles.sort(
   (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
 );

@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { Link } from 'react-router-dom';
-import { Clock, Calendar } from 'lucide-react';
+import { Clock, Calendar, BookOpen, FileText } from 'lucide-react';
 import type { Article } from '../../types/blog';
 
 interface ArticleCardProps {
@@ -21,10 +21,27 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
           alt=""
           className="w-full h-48 object-cover"
         />
-        <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 text-sm font-medium bg-blue-600 text-white rounded-full">
-            {article.category}
+        <div className="absolute top-4 left-4 flex flex-col gap-2">
+          <span className={`px-3 py-1 text-sm font-medium ${
+            article.category === 'wcag-resources' 
+              ? 'bg-green-600' 
+              : 'bg-blue-600'
+          } text-white rounded-full flex items-center`}>
+            {article.category === 'wcag-resources' ? (
+              <>
+                <BookOpen className="w-3 h-3 mr-1" />
+                WCAG Resource
+              </>
+            ) : (
+              article.category
+            )}
           </span>
+          {article.isResource && (
+            <span className="px-3 py-1 text-sm font-medium bg-amber-600 text-white rounded-full flex items-center">
+              <FileText className="w-3 h-3 mr-1" />
+              Reference
+            </span>
+          )}
         </div>
       </div>
       

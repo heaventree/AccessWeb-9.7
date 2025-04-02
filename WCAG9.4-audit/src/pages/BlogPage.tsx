@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, BookOpen, X } from 'lucide-react';
-import type { Article, ArticleCategory } from '../types/blog';
+import { Search, BookOpen, X } from 'lucide-react';
+import type { ArticleCategory } from '../types/blog';
 import { ArticleCard } from '../components/blog/ArticleCard';
 import { articles, featuredArticles } from '../data/articles';
 
