@@ -24,6 +24,9 @@ import {
 
 type TabType = 'issues' | 'warnings' | 'passes' | 'contrast';
 
+// Pro pill styling
+const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold inline-flex items-center scale-[0.85] origin-left";
+
 export function WCAGCheckerPage() {
   const [selectedRegion, setSelectedRegion] = useState('eu');
   const [isLoading, setIsLoading] = useState(false);
@@ -187,7 +190,7 @@ export function WCAGCheckerPage() {
                   <label htmlFor="documentTesting" className="ml-2 text-sm font-medium text-gray-700">
                     Document Testing
                   </label>
-                  <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">PRO</span>
+                  <span className={proPillStyle}>PRO</span>
                   <div className="ml-1 group relative">
                     <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
                     <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
@@ -211,7 +214,7 @@ export function WCAGCheckerPage() {
                   <label htmlFor="pdfAccessibility" className="ml-2 text-sm font-medium text-gray-700">
                     PDF Accessibility
                   </label>
-                  <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">PRO</span>
+                  <span className={proPillStyle}>PRO</span>
                   <div className="ml-1 group relative">
                     <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
                     <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
@@ -236,7 +239,7 @@ export function WCAGCheckerPage() {
                   <label htmlFor="officeDocuments" className="ml-2 text-sm font-medium text-gray-700">
                     Test Office Documents
                   </label>
-                  <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">PRO</span>
+                  <span className={proPillStyle}>PRO</span>
                   <div className="ml-1 group relative">
                     <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
                     <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
@@ -261,7 +264,7 @@ export function WCAGCheckerPage() {
                   <label htmlFor="mediaTesting" className="ml-2 text-sm font-medium text-gray-700">
                     Test Media
                   </label>
-                  <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">PRO</span>
+                  <span className={proPillStyle}>PRO</span>
                   <div className="ml-1 group relative">
                     <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
                     <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
