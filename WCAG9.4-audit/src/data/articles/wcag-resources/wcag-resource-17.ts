@@ -5,7 +5,7 @@ export const wcagResource17: Article = {
   "slug": "wcag-resource-accessible-pdfs",
   "title": "Accessible PDFs",
   "description": "Challenge: PDFs are often created with print in mind and can be highly inaccessible if not properly tagged and structured. They can act as barriers...",
-  "content": "# Accessible PDFs\n\n**Challenge**: PDFs are often created with print in mind and can be highly inaccessible if not properly tagged and structured. They can act as barriers for screen reader users and keyboard navigation.\n\n**Creating Accessible PDFs (Ideally from Source)**:\n*   **Use Authoring Tools Correctly**: Create accessible source documents (e.g., in Microsoft Word, Google Docs, Adobe InDesign) using built-in accessibility features (styles for headings, alt text for images, proper list formatting, defined table headers).\n*   **Tagging**: When exporting/saving as PDF, ensure it's a \"Tagged PDF\". Tags provide the underlying structure (headings, paragraphs, lists, tables, images, reading order) that assistive technologies rely on.\n*   **Reading Order**: Verify the reading order in the tagged PDF matches the logical visual order.\n*   **Alt Text**: Ensure all informative images have alternative text. Mark decorative images as artifacts.\n*   **Table Structure**: Tag tables correctly with headers associated with data cells.\n*   **Forms**: Tag PDF form fields with labels and tooltips. Ensure logical tab order.\n*   **Language**: Specify the document language.\n*   **Document Title**: Set a meaningful document title in the metadata.\n*   **Bookmarks**: Add bookmarks for long documents to aid navigation.\n\n**Checking and Remediating**:\n*   **Adobe Acrobat Pro**: Use the built-in Accessibility Checker tool to identify issues. Use the Reading Order tool and Tags panel to review and fix structure and tagging problems.\n*   **Manual Checks**: Test with a screen reader (NVDA, JAWS, VoiceOver) and keyboard navigation.\n\n**Recommendation**: Prefer HTML content over PDF where possible, as HTML is inherently more flexible and accessible. If PDFs are necessary, always ensure they are created or remediated for accessibility.",
+  "content": "# Accessible PDFs\n\n**Challenge**: PDFs are often created with print in mind and can be highly inaccessible if not properly tagged and structured. They can act as barriers for screen reader users and keyboard navigation (where Tab key navigates between elements, Enter/Space activates them).\n\n**Creating Accessible PDFs (Ideally from Source)**:\n*   **Use Authoring Tools Correctly**: Create accessible source documents (e.g., in Microsoft Word, Google Docs, Adobe InDesign) using built-in accessibility features (styles for headings, alt text for images, proper list formatting, defined table headers).\n*   **Tagging**: When exporting/saving as PDF, ensure it's a \"Tagged PDF\". Tags provide the underlying structure (headings, paragraphs, lists, tables, images, reading order) that assistive technologies rely on.\n*   **Reading Order**: Verify the reading order in the tagged PDF matches the logical visual order.\n*   **Alt Text**: Ensure all informative images have alternative text. Mark decorative images as artifacts.\n*   **Table Structure**: Tag tables correctly with headers associated with data cells.\n*   **Forms**: Tag PDF form fields with labels and tooltips. Ensure logical tab order.\n*   **Language**: Specify the document language.\n*   **Document Title**: Set a meaningful document title in the metadata.\n*   **Bookmarks**: Add bookmarks for long documents to aid navigation.\n\n**Checking and Remediating**:\n*   **Adobe Acrobat Pro**: Use the built-in Accessibility Checker tool to identify issues. Use the Reading Order tool and Tags panel to review and fix structure and tagging problems.\n*   **Manual Checks**: Test with a screen reader (NVDA, JAWS, VoiceOver) and keyboard navigation.\n\n**Recommendation**: Prefer HTML content over PDF where possible, as HTML is inherently more flexible and accessible. If PDFs are necessary, always ensure they are created or remediated for accessibility.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -13,7 +13,11 @@ export const wcagResource17: Article = {
     "Web Standards",
     "Keyboard Accessibility",
     "ARIA",
-    "Screen Readers"
+    "Screen Readers",
+    "Keyboard Navigation",
+    "Alt Text",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -103,4 +107,31 @@ export const wcagResource17: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessible PDFs | WCAG Accessibility Guide",
+      metaDescription: "Challenge: PDFs are often created with print in mind and can be highly inaccessible if not properly tagged and structured. They can act as barriers...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Keyboard Navigation, Alt Text, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessible PDFs",
+        description: "Challenge: PDFs are often created with print in mind and can be highly inaccessible if not properly tagged and structured. They can act as barriers...",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

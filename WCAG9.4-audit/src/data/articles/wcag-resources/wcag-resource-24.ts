@@ -5,7 +5,7 @@ export const wcagResource24: Article = {
   "slug": "wcag-resource-accessible-drag-and-drop-interfaces",
   "title": "Accessible Drag-and-Drop Interfaces",
   "description": "Challenge: Drag-and-drop functionality relies heavily on visual pointer interaction and can be completely inaccessible to keyboard-only users and s...",
-  "content": "# Accessible Drag-and-Drop Interfaces\n\n**Challenge**: Drag-and-drop functionality relies heavily on visual pointer interaction and can be completely inaccessible to keyboard-only users and screen reader users if not implemented carefully.\n\n**Making Drag-and-Drop Accessible (WCAG 2.5.7 - Level AA)**:\n*   **Provide a Keyboard Alternative**: The core requirement is that any action achievable via drag-and-drop must also be achievable using only the keyboard. This often involves providing buttons or menu options like \"Move Up,\" \"Move Down,\" \"Move to Folder,\" etc.\n*   **Use ARIA for Custom Widgets**: If implementing a custom drag-and-drop interface, use appropriate ARIA roles, states, and properties to communicate the functionality to assistive technologies. This is complex and requires following patterns from the ARIA Authoring Practices Guide (APG), such as Listbox reordering.\n    *   Identify draggable items (`role=\"option\"`, `aria-grabbed=\"false\"`).\n    *   Identify drop targets (`aria-dropeffect`).\n    *   Manage focus appropriately during the keyboard-based move operation.\n    *   Announce actions and outcomes using `aria-live` regions (e.g., \"Item moved to position 3\").\n*   **Clear Visual Cues**: Provide clear visual indicators during both mouse and keyboard drag operations (e.g., highlighting drop targets, showing item position).\n*   **Focus Management**: Ensure focus moves logically when using the keyboard alternative.\n\n**Simpler Approach**: Often, the most accessible solution is to design the interface *without* relying on drag-and-drop as the primary interaction method. Provide standard buttons, links, or form controls that achieve the same outcome. If drag-and-drop is added, ensure the keyboard alternative is robust and easy to use.",
+  "content": "# Accessible Drag-and-Drop Interfaces\n\n**Challenge**: Drag-and-drop functionality relies heavily on visual pointer interaction and can be completely inaccessible to keyboard-only users and screen reader users if not implemented carefully.\n\n**Making Drag-and-Drop Accessible (WCAG 2.5.7 - Level A (minimum accessibility requirements)A)**:\n*   **Provide a Keyboard Alternative**: The core requirement is that any action achievable via drag-and-drop must also be achievable using only the keyboard. This often involves providing buttons or menu options like \"Move Up,\" \"Move Down,\" \"Move to Folder,\" etc.\n*   **Use ARIA for Custom Widgets**: If implementing a custom drag-and-drop interface, use appropriate ARIA roles, states, and properties to communicate the functionality to assistive technologies. This is complex and requires following patterns from the ARIA Authoring Practices Guide (APG), such as Listbox reordering.\n    *   Identify draggable items (`role=\"option\"`, `aria-grabbed=\"false\"`).\n    *   Identify drop targets (`aria-dropeffect`).\n    *   Manage focus appropriately during the keyboard-based move operation.\n    *   Announce actions and outcomes using `aria-live` regions (e.g., \"Item moved to position 3\").\n*   **Clear Visual Cues**: Provide clear visual indicators during both mouse and keyboard drag operations (e.g., highlighting drop targets, showing item position).\n*   **Focus Management**: Ensure focus moves logically when using the keyboard alternative.\n\n**Simpler Approach**: Often, the most accessible solution is to design the interface *without* relying on drag-and-drop as the primary interaction method. Provide standard buttons, links, or form controls that achieve the same outcome. If drag-and-drop is added, ensure the keyboard alternative is robust and easy to use.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -13,7 +13,8 @@ export const wcagResource24: Article = {
     "Web Standards",
     "Keyboard Accessibility",
     "ARIA",
-    "Screen Readers"
+    "Screen Readers",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -63,4 +64,31 @@ export const wcagResource24: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessible Drag-and-Drop Interfaces | WCAG Accessibility Guide",
+      metaDescription: "Challenge: Drag-and-drop functionality relies heavily on visual pointer interaction and can be completely inaccessible to keyboard-only users and s...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessible Drag-and-Drop Interfaces",
+        description: "Challenge: Drag-and-drop functionality relies heavily on visual pointer interaction and can be completely inaccessible to keyboard-only users and s...",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

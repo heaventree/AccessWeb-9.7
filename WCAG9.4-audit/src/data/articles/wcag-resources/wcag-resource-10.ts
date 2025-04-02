@@ -4,14 +4,17 @@ export const wcagResource10: Article = {
   "id": "wcag-resource-10",
   "slug": "wcag-resource-understandable-predictability",
   "title": "Understandable: Predictability",
-  "description": "Guideline 3.2: Make Web pages appear and operate in predictable ways.",
-  "content": "# Understandable: Predictability\n\n**Guideline 3.2**: Make Web pages appear and operate in predictable ways.\n\n**Key Success Criteria**:\n*   **On Focus (Level A)**: When an element receives focus, it does not initiate a change of context (e.g., automatically submitting a form or launching a new window just because a radio button received focus).\n*   **On Input (Level A)**: Changing the setting of a user interface component (like selecting a dropdown option) does not automatically cause a change of context unless the user is advised beforehand.\n*   **Consistent Navigation (Level AA)**: Navigational mechanisms that are repeated on multiple pages appear in the same relative order each time.\n*   **Consistent Identification (Level AA)**: Components with the same functionality across pages are identified consistently (e.g., using the same label or icon for a \"Search\" feature).\n\n**Importance**: Creates a stable and understandable experience, reducing confusion, especially for users with cognitive limitations, low vision, or visual disabilities.",
+  "description": "Guideline 3.2: Make Web pages appear and operate in predictable ways. Guideline 3.2: Make Web pages appear and operate in predictable ways.",
+  "content": "# Understandable: Predictability\n\n**Guideline 3.2**: Make Web pages appear and operate in predictable ways.\n\n**Key Success Criteria**:\n*   **On Focus (Level A (minimum accessibility requirements))**: When an element receives focus, it does not initiate a change of context (e.g., automatically submitting a form or launching a new window just because a radio button received focus).\n*   **On Input (Level A (minimum accessibility requirements))**: Changing the setting of a user interface component (like selecting a dropdown option) does not automatically cause a change of context unless the user is advised beforehand.\n*   **Consistent Navigation (Level A (minimum accessibility requirements)A)**: Navigational mechanisms that are repeated on multiple pages appear in the same relative order each time.\n*   **Consistent Identification (Level A (minimum accessibility requirements)A)**: Components with the same functionality across pages are identified consistently (e.g., using the same label or icon for a \"Search\" feature).\n\n**Importance**: Creates a stable and understandable experience, reducing confusion, especially for users with cognitive limitations, low vision, or visual disabilities.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
     "Web Standards",
-    "Understandable"
+    "Understandable",
+    "Keyboard Navigation",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -61,4 +64,31 @@ export const wcagResource10: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Understandable: Predictability | WCAG Accessibility Guide",
+      metaDescription: "Guideline 3.2: Make Web pages appear and operate in predictable ways. Guideline 3.2: Make Web pages appear and operate in predictable ways.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Understandable, Keyboard Navigation, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Understandable: Predictability",
+        description: "Guideline 3.2: Make Web pages appear and operate in predictable ways. Guideline 3.2: Make Web pages appear and operate in predictable ways.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

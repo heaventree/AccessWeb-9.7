@@ -4,8 +4,8 @@ export const wcagResource7: Article = {
   "id": "wcag-resource-7",
   "slug": "wcag-resource-operable-keyboard-accessibility",
   "title": "Operable: Keyboard Accessibility",
-  "description": "Guideline 2.1: Make all functionality available from a keyboard.",
-  "content": "# Operable: Keyboard Accessibility\n\n**Guideline 2.1**: Make all functionality available from a keyboard.\n\n**Why It Matters**: Many users rely solely on a keyboard or keyboard emulators (e.g., switch devices, voice control) to navigate and interact with web content due to motor impairments or visual disabilities (screen reader users).\n\n**Key Requirements**:\n*   **All Functionality**: Every action that can be performed with a mouse must also be achievable using only the keyboard (e.g., activating links, submitting forms, using widgets).\n*   **No Keyboard Trap**: Users must be able to navigate *away* from any component using the keyboard alone. They shouldn't get stuck in a part of the page. (Level A)\n*   **Focus Order**: The order in which elements receive keyboard focus should be logical and predictable, typically following the visual layout. (Level A)\n*   **Focus Visible**: When an element receives keyboard focus, there must be a clear visual indicator showing which element is focused. (Level AA)\n\n**Testing**: Use the `Tab` key to move forward, `Shift+Tab` to move backward, `Enter` or `Spacebar` to activate controls. Ensure all interactive elements are reachable and usable.",
+  "description": "Guideline 2.1: Make all functionality available from a keyboard. Guideline 2.1: Make all functionality available from a keyboard.",
+  "content": "# Operable: Keyboard Accessibility\n\n**Guideline 2.1**: Make all functionality available from a keyboard.\n\n**Why It Matters**: Many users rely solely on a keyboard or keyboard emulators (e.g., switch devices, voice control) to navigate and interact with web content due to motor impairments or visual disabilities (screen reader users).\n\n**Key Requirements**:\n*   **All Functionality**: Every action that can be performed with a mouse must also be achievable using only the keyboard (e.g., activating links, submitting forms, using widgets).\n*   **No Keyboard Trap**: Users must be able to navigate *away* from any component using the keyboard alone. They shouldn't get stuck in a part of the page. (Level A (minimum accessibility requirements))\n*   **Focus Order**: The order in which elements receive keyboard focus should be logical and predictable, typically following the visual layout. (Level A (minimum accessibility requirements))\n*   **Focus Visible**: When an element receives keyboard focus, there must be a clear visual indicator showing which element is focused. (Level A (minimum accessibility requirements)A)\n\n**Testing**: Use the `Tab` key to move forward, `Shift+Tab` to move backward, `Enter` or `Spacebar` to activate controls. Ensure all interactive elements are reachable and usable.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -14,7 +14,10 @@ export const wcagResource7: Article = {
     "Keyboard Accessibility",
     "ARIA",
     "Screen Readers",
-    "Operable"
+    "Operable",
+    "Keyboard Navigation",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -69,4 +72,31 @@ export const wcagResource7: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Operable: Keyboard Accessibility | WCAG Accessibility Guide",
+      metaDescription: "Guideline 2.1: Make all functionality available from a keyboard. Guideline 2.1: Make all functionality available from a keyboard.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Operable, Keyboard Navigation, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Operable: Keyboard Accessibility",
+        description: "Guideline 2.1: Make all functionality available from a keyboard. Guideline 2.1: Make all functionality available from a keyboard.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

@@ -5,7 +5,7 @@ export const wcagResource20: Article = {
   "slug": "wcag-resource-accessible-navigation-menus",
   "title": "Accessible Navigation Menus",
   "description": "Goal: Ensure users can easily find and operate site navigation using various input methods and assistive technologies.",
-  "content": "# Accessible Navigation Menus\n\n**Goal**: Ensure users can easily find and operate site navigation using various input methods and assistive technologies.\n\n**Best Practices**:\n*   **Use Semantic HTML**:\n    *   Wrap primary navigation in a `<nav>` element.\n    *   Use an unordered list (`<ul>`) for the menu items (`<li>`) containing links (`<a>`).\n*   **Identify the Navigation**: Use `aria-label` or `aria-labelledby` on the `<nav>` element if there are multiple navigation landmarks (e.g., `<nav aria-label=\"Main navigation\">`, `<nav aria-label=\"Footer navigation\">`).\n*   **Descriptive Link Text**: Links should clearly indicate their destination (Guideline 2.4.4 - Level A).\n*   **Keyboard Accessibility**:\n    *   All menu items must be reachable and activatable via keyboard (`Tab`, `Enter`).\n    *   Focus order must be logical.\n    *   Focus must be clearly visible.\n*   **Dropdown/Flyout Menus (Increased Complexity)**:\n    *   **Indicate Submenus**: Visually (e.g., arrow icon) and programmatically using `aria-haspopup=\"true\"` and `aria-expanded=\"false\"` (changes to `true` when open) on the controlling element (link or button).\n    *   **Keyboard Operation**: Follow standard patterns (e.g., `Enter`/`Space` or arrow keys to open/navigate submenus, `Escape` to close). Refer to ARIA Authoring Practices Guide (APG) for Menu or Disclosure patterns.\n    *   **Screen Reader Announcement**: Ensure the expanded/collapsed state is announced.\n    *   **Visibility**: Ensure submenus don't get clipped or hidden off-screen.\n*   **Mobile/Responsive Menus**: Ensure \"hamburger\" menus and their revealed content are fully keyboard accessible and correctly announced by screen readers (manage focus appropriately when opening/closing).",
+  "content": "# Accessible Navigation Menus\n\n**Goal**: Ensure users can easily find and operate site navigation using various input methods and assistive technologies.\n\n**Best Practices**:\n*   **Use Semantic HTML**:\n    *   Wrap primary navigation in a `<nav>` element.\n    *   Use an unordered list (`<ul>`) for the menu items (`<li>`) containing links (`<a>`).\n*   **Identify the Navigation**: Use `aria-label (provides an accessible name)` or `aria-labelledby (references another element as the label)` on the `<nav>` element if there are multiple navigation landmarks (e.g., `<nav aria-label (provides an accessible name)=\"Main navigation\">`, `<nav aria-label=\"Footer navigation\">`).\n*   **Descriptive Link Text**: Links should clearly indicate their destination (Guideline 2.4.4 - Level A).\n*   **Keyboard Accessibility**:\n    *   All menu items must be reachable and activatable via keyboard (`Tab`, `Enter`).\n    *   Focus order must be logical.\n    *   Focus must be clearly visible.\n*   **Dropdown/Flyout Menus (Increased Complexity)**:\n    *   **Indicate Submenus**: Visually (e.g., arrow icon) and programmatically using `aria-haspopup=\"true\"` and `aria-expanded=\"false\"` (changes to `true` when open) on the controlling element (link or button).\n    *   **Keyboard Operation**: Follow standard patterns (e.g., `Enter`/`Space` or arrow keys to open/navigate submenus, `Escape` to close). Refer to ARIA Authoring Practices Guide (APG) for Menu or Disclosure patterns.\n    *   **Screen Reader Announcement**: Ensure the expanded/collapsed state is announced.\n    *   **Visibility**: Ensure submenus don't get clipped or hidden off-screen.\n*   **Mobile/Responsive Menus**: Ensure \"hamburger\" menus and their revealed content are fully keyboard accessible and correctly announced by screen readers (manage focus appropriately when opening/closing).",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -13,7 +13,9 @@ export const wcagResource20: Article = {
     "Web Standards",
     "Keyboard Accessibility",
     "ARIA",
-    "Screen Readers"
+    "Screen Readers",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -88,4 +90,31 @@ export const wcagResource20: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessible Navigation Menus | WCAG Accessibility Guide",
+      metaDescription: "Goal: Ensure users can easily find and operate site navigation using various input methods and assistive technologies.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessible Navigation Menus",
+        description: "Goal: Ensure users can easily find and operate site navigation using various input methods and assistive technologies.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

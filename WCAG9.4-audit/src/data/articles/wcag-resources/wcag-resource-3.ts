@@ -5,12 +5,14 @@ export const wcagResource3: Article = {
   "slug": "wcag-resource-wcag-conformance-levels-a-aa-aaa",
   "title": "WCAG Conformance Levels: A, AA, AAA",
   "description": "Levels Explained: WCAG defines three levels of conformance to meet the needs of different groups and situations:\n*   Level A (Minimum): The most ba...",
-  "content": "# WCAG Conformance Levels: A, AA, AAA\n\n**Levels Explained**: WCAG defines three levels of conformance to meet the needs of different groups and situations:\n*   **Level A (Minimum)**: The most basic web accessibility features. If these requirements are not met, it may be impossible for one or more groups to access the content. Conformance to this level is essential.\n*   **Level AA (Mid-range)**: Deals with the biggest and most common barriers for disabled users. This is the recommended level for most websites and is often the standard required by legal regulations (like ADA, Section 508).\n*   **Level AAA (Highest)**: The highest level of web accessibility. It aims to make content accessible to the widest range of users possible, but it's not always feasible to meet all AAA criteria for all types of content. Often applied to specific parts of a site or specialized content.\n\n**Choosing a Level**: Most organizations aim for Level AA conformance, as it provides a strong level of accessibility without the potentially restrictive nature of some AAA criteria.",
+  "content": "# WCAG Conformance Levels: A, AA, AAA\n\n**Levels Explained**: WCAG defines three levels of conformance to meet the needs of different groups and situations:\n*   **Level A (minimum accessibility requirements) (Minimum)**: The most basic web accessibility features. If these requirements are not met, it may be impossible for one or more groups to access the content. Conformance to this level is essential.\n*   **Level A (minimum accessibility requirements)A (Mid-range)**: Deals with the biggest and most common barriers for disabled users. This is the recommended level for most websites and is often the standard required by legal regulations (like ADA, Section 508).\n*   **Level A (minimum accessibility requirements)AA (Highest)**: The highest level of web accessibility. It aims to make content accessible to the widest range of users possible, but it's not always feasible to meet all AAA criteria for all types of content. Often applied to specific parts of a site or specialized content.\n\n**Choosing a Level**: Most organizations aim for Level A (minimum accessibility requirements)A conformance, as it provides a strong level of accessibility without the potentially restrictive nature of some AAA criteria.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
-    "Web Standards"
+    "Web Standards",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -50,4 +52,31 @@ export const wcagResource3: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "WCAG Conformance Levels: A, AA, AAA | WCAG Accessibility Guide",
+      metaDescription: "Levels Explained: WCAG defines three levels of conformance to meet the needs of different groups and situations:\\n*   Level A (Minimum): The most ba...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "WCAG Conformance Levels: A, AA, AAA",
+        description: "Levels Explained: WCAG defines three levels of conformance to meet the needs of different groups and situations:\\n*   Level A (Minimum): The most ba...",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

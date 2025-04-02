@@ -4,14 +4,17 @@ export const wcagResource31: Article = {
   "id": "wcag-resource-31",
   "slug": "wcag-resource-audio-and-video-accessibility",
   "title": "Audio and Video Accessibility",
-  "description": "Key Requirements:\n- Provide captions for all audio content\n- Include transcripts for audio-only content\n- Offer audio descriptions for video\n- Ensu...",
+  "description": "This article covers the WCAG requirements for Audio and Video Accessibility, including requirements:\n- provide captions for all audio content\n- include transcripts for audio-only content\n- offer audio descriptions for video\n- ensu....",
   "content": "# Audio and Video Accessibility\n\n**Key Requirements**:\n- Provide captions for all audio content\n- Include transcripts for audio-only content\n- Offer audio descriptions for video\n- Ensure media controls are keyboard accessible\n- Avoid autoplay or provide easy mechanisms to stop playback\n\n**Implementation Tips**:\n- Use the track element for captions and subtitles\n- Consider using platforms with built-in accessibility features\n- Test with keyboard-only navigation\n- Ensure media players have accessible controls",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
     "Web Standards",
-    "Keyboard Accessibility"
+    "Keyboard Accessibility",
+    "Keyboard Navigation",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -36,4 +39,31 @@ export const wcagResource31: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Audio and Video Accessibility | WCAG Accessibility Guide",
+      metaDescription: "This article covers the WCAG requirements for Audio and Video Accessibility, including requirements:\\n- provide captions for all audio content\\n- include tra...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, Keyboard Navigation, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Audio and Video Accessibility",
+        description: "This article covers the WCAG requirements for Audio and Video Accessibility, including requirements:\\n- provide captions for all audio content\\n- include transcripts for audio-only content\\n- offer audio descriptions for video\\n- ensu....",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

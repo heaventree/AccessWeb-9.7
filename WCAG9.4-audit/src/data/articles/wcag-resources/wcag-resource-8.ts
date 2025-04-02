@@ -4,14 +4,15 @@ export const wcagResource8: Article = {
   "id": "wcag-resource-8",
   "slug": "wcag-resource-operable-enough-time",
   "title": "Operable: Enough Time",
-  "description": "Guideline 2.2: Provide users enough time to read and use content.",
-  "content": "# Operable: Enough Time\n\n**Guideline 2.2**: Provide users enough time to read and use content.\n\n**Key Concepts**:\n*   **Timing Adjustable**: For time limits set by the content (e.g., session timeouts, auto-updating information), users must be able to turn off, adjust, or extend the time limit (unless it's essential, like an auction). (Level A)\n*   **Pause, Stop, Hide**: For moving, blinking, scrolling, or auto-updating information (like carousels or animations), provide controls to pause, stop, or hide it. (Level A)\n*   **No Timing for Interaction**: Avoid requiring specific timing for user interactions (except where essential, e.g., real-time games).\n\n**Importance**: Benefits users with cognitive limitations, motor impairments, or anyone who needs more time to read, understand, or operate controls.",
+  "description": "Guideline 2.2: Provide users enough time to read and use content. Guideline 2.2: Provide users enough time to read and use content.",
+  "content": "# Operable: Enough Time\n\n**Guideline 2.2**: Provide users enough time to read and use content.\n\n**Key Concepts**:\n*   **Timing Adjustable**: For time limits set by the content (e.g., session timeouts, auto-updating information), users must be able to turn off, adjust, or extend the time limit (unless it's essential, like an auction). (Level A (minimum accessibility requirements))\n*   **Pause, Stop, Hide**: For moving, blinking, scrolling, or auto-updating information (like carousels or animations), provide controls to pause, stop, or hide it. (Level A (minimum accessibility requirements))\n*   **No Timing for Interaction**: Avoid requiring specific timing for user interactions (except where essential, e.g., real-time games).\n\n**Importance**: Benefits users with cognitive limitations, motor impairments, or anyone who needs more time to read, understand, or operate controls.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
     "Web Standards",
-    "Operable"
+    "Operable",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -56,4 +57,31 @@ export const wcagResource8: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Operable: Enough Time | WCAG Accessibility Guide",
+      metaDescription: "Guideline 2.2: Provide users enough time to read and use content. Guideline 2.2: Provide users enough time to read and use content.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Operable, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Operable: Enough Time",
+        description: "Guideline 2.2: Provide users enough time to read and use content. Guideline 2.2: Provide users enough time to read and use content.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

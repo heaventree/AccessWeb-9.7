@@ -4,8 +4,8 @@ export const wcagResource9: Article = {
   "id": "wcag-resource-9",
   "slug": "wcag-resource-understandable-readability",
   "title": "Understandable: Readability",
-  "description": "Guideline 3.1: Make text content readable and understandable.",
-  "content": "# Understandable: Readability\n\n**Guideline 3.1**: Make text content readable and understandable.\n\n**Key Success Criteria**:\n*   **Language of Page (Level A)**: Specify the default human language of the page (e.g., `<html lang=\"en\">`).\n*   **Language of Parts (Level AA)**: Identify the language of specific text passages that differ from the page's default language (e.g., `<span lang=\"fr\">Bonjour</span>`).\n*   **Unusual Words (Level AAA)**: Provide definitions for jargon, idioms, or unusual words.\n*   **Abbreviations (Level AAA)**: Provide the expanded form of abbreviations.\n*   **Reading Level (Level AAA)**: Aim for content that doesn't require more than a lower secondary education reading level (approx. grades 7-9), or provide a simpler alternative.\n\n**Importance**: Helps users with cognitive disabilities, learning disabilities, and non-native speakers understand the content. Screen readers also use language attributes for correct pronunciation.",
+  "description": "Guideline 3.1: Make text content readable and understandable. Guideline 3.1: Make text content readable and understandable.",
+  "content": "# Understandable: Readability\n\n**Guideline 3.1**: Make text content readable and understandable.\n\n**Key Success Criteria**:\n*   **Language of Page (Level A (minimum accessibility requirements))**: Specify the default human language of the page (e.g., `<html lang=\"en\">`).\n*   **Language of Parts (Level AA)**: Identify the language of specific text passages that differ from the page's default language (e.g., `<span lang=\"fr\">Bonjour</span>`).\n*   **Unusual Words (Level AAA)**: Provide definitions for jargon, idioms, or unusual words.\n*   **Abbreviations (Level AAA)**: Provide the expanded form of abbreviations.\n*   **Reading Level (Level AAA)**: Aim for content that doesn't require more than a lower secondary education reading level (approx. grades 7-9), or provide a simpler alternative.\n\n**Importance**: Helps users with cognitive disabilities, learning disabilities, and non-native speakers understand the content. Screen readers also use language attributes for correct pronunciation.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -66,4 +66,31 @@ export const wcagResource9: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Understandable: Readability | WCAG Accessibility Guide",
+      metaDescription: "Guideline 3.1: Make text content readable and understandable. Guideline 3.1: Make text content readable and understandable.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Understandable",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Understandable: Readability",
+        description: "Guideline 3.1: Make text content readable and understandable. Guideline 3.1: Make text content readable and understandable.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

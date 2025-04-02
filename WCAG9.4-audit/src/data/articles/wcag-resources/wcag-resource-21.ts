@@ -5,7 +5,7 @@ export const wcagResource21: Article = {
   "slug": "wcag-resource-accessible-error-messages",
   "title": "Accessible Error Messages",
   "description": "Goal: Ensure users understand when an error has occurred, what the error is, and how to fix it, regardless of ability.",
-  "content": "# Accessible Error Messages\n\n**Goal**: Ensure users understand when an error has occurred, what the error is, and how to fix it, regardless of ability.\n\n**Key Principles (WCAG Guideline 3.3 - Input Assistance)**:\n*   **Identify the Error (Guideline 3.3.1 - Level A)**:\n    *   Clearly indicate which field(s) are in error (e.g., change border color, add an icon, change label style). Don't rely on color alone.\n    *   Provide a text description of the error.\n*   **Describe the Error**: The error message itself should be clear and specific (e.g., \"Please enter a valid email address\" is better than \"Invalid input\").\n*   **Programmatic Association**: Link the error message text to the input field it relates to, typically using `aria-describedby`. This allows screen readers to announce the error when the user focuses on the field.\n    ```html\n    <label for=\"email\">Email:</label>\n    <input id=\"email\" name=\"email\" type=\"email\" aria-invalid=\"true\" aria-describedby=\"email-error\">\n    <span id=\"email-error\" class=\"error-message\">Error: Please enter a valid email format (e.g., name@example.com).</span>\n    ```\n*   **Announce Errors Dynamically (Client-side Validation)**:\n    *   Use an `aria-live` region (often `role=\"alert\"` for important errors) to announce errors as they occur or upon form submission attempt. This informs screen reader users immediately without them having to search for the error message.\n    *   Alternatively, move focus programmatically to the first field in error or to a summary of errors at the top of the form.\n*   **Provide Suggestions (Guideline 3.3.3 - Level AA)**: If possible, suggest how to fix the error (e.g., \"Password must be at least 8 characters long\").\n*   **Visibility**: Ensure error messages are visually close to the field in error and have sufficient color contrast.",
+  "content": "# Accessible Error Messages\n\n**Goal**: Ensure users understand when an error has occurred, what the error is, and how to fix it, regardless of ability.\n\n**Key Principles (WCAG Guideline 3.3 - Input Assistance)**:\n*   **Identify the Error (Guideline 3.3.1 - Level A (minimum accessibility requirements))**:\n    *   Clearly indicate which field(s) are in error (e.g., change border color, add an icon, change label style). Don't rely on color alone.\n    *   Provide a text description of the error.\n*   **Describe the Error**: The error message itself should be clear and specific (e.g., \"Please enter a valid email address\" is better than \"Invalid input\").\n*   **Programmatic Association**: Link the error message text to the input field it relates to, typically using `aria-describedby`. This allows screen readers to announce the error when the user focuses on the field.\n    ```html\n    <label for=\"email\">Email:</label>\n    <input id=\"email\" name=\"email\" type=\"email\" aria-invalid=\"true\" aria-describedby=\"email-error\">\n    <span id=\"email-error\" class=\"error-message\">Error: Please enter a valid email format (e.g., name@example.com).</span>\n    ```\n*   **Announce Errors Dynamically (Client-side Validation)**:\n    *   Use an `aria-live` region (often `role=\"alert\"` for important errors) to announce errors as they occur or upon form submission attempt. This informs screen reader users immediately without them having to search for the error message.\n    *   Alternatively, move focus programmatically to the first field in error or to a summary of errors at the top of the form.\n*   **Provide Suggestions (Guideline 3.3.3 - Level AA)**: If possible, suggest how to fix the error (e.g., \"Password must be at least 8 characters long\").\n*   **Visibility**: Ensure error messages are visually close to the field in error and have sufficient color contrast.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -13,7 +13,8 @@ export const wcagResource21: Article = {
     "Web Standards",
     "Color Contrast",
     "ARIA",
-    "Screen Readers"
+    "Screen Readers",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -68,4 +69,31 @@ export const wcagResource21: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessible Error Messages | WCAG Accessibility Guide",
+      metaDescription: "Goal: Ensure users understand when an error has occurred, what the error is, and how to fix it, regardless of ability.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, ARIA, Screen Readers, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessible Error Messages",
+        description: "Goal: Ensure users understand when an error has occurred, what the error is, and how to fix it, regardless of ability.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

@@ -5,7 +5,7 @@ export const wcagResource13: Article = {
   "slug": "wcag-resource-keyboard-navigation-best-practices",
   "title": "Keyboard Navigation Best Practices",
   "description": "Foundation: Ensure every interactive element (links, buttons, form fields, custom widgets) can be reached and operated using only the keyboard (Gui...",
-  "content": "# Keyboard Navigation Best Practices\n\n**Foundation**: Ensure every interactive element (links, buttons, form fields, custom widgets) can be reached and operated using only the keyboard (Guideline 2.1.1 - Level A).\n\n**Best Practices**:\n*   **Logical Focus Order (Guideline 2.4.3 - Level A)**: The sequence in which elements receive focus when tabbing should make sense, usually following the visual flow (left-to-right, top-to-bottom). Modify the DOM order or use `tabindex=\"0\"` carefully if needed, avoid positive `tabindex` values.\n*   **Visible Focus Indicator (Guideline 2.4.7 - Level AA)**: The element that currently has keyboard focus must have a highly visible outline or style. Browsers provide default indicators, but they are often customized (or unfortunately, removed `outline: none;`). Ensure custom focus styles are clear and have good contrast.\n*   **Avoid Keyboard Traps (Guideline 2.1.2 - Level A)**: Users must always be able to tab *out* of any component or section. This is especially critical for modals and widgets.\n*   **Standard Interactions**: Use `Enter` for activating links and buttons, `Spacebar` for toggling checkboxes/radio buttons and activating buttons. Follow ARIA patterns for custom widgets.\n\n**Example CSS for Visible Focus**:\n```css\n/* Basic visible focus */\na:focus, button:focus, input:focus, select:focus, textarea:focus {\n  outline: 2px solid blue;\n  outline-offset: 2px;\n}\n\n/* Removing outline only if providing a better alternative */\nbutton:focus {\n  outline: none; /* Only if replacing */\n  box-shadow: 0 0 0 3px lightblue; /* Example alternative */\n}\n```",
+  "content": "# Keyboard Navigation Best Practices\n\n**Foundation**: Ensure every interactive element (links, buttons, form fields, custom widgets) can be reached and operated using only the keyboard (Guideline 2.1.1 - Level A (minimum accessibility requirements)).\n\n**Best Practices**:\n*   **Logical Focus Order (Guideline 2.4.3 - Level A (minimum accessibility requirements))**: The sequence in which elements receive focus when tabbing should make sense, usually following the visual flow (left-to-right, top-to-bottom). Modify the DOM order or use `tabindex=\"0\"` carefully if needed, avoid positive `tabindex` values.\n*   **Visible Focus Indicator (Guideline 2.4.7 - Level AA)**: The element that currently has keyboard focus must have a highly visible outline or style. Browsers provide default indicators, but they are often customized (or unfortunately, removed `outline: none;`). Ensure custom focus styles are clear and have good contrast.\n*   **Avoid Keyboard Traps (Guideline 2.1.2 - Level A)**: Users must always be able to tab *out* of any component or section. This is especially critical for modals and widgets.\n*   **Standard Interactions**: Use `Enter` for activating links and buttons, `Spacebar` for toggling checkboxes/radio buttons and activating buttons. Follow ARIA patterns for custom widgets.\n\n**Example CSS for Visible Focus**:\n```css\n/* Basic visible focus */\na:focus, button:focus, input:focus, select:focus, textarea:focus {\n  outline: 2px solid blue;\n  outline-offset: 2px;\n}\n\n/* Removing outline only if providing a better alternative */\nbutton:focus {\n  outline: none; /* Only if replacing */\n  box-shadow: 0 0 0 3px lightblue; /* Example alternative */\n}\n```",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -14,7 +14,10 @@ export const wcagResource13: Article = {
     "Color Contrast",
     "Keyboard Accessibility",
     "ARIA",
-    "Screen Readers"
+    "Screen Readers",
+    "Keyboard Navigation",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -64,4 +67,31 @@ export const wcagResource13: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Keyboard Navigation Best Practices | WCAG Accessibility Guide",
+      metaDescription: "Foundation: Ensure every interactive element (links, buttons, form fields, custom widgets) can be reached and operated using only the keyboard (Gui...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Keyboard Accessibility, ARIA, Screen Readers, Keyboard Navigation, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Keyboard Navigation Best Practices",
+        description: "Foundation: Ensure every interactive element (links, buttons, form fields, custom widgets) can be reached and operated using only the keyboard (Gui...",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

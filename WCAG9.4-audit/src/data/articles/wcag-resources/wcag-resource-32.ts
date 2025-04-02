@@ -4,7 +4,7 @@ export const wcagResource32: Article = {
   "id": "wcag-resource-32",
   "slug": "wcag-resource-accessible-authentication-systems",
   "title": "Accessible Authentication Systems",
-  "description": "Common Barriers:\n- CAPTCHAs without accessible alternatives\n- Time-limited sessions without warnings\n- Multi-factor authentication relying solely o...",
+  "description": "This article covers the WCAG requirements for Accessible Authentication Systems, including barriers:\n- captchas without accessible alternatives\n- time-limited sessions without warnings\n- multi-factor authentication relying solely o....",
   "content": "# Accessible Authentication Systems\n\n**Common Barriers**:\n- CAPTCHAs without accessible alternatives\n- Time-limited sessions without warnings\n- Multi-factor authentication relying solely on one method\n- Password complexity requirements without clear guidance\n\n**Solutions**:\n- Provide multiple authentication options (email, phone, etc.)\n- Implement accessible CAPTCHA alternatives\n- Allow for extended session times\n- Provide clear error messages and recovery options\n- Support password managers",
   "category": "wcag-resources",
   "tags": [
@@ -37,4 +37,31 @@ export const wcagResource32: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessible Authentication Systems | WCAG Accessibility Guide",
+      metaDescription: "This article covers the WCAG requirements for Accessible Authentication Systems, including barriers:\\n- captchas without accessible alternatives\\n- time-limi...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Authentication, Security",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessible Authentication Systems",
+        description: "This article covers the WCAG requirements for Accessible Authentication Systems, including barriers:\\n- captchas without accessible alternatives\\n- time-limited sessions without warnings\\n- multi-factor authentication relying solely o....",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

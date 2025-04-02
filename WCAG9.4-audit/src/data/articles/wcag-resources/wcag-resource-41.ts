@@ -4,8 +4,8 @@ export const wcagResource41: Article = {
   "id": "wcag-resource-41",
   "slug": "wcag-resource-ensuring-accessibility-in-single-page-applications-spas",
   "title": "Ensuring Accessibility in Single Page Applications (SPAs)",
-  "description": "Common Challenges:\n- Focus management during routing changes\n- Announcing dynamic content updates\n- Maintaining keyboard navigation\n- Browser histo...",
-  "content": "# Ensuring Accessibility in Single Page Applications (SPAs)\n\n**Common Challenges**:\n- Focus management during routing changes\n- Announcing dynamic content updates\n- Maintaining keyboard navigation\n- Browser history and back button functionality\n\n**Solutions**:\n- Use ARIA live regions for dynamic updates\n- Manually manage focus when content changes\n- Implement proper routing with history API\n- Use semantic HTML despite the dynamic nature\n- Test thoroughly with screen readers and keyboards",
+  "description": "This article covers the WCAG requirements for Ensuring Accessibility in Single Page Applications (SPAs), including challenges:\n- focus management during routing changes\n- announcing dynamic content updates\n- maintaining keyboard navigation\n- browser histo....",
+  "content": "# Ensuring Accessibility in Single Page Applications (SPAs)\n\n**Common Challenges**:\n- Focus management during routing changes\n- Announcing dynamic content updates\n- Maintaining keyboard navigation (where Tab key navigates between elements, Enter/Space activates them)\n- Browser history and back button functionality\n\n**Solutions**:\n- Use ARIA live regions for dynamic updates\n- Manually manage focus when content changes\n- Implement proper routing with history API\n- Use semantic HTML despite the dynamic nature\n- Test thoroughly with screen readers and keyboards",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -13,7 +13,10 @@ export const wcagResource41: Article = {
     "Web Standards",
     "Keyboard Accessibility",
     "ARIA",
-    "Screen Readers"
+    "Screen Readers",
+    "Keyboard Navigation",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -38,4 +41,31 @@ export const wcagResource41: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Ensuring Accessibility in Single Page Applications (SPAs) | WCAG Accessibility Guide",
+      metaDescription: "This article covers the WCAG requirements for Ensuring Accessibility in Single Page Applications (SPAs), including challenges:\\n- focus management during rou...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Keyboard Navigation, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Ensuring Accessibility in Single Page Applications (SPAs)",
+        description: "This article covers the WCAG requirements for Ensuring Accessibility in Single Page Applications (SPAs), including challenges:\\n- focus management during routing changes\\n- announcing dynamic content updates\\n- maintaining keyboard navigation\\n- browser histo....",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

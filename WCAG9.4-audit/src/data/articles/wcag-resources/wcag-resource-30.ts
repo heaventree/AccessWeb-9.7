@@ -4,8 +4,8 @@ export const wcagResource30: Article = {
   "id": "wcag-resource-30",
   "slug": "wcag-resource-creating-accessible-svgs-",
   "title": "Creating Accessible SVGs  ",
-  "description": "Benefits of SVG:  \n- Scales without quality loss\n- Looks sharp on all screens\n- Small file size\n- Animatable\n- Programmable",
-  "content": "# Creating Accessible SVGs  \n\n**Benefits of SVG**:  \n- Scales without quality loss\n- Looks sharp on all screens\n- Small file size\n- Animatable\n- Programmable\n\n**Making SVGs Accessible**:  \n- Add appropriate title and desc elements\n- Use aria-labelledby to connect title to svg\n- Ensure interactive SVGs are keyboard accessible\n- Consider using role=\"img\" or role=\"graphics-document\"\n- Test with screen readers",
+  "description": "Benefits of SVG:  \n- Scales without quality loss\n- Looks sharp on all screens\n- Small file size\n- Animatable\n- Programmable.",
+  "content": "# Creating Accessible SVGs  \n\n**Benefits of SVG**:  \n- Scales without quality loss\n- Looks sharp on all screens\n- Small file size\n- Animatable\n- Programmable\n\n**Making SVGs Accessible**:  \n- Add appropriate title and desc elements\n- Use aria-labelledby (references another element as the label) to connect title to svg\n- Ensure interactive SVGs are keyboard accessible\n- Consider using role=\"img\" or role=\"graphics-document\"\n- Test with screen readers",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -13,7 +13,8 @@ export const wcagResource30: Article = {
     "Web Standards",
     "Keyboard Accessibility",
     "ARIA",
-    "Screen Readers"
+    "Screen Readers",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -38,4 +39,31 @@ export const wcagResource30: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Creating Accessible SVGs   | WCAG Accessibility Guide",
+      metaDescription: "Benefits of SVG:  \\n- Scales without quality loss\\n- Looks sharp on all screens\\n- Small file size\\n- Animatable\\n- Programmable.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Creating Accessible SVGs  ",
+        description: "Benefits of SVG:  \\n- Scales without quality loss\\n- Looks sharp on all screens\\n- Small file size\\n- Animatable\\n- Programmable.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

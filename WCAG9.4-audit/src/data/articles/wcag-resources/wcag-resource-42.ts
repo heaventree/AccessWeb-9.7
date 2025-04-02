@@ -4,8 +4,8 @@ export const wcagResource42: Article = {
   "id": "wcag-resource-42",
   "slug": "wcag-resource-wcag-22-updates-whats-new",
   "title": "WCAG 2.2 Updates: What's New",
-  "description": "New Success Criteria:\n- Focus Appearance (Enhanced): Make focus indicators more visible\n- Dragging Movements: Provide alternatives to drag operatio...",
-  "content": "# WCAG 2.2 Updates: What's New\n\n**New Success Criteria**:\n- Focus Appearance (Enhanced): Make focus indicators more visible\n- Dragging Movements: Provide alternatives to drag operations\n- Target Size: Ensure touch targets are large enough (at least 24x24 pixels)\n- Consistent Help: Make help features available consistently\n- Accessible Authentication: Provide alternatives to cognitive tests\n\n**Updated Guidelines**:\n- Pointer Cancellation: Allow users to abort actions initiated by pointer\n- Focus Visible: Enhanced focus visibility requirements\n- Identify Input Purpose: Help autofill capabilities identify form field purposes",
+  "description": "New Success Criteria:\n- Focus Appearance (Enhanced): Make focus indicators more visible\n- Dragging Movements: Provide alternatives to drag operatio.., as defined in WCAG 2.2.",
+  "content": "# WCAG 2.2 (newest standard, October 2023) Updates: What's New\n\n**New Success Criteria**:\n- Focus Appearance (Enhanced): Make focus indicators more visible\n- Dragging Movements: Provide alternatives to drag operations\n- Target Size: Ensure touch targets are large enough (at least 24x24 pixels)\n- Consistent Help: Make help features available consistently\n- Accessible Authentication: Provide alternatives to cognitive tests\n\n**Updated Guidelines**:\n- Pointer Cancellation: Allow users to abort actions initiated by pointer\n- Focus Visible: Enhanced focus visibility requirements\n- Identify Input Purpose: Help autofill capabilities identify form field purposes",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -13,7 +13,9 @@ export const wcagResource42: Article = {
     "Web Standards",
     "Cognitive Accessibility",
     "WCAG 2.2",
-    "Standards"
+    "Standards",
+    "Keyboard Navigation",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -38,4 +40,31 @@ export const wcagResource42: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "WCAG 2.2 Updates: What's New | WCAG Accessibility Guide",
+      metaDescription: "New Success Criteria:\\n- Focus Appearance (Enhanced): Make focus indicators more visible\\n- Dragging Movements: Provide alternatives to drag operatio.., as d...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Cognitive Accessibility, WCAG 2.2, Standards, Keyboard Navigation, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "WCAG 2.2 Updates: What's New",
+        description: "New Success Criteria:\\n- Focus Appearance (Enhanced): Make focus indicators more visible\\n- Dragging Movements: Provide alternatives to drag operatio.., as defined in WCAG 2.2.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

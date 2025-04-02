@@ -4,14 +4,16 @@ export const wcagResource46: Article = {
   "id": "wcag-resource-46",
   "slug": "wcag-resource-print-accessibility-considerations",
   "title": "Print Accessibility Considerations",
-  "description": "Key Requirements:\n- Ensure print styles maintain readability\n- Provide complete information when printed\n- Maintain proper contrast in grayscale\n- ...",
+  "description": "This article covers the WCAG requirements for Print Accessibility Considerations, including requirements:\n- ensure print styles maintain readability\n- provide complete information when printed\n- maintain proper contrast in grayscale\n- ....",
   "content": "# Print Accessibility Considerations\n\n**Key Requirements**:\n- Ensure print styles maintain readability\n- Provide complete information when printed\n- Maintain proper contrast in grayscale\n- Consider users who may read printed versions with disabilities\n\n**Implementation Techniques**:\n- Create specific print stylesheets\n- Expand collapsed content for printing\n- Display full URLs for important links\n- Add QR codes for digital alternatives\n- Test printed output in black and white",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
     "Web Standards",
-    "Color Contrast"
+    "Color Contrast",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -36,4 +38,31 @@ export const wcagResource46: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Print Accessibility Considerations | WCAG Accessibility Guide",
+      metaDescription: "This article covers the WCAG requirements for Print Accessibility Considerations, including requirements:\\n- ensure print styles maintain readability\\n- prov...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Print Accessibility Considerations",
+        description: "This article covers the WCAG requirements for Print Accessibility Considerations, including requirements:\\n- ensure print styles maintain readability\\n- provide complete information when printed\\n- maintain proper contrast in grayscale\\n- ....",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

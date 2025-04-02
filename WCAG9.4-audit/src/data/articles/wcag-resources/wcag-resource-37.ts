@@ -4,7 +4,7 @@ export const wcagResource37: Article = {
   "id": "wcag-resource-37",
   "slug": "wcag-resource-internationalization-and-accessibility",
   "title": "Internationalization and Accessibility",
-  "description": "Key Considerations:\n- Set the lang attribute appropriately\n- Support text resizing without breaking layouts\n- Ensure right-to-left language support...",
+  "description": "This article covers the WCAG requirements for Internationalization and Accessibility, including considerations:\n- set the lang attribute appropriately\n- support text resizing without breaking layouts\n- ensure right-to-left language support....",
   "content": "# Internationalization and Accessibility\n\n**Key Considerations**:\n- Set the lang attribute appropriately\n- Support text resizing without breaking layouts\n- Ensure right-to-left language support when needed\n- Use Unicode character encoding\n\n**Best Practices**:\n- Separate content from presentation\n- Avoid relying on text embedded in images\n- Consider cultural differences in color meanings\n- Test with screen readers in different languages\n- Allow for text expansion (translations often require more space)",
   "category": "wcag-resources",
   "tags": [
@@ -38,4 +38,31 @@ export const wcagResource37: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Internationalization and Accessibility | WCAG Accessibility Guide",
+      metaDescription: "This article covers the WCAG requirements for Internationalization and Accessibility, including considerations:\\n- set the lang attribute appropriately\\n- su...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, ARIA, Screen Readers",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Internationalization and Accessibility",
+        description: "This article covers the WCAG requirements for Internationalization and Accessibility, including considerations:\\n- set the lang attribute appropriately\\n- support text resizing without breaking layouts\\n- ensure right-to-left language support....",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

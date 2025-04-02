@@ -4,13 +4,15 @@ export const wcagResource49: Article = {
   "id": "wcag-resource-49",
   "slug": "wcag-resource-accessibility-statement-best-practices",
   "title": "Accessibility Statement Best Practices",
-  "description": "Key Components:\n- Commitment to accessibility\n- Accessibility standard followed (e.g., WCAG 2.1 AA)\n- Known limitations or exceptions\n- Contact inf...",
-  "content": "# Accessibility Statement Best Practices\n\n**Key Components**:\n- Commitment to accessibility\n- Accessibility standard followed (e.g., WCAG 2.1 AA)\n- Known limitations or exceptions\n- Contact information for accessibility issues\n- Date of last assessment\n\n**Benefits**:\n- Demonstrates commitment to inclusion\n- Provides transparency about accessibility status\n- Helps users understand what accommodations are available\n- Supports legal compliance documentation\n- Creates accountability for ongoing improvements",
+  "description": "This article covers the WCAG requirements for Accessibility Statement Best Practices, including components:\n- commitment to accessibility\n- accessibility standard followed (e.g., wcag 2.1 aa)\n- known limitations or exceptions\n- contact inf....",
+  "content": "# Accessibility Statement Best Practices\n\n**Key Components**:\n- Commitment to accessibility\n- Accessibility standard followed (e.g., WCAG 2.1 (current technical standard) AA)\n- Known limitations or exceptions\n- Contact information for accessibility issues\n- Date of last assessment\n\n**Benefits**:\n- Demonstrates commitment to inclusion\n- Provides transparency about accessibility status\n- Helps users understand what accommodations are available\n- Supports legal compliance documentation\n- Creates accountability for ongoing improvements",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
-    "Web Standards"
+    "Web Standards",
+    "WCAG 2.1",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -35,4 +37,31 @@ export const wcagResource49: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessibility Statement Best Practices | WCAG Accessibility Guide",
+      metaDescription: "This article covers the WCAG requirements for Accessibility Statement Best Practices, including components:\\n- commitment to accessibility\\n- accessibility s...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, WCAG 2.1, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessibility Statement Best Practices",
+        description: "This article covers the WCAG requirements for Accessibility Statement Best Practices, including components:\\n- commitment to accessibility\\n- accessibility standard followed (e.g., wcag 2.1 aa)\\n- known limitations or exceptions\\n- contact inf....",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

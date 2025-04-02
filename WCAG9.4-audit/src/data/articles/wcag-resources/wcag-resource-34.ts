@@ -5,12 +5,15 @@ export const wcagResource34: Article = {
   "slug": "wcag-resource-accessible-data-tables",
   "title": "Accessible Data Tables",
   "description": "Structural Elements:\n- Use `<caption>` to provide a title for the table\n- Use `<th>` for header cells and `<td>` for data cells\n- Use `scope` attri...",
-  "content": "# Accessible Data Tables\n\n**Structural Elements**:\n- Use `<caption>` to provide a title for the table\n- Use `<th>` for header cells and `<td>` for data cells\n- Use `scope` attributes on header cells\n- Include `<thead>`, `<tbody>`, and `<tfoot>` for complex tables\n\n**Additional Techniques**:\n- Add `summary` attribute for complex tables (HTML4) or descriptive text for HTML5\n- Use `aria-describedby` to associate descriptions with tables\n- Consider responsive design techniques for mobile viewing\n- Avoid merged cells when possible",
+  "content": "# Accessible Data Tables\n\n**Structural Elements**:\n- Use `<caption>` to provide a title for the table\n- Use `<th>` for header cells and `<td>` for data cells\n- Use `scope` attributes on header cells\n- Include `<thead>`, `<tbody>`, and `<tfoot>` for complex tables\n\n**Additional Techniques**:\n- Add `summary` attribute for complex tables (HTML4) or descriptive text for HTML5\n- Use `aria-describedby (references another element as the description)` to associate descriptions with tables\n- Consider responsive design techniques for mobile viewing\n- Avoid merged cells when possible",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
-    "Web Standards"
+    "Web Standards",
+    "ARIA",
+    "Semantic HTML",
+    "Mobile Accessibility"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -35,4 +38,31 @@ export const wcagResource34: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessible Data Tables | WCAG Accessibility Guide",
+      metaDescription: "Structural Elements:\\n- Use `<caption>` to provide a title for the table\\n- Use `<th>` for header cells and `<td>` for data cells\\n- Use `scope` attri...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, ARIA, Semantic HTML, Mobile Accessibility",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessible Data Tables",
+        description: "Structural Elements:\\n- Use `<caption>` to provide a title for the table\\n- Use `<th>` for header cells and `<td>` for data cells\\n- Use `scope` attri...",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

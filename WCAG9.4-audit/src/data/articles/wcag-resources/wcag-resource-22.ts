@@ -5,7 +5,7 @@ export const wcagResource22: Article = {
   "slug": "wcag-resource-accessible-carousels-and-sliders",
   "title": "Accessible Carousels and Sliders",
   "description": "Challenge: Carousels (also known as sliders or slideshows) are often inaccessible due to poor keyboard support, confusing screen reader announcemen...",
-  "content": "# Accessible Carousels and Sliders\n\n**Challenge**: Carousels (also known as sliders or slideshows) are often inaccessible due to poor keyboard support, confusing screen reader announcements, and auto-playing content.\n\n**Accessibility Requirements**:\n*   **Pause/Stop/Hide Control (Guideline 2.2.2 - Level A)**: If the carousel auto-plays or moves, provide a clear, keyboard-accessible control to pause, stop, or hide the movement. Pausing should be persistent.\n*   **Keyboard Accessibility**:\n    *   All controls (next/prev buttons, pagination dots/thumbnails) must be keyboard focusable and operable.\n    *   Content within slides (links, buttons) must be reachable via keyboard when the slide is visible.\n    *   Consider allowing `Tab` to move *out* of the carousel, using arrow keys for slide navigation once a control has focus.\n*   **Screen Reader Support**:\n    *   Use `aria-live=\"polite\"` (or `assertive` if essential, but usually polite) on the carousel region to announce slide changes, but avoid excessive verbosity.\n    *   Use `aria-roledescription` to give the carousel a meaningful name (e.g., `aria-roledescription=\"carousel\"`).\n    *   Use `aria-hidden=\"true\"` on non-visible slides to hide their content from screen readers.\n    *   Ensure controls have accessible names (e.g., `<button aria-label=\"Next Slide\">`, `<button aria-label=\"Go to slide 3\">`).\n    *   Consider using `role=\"region\"` with `aria-label` for the whole component.\n*   **Focus Management**: If slides change automatically, ensure focus isn't unexpectedly lost or moved in a confusing way.\n*   **Alternative Access**: Ensure the information presented in the carousel is available elsewhere on the page or site if the carousel itself cannot be made fully accessible.\n\n**Recommendation**: Use carousels sparingly. If used, prioritize accessibility from the start, following ARIA patterns (like the Carousel pattern in the APG) carefully. Often, simpler display methods (like grids or lists) are more accessible and user-friendly.",
+  "content": "# Accessible Carousels and Sliders\n\n**Challenge**: Carousels (also known as sliders or slideshows) are often inaccessible due to poor keyboard support, confusing screen reader announcements, and auto-playing content.\n\n**Accessibility Requirements**:\n*   **Pause/Stop/Hide Control (Guideline 2.2.2 - Level A (minimum accessibility requirements))**: If the carousel auto-plays or moves, provide a clear, keyboard-accessible control to pause, stop, or hide the movement. Pausing should be persistent.\n*   **Keyboard Accessibility**:\n    *   All controls (next/prev buttons, pagination dots/thumbnails) must be keyboard focusable and operable.\n    *   Content within slides (links, buttons) must be reachable via keyboard when the slide is visible.\n    *   Consider allowing `Tab` to move *out* of the carousel, using arrow keys for slide navigation once a control has focus.\n*   **Screen Reader Support**:\n    *   Use `aria-live (indicates dynamic content updates)=\"polite\"` (or `assertive` if essential, but usually polite) on the carousel region to announce slide changes, but avoid excessive verbosity.\n    *   Use `aria-roledescription` to give the carousel a meaningful name (e.g., `aria-roledescription=\"carousel\"`).\n    *   Use `aria-hidden=\"true\"` on non-visible slides to hide their content from screen readers.\n    *   Ensure controls have accessible names (e.g., `<button aria-label=\"Next Slide\">`, `<button aria-label=\"Go to slide 3\">`).\n    *   Consider using `role=\"region\"` with `aria-label` for the whole component.\n*   **Focus Management**: If slides change automatically, ensure focus isn't unexpectedly lost or moved in a confusing way.\n*   **Alternative Access**: Ensure the information presented in the carousel is available elsewhere on the page or site if the carousel itself cannot be made fully accessible.\n\n**Recommendation**: Use carousels sparingly. If used, prioritize accessibility from the start, following ARIA patterns (like the Carousel pattern in the APG) carefully. Often, simpler display methods (like grids or lists) are more accessible and user-friendly.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -13,7 +13,11 @@ export const wcagResource22: Article = {
     "Web Standards",
     "Keyboard Accessibility",
     "ARIA",
-    "Screen Readers"
+    "Screen Readers",
+    "Operable",
+    "Keyboard Navigation",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -68,4 +72,31 @@ export const wcagResource22: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessible Carousels and Sliders | WCAG Accessibility Guide",
+      metaDescription: "Challenge: Carousels (also known as sliders or slideshows) are often inaccessible due to poor keyboard support, confusing screen reader announcemen...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Operable, Keyboard Navigation, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessible Carousels and Sliders",
+        description: "Challenge: Carousels (also known as sliders or slideshows) are often inaccessible due to poor keyboard support, confusing screen reader announcemen...",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

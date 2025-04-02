@@ -5,12 +5,13 @@ export const wcagResource45: Article = {
   "slug": "wcag-resource-reading-level-and-plain-language",
   "title": "Reading Level and Plain Language",
   "description": "WCAG Requirement:\nLevel AAA requires content to be understandable at a lower secondary education reading level.",
-  "content": "# Reading Level and Plain Language\n\n**WCAG Requirement**:\nLevel AAA requires content to be understandable at a lower secondary education reading level.\n\n**Guidelines**:\n- Use simple, direct language\n- Avoid jargon, idioms, and figurative language\n- Write short sentences with single ideas\n- Define technical terms when they must be used\n- Use active voice when possible\n\n**Testing Methods**:\n- Flesch-Kincaid Grade Level test\n- SMOG Index\n- Automated readability tools and services",
+  "content": "# Reading Level and Plain Language\n\n**WCAG Requirement**:\nLevel A (minimum accessibility requirements)AA requires content to be understandable at a lower secondary education reading level.\n\n**Guidelines**:\n- Use simple, direct language\n- Avoid jargon, idioms, and figurative language\n- Write short sentences with single ideas\n- Define technical terms when they must be used\n- Use active voice when possible\n\n**Testing Methods**:\n- Flesch-Kincaid Grade Level test\n- SMOG Index\n- Automated readability tools and services",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
-    "Web Standards"
+    "Web Standards",
+    "Understandable"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -40,4 +41,31 @@ export const wcagResource45: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Reading Level and Plain Language | WCAG Accessibility Guide",
+      metaDescription: "WCAG Requirement:\\nLevel AAA requires content to be understandable at a lower secondary education reading level.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Understandable",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Reading Level and Plain Language",
+        description: "WCAG Requirement:\\nLevel AAA requires content to be understandable at a lower secondary education reading level.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

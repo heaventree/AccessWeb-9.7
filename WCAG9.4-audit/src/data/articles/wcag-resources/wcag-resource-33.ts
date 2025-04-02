@@ -4,13 +4,14 @@ export const wcagResource33: Article = {
   "id": "wcag-resource-33",
   "slug": "wcag-resource-wcag-audit-tools-and-techniques",
   "title": "WCAG Audit Tools and Techniques",
-  "description": "Manual vs. Automated Testing:\n- Automated tools catch approximately 30-40% of issues\n- Manual testing is essential for user experience and context-...",
+  "description": "Manual vs. Automated Testing:\n- Automated tools catch approximately 30-40% of issues\n- Manual testing is essential for user experience and context-.., as part of the WCAG standards.",
   "content": "# WCAG Audit Tools and Techniques\n\n**Manual vs. Automated Testing**:\n- Automated tools catch approximately 30-40% of issues\n- Manual testing is essential for user experience and context-dependent issues\n\n**Popular Testing Tools**:\n- WAVE (Web Accessibility Evaluation Tool)\n- axe by Deque\n- IBM Equal Access Accessibility Checker\n- Lighthouse (Chrome DevTools)\n- Screen readers: NVDA, JAWS, VoiceOver\n\n**Testing Methodology**:\n- Combine automated with manual testing\n- Test with actual assistive technologies\n- Include users with disabilities in testing when possible",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
-    "Web Standards"
+    "Web Standards",
+    "Screen Readers"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -40,4 +41,31 @@ export const wcagResource33: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "WCAG Audit Tools and Techniques | WCAG Accessibility Guide",
+      metaDescription: "Manual vs. Automated Testing:\\n- Automated tools catch approximately 30-40% of issues\\n- Manual testing is essential for user experience and context-.., as p...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Screen Readers",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "WCAG Audit Tools and Techniques",
+        description: "Manual vs. Automated Testing:\\n- Automated tools catch approximately 30-40% of issues\\n- Manual testing is essential for user experience and context-.., as part of the WCAG standards.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

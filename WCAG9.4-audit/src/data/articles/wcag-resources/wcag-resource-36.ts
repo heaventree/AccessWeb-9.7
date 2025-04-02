@@ -14,7 +14,8 @@ export const wcagResource36: Article = {
     "Color Contrast",
     "Keyboard Accessibility",
     "ARIA",
-    "Screen Readers"
+    "Screen Readers",
+    "Keyboard Navigation"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -39,4 +40,31 @@ export const wcagResource36: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessible Drag and Drop Interfaces | WCAG Accessibility Guide",
+      metaDescription: "Guidelines:\\n- Always provide keyboard alternatives for drag operations\\n- Use ARIA live regions to announce changes\\n- Ensure visible focus indicator...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Keyboard Accessibility, ARIA, Screen Readers, Keyboard Navigation",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessible Drag and Drop Interfaces",
+        description: "Guidelines:\\n- Always provide keyboard alternatives for drag operations\\n- Use ARIA live regions to announce changes\\n- Ensure visible focus indicator...",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

@@ -4,13 +4,16 @@ export const wcagResource15: Article = {
   "id": "wcag-resource-15",
   "slug": "wcag-resource-multimedia-accessibility-captions-and-transcripts",
   "title": "Multimedia Accessibility: Captions and Transcripts",
-  "description": "Focus: Making audio and video content accessible to users with auditory or visual disabilities.",
-  "content": "# Multimedia Accessibility: Captions and Transcripts\n\n**Focus**: Making audio and video content accessible to users with auditory or visual disabilities.\n\n**Captions (Guideline 1.2.2 - Level A for Prerecorded, 1.2.4 - Level AA for Live)**:\n*   **What**: Synchronized text for dialogue and important non-speech audio (e.g., [door slams], [music playing]).\n*   **Who**: Primarily benefits users who are deaf or hard of hearing, but also useful in noisy environments or for non-native speakers.\n*   **How**: Typically provided as Closed Captions (user can toggle on/off) via formats like WebVTT or SRT.\n\n**Audio Descriptions (Guideline 1.2.3 - Level A / 1.2.5 - Level AA for Prerecorded)**:\n*   **What**: Narration added to the soundtrack to describe important visual details that cannot be understood from the main soundtrack alone.\n*   **Who**: Primarily benefits users who are blind or have low vision.\n*   **How**: Integrated into the audio track during pauses or via a separate descriptive track. Extended descriptions (Level AA) pause the video if needed.\n\n**Transcripts (Guideline 1.2.1 - Level A for Audio-only/Video-only, 1.2.3 - Level A as alternative for Synced Media)**:\n*   **What**: A full text version of the spoken audio and relevant non-speech sounds. For video, it should also describe important visual information.\n*   **Who**: Benefits users who are deaf, hard of hearing, deaf-blind, or anyone who prefers/needs to read the content. Also makes content searchable.\n*   **How**: Provided as an HTML page or downloadable document linked near the media.\n\n**Best Practice**: Provide captions and transcripts for all prerecorded multimedia. Provide audio descriptions where visual information is critical.",
+  "description": "Focus: Making audio and video content accessible to users with auditory or visual disabilities. Focus: Making audio and video content accessible to users wit...",
+  "content": "# Multimedia Accessibility: Captions and Transcripts\n\n**Focus**: Making audio and video content accessible to users with auditory or visual disabilities.\n\n**Captions (Guideline 1.2.2 - Level A (minimum accessibility requirements) for Prerecorded, 1.2.4 - Level A (minimum accessibility requirements)A for Live)**:\n*   **What**: Synchronized text for dialogue and important non-speech audio (e.g., [door slams], [music playing]).\n*   **Who**: Primarily benefits users who are deaf or hard of hearing, but also useful in noisy environments or for non-native speakers.\n*   **How**: Typically provided as Closed Captions (user can toggle on/off) via formats like WebVTT or SRT.\n\n**Audio Descriptions (Guideline 1.2.3 - Level A (minimum accessibility requirements) / 1.2.5 - Level A (minimum accessibility requirements)A for Prerecorded)**:\n*   **What**: Narration added to the soundtrack to describe important visual details that cannot be understood from the main soundtrack alone.\n*   **Who**: Primarily benefits users who are blind or have low vision.\n*   **How**: Integrated into the audio track during pauses or via a separate descriptive track. Extended descriptions (Level A (minimum accessibility requirements)A) pause the video if needed.\n\n**Transcripts (Guideline 1.2.1 - Level A (minimum accessibility requirements) for Audio-only/Video-only, 1.2.3 - Level A (minimum accessibility requirements) as alternative for Synced Media)**:\n*   **What**: A full text version of the spoken audio and relevant non-speech sounds. For video, it should also describe important visual information.\n*   **Who**: Benefits users who are deaf, hard of hearing, deaf-blind, or anyone who prefers/needs to read the content. Also makes content searchable.\n*   **How**: Provided as an HTML page or downloadable document linked near the media.\n\n**Best Practice**: Provide captions and transcripts for all prerecorded multimedia. Provide audio descriptions where visual information is critical.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
-    "Web Standards"
+    "Web Standards",
+    "Alt Text",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -95,4 +98,31 @@ export const wcagResource15: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Multimedia Accessibility: Captions and Transcripts | WCAG Accessibility Guide",
+      metaDescription: "Focus: Making audio and video content accessible to users with auditory or visual disabilities. Focus: Making audio and video content accessible to users wit...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Alt Text, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Multimedia Accessibility: Captions and Transcripts",
+        description: "Focus: Making audio and video content accessible to users with auditory or visual disabilities. Focus: Making audio and video content accessible to users wit...",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

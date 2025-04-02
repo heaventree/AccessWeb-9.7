@@ -4,13 +4,18 @@ export const wcagResource4: Article = {
   "id": "wcag-resource-4",
   "slug": "wcag-resource-key-updates-in-wcag-22",
   "title": "Key Updates in WCAG 2.2",
-  "description": "Release Date: WCAG 2.2 became a W3C Recommendation on October 5, 2023.",
-  "content": "# Key Updates in WCAG 2.2\n\n**Release Date**: WCAG 2.2 became a W3C Recommendation on October 5, 2023.\n\n**Main Focus**: WCAG 2.2 builds upon WCAG 2.1, adding new success criteria primarily aimed at improving accessibility for users with cognitive or learning disabilities, users with low vision, and users on mobile devices. It also removes one criterion (4.1.1 Parsing).\n\n**New Success Criteria (Examples)**:\n*   **2.4.11 Focus Not Obscured (Minimum) (AA)**: Ensures that when an element receives focus, it's not completely hidden by other content (like sticky headers/footers).\n*   **2.5.7 Dragging Movements (AA)**: If functionality requires dragging, provide a simple pointer alternative (e.g., click/tap).\n*   **3.3.7 Redundant Entry (A)**: Avoid asking users to re-enter information they've already provided in the same process.\n*   **3.3.8 Accessible Authentication (Minimum) (AA)**: Don't rely solely on cognitive function tests (like remembering passwords or solving puzzles) for authentication if alternatives exist.\n\n**Backward Compatibility**: WCAG 2.2 maintains backward compatibility with 2.1 and 2.0. Content conforming to 2.2 also conforms to 2.1 and 2.0.",
+  "description": "Release Date: WCAG 2.2 became a W3C Recommendation on October 5, 2023. Release Date: WCAG 2.2 became a W3C Recommendation on October 5, 2023.",
+  "content": "# Key Updates in WCAG 2.2 (newest standard, October 2023)\n\n**Release Date**: WCAG 2.2 (newest standard, October 2023) became a W3C Recommendation on October 5, 2023.\n\n**Main Focus**: WCAG 2.2 (newest standard, October 2023) builds upon WCAG 2.1 (current technical standard), adding new success criteria primarily aimed at improving accessibility for users with cognitive or learning disabilities, users with low vision, and users on mobile devices. It also removes one criterion (4.1.1 Parsing).\n\n**New Success Criteria (Examples)**:\n*   **2.4.11 Focus Not Obscured (Minimum) (AA)**: Ensures that when an element receives focus, it's not completely hidden by other content (like sticky headers/footers).\n*   **2.5.7 Dragging Movements (AA)**: If functionality requires dragging, provide a simple pointer alternative (e.g., click/tap).\n*   **3.3.7 Redundant Entry (A)**: Avoid asking users to re-enter information they've already provided in the same process.\n*   **3.3.8 Accessible Authentication (Minimum) (AA)**: Don't rely solely on cognitive function tests (like remembering passwords or solving puzzles) for authentication if alternatives exist.\n\n**Backward Compatibility**: WCAG 2.2 (newest standard, October 2023) maintains backward compatibility with 2.1 and 2.0. Content conforming to 2.2 also conforms to 2.1 and 2.0.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
-    "Web Standards"
+    "Web Standards",
+    "WCAG 2.1",
+    "WCAG 2.2",
+    "Semantic HTML",
+    "Mobile Accessibility",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -65,4 +70,31 @@ export const wcagResource4: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Key Updates in WCAG 2.2 | WCAG Accessibility Guide",
+      metaDescription: "Release Date: WCAG 2.2 became a W3C Recommendation on October 5, 2023. Release Date: WCAG 2.2 became a W3C Recommendation on October 5, 2023.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, WCAG 2.1, WCAG 2.2, Semantic HTML, Mobile Accessibility, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Key Updates in WCAG 2.2",
+        description: "Release Date: WCAG 2.2 became a W3C Recommendation on October 5, 2023. Release Date: WCAG 2.2 became a W3C Recommendation on October 5, 2023.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

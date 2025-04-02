@@ -5,7 +5,7 @@ export const wcagResource23: Article = {
   "slug": "wcag-resource-accessible-charts-and-graphs",
   "title": "Accessible Charts and Graphs",
   "description": "Challenge: Visual charts and graphs present data in a way that is inherently inaccessible to users who are blind or have significant low vision. Co...",
-  "content": "# Accessible Charts and Graphs\n\n**Challenge**: Visual charts and graphs present data in a way that is inherently inaccessible to users who are blind or have significant low vision. Color contrast issues can also affect users with low vision or color blindness.\n\n**Making Data Visualizations Accessible**:\n*   **Provide Text Alternatives**:\n    *   **Summary**: Include a concise text summary of the key insights or trends presented in the chart (Guideline 1.1.1 - Level A).\n    *   **Data Table**: Present the raw data in an accessible HTML table near the chart. This allows screen reader users to access the exact figures.\n*   **Use SVG or Canvas with Accessibility Features**:\n    *   **SVG (Scalable Vector Graphics)**: Preferred method. Add `<title>` and `<desc>` elements within the `<svg>` for accessible names and descriptions. Use ARIA roles (`role=\"img\"`, `aria-labelledby`, `aria-describedby`) to link text elements to the graphic. Ensure interactive elements (tooltips) are keyboard accessible.\n    *   **Canvas**: More complex. Requires using fallback content within the `<canvas>` tags and potentially using ARIA or an Accessibility Object Model (AOM) to expose information.\n*   **Color and Contrast**:\n    *   Use color palettes that are distinguishable by people with color blindness (avoid red/green combinations alone).\n    *   Ensure sufficient contrast between graphical elements (lines, bars) and the background, and within text elements (labels, legends) (Guideline 1.4.11 - Level AA for non-text contrast).\n    *   Use patterns, textures, or different shapes in addition to color to differentiate data series (Guideline 1.4.1 - Level A).\n*   **Interactivity**: Ensure any interactive features (tooltips on hover, zooming) are also available via keyboard and announced by screen readers.\n\n**Example (SVG Structure)**:\n```html\n<figure>\n  <figcaption>Figure 1: Monthly Website Visits</figcaption>\n  <svg role=\"img\" aria-labelledby=\"chart-title chart-desc\">\n    <title id=\"chart-title\">Bar chart showing monthly website visits</title>\n    <desc id=\"chart-desc\">Visits increased steadily from 1000 in January to 2500 in June.</desc>\n    <!-- SVG chart elements go here -->\n  </svg>\n  <!-- Optional: Link to data table -->\n  <p><a href=\"#data-table-1\">View data for Figure 1</a></p>\n</figure>\n```",
+  "content": "# Accessible Charts and Graphs\n\n**Challenge**: Visual charts and graphs present data in a way that is inherently inaccessible to users who are blind or have significant low vision. Color contrast issues can also affect users with low vision or color blindness.\n\n**Making Data Visualizations Accessible**:\n*   **Provide Text Alternatives**:\n    *   **Summary**: Include a concise text summary of the key insights or trends presented in the chart (Guideline 1.1.1 - Level A (minimum accessibility requirements)).\n    *   **Data Table**: Present the raw data in an accessible HTML table near the chart. This allows screen reader users to access the exact figures.\n*   **Use SVG or Canvas with Accessibility Features**:\n    *   **SVG (Scalable Vector Graphics)**: Preferred method. Add `<title>` and `<desc>` elements within the `<svg>` for accessible names and descriptions. Use ARIA roles (`role=\"img\"`, `aria-labelledby`, `aria-describedby`) to link text elements to the graphic. Ensure interactive elements (tooltips) are keyboard accessible.\n    *   **Canvas**: More complex. Requires using fallback content within the `<canvas>` tags and potentially using ARIA or an Accessibility Object Model (AOM) to expose information.\n*   **Color and Contrast**:\n    *   Use color palettes that are distinguishable by people with color blindness (avoid red/green combinations alone).\n    *   Ensure sufficient contrast between graphical elements (lines, bars) and the background, and within text elements (labels, legends) (Guideline 1.4.11 - Level AA for non-text contrast).\n    *   Use patterns, textures, or different shapes in addition to color to differentiate data series (Guideline 1.4.1 - Level A).\n*   **Interactivity**: Ensure any interactive features (tooltips on hover, zooming) are also available via keyboard and announced by screen readers.\n\n**Example (SVG Structure)**:\n```html\n<figure>\n  <figcaption>Figure 1: Monthly Website Visits</figcaption>\n  <svg role=\"img\" aria-labelledby=\"chart-title chart-desc\">\n    <title id=\"chart-title\">Bar chart showing monthly website visits</title>\n    <desc id=\"chart-desc\">Visits increased steadily from 1000 in January to 2500 in June.</desc>\n    <!-- SVG chart elements go here -->\n  </svg>\n  <!-- Optional: Link to data table -->\n  <p><a href=\"#data-table-1\">View data for Figure 1</a></p>\n</figure>\n```",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -14,7 +14,8 @@ export const wcagResource23: Article = {
     "Color Contrast",
     "Keyboard Accessibility",
     "ARIA",
-    "Screen Readers"
+    "Screen Readers",
+    "Alt Text"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -84,4 +85,31 @@ export const wcagResource23: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessible Charts and Graphs | WCAG Accessibility Guide",
+      metaDescription: "Challenge: Visual charts and graphs present data in a way that is inherently inaccessible to users who are blind or have significant low vision. Co...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Keyboard Accessibility, ARIA, Screen Readers, Alt Text",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessible Charts and Graphs",
+        description: "Challenge: Visual charts and graphs present data in a way that is inherently inaccessible to users who are blind or have significant low vision. Co...",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

@@ -69,4 +69,31 @@ export const wcagResource19: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessible E-Commerce Design | WCAG Accessibility Guide",
+      metaDescription: "Goal: Ensure users with disabilities can browse products, understand details, add items to cart, and complete the checkout process without barriers.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Keyboard Accessibility, ARIA, Screen Readers",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessible E-Commerce Design",
+        description: "Goal: Ensure users with disabilities can browse products, understand details, add items to cart, and complete the checkout process without barriers.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

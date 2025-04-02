@@ -4,14 +4,15 @@ export const wcagResource26: Article = {
   "id": "wcag-resource-26",
   "slug": "wcag-resource-cognitive-accessibility-simplifying-content-",
   "title": "Cognitive Accessibility: Simplifying Content  ",
-  "description": "Why It Matters:  \nUsers with cognitive disabilities benefit from clear, simple language and predictable layouts.  ",
+  "description": "Why It Matters:  \nUsers with cognitive disabilities benefit from clear, simple language and predictable layouts.  .",
   "content": "# Cognitive Accessibility: Simplifying Content  \n\n**Why It Matters**:  \nUsers with cognitive disabilities benefit from clear, simple language and predictable layouts.  \n\n**Techniques**:  \n- Use plain language (avoid jargon).  \n- Ensure consistent navigation and layout.  \n- Break down complex tasks into smaller steps.  \n- Use visuals to support text content.  \n- Allow users to control timing and interruptions.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
     "Web Standards",
-    "Cognitive Accessibility"
+    "Cognitive Accessibility",
+    "Semantic HTML"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -36,4 +37,31 @@ export const wcagResource26: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Cognitive Accessibility: Simplifying Content   | WCAG Accessibility Guide",
+      metaDescription: "Why It Matters:  \\nUsers with cognitive disabilities benefit from clear, simple language and predictable layouts.  .",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Cognitive Accessibility, Semantic HTML",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Cognitive Accessibility: Simplifying Content  ",
+        description: "Why It Matters:  \\nUsers with cognitive disabilities benefit from clear, simple language and predictable layouts.  .",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

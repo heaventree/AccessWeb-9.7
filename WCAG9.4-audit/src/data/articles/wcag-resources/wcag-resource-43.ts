@@ -10,7 +10,8 @@ export const wcagResource43: Article = {
   "tags": [
     "WCAG",
     "Accessibility",
-    "Web Standards"
+    "Web Standards",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -35,4 +36,31 @@ export const wcagResource43: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Voice Recognition Compatibility | WCAG Accessibility Guide",
+      metaDescription: "User Needs:\\n- People with physical disabilities often rely on voice commands\\n- Requires clear, consistent interactive elements\\n- Compatible with di...",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Voice Recognition Compatibility",
+        description: "User Needs:\\n- People with physical disabilities often rely on voice commands\\n- Requires clear, consistent interactive elements\\n- Compatible with di...",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

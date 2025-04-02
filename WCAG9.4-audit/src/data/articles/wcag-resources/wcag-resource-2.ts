@@ -10,12 +10,14 @@ export const wcagResource2: Article = {
   "tags": [
     "WCAG",
     "Accessibility",
-    "Web Standards",
-    "Keyboard Accessibility",
     "Perceivable",
     "Operable",
     "Understandable",
-    "Robust"
+    "Robust",
+    "Alt Text",
+    "Form Controls",
+    "Keyboard Accessibility",
+    "Semantic HTML"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -65,4 +67,31 @@ export const wcagResource2: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Understanding WCAG: Principles and Guidelines | WCAG Accessibility Guide",
+      metaDescription: "What is WCAG?: The Web Content Accessibility Guidelines (WCAG) are developed through the W3C process in cooperation with individuals and organizati...",
+      metaKeywords: "WCAG, Accessibility, Perceivable, Operable, Understandable, Robust, Alt Text, Form Controls, Keyboard Accessibility, Semantic HTML",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Understanding WCAG: Principles and Guidelines",
+        description: "What is WCAG?: The Web Content Accessibility Guidelines (WCAG) are developed through the W3C process in cooperation with individuals and organizati...",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

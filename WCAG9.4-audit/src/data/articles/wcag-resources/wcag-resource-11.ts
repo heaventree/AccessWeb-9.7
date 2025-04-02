@@ -5,7 +5,7 @@ export const wcagResource11: Article = {
   "slug": "wcag-resource-robust-compatibility-parsing-name-role-value",
   "title": "Robust: Compatibility (Parsing & Name, Role, Value)",
   "description": "Guideline 4.1: Maximize compatibility with current and future user agents, including assistive technologies.",
-  "content": "# Robust: Compatibility (Parsing & Name, Role, Value)\n\n**Guideline 4.1**: Maximize compatibility with current and future user agents, including assistive technologies.\n\n**Key Success Criteria**:\n*   **Parsing (Level A - Obsolete in WCAG 2.2)**: *Historically*, this required elements to have complete start/end tags, be nested correctly, avoid duplicate attributes, and have unique IDs. While removed from WCAG 2.2 (as modern browsers handle minor errors well), writing valid, well-formed HTML is still crucial for baseline robustness.\n*   **Name, Role, Value (Level A)**: For all user interface components (links, form elements, custom widgets), their *name* (label) and *role* (type of component) must be programmatically determinable (accessible to assistive tech). Their *states*, *properties*, and *values* (if they change) must also be programmatically determinable and notifications of changes must be available.\n\n**Importance**: Ensures that assistive technologies (like screen readers) can accurately interpret and interact with web content and controls. This is fundamental for enabling access. Using standard HTML controls correctly often satisfies this. ARIA (Accessible Rich Internet Applications) is used to define name, role, and value for custom controls.",
+  "content": "# Robust: Compatibility (Parsing & Name, Role, Value)\n\n**Guideline 4.1**: Maximize compatibility with current and future user agents, including assistive technologies.\n\n**Key Success Criteria**:\n*   **Parsing (Level A (minimum accessibility requirements) - Obsolete in WCAG 2.2 (newest standard, October 2023))**: *Historically*, this required elements to have complete start/end tags, be nested correctly, avoid duplicate attributes, and have unique IDs. While removed from WCAG 2.2 (newest standard, October 2023) (as modern browsers handle minor errors well), writing valid, well-formed HTML is still crucial for baseline robustness.\n*   **Name, Role, Value (Level A (minimum accessibility requirements))**: For all user interface components (links, form elements, custom widgets), their *name* (label) and *role* (type of component) must be programmatically determinable (accessible to assistive tech). Their *states*, *properties*, and *values* (if they change) must also be programmatically determinable and notifications of changes must be available.\n\n**Importance**: Ensures that assistive technologies (like screen readers) can accurately interpret and interact with web content and controls. This is fundamental for enabling access. Using standard HTML controls correctly often satisfies this. ARIA (Accessible Rich Internet Applications) is used to define name, role, and value for custom controls.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
@@ -13,7 +13,9 @@ export const wcagResource11: Article = {
     "Web Standards",
     "ARIA",
     "Screen Readers",
-    "Robust"
+    "Robust",
+    "WCAG 2.2",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -53,4 +55,31 @@ export const wcagResource11: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Robust: Compatibility (Parsing & Name, Role, Value) | WCAG Accessibility Guide",
+      metaDescription: "Guideline 4.1: Maximize compatibility with current and future user agents, including assistive technologies.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, ARIA, Screen Readers, Robust, WCAG 2.2, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Robust: Compatibility (Parsing & Name, Role, Value)",
+        description: "Guideline 4.1: Maximize compatibility with current and future user agents, including assistive technologies.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

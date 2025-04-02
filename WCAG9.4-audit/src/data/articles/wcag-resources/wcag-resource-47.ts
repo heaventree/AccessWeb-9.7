@@ -4,7 +4,7 @@ export const wcagResource47: Article = {
   "id": "wcag-resource-47",
   "slug": "wcag-resource-accessibility-in-design-systems",
   "title": "Accessibility in Design Systems",
-  "description": "Components to Standardize:\n- Focus indicators\n- Error messages\n- Form elements\n- Navigation patterns\n- Modal dialogs\n- Notification systems",
+  "description": "Components to Standardize:\n- Focus indicators\n- Error messages\n- Form elements\n- Navigation patterns\n- Modal dialogs\n- Notification systems.",
   "content": "# Accessibility in Design Systems\n\n**Components to Standardize**:\n- Focus indicators\n- Error messages\n- Form elements\n- Navigation patterns\n- Modal dialogs\n- Notification systems\n\n**Implementation Approaches**:\n- Build accessibility into base components\n- Document accessibility features and requirements\n- Include keyboard interaction patterns\n- Specify ARIA attributes for complex components\n- Establish testing procedures for all components",
   "category": "wcag-resources",
   "tags": [
@@ -13,7 +13,10 @@ export const wcagResource47: Article = {
     "Web Standards",
     "Keyboard Accessibility",
     "ARIA",
-    "Screen Readers"
+    "Screen Readers",
+    "Keyboard Navigation",
+    "Semantic HTML",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -38,4 +41,31 @@ export const wcagResource47: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Accessibility in Design Systems | WCAG Accessibility Guide",
+      metaDescription: "Components to Standardize:\\n- Focus indicators\\n- Error messages\\n- Form elements\\n- Navigation patterns\\n- Modal dialogs\\n- Notification systems.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Keyboard Navigation, Semantic HTML, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Accessibility in Design Systems",
+        description: "Components to Standardize:\\n- Focus indicators\\n- Error messages\\n- Form elements\\n- Navigation patterns\\n- Modal dialogs\\n- Notification systems.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };

@@ -4,14 +4,16 @@ export const wcagResource6: Article = {
   "id": "wcag-resource-6",
   "slug": "wcag-resource-perceivable-captions-and-audio-descriptions",
   "title": "Perceivable: Captions and Audio Descriptions",
-  "description": "Guideline 1.2: Provide alternatives for time-based media.",
-  "content": "# Perceivable: Captions and Audio Descriptions\n\n**Guideline 1.2**: Provide alternatives for time-based media.\n\n**Captions (for Audio Content in Video)**:\n*   **Purpose**: Provide synchronized text equivalents for spoken dialogue, sound effects, and other relevant audio information for users who are deaf or hard of hearing.\n*   **Types**: Closed Captions (can be turned on/off) vs. Open Captions (always visible). Closed captions are generally preferred.\n*   **WCAG Levels**: Required for prerecorded audio content (Level A), live audio content (Level AA).\n\n**Audio Descriptions (for Visual Content in Video)**:\n*   **Purpose**: Provide narration describing key visual elements (actions, characters, scene changes, on-screen text) for users who are blind or have low vision.\n*   **Timing**: Inserted during natural pauses in the dialogue.\n*   **WCAG Levels**: Required for prerecorded video content (Level A for basic, Level AA for extended).\n\n**Transcripts**: A full text version of audio or video content. Useful for everyone, especially those who prefer reading or need to search content. Required for prerecorded audio-only/video-only (Level A), recommended for all multimedia.",
+  "description": "Guideline 1.2: Provide alternatives for time-based media. Guideline 1.2: Provide alternatives for time-based media.",
+  "content": "# Perceivable: Captions and Audio Descriptions\n\n**Guideline 1.2**: Provide alternatives for time-based media.\n\n**Captions (for Audio Content in Video)**:\n*   **Purpose**: Provide synchronized text equivalents for spoken dialogue, sound effects, and other relevant audio information for users who are deaf or hard of hearing.\n*   **Types**: Closed Captions (can be turned on/off) vs. Open Captions (always visible). Closed captions are generally preferred.\n*   **WCAG Levels**: Required for prerecorded audio content (Level A (minimum accessibility requirements)), live audio content (Level A (minimum accessibility requirements)A).\n\n**Audio Descriptions (for Visual Content in Video)**:\n*   **Purpose**: Provide narration describing key visual elements (actions, characters, scene changes, on-screen text) for users who are blind or have low vision.\n*   **Timing**: Inserted during natural pauses in the dialogue.\n*   **WCAG Levels**: Required for prerecorded video content (Level A (minimum accessibility requirements) for basic, Level A (minimum accessibility requirements)A for extended).\n\n**Transcripts**: A full text version of audio or video content. Useful for everyone, especially those who prefer reading or need to search content. Required for prerecorded audio-only/video-only (Level A (minimum accessibility requirements)), recommended for all multimedia.",
   "category": "wcag-resources",
   "tags": [
     "WCAG",
     "Accessibility",
     "Web Standards",
-    "Perceivable"
+    "Perceivable",
+    "Alt Text",
+    "Form Controls"
   ],
   "author": {
     "name": "Accessibility Team",
@@ -76,4 +78,31 @@ export const wcagResource6: Article = {
       "level": 2
     }
   ]
+,
+  "metadata": {
+      metaTitle: "Perceivable: Captions and Audio Descriptions | WCAG Accessibility Guide",
+      metaDescription: "Guideline 1.2: Provide alternatives for time-based media. Guideline 1.2: Provide alternatives for time-based media.",
+      metaKeywords: "WCAG, Accessibility, Web Standards, Perceivable, Alt Text, Form Controls",
+      structuredData: {
+        _context: "https://schema.org",
+        _type: "Article",
+        headline: "Perceivable: Captions and Audio Descriptions",
+        description: "Guideline 1.2: Provide alternatives for time-based media. Guideline 1.2: Provide alternatives for time-based media.",
+        image: vectorImage,
+        author: {
+          _type: "Organization",
+          name: "Accessibility Team"
+    },
+        publisher: {
+          _type: "Organization",
+          name: "WCAG 9.4 Audit",
+          logo: {
+            _type: "ImageObject",
+            url: `${window.location.origin}/logo.svg`
+      }
+    },
+        datePublished: publishedAt,
+        dateModified: updatedAt
+  }
+}
 };
