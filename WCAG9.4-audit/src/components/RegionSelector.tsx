@@ -82,32 +82,32 @@ export function RegionSelector({ selectedRegion, onRegionChange }: RegionSelecto
           {regions
             .find(r => r.id === selectedRegion)
             ?.standards.map((standard, index) => {
-              // Get color based on standard type with more distinct colors
+              // Get color based on standard type with highly distinctive colors
               let colorClass = '';
               if (standard.includes('WCAG 2.1')) {
-                colorClass = 'bg-blue-100 text-blue-800 border-blue-200';
+                colorClass = 'bg-blue-500 text-white border-blue-700';
               } else if (standard.includes('WCAG 2.2')) {
-                colorClass = 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                colorClass = 'bg-purple-600 text-white border-purple-800';
               } else if (standard.includes('ADA')) {
-                colorClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                colorClass = 'bg-green-500 text-white border-green-700';
               } else if (standard.includes('508')) {
-                colorClass = 'bg-cyan-100 text-cyan-800 border-cyan-200';
+                colorClass = 'bg-orange-500 text-white border-orange-700';
               } else if (standard.includes('EN')) {
-                colorClass = 'bg-violet-100 text-violet-800 border-violet-200';
+                colorClass = 'bg-red-500 text-white border-red-700';
               } else if (standard.includes('EAA')) {
-                colorClass = 'bg-purple-100 text-purple-800 border-purple-200';
+                colorClass = 'bg-yellow-500 text-yellow-900 border-yellow-700';
               } else if (standard.includes('JIS')) {
-                colorClass = 'bg-rose-100 text-rose-800 border-rose-200';
+                colorClass = 'bg-pink-500 text-white border-pink-700';
               } else if (standard.includes('ISO')) {
-                colorClass = 'bg-amber-100 text-amber-800 border-amber-200';
+                colorClass = 'bg-indigo-500 text-white border-indigo-700';
               } else if (standard.includes('AODA')) {
-                colorClass = 'bg-red-100 text-red-800 border-red-200';
+                colorClass = 'bg-red-600 text-white border-red-800';
               } else if (standard.includes('DDA')) {
-                colorClass = 'bg-lime-100 text-lime-800 border-lime-200';
+                colorClass = 'bg-emerald-600 text-white border-emerald-800';
               } else if (standard.includes('GDS')) {
-                colorClass = 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200';
+                colorClass = 'bg-fuchsia-600 text-white border-fuchsia-800';
               } else {
-                colorClass = 'bg-gray-100 text-gray-800 border-gray-200';
+                colorClass = 'bg-gray-600 text-white border-gray-800';
               }
 
               return (
