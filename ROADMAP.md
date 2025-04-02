@@ -1,12 +1,19 @@
 # WCAG Accessibility Checker Roadmap
 
+This document outlines our plans for enhancing the WCAG 9.4 Accessibility Checker project.
+
 ## Completed
+
 - ✅ PDF accessibility testing: Integrated PDF document accessibility evaluation with detailed reporting and fix suggestions
 - ✅ Fixed CORS issues: Improved web page fetching mechanism with multiple proxy fallbacks
 - ✅ Enhanced error reporting and logging in network operations
 - ✅ Fixed TypeScript errors and code quality issues
+- ✅ Improved WCAG article content quality and formatting
+- ✅ Added implementation tips to accessibility resource articles
+- ✅ Fixed broken metadata in articles
 
-## Current Development (Group 2)
+## Current Development
+
 - 🔄 Media Accessibility Testing
   - Support for evaluating media elements (audio, video) on web pages
   - Audio transcription validation
@@ -16,7 +23,8 @@
 
 ## Planned Features
 
-### Group 3: User Experience and Guidance Features
+### User Experience and Guidance Features
+
 - 🌟 Animated WCAG Compliance Walkthrough
   - Interactive step-by-step guide through WCAG compliance requirements with animated visualizations
   - Visual demonstrations of accessibility principles with before/after comparisons
@@ -27,11 +35,13 @@
   - Accessibility score visualization with animated progress indicators
   - Gamified learning elements to encourage compliance completion
   - Shareable compliance reports to demonstrate progress to stakeholders
+
 - 🔄 One-Click Accessibility Enhancement Suggestions
   - Instantly apply recommended accessibility fixes to your content with a single click
   - AI-powered fix recommendations
   - Preview changes before applying
   - Bulk fix application options
+
 - 🔄 Content Organization and Navigation Improvements
   - Reorganize content across multiple sections (/docs, /help, /blog, /integrations)
   - Reduce content duplication between sections
@@ -40,8 +50,9 @@
   - Implement intelligent content recommendation system
   - Add contextual navigation aids for easier information discovery
   - Create specialized content paths for different user roles (developers, designers, content creators)
-  
-### Group 4: Document Format Testing
+
+### Document Format Testing
+
 - Extend document testing to additional formats:
   - Microsoft Word (.docx) files
   - PowerPoint presentations
@@ -50,6 +61,7 @@
   - EPUB document testing
 
 ### Future Enhancements
+
 - Performance optimization for large websites
 - Multi-language support for accessibility criteria
 - Enhanced reporting with visual indicators
@@ -62,10 +74,12 @@
   - Implement article ratings and user feedback system
 
 ## Technical Debt
+
 - Reduce type warnings in codebase
 - Improve handling of network errors for more informative user feedback
 
 ## Long-Term Vision
+
 - Develop a comprehensive WCAG 2.2 compliance dashboard
 - Create an API for automated accessibility testing
 - Establish accessibility monitoring system for continuous testing

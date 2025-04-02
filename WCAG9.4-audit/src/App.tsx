@@ -58,7 +58,7 @@ import { TeamPage } from './pages/team/TeamPage';
 import { HelpCenter } from './pages/HelpCenter';
 import { HelpArticle } from './pages/HelpArticle';
 import { KnowledgeBasePage } from './pages/KnowledgeBasePage';
-import { RoadmapPage } from './pages/RoadmapPage';
+
 import { ErrorPage } from './components/ErrorPage';
 
 function App() {
@@ -96,7 +96,6 @@ function App() {
               <Route path="/blog" element={<><Navigation /><main id="main-content"><BlogPage /></main><Footer /><BackToTop /></>} />
               <Route path="/blog/:slug" element={<><Navigation /><main id="main-content"><ArticlePage /></main><Footer /><BackToTop /></>} />
               <Route path="/wcag-resources" element={<><Navigation /><main id="main-content"><WcagResourcesPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/roadmap" element={<><Navigation /><main id="main-content"><RoadmapPage /></main><Footer /><BackToTop /></>} />
               <Route path="/help" element={<HelpCenter />} />
               <Route path="/help/:slug" element={<HelpArticle />} />
               <Route path="/login" element={<AuthPage />} />
