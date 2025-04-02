@@ -82,20 +82,30 @@ export function RegionSelector({ selectedRegion, onRegionChange }: RegionSelecto
           {regions
             .find(r => r.id === selectedRegion)
             ?.standards.map((standard, index) => {
-              // Get color based on standard type
+              // Get color based on standard type with more distinct colors
               let colorClass = '';
-              if (standard.includes('WCAG')) {
+              if (standard.includes('WCAG 2.1')) {
                 colorClass = 'bg-blue-100 text-blue-800 border-blue-200';
+              } else if (standard.includes('WCAG 2.2')) {
+                colorClass = 'bg-indigo-100 text-indigo-800 border-indigo-200';
               } else if (standard.includes('ADA')) {
                 colorClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
               } else if (standard.includes('508')) {
-                colorClass = 'bg-teal-100 text-teal-800 border-teal-200';
-              } else if (standard.includes('EN') || standard.includes('EAA')) {
+                colorClass = 'bg-cyan-100 text-cyan-800 border-cyan-200';
+              } else if (standard.includes('EN')) {
+                colorClass = 'bg-violet-100 text-violet-800 border-violet-200';
+              } else if (standard.includes('EAA')) {
                 colorClass = 'bg-purple-100 text-purple-800 border-purple-200';
               } else if (standard.includes('JIS')) {
                 colorClass = 'bg-rose-100 text-rose-800 border-rose-200';
               } else if (standard.includes('ISO')) {
-                colorClass = 'bg-green-100 text-green-800 border-green-200';
+                colorClass = 'bg-amber-100 text-amber-800 border-amber-200';
+              } else if (standard.includes('AODA')) {
+                colorClass = 'bg-red-100 text-red-800 border-red-200';
+              } else if (standard.includes('DDA')) {
+                colorClass = 'bg-lime-100 text-lime-800 border-lime-200';
+              } else if (standard.includes('GDS')) {
+                colorClass = 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200';
               } else {
                 colorClass = 'bg-gray-100 text-gray-800 border-gray-200';
               }
