@@ -55,31 +55,5 @@ export const wcagResource11: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Robust: Compatibility (Parsing & Name, Role, Value) | WCAG Accessibility Guide",
-      metaDescription: "Guideline 4.1: Maximize compatibility with current and future user agents, including assistive technologies.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, ARIA, Screen Readers, Robust, WCAG 2.2, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Robust: Compatibility (Parsing & Name, Role, Value)",
-        description: "Guideline 4.1: Maximize compatibility with current and future user agents, including assistive technologies.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

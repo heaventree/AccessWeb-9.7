@@ -68,31 +68,5 @@ export const wcagResource16: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessible Tables | WCAG Accessibility Guide",
-      metaDescription: "Purpose: Use HTML tables for presenting tabular data, not for layout. Ensure screen readers can correctly associate header cells with data cells.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, ARIA, Screen Readers, Semantic HTML",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessible Tables",
-        description: "Purpose: Use HTML tables for presenting tabular data, not for layout. Ensure screen readers can correctly associate header cells with data cells.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

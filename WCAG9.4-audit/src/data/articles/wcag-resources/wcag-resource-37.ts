@@ -38,31 +38,5 @@ export const wcagResource37: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Internationalization and Accessibility | WCAG Accessibility Guide",
-      metaDescription: "This article covers the WCAG requirements for Internationalization and Accessibility, including considerations:\\n- set the lang attribute appropriately\\n- su...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, ARIA, Screen Readers",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Internationalization and Accessibility",
-        description: "This article covers the WCAG requirements for Internationalization and Accessibility, including considerations:\\n- set the lang attribute appropriately\\n- support text resizing without breaking layouts\\n- ensure right-to-left language support....",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

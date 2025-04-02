@@ -38,31 +38,5 @@ export const wcagResource46: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Print Accessibility Considerations | WCAG Accessibility Guide",
-      metaDescription: "This article covers the WCAG requirements for Print Accessibility Considerations, including requirements:\\n- ensure print styles maintain readability\\n- prov...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Print Accessibility Considerations",
-        description: "This article covers the WCAG requirements for Print Accessibility Considerations, including requirements:\\n- ensure print styles maintain readability\\n- provide complete information when printed\\n- maintain proper contrast in grayscale\\n- ....",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

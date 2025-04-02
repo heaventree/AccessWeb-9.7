@@ -72,31 +72,5 @@ export const wcagResource7: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Operable: Keyboard Accessibility | WCAG Accessibility Guide",
-      metaDescription: "Guideline 2.1: Make all functionality available from a keyboard. Guideline 2.1: Make all functionality available from a keyboard.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Operable, Keyboard Navigation, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Operable: Keyboard Accessibility",
-        description: "Guideline 2.1: Make all functionality available from a keyboard. Guideline 2.1: Make all functionality available from a keyboard.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

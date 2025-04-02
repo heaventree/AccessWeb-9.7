@@ -70,31 +70,5 @@ export const wcagResource4: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Key Updates in WCAG 2.2 | WCAG Accessibility Guide",
-      metaDescription: "Release Date: WCAG 2.2 became a W3C Recommendation on October 5, 2023. Release Date: WCAG 2.2 became a W3C Recommendation on October 5, 2023.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, WCAG 2.1, WCAG 2.2, Semantic HTML, Mobile Accessibility, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Key Updates in WCAG 2.2",
-        description: "Release Date: WCAG 2.2 became a W3C Recommendation on October 5, 2023. Release Date: WCAG 2.2 became a W3C Recommendation on October 5, 2023.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

@@ -72,31 +72,5 @@ export const wcagResource22: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessible Carousels and Sliders | WCAG Accessibility Guide",
-      metaDescription: "Challenge: Carousels (also known as sliders or slideshows) are often inaccessible due to poor keyboard support, confusing screen reader announcemen...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Operable, Keyboard Navigation, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessible Carousels and Sliders",
-        description: "Challenge: Carousels (also known as sliders or slideshows) are often inaccessible due to poor keyboard support, confusing screen reader announcemen...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

@@ -41,31 +41,5 @@ export const wcagResource41: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Ensuring Accessibility in Single Page Applications (SPAs) | WCAG Accessibility Guide",
-      metaDescription: "This article covers the WCAG requirements for Ensuring Accessibility in Single Page Applications (SPAs), including challenges:\\n- focus management during rou...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Keyboard Navigation, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Ensuring Accessibility in Single Page Applications (SPAs)",
-        description: "This article covers the WCAG requirements for Ensuring Accessibility in Single Page Applications (SPAs), including challenges:\\n- focus management during routing changes\\n- announcing dynamic content updates\\n- maintaining keyboard navigation\\n- browser histo....",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

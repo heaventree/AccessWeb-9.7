@@ -50,31 +50,5 @@ export const wcagResource5: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Perceivable: Text Alternatives (Alt Text) | WCAG Accessibility Guide",
-      metaDescription: "Guideline 1.1: Provide text alternatives for any non-text content so that it can be changed into other forms people need, such as large print, brai...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, ARIA, Screen Readers, Perceivable, Alt Text, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Perceivable: Text Alternatives (Alt Text)",
-        description: "Guideline 1.1: Provide text alternatives for any non-text content so that it can be changed into other forms people need, such as large print, brai...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

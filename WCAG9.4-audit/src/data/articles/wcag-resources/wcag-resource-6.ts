@@ -78,31 +78,5 @@ export const wcagResource6: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Perceivable: Captions and Audio Descriptions | WCAG Accessibility Guide",
-      metaDescription: "Guideline 1.2: Provide alternatives for time-based media. Guideline 1.2: Provide alternatives for time-based media.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Perceivable, Alt Text, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Perceivable: Captions and Audio Descriptions",
-        description: "Guideline 1.2: Provide alternatives for time-based media. Guideline 1.2: Provide alternatives for time-based media.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

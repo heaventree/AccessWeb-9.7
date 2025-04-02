@@ -39,31 +39,5 @@ export const wcagResource28: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "ARIA Landmarks and Document Structure   | WCAG Accessibility Guide",
-      metaDescription: "What Are Landmarks?: ARIA landmarks are HTML attributes that identify regions of a page, making it easier for assistive technology users to navigat...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, ARIA, Screen Readers, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "ARIA Landmarks and Document Structure  ",
-        description: "What Are Landmarks?: ARIA landmarks are HTML attributes that identify regions of a page, making it easier for assistive technology users to navigat...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

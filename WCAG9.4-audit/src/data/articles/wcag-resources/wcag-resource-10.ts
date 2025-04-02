@@ -64,31 +64,5 @@ export const wcagResource10: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Understandable: Predictability | WCAG Accessibility Guide",
-      metaDescription: "Guideline 3.2: Make Web pages appear and operate in predictable ways. Guideline 3.2: Make Web pages appear and operate in predictable ways.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Understandable, Keyboard Navigation, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Understandable: Predictability",
-        description: "Guideline 3.2: Make Web pages appear and operate in predictable ways. Guideline 3.2: Make Web pages appear and operate in predictable ways.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

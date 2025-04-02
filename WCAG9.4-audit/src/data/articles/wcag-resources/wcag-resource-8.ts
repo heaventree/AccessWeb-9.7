@@ -57,31 +57,5 @@ export const wcagResource8: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Operable: Enough Time | WCAG Accessibility Guide",
-      metaDescription: "Guideline 2.2: Provide users enough time to read and use content. Guideline 2.2: Provide users enough time to read and use content.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Operable, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Operable: Enough Time",
-        description: "Guideline 2.2: Provide users enough time to read and use content. Guideline 2.2: Provide users enough time to read and use content.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

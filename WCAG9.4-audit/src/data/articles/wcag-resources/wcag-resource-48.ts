@@ -123,31 +123,5 @@ export const wcagResource48: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "User-Controlled Animations and Motion | WCAG Accessibility Guide",
-      metaDescription: "Learn how to make animations and motion effects accessible for all users, especially those with motion sensitivity or vestibular disorders. Implement the pre...",
-      metaKeywords: "WCAG, Accessibility, Animation, CSS, Form Controls, JavaScript, Media Queries, Mobile Accessibility, Motion, Seizure Prevention",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "User-Controlled Animations and Motion",
-        description: "Learn how to make animations and motion effects accessible for all users, especially those with motion sensitivity or vestibular disorders. Implement the prefers-reduced-motion media query, add manual controls, and create animations that don't cause discomfort.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

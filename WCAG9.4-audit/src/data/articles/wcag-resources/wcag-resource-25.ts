@@ -109,31 +109,5 @@ export const wcagResource25: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessible Authentication (CAPTCHAs) | WCAG Accessibility Guide",
-      metaDescription: "Challenge: CAPTCHAs (Completely Automated Public Turing test to tell Computers and Humans Apart) are designed to block bots but often create signif...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, WCAG 2.2, Alt Text, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessible Authentication (CAPTCHAs)",
-        description: "Challenge: CAPTCHAs (Completely Automated Public Turing test to tell Computers and Humans Apart) are designed to block bots but often create signif...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

@@ -52,31 +52,5 @@ export const wcagResource3: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "WCAG Conformance Levels: A, AA, AAA | WCAG Accessibility Guide",
-      metaDescription: "Levels Explained: WCAG defines three levels of conformance to meet the needs of different groups and situations:\\n*   Level A (Minimum): The most ba...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "WCAG Conformance Levels: A, AA, AAA",
-        description: "Levels Explained: WCAG defines three levels of conformance to meet the needs of different groups and situations:\\n*   Level A (Minimum): The most ba...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

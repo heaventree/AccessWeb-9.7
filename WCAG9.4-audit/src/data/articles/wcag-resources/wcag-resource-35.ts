@@ -42,31 +42,5 @@ export const wcagResource35: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessible PDF Documents | WCAG Accessibility Guide",
-      metaDescription: "This article covers the WCAG requirements for Accessible PDF Documents, including requirements:\\n- properly tagged document structure\\n- logical reading orde...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, ARIA, Screen Readers, PDF, Documents, Alt Text, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessible PDF Documents",
-        description: "This article covers the WCAG requirements for Accessible PDF Documents, including requirements:\\n- properly tagged document structure\\n- logical reading order\\n- alternative text for images\\n- defined document language\\n- accessib....",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

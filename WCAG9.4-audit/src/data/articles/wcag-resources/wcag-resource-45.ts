@@ -41,31 +41,5 @@ export const wcagResource45: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Reading Level and Plain Language | WCAG Accessibility Guide",
-      metaDescription: "WCAG Requirement:\\nLevel AAA requires content to be understandable at a lower secondary education reading level.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Understandable",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Reading Level and Plain Language",
-        description: "WCAG Requirement:\\nLevel AAA requires content to be understandable at a lower secondary education reading level.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

@@ -67,31 +67,5 @@ export const wcagResource13: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Keyboard Navigation Best Practices | WCAG Accessibility Guide",
-      metaDescription: "Foundation: Ensure every interactive element (links, buttons, form fields, custom widgets) can be reached and operated using only the keyboard (Gui...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Keyboard Accessibility, ARIA, Screen Readers, Keyboard Navigation, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Keyboard Navigation Best Practices",
-        description: "Foundation: Ensure every interactive element (links, buttons, form fields, custom widgets) can be reached and operated using only the keyboard (Gui...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

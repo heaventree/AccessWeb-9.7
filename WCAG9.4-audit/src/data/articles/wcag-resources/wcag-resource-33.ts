@@ -41,31 +41,5 @@ export const wcagResource33: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "WCAG Audit Tools and Techniques | WCAG Accessibility Guide",
-      metaDescription: "Manual vs. Automated Testing:\\n- Automated tools catch approximately 30-40% of issues\\n- Manual testing is essential for user experience and context-.., as p...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Screen Readers",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "WCAG Audit Tools and Techniques",
-        description: "Manual vs. Automated Testing:\\n- Automated tools catch approximately 30-40% of issues\\n- Manual testing is essential for user experience and context-.., as part of the WCAG standards.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

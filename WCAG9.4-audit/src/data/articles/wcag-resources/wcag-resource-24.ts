@@ -64,31 +64,5 @@ export const wcagResource24: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessible Drag-and-Drop Interfaces | WCAG Accessibility Guide",
-      metaDescription: "Challenge: Drag-and-drop functionality relies heavily on visual pointer interaction and can be completely inaccessible to keyboard-only users and s...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessible Drag-and-Drop Interfaces",
-        description: "Challenge: Drag-and-drop functionality relies heavily on visual pointer interaction and can be completely inaccessible to keyboard-only users and s...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

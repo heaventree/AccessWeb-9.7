@@ -37,31 +37,5 @@ export const wcagResource32: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessible Authentication Systems | WCAG Accessibility Guide",
-      metaDescription: "This article covers the WCAG requirements for Accessible Authentication Systems, including barriers:\\n- captchas without accessible alternatives\\n- time-limi...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Authentication, Security",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessible Authentication Systems",
-        description: "This article covers the WCAG requirements for Accessible Authentication Systems, including barriers:\\n- captchas without accessible alternatives\\n- time-limited sessions without warnings\\n- multi-factor authentication relying solely o....",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

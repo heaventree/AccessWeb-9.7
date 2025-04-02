@@ -37,31 +37,5 @@ export const wcagResource26: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Cognitive Accessibility: Simplifying Content   | WCAG Accessibility Guide",
-      metaDescription: "Why It Matters:  \\nUsers with cognitive disabilities benefit from clear, simple language and predictable layouts.  .",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Cognitive Accessibility, Semantic HTML",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Cognitive Accessibility: Simplifying Content  ",
-        description: "Why It Matters:  \\nUsers with cognitive disabilities benefit from clear, simple language and predictable layouts.  .",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

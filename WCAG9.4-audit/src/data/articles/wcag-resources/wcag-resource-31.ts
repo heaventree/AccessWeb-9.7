@@ -39,31 +39,5 @@ export const wcagResource31: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Audio and Video Accessibility | WCAG Accessibility Guide",
-      metaDescription: "This article covers the WCAG requirements for Audio and Video Accessibility, including requirements:\\n- provide captions for all audio content\\n- include tra...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, Keyboard Navigation, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Audio and Video Accessibility",
-        description: "This article covers the WCAG requirements for Audio and Video Accessibility, including requirements:\\n- provide captions for all audio content\\n- include transcripts for audio-only content\\n- offer audio descriptions for video\\n- ensu....",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

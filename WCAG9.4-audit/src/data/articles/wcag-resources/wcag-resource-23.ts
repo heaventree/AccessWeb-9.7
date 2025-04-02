@@ -85,31 +85,5 @@ export const wcagResource23: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessible Charts and Graphs | WCAG Accessibility Guide",
-      metaDescription: "Challenge: Visual charts and graphs present data in a way that is inherently inaccessible to users who are blind or have significant low vision. Co...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Keyboard Accessibility, ARIA, Screen Readers, Alt Text",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessible Charts and Graphs",
-        description: "Challenge: Visual charts and graphs present data in a way that is inherently inaccessible to users who are blind or have significant low vision. Co...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

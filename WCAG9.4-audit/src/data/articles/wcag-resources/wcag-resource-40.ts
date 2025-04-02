@@ -36,31 +36,5 @@ export const wcagResource40: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Progressive Enhancement for Accessibility | WCAG Accessibility Guide",
-      metaDescription: "Core Principle:\\nStart with a solid accessible foundation that works for everyone, then enhance the experience for users with more capable browsers/...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Semantic HTML",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Progressive Enhancement for Accessibility",
-        description: "Core Principle:\\nStart with a solid accessible foundation that works for everyone, then enhance the experience for users with more capable browsers/...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

@@ -38,31 +38,5 @@ export const wcagResource50: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Future of Web Accessibility: WCAG 3.0 | WCAG Accessibility Guide",
-      metaDescription: "This article covers Future of Web Accessibility: WCAG 3.0, including changes from wcag 2.x:\\n- new name: w3c accessibility guidelines (wcag) 3.0\\n- broader s...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Cognitive Accessibility, WCAG 3.0, Future Standards",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Future of Web Accessibility: WCAG 3.0",
-        description: "This article covers Future of Web Accessibility: WCAG 3.0, including changes from wcag 2.x:\\n- new name: w3c accessibility guidelines (wcag) 3.0\\n- broader scope beyond web content\\n- new scoring system replacing a/....",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

@@ -98,31 +98,5 @@ export const wcagResource15: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Multimedia Accessibility: Captions and Transcripts | WCAG Accessibility Guide",
-      metaDescription: "Focus: Making audio and video content accessible to users with auditory or visual disabilities. Focus: Making audio and video content accessible to users wit...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Alt Text, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Multimedia Accessibility: Captions and Transcripts",
-        description: "Focus: Making audio and video content accessible to users with auditory or visual disabilities. Focus: Making audio and video content accessible to users wit...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

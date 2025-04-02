@@ -113,31 +113,5 @@ export const wcagResource29: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessible Navigation Patterns   | WCAG Accessibility Guide",
-      metaDescription: "Learn how to implement accessible navigation patterns for all users. This comprehensive guide covers keyboard accessibility, consistent navigation, and techn...",
-      metaKeywords: "WCAG, Accessibility, Operable, ARIA, Breadcrumbs, Dropdown Menus, Form Controls, Hamburger Menu, Keyboard Accessibility, Keyboard Navigation",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessible Navigation Patterns  ",
-        description: "Learn how to implement accessible navigation patterns for all users. This comprehensive guide covers keyboard accessibility, consistent navigation, and techniques for making all navigation types—from dropdown menus to breadcrumbs—fully accessible.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

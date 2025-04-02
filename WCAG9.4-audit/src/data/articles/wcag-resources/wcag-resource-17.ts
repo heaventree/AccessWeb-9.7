@@ -107,31 +107,5 @@ export const wcagResource17: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessible PDFs | WCAG Accessibility Guide",
-      metaDescription: "Challenge: PDFs are often created with print in mind and can be highly inaccessible if not properly tagged and structured. They can act as barriers...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Keyboard Navigation, Alt Text, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessible PDFs",
-        description: "Challenge: PDFs are often created with print in mind and can be highly inaccessible if not properly tagged and structured. They can act as barriers...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

@@ -72,31 +72,5 @@ export const wcagResource14: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessible Forms and Inputs | WCAG Accessibility Guide",
-      metaDescription: "Core Principle: Ensure users know what information is needed, can easily input it, understand the format required, and can correct errors.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessible Forms and Inputs",
-        description: "Core Principle: Ensure users know what information is needed, can easily input it, understand the format required, and can correct errors.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

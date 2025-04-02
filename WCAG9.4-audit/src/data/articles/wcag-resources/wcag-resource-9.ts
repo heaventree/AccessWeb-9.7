@@ -66,31 +66,5 @@ export const wcagResource9: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Understandable: Readability | WCAG Accessibility Guide",
-      metaDescription: "Guideline 3.1: Make text content readable and understandable. Guideline 3.1: Make text content readable and understandable.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Understandable",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Understandable: Readability",
-        description: "Guideline 3.1: Make text content readable and understandable. Guideline 3.1: Make text content readable and understandable.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

@@ -40,31 +40,5 @@ export const wcagResource38: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Email Accessibility Best Practices | WCAG Accessibility Guide",
-      metaDescription: "Structure and Content:\\n- Use semantic HTML elements\\n- Include proper heading structure\\n- Provide alternative text for images\\n- Ensure sufficient co...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Alt Text, Semantic HTML, Mobile Accessibility, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Email Accessibility Best Practices",
-        description: "Structure and Content:\\n- Use semantic HTML elements\\n- Include proper heading structure\\n- Provide alternative text for images\\n- Ensure sufficient co...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

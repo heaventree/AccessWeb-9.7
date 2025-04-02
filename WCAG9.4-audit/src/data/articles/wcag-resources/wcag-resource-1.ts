@@ -153,31 +153,5 @@ export const wcagResource1: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Introduction to Web Accessibility (What is A11y?) | WCAG Accessibility Guide",
-      metaDescription: "A comprehensive introduction to web accessibility, explaining what A11y means, why it matters for all users, legal requirements, key principles, and practica...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, A11y, Digital Inclusion, Screen Readers, Keyboard Navigation, UK Accessibility Regulations, POUR Principles, Semantic HTML",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Introduction to Web Accessibility (What is A11y?)",
-        description: "A comprehensive introduction to web accessibility, explaining what A11y means, why it matters for all users, legal requirements, key principles, and practical implementation strategies for inclusive web design.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

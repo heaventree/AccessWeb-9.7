@@ -37,31 +37,5 @@ export const wcagResource49: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessibility Statement Best Practices | WCAG Accessibility Guide",
-      metaDescription: "This article covers the WCAG requirements for Accessibility Statement Best Practices, including components:\\n- commitment to accessibility\\n- accessibility s...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, WCAG 2.1, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessibility Statement Best Practices",
-        description: "This article covers the WCAG requirements for Accessibility Statement Best Practices, including components:\\n- commitment to accessibility\\n- accessibility standard followed (e.g., wcag 2.1 aa)\\n- known limitations or exceptions\\n- contact inf....",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

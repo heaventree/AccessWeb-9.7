@@ -103,31 +103,5 @@ export const wcagResource12: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Designing for Color Blindness: WCAG Compliance Guide | WCAG Accessibility Guide",
-      metaDescription: "A comprehensive guide to designing websites for users with color vision deficiencies including deuteranopia, protanopia, and tritanopia, with practical code ...",
-      metaKeywords: "WCAG, Accessibility, CSS Techniques, Color Blindness, Color Contrast, Deuteranopia, Form Controls, Protanopia, WCAG 1.4.1, WCAG 1.4.3",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Designing for Color Blindness: WCAG Compliance Guide",
-        description: "A comprehensive guide to designing websites for users with color vision deficiencies including deuteranopia, protanopia, and tritanopia, with practical code examples and WCAG compliance techniques.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

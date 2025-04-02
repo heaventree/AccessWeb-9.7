@@ -40,31 +40,5 @@ export const wcagResource42: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "WCAG 2.2 Updates: What's New | WCAG Accessibility Guide",
-      metaDescription: "New Success Criteria:\\n- Focus Appearance (Enhanced): Make focus indicators more visible\\n- Dragging Movements: Provide alternatives to drag operatio.., as d...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Cognitive Accessibility, WCAG 2.2, Standards, Keyboard Navigation, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "WCAG 2.2 Updates: What's New",
-        description: "New Success Criteria:\\n- Focus Appearance (Enhanced): Make focus indicators more visible\\n- Dragging Movements: Provide alternatives to drag operatio.., as defined in WCAG 2.2.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

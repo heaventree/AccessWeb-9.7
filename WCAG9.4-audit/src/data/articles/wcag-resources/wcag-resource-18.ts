@@ -100,31 +100,5 @@ export const wcagResource18: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Testing Accessibility with Screen Readers | WCAG Accessibility Guide",
-      metaDescription: "Purpose: To understand how users who are blind or have low vision experience your website and identify barriers they might encounter.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, ARIA, Screen Readers, Alt Text, Semantic HTML, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Testing Accessibility with Screen Readers",
-        description: "Purpose: To understand how users who are blind or have low vision experience your website and identify barriers they might encounter.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

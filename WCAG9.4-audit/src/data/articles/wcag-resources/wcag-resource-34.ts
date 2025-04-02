@@ -38,31 +38,5 @@ export const wcagResource34: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessible Data Tables | WCAG Accessibility Guide",
-      metaDescription: "Structural Elements:\\n- Use `<caption>` to provide a title for the table\\n- Use `<th>` for header cells and `<td>` for data cells\\n- Use `scope` attri...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, ARIA, Semantic HTML, Mobile Accessibility",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessible Data Tables",
-        description: "Structural Elements:\\n- Use `<caption>` to provide a title for the table\\n- Use `<th>` for header cells and `<td>` for data cells\\n- Use `scope` attri...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

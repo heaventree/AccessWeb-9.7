@@ -39,31 +39,5 @@ export const wcagResource44: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Touch Interface Accessibility | WCAG Accessibility Guide",
-      metaDescription: "This article covers the WCAG requirements for Touch Interface Accessibility, including requirements:\\n- ensure adequate touch target size (44x44px recommende...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, Touch Interfaces, Mobile, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Touch Interface Accessibility",
-        description: "This article covers the WCAG requirements for Touch Interface Accessibility, including requirements:\\n- ensure adequate touch target size (44x44px recommended)\\n- provide sufficient spacing between touch targets\\n- support multiple i....",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

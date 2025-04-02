@@ -41,31 +41,5 @@ export const wcagResource39: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Accessibility for Data Visualizations | WCAG Accessibility Guide",
-      metaDescription: "Guidelines:\\n- Provide textual alternatives (descriptions, data tables)\\n- Don't rely solely on color to convey information\\n- Use patterns and shapes...",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Keyboard Accessibility, ARIA, Screen Readers, Alt Text, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Accessibility for Data Visualizations",
-        description: "Guidelines:\\n- Provide textual alternatives (descriptions, data tables)\\n- Don't rely solely on color to convey information\\n- Use patterns and shapes...",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

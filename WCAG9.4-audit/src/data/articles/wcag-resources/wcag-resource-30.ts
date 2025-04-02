@@ -39,31 +39,5 @@ export const wcagResource30: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Creating Accessible SVGs   | WCAG Accessibility Guide",
-      metaDescription: "Benefits of SVG:  \\n- Scales without quality loss\\n- Looks sharp on all screens\\n- Small file size\\n- Animatable\\n- Programmable.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Keyboard Accessibility, ARIA, Screen Readers, Form Controls",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Creating Accessible SVGs  ",
-        description: "Benefits of SVG:  \\n- Scales without quality loss\\n- Looks sharp on all screens\\n- Small file size\\n- Animatable\\n- Programmable.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };

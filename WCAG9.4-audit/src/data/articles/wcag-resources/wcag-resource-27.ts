@@ -41,31 +41,5 @@ export const wcagResource27: Article = {
       "level": 2
     }
   ]
-,
-  "metadata": {
-      metaTitle: "Focus Management for Screen Reader Users | WCAG Accessibility Guide",
-      metaDescription: "Importance: Proper focus management is essential for screen reader users to navigate and interact with web content effectively.",
-      metaKeywords: "WCAG, Accessibility, Web Standards, Color Contrast, Keyboard Accessibility, ARIA, Screen Readers, Keyboard Navigation, Semantic HTML",
-      structuredData: {
-        _context: "https://schema.org",
-        _type: "Article",
-        headline: "Focus Management for Screen Reader Users",
-        description: "Importance: Proper focus management is essential for screen reader users to navigate and interact with web content effectively.",
-        image: vectorImage,
-        author: {
-          _type: "Organization",
-          name: "Accessibility Team"
-    },
-        publisher: {
-          _type: "Organization",
-          name: "WCAG 9.4 Audit",
-          logo: {
-            _type: "ImageObject",
-            url: `${window.location.origin}/logo.svg`
-      }
-    },
-        datePublished: publishedAt,
-        dateModified: updatedAt
-  }
-}
+
 };
