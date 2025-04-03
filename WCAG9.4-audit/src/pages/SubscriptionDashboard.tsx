@@ -102,7 +102,11 @@ export function SubscriptionDashboard() {
     { name: 'Overview', icon: Gauge, value: 'overview' },
     { name: 'Monitoring', icon: MonitorPlay, value: 'monitoring' },
     { name: 'Analytics', icon: BarChart2, value: 'analytics' },
-    { name: 'Alerts', icon: Bell, value: 'alerts' }
+    { name: 'Alerts', icon: Bell, value: 'alerts' },
+    { name: 'Connections', icon: Activity, value: 'connections', path: '/my-account/connections' },
+    { name: 'Settings', icon: Settings, value: 'settings', path: '/my-account/settings' },
+    { name: 'Billing', icon: CreditCard, value: 'billing', path: '/my-account/billing' },
+    { name: 'Team', icon: Users, value: 'team', path: '/my-account/team' }
   ];
   
   const subscription = {
@@ -179,26 +183,47 @@ export function SubscriptionDashboard() {
           <div className="mt-5 flex-1 h-0 overflow-y-auto">
             <nav className="px-2 space-y-1">
               {navigationItems.map((item) => (
-                <button
-                  key={item.value}
-                  onClick={() => {
-                    setActiveTab(item.value);
-                    setMobileSidebarOpen(false);
-                  }}
-                  className={`${
-                    activeTab === item.value
-                      ? 'bg-gray-100 text-gray-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  } group flex items-center px-2 py-2 text-base font-medium rounded-md w-full`}
-                >
-                  <item.icon
+                item.path ? (
+                  <Link
+                    key={item.value}
+                    to={item.path}
                     className={`${
-                      activeTab === item.value ? 'text-gray-800' : 'text-gray-400 group-hover:text-gray-500'
-                    } mr-4 flex-shrink-0 h-6 w-6`}
-                    aria-hidden="true"
-                  />
-                  {item.name}
-                </button>
+                      activeTab === item.value
+                        ? 'bg-gray-100 text-gray-900'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    } group flex items-center px-2 py-2 text-base font-medium rounded-md w-full`}
+                    onClick={() => setMobileSidebarOpen(false)}
+                  >
+                    <item.icon
+                      className={`${
+                        activeTab === item.value ? 'text-gray-800' : 'text-gray-400 group-hover:text-gray-500'
+                      } mr-4 flex-shrink-0 h-6 w-6`}
+                      aria-hidden="true"
+                    />
+                    {item.name}
+                  </Link>
+                ) : (
+                  <button
+                    key={item.value}
+                    onClick={() => {
+                      setActiveTab(item.value);
+                      setMobileSidebarOpen(false);
+                    }}
+                    className={`${
+                      activeTab === item.value
+                        ? 'bg-gray-100 text-gray-900'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    } group flex items-center px-2 py-2 text-base font-medium rounded-md w-full`}
+                  >
+                    <item.icon
+                      className={`${
+                        activeTab === item.value ? 'text-gray-800' : 'text-gray-400 group-hover:text-gray-500'
+                      } mr-4 flex-shrink-0 h-6 w-6`}
+                      aria-hidden="true"
+                    />
+                    {item.name}
+                  </button>
+                )
               ))}
             </nav>
           </div>
@@ -216,23 +241,43 @@ export function SubscriptionDashboard() {
               
               <nav className="mt-5 flex-1 px-4 space-y-1">
                 {navigationItems.map((item) => (
-                  <button
-                    key={item.value}
-                    onClick={() => setActiveTab(item.value)}
-                    className={`${
-                      activeTab === item.value
-                        ? 'bg-gray-100 text-gray-900'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    } group flex items-center px-3 py-2 text-sm font-medium rounded-md w-full`}
-                  >
-                    <item.icon
+                  item.path ? (
+                    <Link
+                      key={item.value}
+                      to={item.path}
                       className={`${
-                        activeTab === item.value ? 'text-gray-800' : 'text-gray-400 group-hover:text-gray-500'
-                      } mr-3 flex-shrink-0 h-5 w-5`}
-                      aria-hidden="true"
-                    />
-                    {item.name}
-                  </button>
+                        activeTab === item.value
+                          ? 'bg-gray-100 text-gray-900'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      } group flex items-center px-3 py-2 text-sm font-medium rounded-md w-full`}
+                    >
+                      <item.icon
+                        className={`${
+                          activeTab === item.value ? 'text-gray-800' : 'text-gray-400 group-hover:text-gray-500'
+                        } mr-3 flex-shrink-0 h-5 w-5`}
+                        aria-hidden="true"
+                      />
+                      {item.name}
+                    </Link>
+                  ) : (
+                    <button
+                      key={item.value}
+                      onClick={() => setActiveTab(item.value)}
+                      className={`${
+                        activeTab === item.value
+                          ? 'bg-gray-100 text-gray-900'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      } group flex items-center px-3 py-2 text-sm font-medium rounded-md w-full`}
+                    >
+                      <item.icon
+                        className={`${
+                          activeTab === item.value ? 'text-gray-800' : 'text-gray-400 group-hover:text-gray-500'
+                        } mr-3 flex-shrink-0 h-5 w-5`}
+                        aria-hidden="true"
+                      />
+                      {item.name}
+                    </button>
+                  )
                 ))}
               </nav>
 
@@ -431,11 +476,11 @@ export function SubscriptionDashboard() {
                       <h3 className="text-lg leading-6 font-medium text-gray-900">Quick Actions</h3>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
-                      <Link to="/settings" className="flex flex-col items-center p-6 hover:bg-gray-50">
+                      <Link to="/my-account/settings" className="flex flex-col items-center p-6 hover:bg-gray-50">
                         <Settings className="w-8 h-8 text-gray-500 mb-3" />
                         <span className="text-sm font-medium text-gray-900">Settings</span>
                       </Link>
-                      <Link to="/billing" className="flex flex-col items-center p-6 hover:bg-gray-50">
+                      <Link to="/my-account/billing" className="flex flex-col items-center p-6 hover:bg-gray-50">
                         <FileText className="w-8 h-8 text-gray-500 mb-3" />
                         <span className="text-sm font-medium text-gray-900">Billing History</span>
                       </Link>
@@ -443,7 +488,7 @@ export function SubscriptionDashboard() {
                         <Bell className="w-8 h-8 text-gray-500 mb-3" />
                         <span className="text-sm font-medium text-gray-900">Notifications</span>
                       </Link>
-                      <Link to="/team" className="flex flex-col items-center p-6 hover:bg-gray-50">
+                      <Link to="/my-account/team" className="flex flex-col items-center p-6 hover:bg-gray-50">
                         <Users className="w-8 h-8 text-gray-500 mb-3" />
                         <span className="text-sm font-medium text-gray-900">Team</span>
                       </Link>
