@@ -72,7 +72,7 @@
 /* Toggle control styling */
 .section-identifiers-toggle {
   position: fixed;
-  bottom: 20px;
+  top: 70px;
   right: 20px;
   background-color: white;
   border: 1px solid #e5e7eb;

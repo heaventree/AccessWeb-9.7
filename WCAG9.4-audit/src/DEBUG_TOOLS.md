@@ -8,7 +8,7 @@ Section Identifiers is a non-breaking feature that helps visualize the structure
 
 ### How to Use
 
-1. A toggle button will appear in the bottom-right corner of the screen labeled "Section Identifiers"
+1. A toggle button will appear in the top-right corner of the screen labeled "Section Identifiers"
 2. Click the checkbox to enable/disable the section identifiers
 3. Colored numbered labels will appear at the top-left corner of key sections
 4. Hover over a label to see details about the element (tag, ID, classes)
