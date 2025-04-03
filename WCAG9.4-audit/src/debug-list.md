@@ -217,4 +217,25 @@
      - Test alert delivery
      - Document alert system
 
+11. Integration Pages Design Enhancement
+   - Current Status: Base content updated, needs additional UI refinement
+   - Affected Pages:
+     - /integrations/shopify
+     - /integrations/api
+     - /wordpressint
+     - /docs/wordpress
+     - /docs/shopify
+     - /docs/api
+   - TODO:
+     - Add section icons for better visual hierarchy
+     - Improve responsive design for mobile views
+     - Add pagination for long documentation pages
+     - Consider adding interactive demos
+     - Add copy-to-clipboard functionality for code examples
+     - Implement better code syntax highlighting
+     - Add table of contents for long documentation
+     - Add feedback mechanism at bottom of pages
+     - Improve print stylesheets for documentation
+     - Add version selector for API documentation
+
 [Rest of debug list remains unchanged...]
