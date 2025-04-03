@@ -396,6 +396,9 @@ export function Navigation() {
             <Link to="/help" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
               <HelpCircle className="w-5 h-5" />
             </Link>
+            <Link to="/admin" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+              <Settings className="w-5 h-5" />
+            </Link>
             <ThemeToggle />
             <Link
               to="/signup"
@@ -504,6 +507,16 @@ export function Navigation() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Pricing
+                </Link>
+                <Link
+                  to="/admin"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="flex items-center">
+                    <Settings className="w-5 h-5 mr-3" />
+                    Admin
+                  </div>
                 </Link>
                 <Link
                   to="/signup"
