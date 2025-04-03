@@ -304,13 +304,34 @@
       
       // For nav elements, use FIXED identifiers that won't change between pages
       if (isNavElement) {
+        // Check if this is the root navigation container (from main-nav-wrapper section type)
+        // This is our MAIN target that's been changing between pages
+        const navWrapperElements = document.querySelectorAll('.nav-wrapper, .nav-container, .navigation-wrapper, .navigation-container, .header-wrapper, header > div, .navbar-wrapper, .main-nav-wrapper');
+        for (let i = 0; i < navWrapperElements.length; i++) {
+          if (navWrapperElements[i] === element) {
+            return 'FIXED-MAIN-NAV-WRAPPER'; // Most important ID to keep consistent!
+          }
+        }
+        
+        // Is parent of nav? These are often wrapper divs that can change between pages
+        if (element.querySelector('nav') || 
+            element.querySelector('[role="navigation"]') ||
+            element.querySelector('.navbar, .navigation')) {
+          return 'FIXED-NAV-PARENT-WRAPPER';
+        }
+        
+        // For common main layout elements - critical to identify
+        const tagName = element.tagName.toLowerCase();
+        if (tagName === 'header') {
+          return 'FIXED-SEMANTIC-HEADER';
+        }
+          
         // First, check for clear distinguishing features like IDs
         if (element.id && element.id.trim() !== '') {
           return `FIXED-NAV-ID-${element.id}`;
         }
         
         // Use tag name + role as a reliable identifier
-        const tagName = element.tagName.toLowerCase();
         const role = element.getAttribute('role');
         
         if (role === 'navigation') {
@@ -327,11 +348,6 @@
             }
           }
           return 'FIXED-SEMANTIC-NAV';
-        }
-        
-        // Header is usually the main navigation container
-        if (tagName === 'header') {
-          return 'FIXED-SEMANTIC-HEADER';
         }
         
         // For UL/OL inside navigation - very common pattern
@@ -356,6 +372,28 @@
           if (element.className.includes('topnav')) {
             return 'FIXED-TOP-NAV';
           }
+          // More specific checks for app's patterns
+          if (element.className.includes('main-nav') || 
+              element.className.includes('main-navigation')) {
+            return 'FIXED-MAIN-NAVIGATION';
+          }
+          if (element.className.includes('app-header') || 
+              element.className.includes('site-header')) {
+            return 'FIXED-SITE-HEADER';
+          }
+        }
+        
+        // Check for main nav container - a div with a class containing both 'nav' and 'container' or 'wrapper'
+        if (element.className && 
+            typeof element.className === 'string' && 
+            element.className.includes('nav') && 
+            (element.className.includes('container') || element.className.includes('wrapper'))) {
+          return 'FIXED-NAV-WRAPPER-CONTAINER';
+        }
+        
+        // Identify by child nav elements
+        if (element.querySelector('nav') || element.querySelector('[role="navigation"]')) {
+          return 'FIXED-CONTAINS-NAV-ELEMENT';
         }
         
         // Last resort - count position in DOM for nav elements
@@ -591,22 +629,39 @@
       // PRIORITY 1: Navigation Elements (process these first for consistency)
       // ----------------
       
-      // Find navigation elements first (these are crucial for cross-page consistency)
+      // IMPORTANT: Find main navigation wrapper first - highest priority for consistency
+      // This is typically the first level container holding the navigation
+      const navWrappers = document.querySelectorAll('.nav-wrapper, .nav-container, .navigation-wrapper, .navigation-container, .header-wrapper, header > div, .navbar-wrapper, .main-nav-wrapper');
+      navWrappers.forEach(wrapper => {
+        // Give top priority to these wrappers as they're often the structural container
+        addToSections(wrapper, 'main-nav-wrapper', sections);
+      });
+      
+      // Find navigation elements (these are crucial for cross-page consistency)
       const navElements = document.querySelectorAll('nav, [role="navigation"], header, .navbar, .navigation, [class*="navbar"], [class*="header"], [id*="nav"], [id*="menu"], [id*="header"]');
       navElements.forEach(nav => {
         addToSections(nav, 'navigation', sections);
         
         // Also add important children of navigation elements
         Array.from(nav.children).forEach(child => {
-          if (child.className && 
+          if ((child.className && typeof child.className === 'string' && 
               (child.className.includes('nav') || 
                child.className.includes('menu') || 
-               child.className.includes('links')) ||
+               child.className.includes('links'))) ||
               child.tagName.toLowerCase() === 'ul' ||
               child.tagName.toLowerCase() === 'ol') {
             addToSections(child, 'nav-component', sections);
           }
         });
+        
+        // Special handling for parent container of nav elements
+        // Often the direct parent is the wrapper that changes between pages
+        if (nav.parentElement && 
+            nav.parentElement !== document.body && 
+            nav.parentElement.tagName.toLowerCase() !== 'main' &&
+            !processedElements.has(nav.parentElement)) {
+          addToSections(nav.parentElement, 'nav-parent-container', sections);
+        }
       });
       
       // ----------------
