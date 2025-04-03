@@ -306,14 +306,20 @@ function createComplementaryPalette(baseHsl: { h: number, s: number, l: number }
   const palette: string[] = [];
   const complementaryHue = (baseHsl.h + 180) % 360;
   
-  // Add variations of the base color
-  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l));
-  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 15, 10)));
-  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 15, 90)));
+  // Add base color variations
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l)); // Base color
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 15, 10))); // Darker
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 15, 90))); // Lighter
   
-  // Add complementary color and variation
-  palette.push(hslToHexString(complementaryHue, baseHsl.s, baseHsl.l));
-  palette.push(hslToHexString(complementaryHue, baseHsl.s, Math.max(baseHsl.l - 15, 10)));
+  // Add complementary color variations
+  palette.push(hslToHexString(complementaryHue, baseHsl.s, baseHsl.l)); // Complementary
+  palette.push(hslToHexString(complementaryHue, baseHsl.s, Math.max(baseHsl.l - 15, 10))); // Darker complementary
+  palette.push(hslToHexString(complementaryHue, baseHsl.s, Math.min(baseHsl.l + 15, 90))); // Lighter complementary
+  
+  // Add more variations for 9-color layout
+  palette.push(hslToHexString(baseHsl.h, Math.max(baseHsl.s - 20, 0), baseHsl.l)); // Desaturated base
+  palette.push(hslToHexString(complementaryHue, Math.max(baseHsl.s - 20, 0), baseHsl.l)); // Desaturated complementary
+  palette.push(hslToHexString((baseHsl.h + 90) % 360, baseHsl.s, baseHsl.l)); // 90-degree offset color
   
   return palette;
 }
@@ -321,12 +327,22 @@ function createComplementaryPalette(baseHsl: { h: number, s: number, l: number }
 function createAnalogousPalette(baseHsl: { h: number, s: number, l: number }): string[] {
   const palette: string[] = [];
   
-  // Create a smooth progression of analogous colors
-  palette.push(hslToHexString((baseHsl.h - 30 + 360) % 360, baseHsl.s, baseHsl.l + 5));
-  palette.push(hslToHexString((baseHsl.h - 15 + 360) % 360, baseHsl.s, baseHsl.l));
-  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l));
-  palette.push(hslToHexString((baseHsl.h + 15) % 360, baseHsl.s, baseHsl.l));
-  palette.push(hslToHexString((baseHsl.h + 30) % 360, baseHsl.s, baseHsl.l - 5));
+  // Base color
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l)); // Base color
+  
+  // Create a smooth progression of analogous colors (adjacent on the color wheel)
+  palette.push(hslToHexString((baseHsl.h - 30 + 360) % 360, baseHsl.s, baseHsl.l)); // 30 degrees left
+  palette.push(hslToHexString((baseHsl.h - 15 + 360) % 360, baseHsl.s, baseHsl.l)); // 15 degrees left
+  palette.push(hslToHexString((baseHsl.h + 15) % 360, baseHsl.s, baseHsl.l)); // 15 degrees right
+  palette.push(hslToHexString((baseHsl.h + 30) % 360, baseHsl.s, baseHsl.l)); // 30 degrees right
+  
+  // Add variations of base color with different lightness
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 20, 10))); // Darker base
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 20, 90))); // Lighter base
+  
+  // Add desaturated variants
+  palette.push(hslToHexString(baseHsl.h, Math.max(baseHsl.s - 30, 0), baseHsl.l)); // Less saturated
+  palette.push(hslToHexString((baseHsl.h + 15) % 360, Math.max(baseHsl.s - 20, 0), baseHsl.l + 5)); // Muted variant
   
   return palette;
 }
@@ -337,15 +353,19 @@ function createTriadicPalette(baseHsl: { h: number, s: number, l: number }): str
   const triadicHue2 = (baseHsl.h + 240) % 360;
   
   // Base color and variations
-  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l));
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l)); // Base color
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 20, 10))); // Darker base
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 20, 90))); // Lighter base
   
   // First triadic color and variations
-  palette.push(hslToHexString(triadicHue1, baseHsl.s, Math.min(baseHsl.l + 10, 90)));
-  palette.push(hslToHexString(triadicHue1, baseHsl.s - 10, baseHsl.l));
+  palette.push(hslToHexString(triadicHue1, baseHsl.s, baseHsl.l)); // First triadic
+  palette.push(hslToHexString(triadicHue1, baseHsl.s, Math.min(baseHsl.l + 10, 90))); // Lighter first triadic
+  palette.push(hslToHexString(triadicHue1, baseHsl.s - 10, baseHsl.l)); // Desaturated first triadic
   
   // Second triadic color and variations
-  palette.push(hslToHexString(triadicHue2, baseHsl.s, Math.max(baseHsl.l - 10, 10)));
-  palette.push(hslToHexString(triadicHue2, baseHsl.s - 10, baseHsl.l));
+  palette.push(hslToHexString(triadicHue2, baseHsl.s, baseHsl.l)); // Second triadic
+  palette.push(hslToHexString(triadicHue2, baseHsl.s, Math.max(baseHsl.l - 10, 10))); // Darker second triadic  
+  palette.push(hslToHexString(triadicHue2, baseHsl.s - 10, baseHsl.l)); // Desaturated second triadic
   
   return palette;
 }
@@ -356,36 +376,46 @@ function createSplitComplementaryPalette(baseHsl: { h: number, s: number, l: num
   const splitComp1 = (complementaryHue - 30 + 360) % 360;
   const splitComp2 = (complementaryHue + 30) % 360;
   
-  // Base color
-  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l));
-  palette.push(hslToHexString(baseHsl.h, baseHsl.s - 10, Math.min(baseHsl.l + 15, 90)));
+  // Base color and variations
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l)); // Base
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 15, 10))); // Darker base
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 15, 90))); // Lighter base
   
-  // Split complementary colors
-  palette.push(hslToHexString(splitComp1, baseHsl.s, baseHsl.l));
-  palette.push(hslToHexString(splitComp2, baseHsl.s, baseHsl.l));
-  palette.push(hslToHexString(complementaryHue, baseHsl.s - 5, baseHsl.l - 5));
+  // Split complementary colors with variations
+  palette.push(hslToHexString(splitComp1, baseHsl.s, baseHsl.l)); // First split
+  palette.push(hslToHexString(splitComp2, baseHsl.s, baseHsl.l)); // Second split
+  palette.push(hslToHexString(complementaryHue, baseHsl.s, baseHsl.l)); // Complementary
+  
+  // Additional variations
+  palette.push(hslToHexString(splitComp1, Math.max(baseHsl.s - 15, 0), baseHsl.l + 5)); // Desaturated first split
+  palette.push(hslToHexString(splitComp2, Math.max(baseHsl.s - 15, 0), baseHsl.l - 5)); // Desaturated second split
+  palette.push(hslToHexString(complementaryHue, Math.max(baseHsl.s - 10, 0), baseHsl.l)); // Desaturated complementary
   
   return palette;
 }
 
 function createMixedPalette(baseHsl: { h: number, s: number, l: number }): string[] {
   const palette: string[] = [];
-  
-  // Base color
-  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l));
-  
-  // Analogous
-  palette.push(hslToHexString((baseHsl.h + 30) % 360, baseHsl.s, baseHsl.l - 10));
-  
-  // Split complementary
   const complementaryHue = (baseHsl.h + 180) % 360;
-  palette.push(hslToHexString((complementaryHue - 30 + 360) % 360, baseHsl.s - 5, baseHsl.l + 5));
   
-  // Triadic
-  palette.push(hslToHexString((baseHsl.h + 120) % 360, baseHsl.s - 10, baseHsl.l + 10));
+  // Base color and variations
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l)); // Base
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 20, 10))); // Darker base
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 20, 90))); // Lighter base
   
   // Complementary
-  palette.push(hslToHexString(complementaryHue, baseHsl.s, baseHsl.l));
+  palette.push(hslToHexString(complementaryHue, baseHsl.s, baseHsl.l)); // Complementary
+  
+  // Triadic (120° apart)
+  palette.push(hslToHexString((baseHsl.h + 120) % 360, baseHsl.s, baseHsl.l)); // First triadic
+  palette.push(hslToHexString((baseHsl.h + 240) % 360, baseHsl.s, baseHsl.l)); // Second triadic
+  
+  // Analogous (30° apart)
+  palette.push(hslToHexString((baseHsl.h + 30) % 360, baseHsl.s, baseHsl.l)); // Analogous right
+  palette.push(hslToHexString((baseHsl.h - 30 + 360) % 360, baseHsl.s, baseHsl.l)); // Analogous left
+  
+  // Split complementary
+  palette.push(hslToHexString((complementaryHue - 30 + 360) % 360, baseHsl.s, baseHsl.l)); // Split left
   
   return palette;
 }
