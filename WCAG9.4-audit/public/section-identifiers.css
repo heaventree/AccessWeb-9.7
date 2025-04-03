@@ -11,7 +11,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  background-color: rgba(59, 130, 246, 0.9);
+  background-color: rgba(255, 0, 128, 0.95); /* Bright pink - very distinct from theme */
   color: white;
   font-size: 12px;
   font-weight: bold;
@@ -20,9 +20,11 @@
   z-index: 9999;
   pointer-events: none; /* Prevents click interference */
   font-family: 'Inter', sans-serif;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transform: translate(-4px, -4px);
   user-select: none;
+  border: 1px solid white; /* White border for better visibility */
+  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.8); /* Text shadow for better readability */
 }
 
 /* Only display identifiers when enabled */
@@ -30,21 +32,63 @@
   display: block;
 }
 
-/* Styling for different section types */
+/* Styling for different section types - bright, distinct colors */
 .section-identifier[data-section-type="main"] {
-  background-color: rgba(220, 38, 38, 0.9); /* Red for main sections */
+  background-color: rgba(220, 38, 38, 0.95); /* Red for main sections */
+}
+
+.section-identifier[data-section-type="section"] {
+  background-color: rgba(37, 99, 235, 0.95); /* Blue for regular sections */
+}
+
+.section-identifier[data-section-type="sub-section"] {
+  background-color: rgba(79, 70, 229, 0.95); /* Indigo for sub-sections */
 }
 
 .section-identifier[data-section-type="article"] {
-  background-color: rgba(16, 185, 129, 0.9); /* Green for articles */
+  background-color: rgba(16, 185, 129, 0.95); /* Green for articles */
 }
 
 .section-identifier[data-section-type="card"] {
-  background-color: rgba(139, 92, 246, 0.9); /* Purple for cards */
+  background-color: rgba(139, 92, 246, 0.95); /* Purple for cards */
 }
 
 .section-identifier[data-section-type="form"] {
-  background-color: rgba(245, 158, 11, 0.9); /* Orange for forms */
+  background-color: rgba(245, 158, 11, 0.95); /* Orange for forms */
+}
+
+.section-identifier[data-section-type="generator"] {
+  background-color: rgba(6, 182, 212, 0.95); /* Cyan for generators */
+}
+
+.section-identifier[data-section-type="palette-output"], 
+.section-identifier[data-section-type="results"] {
+  background-color: rgba(5, 150, 105, 0.95); /* Emerald for palette outputs/results */
+}
+
+.section-identifier[data-section-type="container"],
+.section-identifier[data-section-type="wrapper"] {
+  background-color: rgba(217, 70, 239, 0.95); /* Fuchsia for containers */
+}
+
+.section-identifier[data-section-type="controls"] {
+  background-color: rgba(245, 158, 11, 0.95); /* Amber for control sections */
+}
+
+.section-identifier[data-section-type="grid"] {
+  background-color: rgba(234, 88, 12, 0.95); /* Orange for grid layouts */
+}
+
+.section-identifier[data-section-type="wcag"] {
+  background-color: rgba(190, 24, 93, 0.95); /* Pink for WCAG specific sections */
+}
+
+.section-identifier[data-section-type="react-component"] {
+  background-color: rgba(124, 58, 237, 0.95); /* Violet for React components */
+}
+
+.section-identifier[data-section-type="component"] {
+  background-color: rgba(220, 38, 38, 0.95); /* Red for generic components */
 }
 
 /* Tooltip with info about the section */
@@ -57,12 +101,19 @@
   color: white;
   font-size: 11px;
   font-weight: normal;
-  padding: 4px 6px;
-  border-radius: 2px;
-  white-space: nowrap;
+  padding: 8px 10px;
+  border-radius: 4px;
+  white-space: pre-line; /* Support multiline tooltips */
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
+  max-width: 300px; /* Limit width for long content */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 10001; /* Higher than the badge itself */
+  line-height: 1.5; /* Better readability for multi-line content */
+  text-align: left;
+  margin-top: 5px; /* Spacing from the badge */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
 }
 
 .section-identifier:hover::after {

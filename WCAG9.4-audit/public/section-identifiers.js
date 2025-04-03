@@ -192,65 +192,132 @@
   }
   
   /**
-   * Find all sections in the document
+   * Find all sections in the document with a more granular approach
    */
   function findSections() {
     const sections = [];
     
     try {
+      // Helper to add section if valid
+      const addToSections = function(element, type, sections) {
+        if (isValidSection(element) && !sections.some(s => s.element === element)) {
+          sections.push({
+            element: element,
+            type: type
+          });
+        }
+      };
+      
+      // ----------------
+      // Color Palette Generator Page - Specific Sections
+      // ----------------
+      
+      // Find palette generator sections
+      const generatorSections = document.querySelectorAll('.palette-generator, [id*="palette"], [class*="palette"]');
+      generatorSections.forEach(section => {
+        addToSections(section, 'generator', sections);
+      });
+      
+      // Find all headings with content as sections
+      const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      headings.forEach(heading => {
+        // Find the parent container of this heading
+        let parentSection = heading.parentElement;
+        if (parentSection && parentSection !== document.body) {
+          addToSections(parentSection, 'section', sections);
+        }
+      });
+      
+      // Look for specific WCAG related sections
+      const wcagSections = document.querySelectorAll('[class*="wcag"], [id*="wcag"], [class*="WCAG"], [id*="WCAG"]');
+      wcagSections.forEach(section => {
+        addToSections(section, 'wcag', sections);
+      });
+      
+      // ----------------
+      // Generic UI Components
+      // ----------------
+      
       // Method 1: Find main content sections first
-      const mainSections = document.querySelectorAll('main section, article, [role="main"] > div');
-      if (mainSections.length > 0) {
-        mainSections.forEach(function(section) {
-          if (isValidSection(section)) {
-            sections.push({
-              element: section,
-              type: section.tagName.toLowerCase() === 'article' ? 'article' : 'main'
-            });
+      const mainSections = document.querySelectorAll('main, section, article, [role="main"] > div');
+      mainSections.forEach(section => {
+        addToSections(section, 'main', sections);
+        
+        // Look for direct children that are substantial sections
+        Array.from(section.children).forEach(child => {
+          // Only consider fairly substantial elements
+          if (child.offsetHeight > 50 && child.offsetWidth > 50) {
+            addToSections(child, 'sub-section', sections);
           }
         });
-      }
+      });
       
-      // Method 2: Find cards and UI components
-      const cards = document.querySelectorAll('.card, [class*="card"], [class*="Card"]');
-      if (cards.length > 0) {
-        cards.forEach(function(card) {
-          if (isValidSection(card) && !isSectionChild(card, sections)) {
-            sections.push({
-              element: card,
-              type: 'card'
-            });
+      // Method 2: Find UI components by common class patterns
+      [
+        // UI Components
+        '.card, [class*="card"], [class*="Card"]',
+        '.panel, [class*="panel"], [class*="Panel"]',
+        '.box, [class*="box"], [class*="Box"]',
+        // Forms
+        'form, [role="form"]',
+        // Layout components
+        '.container, [class*="container"], [class*="Container"]',
+        '.wrapper, [class*="wrapper"], [class*="Wrapper"]',
+        '.layout, [class*="layout"], [class*="Layout"]',
+        // Interactive components
+        '[class*="generator"], [id*="generator"]',
+        '[class*="form-group"], [class*="form-section"]',
+        // Results displays
+        '[class*="results"], [id*="results"]',
+        '[class*="output"], [id*="output"]',
+        '.color-display, [class*="color-display"]'
+      ].forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+          // Avoid adding children of already added sections
+          if (!isSectionChild(element, sections)) {
+            // Get selector type for classification
+            const type = selector.includes('card') ? 'card' 
+                        : selector.includes('form') ? 'form'
+                        : selector.includes('container') || selector.includes('wrapper') ? 'container'
+                        : selector.includes('generator') ? 'generator'
+                        : selector.includes('results') || selector.includes('output') ? 'results'
+                        : 'component';
+            
+            addToSections(element, type, sections);
           }
         });
-      }
+      });
+
+      // Look specifically for color palette output areas
+      const colorOutputs = document.querySelectorAll('[class*="color-combination"], [class*="color-palette"], [class*="palette-output"]');
+      colorOutputs.forEach(output => {
+        addToSections(output, 'palette-output', sections);
+      });
       
-      // Method 3: Find forms
-      const forms = document.querySelectorAll('form, [role="form"]');
-      if (forms.length > 0) {
-        forms.forEach(function(form) {
-          if (isValidSection(form) && !isSectionChild(form, sections)) {
-            sections.push({
-              element: form,
-              type: 'form'
-            });
-          }
-        });
-      }
+      // Find buttons groups - they're often important controls
+      const buttonGroups = document.querySelectorAll('.btn-group, [class*="button-group"], [role="toolbar"]');
+      buttonGroups.forEach(group => {
+        addToSections(group, 'controls', sections);
+      });
       
-      // Method 4: Find React components by class naming conventions
-      const reactComponents = document.querySelectorAll('[class*="container"], [class*="wrapper"], [class*="Component"]');
-      if (reactComponents.length > 0) {
-        reactComponents.forEach(function(component) {
-          if (isValidSection(component) && 
-              !isSectionChild(component, sections) && 
-              !sections.some(s => s.element === component)) {
-            sections.push({
-              element: component,
-              type: 'component'
-            });
-          }
-        });
-      }
+      // Special case: look for grid sections which are often results displays
+      const gridSections = document.querySelectorAll('[class*="grid"]');
+      gridSections.forEach(grid => {
+        // Avoid tiny grids
+        if (grid.offsetHeight > 100 && grid.offsetWidth > 100) {
+          addToSections(grid, 'grid', sections);
+        }
+      });
+      
+      // Get React component containers
+      const reactComponents = document.querySelectorAll('[class*="Component"], [class*="component"]');
+      reactComponents.forEach(component => {
+        if (!isSectionChild(component, sections)) {
+          addToSections(component, 'react-component', sections);
+        }
+      });
+      
     } catch (error) {
       console.warn('Error finding sections:', error);
     }
@@ -259,13 +326,16 @@
   }
   
   /**
-   * Check if an element is a valid section
+   * Check if an element is a valid section - with more granular requirements
    */
   function isValidSection(element) {
     try {
-      // Skip elements that are too small
+      // Get element dimensions
       const rect = element.getBoundingClientRect();
-      if (rect.width < 100 || rect.height < 100) {
+      
+      // Skip extremely small elements (allowing more granular sections)
+      // Relaxed from 100x100 to 50x50 to catch smaller UI elements
+      if (rect.width < 50 || rect.height < 50) {
         return false;
       }
       
@@ -274,15 +344,51 @@
         return false;
       }
       
-      // Skip elements with no meaningful content
-      if (element.textContent.trim().length === 0 && element.querySelectorAll('img, svg').length === 0) {
+      // Skip elements with no meaningful content, but allow UI controls
+      const hasUIControl = element.querySelector('button, input, select, textarea');
+      const hasImage = element.querySelectorAll('img, svg').length > 0;
+      const hasText = element.textContent.trim().length > 0;
+      
+      if (!hasText && !hasImage && !hasUIControl) {
         return false;
       }
       
-      // Skip certain types of elements
+      // Skip certain types of elements that are never sections
       const tagName = element.tagName.toLowerCase();
-      if (['script', 'style', 'link', 'meta', 'head', 'html', 'body'].includes(tagName)) {
+      if (['script', 'style', 'link', 'meta', 'head', 'html', 'body', 'br', 'hr'].includes(tagName)) {
         return false;
+      }
+      
+      // Skip very simple inline elements
+      if (['span', 'a', 'label', 'strong', 'em', 'i', 'b', 'u'].includes(tagName)) {
+        // Unless they have specific classes that indicate they're components
+        const classes = Array.from(element.classList);
+        const isComponent = classes.some(cls => 
+          cls.includes('component') || 
+          cls.includes('container') || 
+          cls.includes('card') || 
+          cls.includes('button') || 
+          cls.includes('control'));
+          
+        if (!isComponent) {
+          return false;
+        }
+      }
+      
+      // Special case: identify palette generation regions
+      if (element.className && typeof element.className === 'string') {
+        if (element.className.includes('palette') || 
+            element.className.includes('color-') || 
+            element.className.includes('generator') ||
+            element.id && element.id.includes('palette')) {
+          // For palette-related elements, be more lenient with size
+          return true;
+        }
+      }
+      
+      // Include all elements with IDs as they're likely important
+      if (element.id && element.id.trim() !== '') {
+        return true;
       }
       
       return true;
@@ -325,11 +431,40 @@
       const elementClass = Array.from(element.classList).map(c => '.' + c).join('');
       const elementTag = element.tagName.toLowerCase();
       
+      // Get element dimensions for tooltip
+      const rect = element.getBoundingClientRect();
+      const width = Math.round(rect.width);
+      const height = Math.round(rect.height);
+      
+      // Get element content summary
+      let contentSummary = '';
+      if (element.textContent) {
+        const text = element.textContent.trim();
+        if (text.length > 0) {
+          // Get first 30 chars of content as a preview
+          contentSummary = text.length > 30 ? 
+            text.substring(0, 30) + '...' : 
+            text;
+        }
+      }
+      
+      // Get heading content if present
+      const headingElement = element.querySelector('h1, h2, h3, h4, h5, h6');
+      const headingText = headingElement ? headingElement.textContent.trim() : '';
+      
+      // Build enhanced tooltip info
+      const tooltipInfo = [
+        `Type: ${type}`,
+        `Element: ${elementTag}${elementId}${elementClass}`,
+        `Size: ${width}×${height}px`,
+        headingText ? `Heading: ${headingText}` : '',
+        contentSummary ? `Content: "${contentSummary}"` : ''
+      ].filter(Boolean).join('\n');
+      
       // Set tooltip info
-      identifier.setAttribute('data-info', `${elementTag}${elementId}${elementClass}`);
+      identifier.setAttribute('data-info', tooltipInfo);
       
       // Position the identifier correctly based on element position
-      const rect = element.getBoundingClientRect();
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
       
