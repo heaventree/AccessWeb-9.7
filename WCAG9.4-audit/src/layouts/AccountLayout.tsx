@@ -4,7 +4,6 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
   CreditCard,
   Settings,
-  FileText,
   Bell,
   Users,
   Activity,
@@ -14,6 +13,7 @@ import {
   Gauge,
   XCircle
 } from 'lucide-react';
+import { Navigation } from '../components/Navigation';
 
 // Mock subscription data
 const subscription = {
@@ -50,8 +50,10 @@ export function AccountLayout() {
   };
 
   return (
-    <div className="bg-gray-50 flex h-full">
-      {/* Mobile sidebar */}
+    <>
+      <Navigation />
+      <div className="bg-gray-50 flex h-full">
+        {/* Mobile sidebar */}
       <div
         className={`fixed inset-0 z-40 md:hidden ${
           mobileSidebarOpen ? 'block' : 'hidden'
@@ -215,5 +217,6 @@ export function AccountLayout() {
         </main>
       </div>
     </div>
+    </>
   );
 }
