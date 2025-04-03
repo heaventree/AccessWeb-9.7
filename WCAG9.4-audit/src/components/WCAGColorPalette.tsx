@@ -462,6 +462,9 @@ function determineColorName(baseHsl: { h: number, s: number, l: number }, colorH
   return harmonyType.charAt(0).toUpperCase() + harmonyType.slice(1);
 }
 
+// Pro pill styling
+const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold inline-flex items-center scale-[0.85] origin-left";
+
 export function WCAGColorPalette() {
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const [baseColor, setBaseColor] = useState('#1a365d');
@@ -777,6 +780,7 @@ export function WCAGColorPalette() {
             >
               <FileText className="w-5 h-5 mr-2" />
               Export as Text
+              <span className={proPillStyle}>PRO</span>
             </button>
             <button
               onClick={exportToPDF}
@@ -784,6 +788,7 @@ export function WCAGColorPalette() {
             >
               <FileDown className="w-5 h-5 mr-2" />
               Export as PDF
+              <span className={proPillStyle}>PRO</span>
             </button>
           </div>
           <div ref={paletteRef}>
