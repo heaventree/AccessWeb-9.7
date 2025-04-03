@@ -100,7 +100,7 @@ export function ShopifySetup() {
       <div className="mb-2">
         <Link 
           to="/my-account/connections" 
-          className="inline-flex items-center text-blue-600 hover:text-blue-800"
+          className="inline-flex items-center text-green-600 hover:text-green-800"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Return to My Connections
@@ -186,7 +186,7 @@ export function ShopifySetup() {
                   id="shop"
                   value={settings.shop}
                   onChange={(e) => setSettings({...settings, shop: e.target.value})}
-                  className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
                   placeholder="your-store.myshopify.com"
                 />
               </div>
@@ -205,13 +205,13 @@ export function ShopifySetup() {
                   id="accessToken"
                   value={settings.accessToken}
                   onChange={(e) => setSettings({...settings, accessToken: e.target.value})}
-                  className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md pr-12"
+                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md pr-12"
                   placeholder="shpat_xxxxxxxxxxxxxxxxxxxx"
                 />
                 <button
                   type="button"
                   onClick={() => setShowCredentials(!showCredentials)}
-                  className="absolute inset-y-0 right-0 px-3 flex items-center text-blue-600 hover:text-blue-700"
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-green-600 hover:text-green-700"
                 >
                   {showCredentials ? 'Hide' : 'Show'}
                 </button>
@@ -222,7 +222,7 @@ export function ShopifySetup() {
                   href="https://admin.shopify.com/settings/apps/development" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="ml-1 text-blue-600 hover:text-blue-800"
+                  className="ml-1 text-green-600 hover:text-green-800"
                 >
                   Get your access token →
                 </a>
@@ -276,7 +276,7 @@ export function ShopifySetup() {
                   id="scanFrequency"
                   value={settings.scanFrequency}
                   onChange={(e) => setSettings({ ...settings, scanFrequency: e.target.value })}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
                   style={{ maxWidth: '280px' }}
                 >
                   <option value="realtime">Real-time</option>
@@ -296,7 +296,7 @@ export function ShopifySetup() {
                       type="checkbox"
                       checked={settings.autoFix}
                       onChange={(e) => setSettings({ ...settings, autoFix: e.target.checked })}
-                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                      className="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
@@ -312,7 +312,7 @@ export function ShopifySetup() {
                       type="checkbox"
                       checked={settings.notifyAdmin}
                       onChange={(e) => setSettings({ ...settings, notifyAdmin: e.target.checked })}
-                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                      className="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
@@ -332,7 +332,7 @@ export function ShopifySetup() {
                   rows={3}
                   value={settings.excludedPaths.join('\n')}
                   onChange={(e) => setSettings({ ...settings, excludedPaths: e.target.value.split('\n').filter(p => p.trim()) })}
-                  className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
                   placeholder="/cart&#10;/products/sample-product&#10;/collections/all"
                 />
               </div>
@@ -346,8 +346,8 @@ export function ShopifySetup() {
               <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">Current Theme</h3>
                 <div className="mt-2 flex items-center">
-                  <div className="bg-blue-100 rounded-full p-2">
-                    <Store className="h-5 w-5 text-blue-600" />
+                  <div className="bg-green-100 rounded-full p-2">
+                    <Store className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="ml-3">
                     <p className="text-sm font-medium text-gray-900">{settings.theme.name}</p>

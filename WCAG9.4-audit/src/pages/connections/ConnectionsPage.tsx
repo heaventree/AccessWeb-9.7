@@ -69,11 +69,19 @@ export function ConnectionsPage() {
             {connections.map((connection) => (
               <div
                 key={connection.id}
-                className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 flex flex-col h-full"
+                className={`bg-white rounded-xl shadow-sm overflow-hidden border flex flex-col h-full ${
+                  connection.id === 'custom-api' ? 'border-purple-200' : 
+                  connection.id === 'shopify' ? 'border-green-200' : 
+                  connection.id === 'wordpress' ? 'border-blue-200' : 'border-gray-200'
+                }`}
               >
                 <div className="p-6 flex-grow">
                   <div className="flex items-center">
-                    <connection.icon className="w-8 h-8 text-blue-600" />
+                    <connection.icon className={`w-8 h-8 ${
+                      connection.id === 'custom-api' ? 'text-purple-600' : 
+                      connection.id === 'shopify' ? 'text-green-600' : 
+                      connection.id === 'wordpress' ? 'text-blue-600' : 'text-gray-600'
+                    }`} />
                     <div className="ml-3">
                       <h2 className="text-xl font-bold text-gray-900">{connection.name}</h2>
                       <p className="mt-1 text-gray-500">{connection.description}</p>
@@ -104,7 +112,11 @@ export function ConnectionsPage() {
                     </span>
                     <Link
                       to={connection.path}
-                      className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+                      className={`inline-flex items-center font-medium ${
+                        connection.id === 'custom-api' ? 'text-purple-600 hover:text-purple-700' : 
+                        connection.id === 'shopify' ? 'text-green-600 hover:text-green-700' : 
+                        connection.id === 'wordpress' ? 'text-blue-600 hover:text-blue-700' : 'text-gray-600 hover:text-gray-700'
+                      }`}
                     >
                       Configure
                       <ArrowRight className="ml-2 -mr-1 h-5 w-5" />
