@@ -43,6 +43,7 @@ import { ShopifyDashboard } from './components/integrations/ShopifyDashboard';
 import { BlogPage } from './pages/BlogPage';
 import { ArticlePage } from './pages/ArticlePage';
 import { WcagResourcesPage } from './pages/WcagResourcesPage';
+import { NonDestructiveFixPage } from './pages/NonDestructiveFixPage';
 import { BackToTop } from './components/BackToTop';
 import { Toaster } from 'react-hot-toast';
 import { ScrollToTop } from './components/ScrollToTop';
@@ -102,6 +103,7 @@ function App() {
               <Route path="/blog" element={<><Navigation /><main id="main-content"><BlogPage /></main><Footer /><BackToTop /></>} />
               <Route path="/blog/:slug" element={<><Navigation /><main id="main-content"><ArticlePage /></main><Footer /><BackToTop /></>} />
               <Route path="/wcag-resources" element={<><Navigation /><main id="main-content"><WcagResourcesPage /></main><Footer /><BackToTop /></>} />
+              <Route path="/non-destructive-fixes" element={<><Navigation /><main id="main-content"><NonDestructiveFixPage /></main><Footer /><BackToTop /></>} />
               <Route path="/help" element={<HelpCenter />} />
               <Route path="/help/:slug" element={<HelpArticle />} />
               <Route path="/login" element={<AuthPage />} />

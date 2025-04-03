@@ -13,11 +13,14 @@ import {
   MonitorSmartphone,
   Zap
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import type { AccessibilityIssue, WCAGInfo } from '../types';
+import type { Website } from '../lib/accessibility-fixes/types';
 import { Modal } from './Modal';
 import { getWCAGInfo } from '../utils/wcagHelper';
 import { AIRecommendations } from './AIRecommendations'; 
 import { EmptyState } from './EmptyState';
+import { fixEngine } from '../lib/accessibility-fixes';
 
 type ModalView = 'info' | 'fix' | null;
 
@@ -400,7 +403,45 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                           Learn More
                         </button>
                         <button
-                          onClick={() => console.log(`Implement fix for issue: ${issue.id}`)}
+                          onClick={() => {
+                            // Get the currently selected site from the app context
+                            // This would typically come from a context or state
+                            const selectedSite = {
+                              id: 'current-site',
+                              url: window.location.origin,
+                              platform: 'wordpress' as const,
+                              name: 'Current Site',
+                              metadata: {}
+                            };
+                            
+                            try {
+                              fixEngine.applyFix(selectedSite, {
+                                id: issue.id,
+                                targetSelector: issue.nodes[0] || 'body',
+                                cssProperties: [
+                                  { name: 'outline', value: '2px solid red' },
+                                  { name: 'position', value: 'relative' }
+                                ],
+                                wcagCriteria: issue.wcagCriteria || ['2.4.1'],
+                                description: `Fix for: ${issue.description}`,
+                                createdAt: new Date().toISOString(),
+                                metadata: {
+                                  issueId: issue.id,
+                                  impact: issue.impact,
+                                  nodes: issue.nodes
+                                }
+                              }).then(result => {
+                                if (result.success) {
+                                  toast.success(`Successfully applied fix for "${issue.description}"`);
+                                } else {
+                                  toast.error(`Failed to apply fix: ${result.error}`);
+                                }
+                              });
+                            } catch (error) {
+                              console.error('Error applying fix:', error);
+                              toast.error('An error occurred while applying the fix');
+                            }
+                          }}
                           className="inline-flex items-center px-4 py-2 text-sm font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition-colors border border-green-200 shadow-sm"
                           aria-label={`Apply fix for ${issue.description}`}
                         >

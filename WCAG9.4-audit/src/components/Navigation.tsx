@@ -136,6 +136,12 @@ export function Navigation() {
       description: 'FAQs and troubleshooting'
     },
     {
+      name: 'Non-Destructive Fixes',
+      path: '/non-destructive-fixes',
+      icon: Zap,
+      description: 'CSS-based accessibility fixes'
+    },
+    {
       name: 'Blog',
       path: '/blog',
       icon: FileText,
