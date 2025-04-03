@@ -527,6 +527,24 @@
         });
       });
 
+      // Priority 1: Find navigation elements first (these are crucial for cross-page consistency)
+      const navElements = document.querySelectorAll('nav, [role="navigation"], header, .navbar, .navigation, [class*="navbar"], [class*="header"], [id*="nav"], [id*="menu"], [id*="header"]');
+      navElements.forEach(nav => {
+        addToSections(nav, 'navigation', sections);
+        
+        // Also add important children of navigation elements
+        Array.from(nav.children).forEach(child => {
+          if (child.className && 
+              (child.className.includes('nav') || 
+               child.className.includes('menu') || 
+               child.className.includes('links')) ||
+              child.tagName.toLowerCase() === 'ul' ||
+              child.tagName.toLowerCase() === 'ol') {
+            addToSections(child, 'nav-component', sections);
+          }
+        });
+      });
+      
       // Look specifically for color palette output areas
       const colorOutputs = document.querySelectorAll('[class*="color-combination"], [class*="color-palette"], [class*="palette-output"]');
       colorOutputs.forEach(output => {
@@ -568,6 +586,18 @@
    */
   function isValidSection(element) {
     try {
+      // Special case for navigation elements - these are ALWAYS valid
+      // Nav elements are critical for cross-page consistency
+      if (element.tagName.toLowerCase() === 'nav' || 
+          element.getAttribute('role') === 'navigation' ||
+          element.className && (
+            element.className.includes('nav') || 
+            element.className.includes('menu') ||
+            element.className.includes('header')
+          )) {
+        return true;
+      }
+      
       // Get element dimensions
       const rect = element.getBoundingClientRect();
       
@@ -781,11 +811,21 @@
       identifier.setAttribute('title', tooltipInfo); // Fallback tooltip
       
       // Set bright pink color for high visibility with improved styling
-      identifier.style.backgroundColor = '#FF1493'; // Deep Pink
-      identifier.style.color = 'white';
-      identifier.style.fontWeight = 'bold';
-      identifier.style.zIndex = '9999'; // Ensure it's on top
-      identifier.style.boxShadow = '0 0 0 1px #fff'; // White outline for visibility against dark backgrounds
+      // Make navigation elements stand out with special styling
+      if (type === 'navigation' || type === 'nav-component') {
+        identifier.style.backgroundColor = '#FF00FF'; // Magenta for nav elements
+        identifier.style.color = 'white';
+        identifier.style.fontWeight = 'bold';
+        identifier.style.zIndex = '10000'; // Even higher z-index for nav elements
+        identifier.style.boxShadow = '0 0 0 2px yellow'; // Yellow outline for extreme visibility
+        identifier.style.border = '1px solid white'; // Extra border for navigation elements
+      } else {
+        identifier.style.backgroundColor = '#FF1493'; // Deep Pink for regular elements
+        identifier.style.color = 'white';
+        identifier.style.fontWeight = 'bold';
+        identifier.style.zIndex = '9999';
+        identifier.style.boxShadow = '0 0 0 1px #fff'; // White outline for visibility
+      }
       
       // Position the identifier correctly based on element position
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
