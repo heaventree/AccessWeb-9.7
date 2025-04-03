@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { RefreshCw, Copy, Info, Check, Download, FileText, FileDown, Settings, X, Palette } from 'lucide-react';
+import { RefreshCw, Copy, Info, Check, FileText, FileDown, Palette } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -15,13 +15,8 @@ interface ColorCombination {
   isBaseColor?: boolean;
 }
 
-interface ExpertSettings {
-  minContrast: number;
-  maxContrast: number;
-  saturationRange: [number, number];
-  lightnessRange: [number, number];
-  colorHarmony: 'complementary' | 'analogous' | 'triadic' | 'split-complementary' | 'all';
-}
+// Color harmony type
+type ColorHarmony = 'complementary' | 'analogous' | 'triadic' | 'split-complementary' | 'all';
 
 // Color utility functions
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
@@ -142,7 +137,7 @@ function generateRandomColor(): string {
   return rgbToHex(rgb.r, rgb.g, rgb.b);
 }
 
-function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all'): ColorCombination[] {
+function generateAccessiblePalette(baseColor: string, harmonyType: ColorHarmony = 'all'): ColorCombination[] {
   const combinations: ColorCombination[] = [];
   const baseRgb = hexToRgb(baseColor);
   const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
@@ -425,7 +420,7 @@ function hslToHexString(h: number, s: number, l: number): string {
   return rgbToHex(rgb.r, rgb.g, rgb.b);
 }
 
-function determineColorName(baseHsl: { h: number, s: number, l: number }, colorHsl: { h: number, s: number, l: number }, harmonyType: string): string {
+function determineColorName(baseHsl: { h: number, s: number, l: number }, colorHsl: { h: number, s: number, l: number }, harmonyType: ColorHarmony): string {
   // Calculate hue difference
   const hueDiff = Math.abs(baseHsl.h - colorHsl.h);
   
@@ -470,14 +465,7 @@ export function WCAGColorPalette() {
   const [baseColor, setBaseColor] = useState('#1a365d');
   const [generatedPalette, setGeneratedPalette] = useState<ColorCombination[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [showExpertSettings, setShowExpertSettings] = useState(false);
-  const [expertSettings, setExpertSettings] = useState<ExpertSettings>({
-    minContrast: 4.5,
-    maxContrast: 21,
-    saturationRange: [60, 100],
-    lightnessRange: [20, 80],
-    colorHarmony: 'all'
-  });
+  const [colorHarmony, setColorHarmony] = useState<'complementary' | 'analogous' | 'triadic' | 'split-complementary' | 'all'>('all');
   const paletteRef = useRef<HTMLDivElement>(null);
 
   const copyToClipboard = (color: string) => {
@@ -491,7 +479,7 @@ export function WCAGColorPalette() {
     setTimeout(() => {
       const newBaseColor = generateRandomColor();
       setBaseColor(newBaseColor);
-      const newPalette = generateAccessiblePalette(newBaseColor, expertSettings.colorHarmony);
+      const newPalette = generateAccessiblePalette(newBaseColor, colorHarmony);
       setGeneratedPalette(newPalette);
       setIsGenerating(false);
     }, 500);
@@ -500,7 +488,7 @@ export function WCAGColorPalette() {
   const handleBaseColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = e.target.value;
     setBaseColor(newColor);
-    const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony);
+    const newPalette = generateAccessiblePalette(newColor, colorHarmony);
     setGeneratedPalette(newPalette);
   };
 
@@ -589,146 +577,59 @@ export function WCAGColorPalette() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             <div className="flex items-center justify-between">
               <span>Generate Custom Palette</span>
-              <button
-                onClick={() => setShowExpertSettings(!showExpertSettings)}
-                className="inline-flex items-center text-gray-600 hover:text-gray-900"
-              >
-                <Settings className="w-5 h-5 mr-2" />
-                Expert Settings
-              </button>
             </div>
           </h3>
           
-          {showExpertSettings && (
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <div className="flex justify-between items-center mb-4">
-                <h4 className="font-medium text-gray-900">Expert Color Settings</h4>
-                <button
-                  onClick={() => setShowExpertSettings(false)}
-                  className="text-gray-400 hover:text-gray-500"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contrast Range
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <input
-                      type="number"
-                      min="1"
-                      max="21"
-                      step="0.1"
-                      value={expertSettings.minContrast}
-                      onChange={(e) => setExpertSettings(prev => ({
-                        ...prev,
-                        minContrast: parseFloat(e.target.value)
-                      }))}
-                      className="w-24 px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                    <span>to</span>
-                    <input
-                      type="number"
-                      min="1"
-                      max="21"
-                      step="0.1"
-                      value={expertSettings.maxContrast}
-                      onChange={(e) => setExpertSettings(prev => ({
-                        ...prev,
-                        maxContrast: parseFloat(e.target.value)
-                      }))}
-                      className="w-24 px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Color Harmony
-                  </label>
-                  <select
-                    value={expertSettings.colorHarmony}
-                    onChange={(e) => setExpertSettings(prev => ({
-                      ...prev,
-                      colorHarmony: e.target.value as ExpertSettings['colorHarmony']
-                    }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    <option value="all">All Harmonies</option>
-                    <option value="complementary">Complementary</option>
-                    <option value="analogous">Analogous</option>
-                    <option value="triadic">Triadic</option>
-                    <option value="split-complementary">Split Complementary</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Saturation Range (%)
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={expertSettings.saturationRange[0]}
-                      onChange={(e) => setExpertSettings(prev => ({
-                        ...prev,
-                        saturationRange: [parseInt(e.target.value), prev.saturationRange[1]]
-                      }))}
-                      className="w-24 px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                    <span>to</span>
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={expertSettings.saturationRange[1]}
-                      onChange={(e) => setExpertSettings(prev => ({
-                        ...prev,
-                        saturationRange: [prev.saturationRange[0], parseInt(e.target.value)]
-                      }))}
-                      className="w-24 px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Lightness Range (%)
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={expertSettings.lightnessRange[0]}
-                      onChange={(e) => setExpertSettings(prev => ({
-                        ...prev,
-                        lightnessRange: [parseInt(e.target.value), prev.lightnessRange[1]]
-                      }))}
-                      className="w-24 px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                    <span>to</span>
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={expertSettings.lightnessRange[1]}
-                      onChange={(e) => setExpertSettings(prev => ({
-                        ...prev,
-                        lightnessRange: [prev.lightnessRange[0], parseInt(e.target.value)]
-                      }))}
-                      className="w-24 px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                  </div>
-                </div>
-              </div>
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Color Harmony
+              </label>
             </div>
-          )}
+            
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+              <button
+                onClick={() => setColorHarmony('all')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'all' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                All Harmonies
+              </button>
+              <button
+                onClick={() => setColorHarmony('complementary')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                Complementary
+              </button>
+              <button
+                onClick={() => setColorHarmony('analogous')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'analogous' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                Analogous
+              </button>
+              <button
+                onClick={() => setColorHarmony('triadic')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'triadic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                Triadic
+              </button>
+              <button
+                onClick={() => setColorHarmony('split-complementary')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'split-complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                Split Complementary
+              </button>
+            </div>
+          </div>
           
           <div className="flex items-center gap-4">
             <div className="flex-1">
@@ -750,7 +651,7 @@ export function WCAGColorPalette() {
                     const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
                     if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
                       setBaseColor(newColor);
-                      const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony);
+                      const newPalette = generateAccessiblePalette(newColor, colorHarmony);
                       setGeneratedPalette(newPalette);
                     }
                   }}
