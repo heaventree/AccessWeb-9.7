@@ -116,14 +116,30 @@ function getContrastRatio(l1: number, l2: number): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-function getWCAGLevel(ratio: number, isLargeText: boolean = false): 'AAA' | 'AA' | 'Fail' {
-  if (isLargeText) {
+function getWCAGLevel(ratio: number, isLargeText: boolean = false, isUI: boolean = false): 'AAA' | 'AA' | 'Fail' {
+  // WCAG 2.2 maintains the same contrast requirements as 2.1, but adds specific requirements
+  // for focus indicators and other UI components which are handled elsewhere
+  
+  // For regular text
+  if (!isLargeText && !isUI) {
+    if (ratio >= 7) return 'AAA';
+    if (ratio >= 4.5) return 'AA';
+    return 'Fail';
+  }
+  
+  // For large text
+  if (isLargeText && !isUI) {
     if (ratio >= 4.5) return 'AAA';
     if (ratio >= 3) return 'AA';
     return 'Fail';
   }
-  if (ratio >= 7) return 'AAA';
-  if (ratio >= 4.5) return 'AA';
+  
+  // For UI components or graphical objects (including focus indicators in WCAG 2.2)
+  if (isUI) {
+    if (ratio >= 3) return 'AA'; // UI components need minimum 3:1 ratio
+    return 'Fail';
+  }
+  
   return 'Fail';
 }
 
@@ -271,8 +287,9 @@ function generateAccessiblePalette(baseColor: string, harmonyType: ColorHarmony 
     const textColor = whiteContrast > blackContrast ? '#FFFFFF' : '#000000';
     const ratio = Math.max(whiteContrast, blackContrast);
     
-    // Determine WCAG level
-    const wcagLevel = getWCAGLevel(ratio);
+    // Determine WCAG level (using WCAG 2.2 standards)
+    // Use regular text by default, but could be extended to detect UI elements
+    const wcagLevel = getWCAGLevel(ratio, false, false);
     
     // If it's the first one (index 0), always mark it as "Base" regardless of other factors
     let name = i === 0 ? "Base" : determineColorName(baseHsl, bgHsl, harmonyType);
@@ -680,7 +697,7 @@ export function WCAGColorPalette() {
             WCAG Color Palette Generator
           </h2>
           <p className="text-gray-600">
-            Generate accessible color combinations that meet WCAG 2.1 contrast requirements.
+            Generate accessible color combinations that meet WCAG 2.1 and 2.2 contrast requirements.
             Our algorithm creates diverse palettes using multiple color harmonies including complementary, analogous, triadic, 
             monochromatic, tetradic, square, and split-complementary.
           </p>
@@ -990,13 +1007,15 @@ export function WCAGColorPalette() {
           
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Contrast Requirements (WCAG 1.4.3 & 1.4.6)</h4>
+              <h4 className="font-medium text-gray-900 mb-3">Contrast Requirements (WCAG 2.1 & 2.2)</h4>
               <ul className="list-disc list-inside text-gray-600 space-y-2">
                 <li>AAA level (Enhanced): 7:1 contrast ratio for normal text</li>
                 <li>AA level (Minimum): 4.5:1 contrast ratio for normal text</li>
                 <li>Large text (18pt+ or 14pt+ bold): 3:1 for AA, 4.5:1 for AAA</li>
                 <li>UI components and graphical objects: minimum 3:1 against adjacent colors</li>
-                <li>Focus indicators must have 3:1 contrast with surrounding content</li>
+                <li>Focus indicators: minimum 3:1 contrast (WCAG 2.2, SC 2.4.11)</li>
+                <li>Target size: minimum 24x24 pixels (WCAG 2.2, SC 2.5.8)</li>
+                <li>Dragging movement: alternatives required (WCAG 2.2, SC 2.5.7)</li>
               </ul>
               
               <h4 className="font-medium text-gray-900 mt-6 mb-3">Why Contrast Matters</h4>
