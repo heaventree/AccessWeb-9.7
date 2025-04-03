@@ -11,6 +11,7 @@ import { AdminLoginPage } from './pages/AdminLoginPage';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 import { AdminLayout } from './layouts/AdminLayout';
+import { AccountLayout } from './layouts/AccountLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminPackages } from './pages/admin/AdminPackages';
 import { AdminClients } from './pages/admin/AdminClients';
@@ -85,14 +86,17 @@ function App() {
               <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/monitoring" element={<><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/realtime" element={<><Navigation /><main id="main-content"><RealTimeMonitorPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/my-account" element={<ProtectedRoute><><Navigation /><main id="main-content"><SubscriptionDashboard /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/my-account/monitoring" element={<ProtectedRoute><><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/my-account/analytics" element={<ProtectedRoute><><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/my-account/alerts" element={<ProtectedRoute><><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/my-account/connections" element={<ProtectedRoute><><Navigation /><main id="main-content"><ConnectionsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/my-account/connections/custom-api" element={<ProtectedRoute><><Navigation /><main id="main-content"><CustomAPIPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/my-account/connections/shopify" element={<ProtectedRoute><><Navigation /><main id="main-content"><ShopifyAPIPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/my-account/connections/wordpress" element={<ProtectedRoute><><Navigation /><main id="main-content"><WordPressAPIPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              {/* Account Routes with shared layout */}
+              <Route path="/my-account" element={<ProtectedRoute><><Navigation /><main id="main-content" className="flex-1"><AccountLayout /></main><Footer /><BackToTop /></></ProtectedRoute>}>
+                <Route index element={<SubscriptionDashboard />} />
+                <Route path="monitoring" element={<MonitoringPage />} />
+                <Route path="analytics" element={<AnalyticsPage />} />
+                <Route path="alerts" element={<CompliancePage />} />
+                <Route path="connections" element={<ConnectionsPage />} />
+                <Route path="connections/custom-api" element={<CustomAPIPage />} />
+                <Route path="connections/shopify" element={<ShopifyAPIPage />} />
+                <Route path="connections/wordpress" element={<WordPressAPIPage />} />
+              </Route>
               <Route path="/integrations/wordpress" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/analytics" element={<><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/compliance" element={<><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></>} />
@@ -116,9 +120,6 @@ function App() {
 
               {/* Protected Routes */}
               <Route path="/dashboard" element={<ProtectedRoute><><Navigation /><main id="main-content"><SubscriptionDashboard /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/my-account/billing" element={<ProtectedRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/my-account/settings" element={<ProtectedRoute><><Navigation /><main id="main-content"><SettingsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/my-account/team" element={<ProtectedRoute><><Navigation /><main id="main-content"><TeamPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               {/* Keep old routes for backwards compatibility */}
               <Route path="/billing" element={<ProtectedRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><><Navigation /><main id="main-content"><SettingsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
