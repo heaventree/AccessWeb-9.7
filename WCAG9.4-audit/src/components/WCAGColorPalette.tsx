@@ -16,7 +16,7 @@ interface ColorCombination {
 }
 
 // Color harmony type
-type ColorHarmony = 'complementary' | 'analogous' | 'triadic' | 'split-complementary' | 'all';
+type ColorHarmony = 'complementary' | 'analogous' | 'triadic' | 'split-complementary' | 'monochromatic' | 'tetradic' | 'square' | 'all';
 
 // Color utility functions
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
@@ -165,6 +165,21 @@ function generateAccessiblePalette(baseColor: string, harmonyType: ColorHarmony 
     case 'split-complementary':
       // Base color + colors adjacent to the complement
       colorPalette = createSplitComplementaryPalette(baseHsl);
+      break;
+      
+    case 'monochromatic':
+      // Base color with variations in lightness and saturation
+      colorPalette = createMonochromaticPalette(baseHsl);
+      break;
+      
+    case 'tetradic':
+      // Four colors spaced evenly around the color wheel (also called rectangular)
+      colorPalette = createTetradicPalette(baseHsl);
+      break;
+      
+    case 'square':
+      // Four colors spaced in a square around the color wheel
+      colorPalette = createSquarePalette(baseHsl);
       break;
       
     case 'all':
@@ -389,6 +404,90 @@ function createSplitComplementaryPalette(baseHsl: { h: number, s: number, l: num
   return palette;
 }
 
+function createMonochromaticPalette(baseHsl: { h: number, s: number, l: number }): string[] {
+  const palette: string[] = [];
+  
+  // Base color
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l)); // Base color
+  
+  // Create variations with different saturations and lightness
+  // Darker variations
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 30, 5))); // Much darker
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 15, 10))); // Darker
+  
+  // Lighter variations
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 15, 95))); // Lighter
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 30, 95))); // Much lighter
+  
+  // Saturation variations (using original lightness)
+  palette.push(hslToHexString(baseHsl.h, Math.max(baseHsl.s - 30, 0), baseHsl.l)); // Less saturated
+  palette.push(hslToHexString(baseHsl.h, Math.min(baseHsl.s + 30, 100), baseHsl.l)); // More saturated
+  
+  // Combined lightness and saturation variations
+  palette.push(hslToHexString(baseHsl.h, Math.max(baseHsl.s - 20, 0), Math.max(baseHsl.l - 10, 10))); // Darker and less saturated
+  palette.push(hslToHexString(baseHsl.h, Math.min(baseHsl.s + 20, 100), Math.min(baseHsl.l + 10, 90))); // Lighter and more saturated
+  
+  return palette;
+}
+
+function createTetradicPalette(baseHsl: { h: number, s: number, l: number }): string[] {
+  const palette: string[] = [];
+  // Tetradic uses 4 colors in a rectangle on the color wheel (2 complementary pairs)
+  const tetradicHue1 = (baseHsl.h + 60) % 360;  // 60 degrees from base
+  const tetradicHue2 = (baseHsl.h + 180) % 360; // 180 degrees from base (complementary)
+  const tetradicHue3 = (baseHsl.h + 240) % 360; // 240 degrees from base (60 degrees from complementary)
+  
+  // Base color and variations
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l)); // Base
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 15, 10))); // Darker base
+  
+  // Second color (60 degrees)
+  palette.push(hslToHexString(tetradicHue1, baseHsl.s, baseHsl.l)); // Second color
+  
+  // Third color (complementary to base)
+  palette.push(hslToHexString(tetradicHue2, baseHsl.s, baseHsl.l)); // Third color
+  
+  // Fourth color (240 degrees)
+  palette.push(hslToHexString(tetradicHue3, baseHsl.s, baseHsl.l)); // Fourth color
+  
+  // Variations
+  palette.push(hslToHexString(tetradicHue1, baseHsl.s, Math.min(baseHsl.l + 15, 90))); // Lighter second
+  palette.push(hslToHexString(tetradicHue2, baseHsl.s, Math.min(baseHsl.l + 15, 90))); // Lighter third
+  palette.push(hslToHexString(tetradicHue3, baseHsl.s, Math.max(baseHsl.l - 15, 10))); // Darker fourth
+  palette.push(hslToHexString(baseHsl.h, Math.max(baseHsl.s - 20, 0), Math.min(baseHsl.l + 20, 90))); // Desaturated, lighter base
+  
+  return palette;
+}
+
+function createSquarePalette(baseHsl: { h: number, s: number, l: number }): string[] {
+  const palette: string[] = [];
+  // Square uses 4 colors evenly spaced around the color wheel (90 degrees apart)
+  const squareHue1 = (baseHsl.h + 90) % 360;  // 90 degrees from base
+  const squareHue2 = (baseHsl.h + 180) % 360; // 180 degrees from base (complementary)
+  const squareHue3 = (baseHsl.h + 270) % 360; // 270 degrees from base
+  
+  // Base color and variations
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l)); // Base
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 15, 10))); // Darker base
+  
+  // Second color (90 degrees)
+  palette.push(hslToHexString(squareHue1, baseHsl.s, baseHsl.l)); // Second color
+  
+  // Third color (complementary to base)
+  palette.push(hslToHexString(squareHue2, baseHsl.s, baseHsl.l)); // Third color
+  
+  // Fourth color (270 degrees)
+  palette.push(hslToHexString(squareHue3, baseHsl.s, baseHsl.l)); // Fourth color
+  
+  // Variations
+  palette.push(hslToHexString(squareHue1, baseHsl.s, Math.min(baseHsl.l + 15, 90))); // Lighter second
+  palette.push(hslToHexString(squareHue2, baseHsl.s, Math.min(baseHsl.l + 15, 90))); // Lighter third
+  palette.push(hslToHexString(squareHue3, baseHsl.s, Math.max(baseHsl.l - 15, 10))); // Darker fourth
+  palette.push(hslToHexString(baseHsl.h, Math.max(baseHsl.s - 20, 0), Math.min(baseHsl.l + 20, 90))); // Desaturated, lighter base
+  
+  return palette;
+}
+
 function createMixedPalette(baseHsl: { h: number, s: number, l: number }): string[] {
   const palette: string[] = [];
   const complementaryHue = (baseHsl.h + 180) % 360;
@@ -426,6 +525,15 @@ function determineColorName(baseHsl: { h: number, s: number, l: number }, colorH
   
   // Base color or variation
   if (hueDiff < 15) {
+    // For monochromatic, check if it's saturation difference
+    if (harmonyType === 'monochromatic') {
+      const satDiff = Math.abs(baseHsl.s - colorHsl.s);
+      if (satDiff > 15) {
+        return colorHsl.s > baseHsl.s ? 'More Saturated' : 'Less Saturated';
+      }
+    }
+    
+    // Check lightness difference
     if (Math.abs(baseHsl.l - colorHsl.l) < 5) {
       return 'Base';
     } else {
@@ -453,6 +561,21 @@ function determineColorName(baseHsl: { h: number, s: number, l: number }, colorH
     return 'Split Complementary';
   }
   
+  // Check for tetradic (60° and 240° away)
+  if (Math.abs(hueDiff - 60) < 15 || Math.abs(hueDiff - 240) < 15) {
+    return 'Tetradic';
+  }
+  
+  // Check for square (90°, 180°, 270° away)
+  if (Math.abs(hueDiff - 90) < 15 || Math.abs(hueDiff - 270) < 15) {
+    return 'Square';
+  }
+  
+  // If it's monochromatic but not a base variation, it must be a saturation variation
+  if (harmonyType === 'monochromatic') {
+    return 'Monochromatic';
+  }
+  
   // If it doesn't match a specific relationship, use the harmony type
   return harmonyType.charAt(0).toUpperCase() + harmonyType.slice(1);
 }
@@ -465,7 +588,7 @@ export function WCAGColorPalette() {
   const [baseColor, setBaseColor] = useState('#1a365d');
   const [generatedPalette, setGeneratedPalette] = useState<ColorCombination[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [colorHarmony, setColorHarmony] = useState<'complementary' | 'analogous' | 'triadic' | 'split-complementary' | 'all'>('all');
+  const [colorHarmony, setColorHarmony] = useState<ColorHarmony>('all');
   const paletteRef = useRef<HTMLDivElement>(null);
 
   const copyToClipboard = (color: string) => {
@@ -559,7 +682,8 @@ export function WCAGColorPalette() {
           </h2>
           <p className="text-gray-600">
             Generate accessible color combinations that meet WCAG 2.1 contrast requirements.
-            Our algorithm creates diverse palettes using complementary, analogous, and triadic color harmonies.
+            Our algorithm creates diverse palettes using multiple color harmonies including complementary, analogous, triadic, 
+            monochromatic, tetradic, square, and split-complementary.
           </p>
         </div>
 
@@ -587,7 +711,7 @@ export function WCAGColorPalette() {
               </label>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
               <button
                 onClick={() => {
                   setColorHarmony('all');
@@ -646,7 +770,43 @@ export function WCAGColorPalette() {
                   colorHarmony === 'split-complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
                 }`}
               >
-                Split Complementary
+                Split Comp
+              </button>
+              <button
+                onClick={() => {
+                  setColorHarmony('monochromatic');
+                  const newPalette = generateAccessiblePalette(baseColor, 'monochromatic');
+                  setGeneratedPalette(newPalette);
+                }}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'monochromatic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                Monochromatic
+              </button>
+              <button
+                onClick={() => {
+                  setColorHarmony('tetradic');
+                  const newPalette = generateAccessiblePalette(baseColor, 'tetradic');
+                  setGeneratedPalette(newPalette);
+                }}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'tetradic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                Tetradic
+              </button>
+              <button
+                onClick={() => {
+                  setColorHarmony('square');
+                  const newPalette = generateAccessiblePalette(baseColor, 'square');
+                  setGeneratedPalette(newPalette);
+                }}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'square' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                Square
               </button>
             </div>
           </div>
