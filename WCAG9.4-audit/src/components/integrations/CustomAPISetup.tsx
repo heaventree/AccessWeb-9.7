@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Save, RefreshCw, Activity, Code, Key, Info, Book, ArrowRight, X, CheckCircle } from 'lucide-react';
+import { Save, RefreshCw, Activity, Code, Key, Info, Book, ArrowRight, ArrowLeft, X, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAPI } from '../../hooks/useAPI';
@@ -357,6 +357,17 @@ export function CustomAPISetup() {
               </div>
             </div>
           </motion.div>
+        </div>
+        
+        {/* Return to My Connections link */}
+        <div className="mt-8">
+          <Link 
+            to="/my-account/connections" 
+            className="inline-flex items-center text-blue-600 hover:text-blue-800"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Return to My Connections
+          </Link>
         </div>
     </div>
   );
