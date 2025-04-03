@@ -10,7 +10,8 @@ import {
   LogOut,
   Settings,
   Bell,
-  Wallet
+  Wallet,
+  Home
 } from 'lucide-react';
 import { ThemeToggle } from '../components/ThemeToggle';
 
