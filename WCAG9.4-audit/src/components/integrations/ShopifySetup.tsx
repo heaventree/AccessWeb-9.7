@@ -103,7 +103,7 @@ export function ShopifySetup() {
           <div className="ml-3">
             <h2 className="text-lg font-semibold text-blue-900">Shopify App Setup</h2>
             <p className="mt-1 text-blue-700">
-              Before connecting your Shopify store, you'll need to create a custom app in your Shopify admin. Follow our comprehensive documentation to get started.
+              Before connecting your Shopify store, you'll need to either install our app from the Shopify App Store or create a custom app in your Shopify admin. Follow our setup instructions to get started.
             </p>
             <div className="flex mt-3 space-x-3">
               <Link
@@ -428,18 +428,23 @@ export function ShopifySetup() {
                   </h3>
                   <div className="mt-4">
                     <ol className="list-decimal list-inside space-y-3 text-gray-600">
-                      <li>Go to your Shopify admin dashboard</li>
-                      <li>Navigate to Settings &gt; Apps and sales channels</li>
-                      <li>Click on "Develop apps for your store"</li>
-                      <li>Create a new app with a descriptive name</li>
-                      <li>Set up Admin API access with the following scopes:
+                      <li>Install our app from the Shopify App Store
                         <ul className="list-disc list-inside pl-6 mt-2 text-sm text-gray-500 space-y-1">
-                          <li>read_themes, write_themes</li>
-                          <li>read_content, write_content</li>
+                          <li>Search for "WCAG Accessibility Scanner" in the Shopify App Store</li>
+                          <li>Click "Add app" and follow the installation process</li>
                         </ul>
                       </li>
-                      <li>Install the app to your store</li>
-                      <li>Copy the access token and enter it in the form above</li>
+                      <li>Alternatively, if you prefer a custom app setup:
+                        <ul className="list-disc list-inside pl-6 mt-2 text-sm text-gray-500 space-y-1">
+                          <li>Go to your Shopify admin dashboard</li>
+                          <li>Navigate to Settings &gt; Apps and sales channels</li>
+                          <li>Click on "Develop apps for your store"</li>
+                          <li>Create a new app with a descriptive name</li>
+                          <li>Set up Admin API access with the following scopes: read_themes, write_themes, read_content, write_content</li>
+                          <li>Install the app to your store</li>
+                          <li>Copy the access token and enter it in the form above</li>
+                        </ul>
+                      </li>
                     </ol>
                     
                     <div className="mt-6 bg-blue-50 p-4 rounded-md">

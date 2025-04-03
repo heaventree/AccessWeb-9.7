@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Save, RefreshCw, Activity, Code, Key, Info, Book, ArrowRight, X, CheckCircle, Globe, Zap, FileText, HelpCircle } from 'lucide-react';
+import { Save, RefreshCw, Activity, Code, Key, Info, Book, ArrowRight, X, CheckCircle, Globe, Zap, FileText, HelpCircle, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { wordPressAPI } from '../../lib/integrations/wordpress';
@@ -97,13 +97,14 @@ export function WordPressSetup() {
               Before connecting your WordPress site, you'll need to install our WordPress plugin. Follow our comprehensive documentation to get started.
             </p>
             <div className="flex mt-3 space-x-3">
-              <Link
-                to="/docs/wordpress"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              <a
+                href="/downloads/wcag-accessibility-scanner.zip"
+                download
+                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
               >
-                <Book className="w-5 h-5 mr-2" />
-                View Documentation
-              </Link>
+                <Download className="w-5 h-5 mr-2" />
+                Download Plugin
+              </a>
               <button
                 onClick={() => setShowInstructionsModal(true)}
                 className="inline-flex items-center px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50"
@@ -111,6 +112,13 @@ export function WordPressSetup() {
                 <HelpCircle className="w-5 h-5 mr-2" />
                 Setup Instructions
               </button>
+              <Link
+                to="/docs/wordpress"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                <Book className="w-5 h-5 mr-2" />
+                View Documentation
+              </Link>
             </div>
           </div>
         </div>
