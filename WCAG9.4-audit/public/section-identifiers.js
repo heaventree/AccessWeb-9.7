@@ -255,7 +255,69 @@
    */
   function generateElementPath(element) {
     try {
-      // Get element tag name
+      // Special case for navigation elements - use a more consistent approach
+      const isNavElement = element.tagName.toLowerCase() === 'nav' || 
+                           element.getAttribute('role') === 'navigation' ||
+                           (element.className && 
+                            (element.className.includes('nav') || 
+                             element.className.includes('menu') || 
+                             element.className.includes('header')));
+      
+      // Special case for layout containers that might change per page
+      const isLayoutContainer = element.className && 
+                               (element.className.includes('container') ||
+                                element.className.includes('wrapper') ||
+                                element.className.includes('layout') ||
+                                element.className.includes('main')) ||
+                               element.tagName.toLowerCase() === 'main';
+      
+      // For nav elements and main layout containers, use more structural identity
+      if (isNavElement) {
+        // For navigation, create a path that focuses on structure not page-specific classes
+        const tagName = element.tagName.toLowerCase();
+        
+        // Use the ID if available as it's usually consistent
+        if (element.id) {
+          return `nav-element-${element.id}`;
+        }
+        
+        // For navigation, prioritize role and structure over classes
+        const role = element.getAttribute('role');
+        if (role === 'navigation') {
+          return `nav-role-navigation`;
+        }
+        
+        // Check for common navigation patterns
+        if (tagName === 'nav') {
+          // Just use nav tag - it's semantic and consistent
+          return 'semantic-nav';
+        }
+        
+        if (tagName === 'header') {
+          // Headers are usually consistent across pages
+          return 'semantic-header';
+        }
+        
+        // Create a simplified class-based identifier for nav elements
+        return `generic-navigation`;
+      }
+      
+      if (isLayoutContainer) {
+        const tagName = element.tagName.toLowerCase();
+        
+        if (tagName === 'main') {
+          return 'semantic-main'; // main is a semantic element that should be consistent
+        }
+        
+        if (element.id) {
+          return `layout-${element.id}`; // Use ID-based layout identifier
+        }
+        
+        // For other containers, use a simplified structural identifier
+        return `${tagName}-layout-container`;
+      }
+      
+      // Regular approach for most elements
       const tagName = element.tagName.toLowerCase();
       
       // If element has an ID, that's the most reliable identifier
@@ -263,11 +325,12 @@
         return `${tagName}#${element.id}`;
       }
       
-      // Collect element classes but filter out dynamic ones 
-      // (ones that might have numbers, timestamps, or randomly generated parts)
+      // Collect element classes but filter out dynamic ones
+      // and also filter out layout-related classes that might change between pages
       const classes = Array.from(element.classList)
         .filter(cls => !cls.match(/\d+/)) // Filter out classes with numbers
         .filter(cls => !cls.match(/random|uuid|guid|hash/i)) // Filter out likely dynamic classes
+        .filter(cls => !cls.match(/^(container|wrapper|layout|content|main)$/)) // Filter layout classes
         .map(c => `.${c}`)
         .join('');
       
@@ -431,20 +494,52 @@
   
   /**
    * Find all sections in the document with a more granular approach
+   * With improved processing order to ensure consistent parent-child relationships
    */
   function findSections() {
     const sections = [];
+    
+    // Track processed elements to avoid duplicates with different types
+    const processedElements = new Set();
     
     try {
       // Helper to add section if valid
       const addToSections = function(element, type, sections) {
         if (isValidSection(element) && !sections.some(s => s.element === element)) {
+          // Prevent duplicate processing
+          if (processedElements.has(element)) {
+            return;
+          }
+          
+          processedElements.add(element);
           sections.push({
             element: element,
             type: type
           });
         }
       };
+      
+      // ----------------
+      // PRIORITY 1: Navigation Elements (process these first for consistency)
+      // ----------------
+      
+      // Find navigation elements first (these are crucial for cross-page consistency)
+      const navElements = document.querySelectorAll('nav, [role="navigation"], header, .navbar, .navigation, [class*="navbar"], [class*="header"], [id*="nav"], [id*="menu"], [id*="header"]');
+      navElements.forEach(nav => {
+        addToSections(nav, 'navigation', sections);
+        
+        // Also add important children of navigation elements
+        Array.from(nav.children).forEach(child => {
+          if (child.className && 
+              (child.className.includes('nav') || 
+               child.className.includes('menu') || 
+               child.className.includes('links')) ||
+              child.tagName.toLowerCase() === 'ul' ||
+              child.tagName.toLowerCase() === 'ol') {
+            addToSections(child, 'nav-component', sections);
+          }
+        });
+      });
       
       // ----------------
       // Color Palette Generator Page - Specific Sections
@@ -527,23 +622,7 @@
         });
       });
 
-      // Priority 1: Find navigation elements first (these are crucial for cross-page consistency)
-      const navElements = document.querySelectorAll('nav, [role="navigation"], header, .navbar, .navigation, [class*="navbar"], [class*="header"], [id*="nav"], [id*="menu"], [id*="header"]');
-      navElements.forEach(nav => {
-        addToSections(nav, 'navigation', sections);
-        
-        // Also add important children of navigation elements
-        Array.from(nav.children).forEach(child => {
-          if (child.className && 
-              (child.className.includes('nav') || 
-               child.className.includes('menu') || 
-               child.className.includes('links')) ||
-              child.tagName.toLowerCase() === 'ul' ||
-              child.tagName.toLowerCase() === 'ol') {
-            addToSections(child, 'nav-component', sections);
-          }
-        });
-      });
+      // Navigation elements were already processed at the beginning of the function
       
       // Look specifically for color palette output areas
       const colorOutputs = document.querySelectorAll('[class*="color-combination"], [class*="color-palette"], [class*="palette-output"]');
