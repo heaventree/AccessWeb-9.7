@@ -165,7 +165,7 @@ export function ShopifyIntegrationPage() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              to="/help/shopify-integration-guide"
+              to="/docs/shopify"
               className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-blue-700 bg-white hover:bg-blue-50"
             >
               Read Documentation

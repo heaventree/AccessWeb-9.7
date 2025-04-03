@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FileText, Code, Globe, Book } from 'lucide-react';
+import { FileText, Code, Globe, Book, Store } from 'lucide-react';
 
 export function DocumentationPage() {
   const documentationSections = [
@@ -81,6 +81,20 @@ export function DocumentationPage() {
             >
               <Code className="w-5 h-5 mr-2" />
               API Quick Start Guide
+            </Link>
+            <Link
+              to="/docs/wordpress"
+              className="flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+            >
+              <Globe className="w-5 h-5 mr-2" />
+              WordPress Integration Guide
+            </Link>
+            <Link
+              to="/docs/shopify"
+              className="flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+            >
+              <Store className="w-5 h-5 mr-2" />
+              Shopify Integration Guide
             </Link>
             <Link
               to="/help"

@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertTriangle, CheckCircle, Code, FileText, Download } from 'lucide-react';
 import type { ScanResult } from '../../types/integrations';
 import { IssuesList } from '../IssuesList';
+import { Link } from 'react-router-dom';
 
 interface ShopifyScanResultsProps {
   result: ScanResult;
@@ -123,19 +124,19 @@ export function ShopifyScanResults({ result, onApplyFix, onExport }: ShopifyScan
           </p>
           <ul>
             <li>
-              <a href="#" className="text-blue-600 hover:text-blue-700">
+              <Link to="/wcag-resources" className="text-blue-600 hover:text-blue-700">
                 Understanding WCAG Requirements
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="text-blue-600 hover:text-blue-700">
+              <Link to="/docs/shopify" className="text-blue-600 hover:text-blue-700">
                 Shopify Theme Accessibility Guide
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="text-blue-600 hover:text-blue-700">
+              <Link to="/docs/shopify#theme-analysis" className="text-blue-600 hover:text-blue-700">
                 Common Accessibility Issues & Solutions
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
