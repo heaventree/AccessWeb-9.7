@@ -11,9 +11,41 @@
 
   // Configuration
   const IDENTIFIERS_ENABLED_KEY = 'sectionIdentifiersEnabled';
+  const IDENTIFIERS_COUNTER_KEY = 'sectionIdentifiersCounter';
+  const IDENTIFIERS_MAP_KEY = 'sectionIdentifiersMap';
+  
+  // Global counter for unique identifiers
+  let globalCounter = 1;
+  
+  // Map to store element paths and their assigned IDs
+  const elementIdentifierMap = new Map();
   
   // Cache DOM lookups
   let toggleButton = null;
+  
+  // Try to load the global counter from localStorage
+  try {
+    const savedCounter = parseInt(localStorage.getItem(IDENTIFIERS_COUNTER_KEY));
+    if (!isNaN(savedCounter) && savedCounter > 1) {
+      globalCounter = savedCounter;
+    }
+  } catch (e) {
+    console.warn('Error loading saved counter:', e);
+  }
+  
+  // Try to load the element map from localStorage
+  try {
+    const savedMap = localStorage.getItem(IDENTIFIERS_MAP_KEY);
+    if (savedMap) {
+      const parsedMap = JSON.parse(savedMap);
+      // Convert JSON object back to Map
+      Object.entries(parsedMap).forEach(([key, value]) => {
+        elementIdentifierMap.set(key, value);
+      });
+    }
+  } catch (e) {
+    console.warn('Error loading saved element map:', e);
+  }
   
   /**
    * Initialize the section identifiers system
@@ -164,6 +196,55 @@
   }
   
   /**
+   * Generate a unique element path to identify elements across page loads
+   * @param {Element} element - The DOM element
+   * @returns {string} A unique path for the element
+   */
+  function generateElementPath(element) {
+    try {
+      // Get element path components
+      const tagName = element.tagName.toLowerCase();
+      const id = element.id ? `#${element.id}` : '';
+      const classes = Array.from(element.classList).map(c => `.${c}`).join('');
+      
+      // Try to get text content hash for additional uniqueness
+      let contentHash = '';
+      if (element.textContent) {
+        const text = element.textContent.trim();
+        if (text.length > 0) {
+          // Simple hashing function for text content
+          let hash = 0;
+          for (let i = 0; i < Math.min(text.length, 50); i++) {
+            hash = ((hash << 5) - hash) + text.charCodeAt(i);
+            hash |= 0; // Convert to 32bit integer
+          }
+          contentHash = `::${Math.abs(hash)}`;
+        }
+      }
+      
+      // Calculate position in parent if no ID
+      let positionInfo = '';
+      if (!id && element.parentElement) {
+        const siblings = Array.from(element.parentElement.children)
+          .filter(el => el.tagName === element.tagName);
+        const position = siblings.indexOf(element);
+        if (position !== -1) {
+          positionInfo = `:nth-of-type(${position + 1})`;
+        }
+      }
+      
+      // Generate a unique path
+      const path = `${tagName}${id}${classes}${positionInfo}${contentHash}`;
+      
+      return path;
+    } catch (e) {
+      console.warn('Error generating element path:', e);
+      // Fallback to random ID
+      return `element-${Math.floor(Math.random() * 1000000)}`;
+    }
+  }
+  
+  /**
    * Refresh all section identifiers
    */
   function refreshIdentifiers() {
@@ -182,9 +263,33 @@
       // Find sections without modifying them
       const sections = findSections();
       
-      // Create new identifiers
-      sections.forEach(function(section, index) {
-        createIdentifier(section, index + 1);
+      // Create new identifiers with globally unique IDs
+      sections.forEach(function(section) {
+        const element = section.element;
+        const elementPath = generateElementPath(element);
+        
+        // Check if this element already has a stable ID assigned
+        let sectionId;
+        if (elementIdentifierMap.has(elementPath)) {
+          sectionId = elementIdentifierMap.get(elementPath);
+        } else {
+          // Assign new ID from the global counter
+          sectionId = globalCounter++;
+          elementIdentifierMap.set(elementPath, sectionId);
+          
+          // Save the updated counter to localStorage
+          localStorage.setItem(IDENTIFIERS_COUNTER_KEY, globalCounter.toString());
+          
+          // Save the updated map to localStorage (convert Map to object first)
+          try {
+            const mapObject = Object.fromEntries(elementIdentifierMap.entries());
+            localStorage.setItem(IDENTIFIERS_MAP_KEY, JSON.stringify(mapObject));
+          } catch (e) {
+            console.warn('Error saving element map:', e);
+          }
+        }
+        
+        createIdentifier(section, sectionId);
       });
     } catch (error) {
       console.warn('Error refreshing section identifiers:', error);
@@ -425,6 +530,7 @@
       identifier.className = 'section-identifier';
       identifier.textContent = index;
       identifier.setAttribute('data-section-type', type);
+      identifier.setAttribute('data-global-id', index); // Add global ID attribute
       
       // Add additional information
       const elementId = element.id ? '#' + element.id : '';
@@ -452,17 +558,53 @@
       const headingElement = element.querySelector('h1, h2, h3, h4, h5, h6');
       const headingText = headingElement ? headingElement.textContent.trim() : '';
       
+      // Count child elements
+      const childCount = element.children.length;
+      
+      // Get any ARIA attributes
+      const ariaAttributes = [];
+      for (let i = 0; i < element.attributes.length; i++) {
+        const attr = element.attributes[i];
+        if (attr.name.startsWith('aria-') || attr.name === 'role') {
+          ariaAttributes.push(`${attr.name}="${attr.value}"`);
+        }
+      }
+      
+      // Check for interactive elements
+      const hasButtons = element.querySelectorAll('button').length > 0;
+      const hasInputs = element.querySelectorAll('input, select, textarea').length > 0;
+      const hasLinks = element.querySelectorAll('a').length > 0;
+      
+      const interactiveInfo = [
+        hasButtons ? `Contains ${element.querySelectorAll('button').length} button(s)` : '',
+        hasInputs ? `Contains ${element.querySelectorAll('input, select, textarea').length} form field(s)` : '',
+        hasLinks ? `Contains ${element.querySelectorAll('a').length} link(s)` : ''
+      ].filter(Boolean);
+      
+      // Generate a unique selector for this element (for developer reference)
+      const elementPath = generateElementPath(element);
+      const shortPath = elementPath.length > 80 ? elementPath.substring(0, 80) + '...' : elementPath;
+      
       // Build enhanced tooltip info
       const tooltipInfo = [
-        `Type: ${type}`,
+        `ID: ${index} (${type})`,
         `Element: ${elementTag}${elementId}${elementClass}`,
         `Size: ${width}×${height}px`,
+        childCount > 0 ? `Children: ${childCount} element(s)` : '',
+        ariaAttributes.length > 0 ? `ARIA: ${ariaAttributes.join(', ')}` : '',
+        interactiveInfo.length > 0 ? `Interactive: ${interactiveInfo.join(', ')}` : '',
         headingText ? `Heading: ${headingText}` : '',
-        contentSummary ? `Content: "${contentSummary}"` : ''
+        contentSummary ? `Content: "${contentSummary}"` : '',
+        `Path: ${shortPath}`
       ].filter(Boolean).join('\n');
       
       // Set tooltip info
       identifier.setAttribute('data-info', tooltipInfo);
+      
+      // Set bright pink color for high visibility
+      identifier.style.backgroundColor = '#FF1493'; // Deep Pink
+      identifier.style.color = 'white';
+      identifier.style.fontWeight = 'bold';
       
       // Position the identifier correctly based on element position
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -503,11 +645,36 @@
     }, 250);
   });
   
+  /**
+   * Reset all section identifiers to start fresh
+   */
+  function resetIdentifiers() {
+    try {
+      // Reset global counter
+      globalCounter = 1;
+      
+      // Clear the element map
+      elementIdentifierMap.clear();
+      
+      // Clear localStorage
+      localStorage.removeItem(IDENTIFIERS_COUNTER_KEY);
+      localStorage.removeItem(IDENTIFIERS_MAP_KEY);
+      
+      // Refresh identifiers
+      refreshIdentifiers();
+      
+      console.info('Section identifiers have been reset');
+    } catch (error) {
+      console.warn('Error resetting section identifiers:', error);
+    }
+  }
+  
   // Export API for debugging purpose only (not for application use)
   window._devSectionIdentifiers = {
     refresh: refreshIdentifiers,
     enable: function() { setEnabled(true); },
     disable: function() { setEnabled(false); },
-    toggle: function() { setEnabled(!document.body.classList.contains('section-identifiers-enabled')); }
+    toggle: function() { setEnabled(!document.body.classList.contains('section-identifiers-enabled')); },
+    reset: resetIdentifiers
   };
 })();

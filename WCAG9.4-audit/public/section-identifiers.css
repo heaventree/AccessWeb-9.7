@@ -11,20 +11,23 @@
   position: absolute;
   top: 0;
   left: 0;
-  background-color: rgba(255, 0, 128, 0.95); /* Bright pink - very distinct from theme */
+  background-color: rgba(255, 20, 147, 0.95); /* Hot/Deep Pink - extremely distinct from most themes */
   color: white;
-  font-size: 12px;
+  font-size: 14px; /* Larger font size for better visibility */
   font-weight: bold;
   padding: 4px 8px;
   border-radius: 4px;
   z-index: 9999;
-  pointer-events: none; /* Prevents click interference */
-  font-family: 'Inter', sans-serif;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: all; /* Allow interactions to see tooltips on mobile */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Stronger shadow */
   transform: translate(-4px, -4px);
   user-select: none;
-  border: 1px solid white; /* White border for better visibility */
-  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.8); /* Text shadow for better readability */
+  border: 2px solid white; /* Thicker white border for better visibility */
+  text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.9); /* Stronger text shadow for better readability */
+  min-width: 20px; /* Ensure enough width for numbers */
+  text-align: center;
+  cursor: help; /* Show help cursor to indicate tooltip */
 }
 
 /* Only display identifiers when enabled */
@@ -97,53 +100,105 @@
   position: absolute;
   top: 100%;
   left: 0;
-  background-color: rgba(17, 24, 39, 0.95);
+  background-color: rgba(0, 0, 0, 0.95); /* Nearly black for better contrast */
   color: white;
-  font-size: 11px;
+  font-size: 12px; /* Slightly larger font for better readability */
   font-weight: normal;
-  padding: 8px 10px;
+  padding: 10px 12px; /* More padding for easier reading */
   border-radius: 4px;
   white-space: pre-line; /* Support multiline tooltips */
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
-  max-width: 300px; /* Limit width for long content */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 400px; /* Wider tooltip for more content */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Stronger shadow */
   z-index: 10001; /* Higher than the badge itself */
-  line-height: 1.5; /* Better readability for multi-line content */
+  line-height: 1.6; /* Better readability for multi-line content */
   text-align: left;
   margin-top: 5px; /* Spacing from the badge */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* More visible subtle border */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Make tooltip more visible on hover */
 .section-identifier:hover::after {
+  opacity: 1;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5); /* Enhanced shadow on hover */
+}
+
+/* Make sure tooltip stays visible during interaction */
+.section-identifier:focus::after,
+.section-identifier:active::after {
   opacity: 1;
 }
 
-/* Toggle control styling */
+/* Right-aligned tooltip for elements near the left edge */
+.section-identifier[style*="left: 0"]::after,
+.section-identifier[style*="left: 1"]::after,
+.section-identifier[style*="left: 2"]::after,
+.section-identifier[style*="left: 3"]::after,
+.section-identifier[style*="left: 4"]::after,
+.section-identifier[style*="left: 5"]::after,
+.section-identifier[style*="left: 6"]::after,
+.section-identifier[style*="left: 7"]::after,
+.section-identifier[style*="left: 8"]::after,
+.section-identifier[style*="left: 9"]::after {
+  left: auto;
+  right: 0;
+}
+
+/* Toggle control styling - moved to top right */
 .section-identifiers-toggle {
   position: fixed;
-  top: 70px;
-  right: 20px;
-  background-color: white;
-  border: 1px solid #e5e7eb;
+  top: 15px; /* Moved higher for better visibility */
+  right: 15px;
+  background-color: rgba(255, 20, 147, 0.9); /* Match the marker color */
+  color: white;
+  border: 2px solid white;
   border-radius: 8px;
-  padding: 8px 12px;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
+  padding: 8px 14px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px; /* Larger for better visibility */
+  font-weight: bold;
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   z-index: 10000;
-  opacity: 0.8;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
+  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
 }
 
 .section-identifiers-toggle:hover {
-  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
 }
 
 .section-identifiers-toggle input {
   margin: 0;
+  width: 16px;
+  height: 16px;
+}
+
+/* Help text that appears on hover */
+.section-identifiers-toggle::after {
+  content: "Toggle section identifiers for debugging";
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  margin-top: 5px;
+  font-weight: normal;
+}
+
+.section-identifiers-toggle:hover::after {
+  opacity: 1;
 }
