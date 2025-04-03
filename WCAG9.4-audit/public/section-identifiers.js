@@ -324,11 +324,10 @@
         return `${getPositionPath(element, true)}`;
       }
       
-      // Make path more specific with a page context (pathname)
-      const pagePath = window.location.pathname;
-      const pageContext = `[page="${pagePath}"]`;
+      // We're NOT adding page context to maintain consistency across pages
+      // This ensures the same element gets the same ID on different pages
       
-      return `${path}${pageContext}`;
+      return path;
     } catch (e) {
       console.warn('Error generating element path:', e);
       // Fallback to random ID, but this will make identifiers inconsistent
