@@ -135,7 +135,7 @@ export function WordPressSetup() {
       </div>
 
       {/* API Key Management */}
-      <div>
+      <div className="bg-white p-8">
         {/* API Key Generation */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -174,7 +174,7 @@ export function WordPressSetup() {
           </div>
 
           {settings.apiKey ? (
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+            <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Key className="w-6 h-6 text-blue-600" />
@@ -191,7 +191,7 @@ export function WordPressSetup() {
               </div>
               <div className="mt-4">
                 <div className="relative">
-                  <code className="block w-full text-sm font-mono bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 pr-20">
+                  <code className="block w-full text-sm font-mono bg-gray-50 px-4 py-3 rounded-lg pr-20">
                     {showExistingKey ? settings.apiKey : `${settings.apiKey.slice(0, 8)}...${settings.apiKey.slice(-8)}`}
                   </code>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -223,7 +223,7 @@ export function WordPressSetup() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+            <div className="text-center py-12 bg-gray-50 rounded-xl">
               <Globe className="mx-auto h-12 w-12 text-blue-400" />
               <h3 className="mt-2 text-sm font-medium text-gray-900">No WordPress API Key</h3>
               <p className="mt-1 text-sm text-gray-500">
@@ -253,7 +253,7 @@ export function WordPressSetup() {
 
           {/* Display newly generated key */}
           {newApiKey && (
-            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
+            <div className="mt-8 bg-blue-50 rounded-xl p-6">
               <div className="flex items-start">
                 <CheckCircle className="w-6 h-6 text-blue-600 mt-1" />
                 <div className="ml-3">
@@ -263,7 +263,7 @@ export function WordPressSetup() {
                   </p>
                   <div className="mt-4">
                     <div className="relative">
-                      <code className="block w-full text-sm font-mono bg-white px-4 py-3 rounded-lg border border-blue-200 pr-20">
+                      <code className="block w-full text-sm font-mono bg-white px-4 py-3 rounded-lg pr-20">
                         {showNewKey ? newApiKey : `${newApiKey.slice(0, 8)}...${newApiKey.slice(-8)}`}
                       </code>
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3">
