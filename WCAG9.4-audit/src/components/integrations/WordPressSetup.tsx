@@ -135,13 +135,13 @@ export function WordPressSetup() {
       </div>
 
       {/* API Key Management */}
-      <div className="bg-blue-50 border border-blue-100 rounded-xl shadow-sm p-8">
+      <div className="bg-white p-8">
         {/* API Key Generation */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-8"
+          className="bg-white rounded-xl shadow-sm mb-8"
         >
           <div className="border-b border-gray-200 pb-5 mb-6">
             <div className="flex items-center justify-between">

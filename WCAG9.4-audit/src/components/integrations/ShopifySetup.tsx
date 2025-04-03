@@ -107,25 +107,25 @@ export function ShopifySetup() {
         </Link>
       </div>
       {/* Shopify App Documentation Link */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+      <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
         <div className="flex items-start">
-          <Book className="w-6 h-6 text-blue-600 mt-1" />
+          <Book className="w-6 h-6 text-green-600 mt-1" />
           <div className="ml-3">
-            <h2 className="text-lg font-semibold text-blue-900">Shopify App Setup</h2>
-            <p className="mt-1 text-blue-700">
+            <h2 className="text-lg font-semibold text-green-900">Shopify App Setup</h2>
+            <p className="mt-1 text-green-700">
               Before connecting your Shopify store, you'll need to either install our app from the Shopify App Store or create a custom app in your Shopify admin. Follow our setup instructions to get started.
             </p>
             <div className="flex mt-3 space-x-3">
               <Link
                 to="/docs/shopify"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
               >
                 <Book className="w-5 h-5 mr-2" />
                 View Documentation
               </Link>
               <button
                 onClick={() => setShowInstructionsModal(true)}
-                className="inline-flex items-center px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50"
+                className="inline-flex items-center px-4 py-2 bg-white border border-green-300 text-green-700 rounded-lg hover:bg-green-50"
               >
                 <HelpCircle className="w-5 h-5 mr-2" />
                 Setup Instructions
@@ -147,7 +147,7 @@ export function ShopifySetup() {
           <div className="border-b border-gray-200 pb-5 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <ShoppingBag className="w-6 h-6 text-blue-600" />
+                <ShoppingBag className="w-6 h-6 text-green-600" />
                 <h2 className="ml-3 text-lg font-medium text-gray-900">
                   Shopify Credentials
                 </h2>
@@ -161,11 +161,11 @@ export function ShopifySetup() {
           <div className="mb-8">
             <div className="flex items-start mb-4">
               <div className="flex-shrink-0">
-                <Info className="h-5 w-5 text-blue-400" />
+                <Info className="h-5 w-5 text-green-400" />
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">Why do we need these credentials?</h3>
-                <div className="mt-2 text-sm text-blue-700">
+                <h3 className="text-sm font-medium text-green-800">Why do we need these credentials?</h3>
+                <div className="mt-2 text-sm text-green-700">
                   <p>
                     To integrate with your Shopify store, we need access to your store through the Shopify API. 
                     This allows us to scan your theme for accessibility issues and provide fixes.
@@ -258,7 +258,7 @@ export function ShopifySetup() {
           <div className="border-b border-gray-200 pb-5 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Store className="w-6 h-6 text-blue-600" />
+                <Store className="w-6 h-6 text-green-600" />
                 <h2 className="ml-3 text-lg font-medium text-gray-900">
                   Shopify Configuration
                 </h2>
@@ -384,13 +384,13 @@ export function ShopifySetup() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-8 bg-blue-50 rounded-xl p-6 border border-blue-200"
+          className="mt-8 bg-green-50 rounded-xl p-6 border border-green-200"
         >
           <div className="flex items-start">
-            <FileText className="w-6 h-6 text-blue-600 mt-1" />
+            <FileText className="w-6 h-6 text-green-600 mt-1" />
             <div className="ml-3">
-              <h3 className="text-lg font-semibold text-blue-900">Shopify Integration Steps</h3>
-              <ol className="mt-2 text-blue-700 space-y-3 list-decimal list-inside">
+              <h3 className="text-lg font-semibold text-green-900">Shopify Integration Steps</h3>
+              <ol className="mt-2 text-green-700 space-y-3 list-decimal list-inside">
                 <li>Create a custom app in your Shopify admin panel</li>
                 <li>Set up the appropriate API permissions (read/write access to themes)</li>
                 <li>Generate an access token in your Shopify admin</li>
@@ -401,7 +401,7 @@ export function ShopifySetup() {
               <div className="mt-4">
                 <Link
                   to="/help/shopify-integration-guide"
-                  className="inline-flex items-center text-blue-600 hover:text-blue-700"
+                  className="inline-flex items-center text-green-600 hover:text-green-700"
                 >
                   Read the full integration guide
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -428,7 +428,7 @@ export function ShopifySetup() {
               <div className="absolute top-0 right-0 pt-4 pr-4">
                 <button
                   type="button"
-                  className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                   onClick={() => setShowInstructionsModal(false)}
                 >
                   <span className="sr-only">Close</span>
@@ -437,8 +437,8 @@ export function ShopifySetup() {
               </div>
 
               <div className="sm:flex sm:items-start">
-                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                  <ShoppingBag className="h-6 w-6 text-blue-600" />
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <ShoppingBag className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                   <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
@@ -465,7 +465,7 @@ export function ShopifySetup() {
                               href="https://admin.shopify.com/settings/apps/development" 
                               target="_blank" 
                               rel="noopener noreferrer" 
-                              className="text-blue-600 hover:text-blue-800"
+                              className="text-green-600 hover:text-green-800"
                             >
                               Open Shopify app development page
                             </a> to generate your token
@@ -474,9 +474,9 @@ export function ShopifySetup() {
                       </li>
                     </ol>
                     
-                    <div className="mt-6 bg-blue-50 p-4 rounded-md">
-                      <h4 className="font-medium text-blue-800">Important Security Note</h4>
-                      <p className="mt-2 text-sm text-blue-700">
+                    <div className="mt-6 bg-green-50 p-4 rounded-md">
+                      <h4 className="font-medium text-green-800">Important Security Note</h4>
+                      <p className="mt-2 text-sm text-green-700">
                         Your access token is sensitive information. We securely store and encrypt this token,
                         and only use it to scan and fix accessibility issues in your Shopify theme.
                       </p>
@@ -494,7 +494,7 @@ export function ShopifySetup() {
                 </button>
                 <Link
                   to="/docs/shopify"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:w-auto sm:text-sm"
                 >
                   View Full Documentation
                 </Link>
