@@ -12,6 +12,7 @@ interface ColorCombination {
   name: string;
   ratio: number;
   wcagLevel: 'AAA' | 'AA' | 'Fail';
+  isBaseColor?: boolean;
 }
 
 interface ExpertSettings {
@@ -181,8 +182,26 @@ function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all
   // Limit to 5 colors max like Coolors.co
   colorPalette = colorPalette.slice(0, 5);
   
+  // Make sure the base color is always first in the palette
+  // First, check if the base color is already in the palette
+  const baseColorHex = rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b);
+  if (!colorPalette.includes(baseColorHex)) {
+    // If not, add it to the beginning
+    colorPalette.unshift(baseColorHex);
+    // Keep the palette limited to 5 colors
+    colorPalette = colorPalette.slice(0, 5);
+  } else {
+    // If it exists, move it to the front
+    const index = colorPalette.indexOf(baseColorHex);
+    if (index > 0) {
+      colorPalette.splice(index, 1);
+      colorPalette.unshift(baseColorHex);
+    }
+  }
+  
   // Now generate accessible combinations using the palette
-  for (const bgColor of colorPalette) {
+  for (let i = 0; i < colorPalette.length; i++) {
+    const bgColor = colorPalette[i];
     const bgRgb = hexToRgb(bgColor);
     const bgHsl = rgbToHsl(bgRgb.r, bgRgb.g, bgRgb.b);
     const bgLuminance = getLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
@@ -202,8 +221,8 @@ function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all
     // Determine WCAG level
     const wcagLevel = getWCAGLevel(ratio);
     
-    // Name the combination based on the relationship to the base color
-    let name = determineColorName(baseHsl, bgHsl, harmonyType);
+    // If it's the first one (index 0), always mark it as "Base" regardless of other factors
+    let name = i === 0 ? "Base" : determineColorName(baseHsl, bgHsl, harmonyType);
     
     // Add to combinations
     combinations.push({
@@ -211,7 +230,9 @@ function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all
       text: textColor,
       name,
       ratio,
-      wcagLevel
+      wcagLevel,
+      // Flag to indicate this is the base color (for highlighting in UI)
+      isBaseColor: i === 0
     });
   }
   
@@ -688,7 +709,9 @@ export function WCAGColorPalette() {
             {generatedPalette.map((combo, index) => (
               <div
                 key={`${combo.background}-${combo.text}-${index}`}
-                className="bg-white rounded-lg shadow-sm overflow-hidden"
+                className={`bg-white rounded-lg shadow-sm overflow-hidden ${
+                  combo.isBaseColor ? 'ring-2 ring-blue-500' : ''
+                }`}
               >
                 <div
                   style={{ backgroundColor: combo.background }}
@@ -701,7 +724,15 @@ export function WCAGColorPalette() {
 
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-900">{combo.name}</h3>
+                    <h3 className={`font-medium ${combo.isBaseColor ? 'text-blue-600 font-bold' : 'text-gray-900'}`}>
+                      {combo.isBaseColor ? (
+                        <div className="flex items-center">
+                          <span className="mr-1">🔍</span> {combo.name} Color
+                        </div>
+                      ) : (
+                        combo.name
+                      )}
+                    </h3>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLevelBadgeColor(
                         combo.wcagLevel
