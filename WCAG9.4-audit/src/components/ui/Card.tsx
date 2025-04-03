@@ -1,26 +1,27 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 
-export interface CardProps {
-  children: ReactNode;
+interface CardProps {
   className?: string;
-  onClick?: () => void;
+  children: React.ReactNode;
 }
 
-const Card: React.FC<CardProps> = ({ 
-  children, 
-  className = '', 
-  onClick,
-  ...props
-}) => {
+export const Card: React.FC<CardProps> = ({ className = '', children }) => {
   return (
-    <div
-      className={`bg-white border border-gray-200 rounded-lg shadow-sm ${onClick ? 'cursor-pointer' : ''} ${className}`}
-      onClick={onClick}
-      {...props}
-    >
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm ${className}`}>
       {children}
     </div>
   );
 };
 
-export default Card;
+interface CardContentProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
+export const CardContent: React.FC<CardContentProps> = ({ className = '', children }) => {
+  return (
+    <div className={`p-4 ${className}`}>
+      {children}
+    </div>
+  );
+};

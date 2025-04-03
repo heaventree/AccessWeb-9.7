@@ -18,6 +18,8 @@ import { AdminReports } from './pages/admin/AdminReports';
 import { AdminPayments } from './pages/admin/AdminPayments';
 import { AdminPaymentGateways } from './pages/admin/AdminPaymentGateways';
 import { AdminCMS } from './pages/admin/AdminCMS';
+import { AdminRoadmap } from './pages/admin/AdminRoadmap';
+import { AdminDebug } from './pages/admin/AdminDebug';
 import { IntegrationsOverview } from './pages/integrations/IntegrationsOverview';
 import { ConnectionsPage } from './pages/connections/ConnectionsPage';
 import { CustomAPIPage } from './pages/connections/CustomAPIPage';
@@ -123,6 +125,8 @@ function App() {
                 <Route path="payments" element={<AdminPayments />} />
                 <Route path="payment-gateways" element={<AdminPaymentGateways />} />
                 <Route path="cms/*" element={<AdminCMS />} />
+                <Route path="roadmap" element={<AdminRoadmap />} />
+                <Route path="debug" element={<AdminDebug />} />
               </Route>
 
               {/* 404 Route */}
