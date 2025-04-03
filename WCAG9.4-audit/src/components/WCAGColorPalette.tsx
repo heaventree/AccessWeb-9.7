@@ -390,25 +390,7 @@ export function WCAGColorPalette() {
                   </div>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Color Harmony
-                  </label>
-                  <select
-                    value={expertSettings.colorHarmony}
-                    onChange={(e) => setExpertSettings(prev => ({
-                      ...prev,
-                      colorHarmony: e.target.value as ExpertSettings['colorHarmony']
-                    }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    <option value="all">All Harmonies</option>
-                    <option value="complementary">Complementary</option>
-                    <option value="analogous">Analogous</option>
-                    <option value="triadic">Triadic</option>
-                    <option value="split-complementary">Split Complementary</option>
-                  </select>
-                </div>
+                {/* Color Harmony moved outside of expert settings */}
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -512,6 +494,53 @@ export function WCAGColorPalette() {
               <RefreshCw className={`w-4 h-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
               Generate Random
             </button>
+          </div>
+        </div>
+
+        {/* Color Harmony Selector */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Color Harmony</h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div 
+              className={`cursor-pointer p-3 rounded-lg border text-center transition-all hover:shadow-md 
+                ${expertSettings.colorHarmony === 'all' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
+              onClick={() => setExpertSettings(prev => ({ ...prev, colorHarmony: 'all' }))}
+            >
+              <div className="font-medium">All Harmonies</div>
+              <div className="text-xs mt-1 text-gray-500">Combined palette</div>
+            </div>
+            <div 
+              className={`cursor-pointer p-3 rounded-lg border text-center transition-all hover:shadow-md 
+                ${expertSettings.colorHarmony === 'complementary' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
+              onClick={() => setExpertSettings(prev => ({ ...prev, colorHarmony: 'complementary' }))}
+            >
+              <div className="font-medium">Complementary</div>
+              <div className="text-xs mt-1 text-gray-500">Opposite colors</div>
+            </div>
+            <div 
+              className={`cursor-pointer p-3 rounded-lg border text-center transition-all hover:shadow-md 
+                ${expertSettings.colorHarmony === 'analogous' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
+              onClick={() => setExpertSettings(prev => ({ ...prev, colorHarmony: 'analogous' }))}
+            >
+              <div className="font-medium">Analogous</div>
+              <div className="text-xs mt-1 text-gray-500">Adjacent colors</div>
+            </div>
+            <div 
+              className={`cursor-pointer p-3 rounded-lg border text-center transition-all hover:shadow-md 
+                ${expertSettings.colorHarmony === 'triadic' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
+              onClick={() => setExpertSettings(prev => ({ ...prev, colorHarmony: 'triadic' }))}
+            >
+              <div className="font-medium">Triadic</div>
+              <div className="text-xs mt-1 text-gray-500">Three evenly spaced</div>
+            </div>
+            <div 
+              className={`cursor-pointer p-3 rounded-lg border text-center transition-all hover:shadow-md 
+                ${expertSettings.colorHarmony === 'split-complementary' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
+              onClick={() => setExpertSettings(prev => ({ ...prev, colorHarmony: 'split-complementary' }))}
+            >
+              <div className="font-medium">Split Complementary</div>
+              <div className="text-xs mt-1 text-gray-500">Adjacent to opposite</div>
+            </div>
           </div>
         </div>
 
