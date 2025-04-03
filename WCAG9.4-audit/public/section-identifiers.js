@@ -171,15 +171,44 @@
       label.htmlFor = 'section-identifiers-toggle-input';
       label.textContent = 'Section Identifiers';
       
+      // Add a reset button
+      const resetButton = document.createElement('button');
+      resetButton.textContent = 'Reset IDs';
+      resetButton.className = 'section-identifiers-reset-button';
+      resetButton.style.marginLeft = '10px';
+      resetButton.style.padding = '2px 6px';
+      resetButton.style.backgroundColor = '#FF1493'; // Deep pink
+      resetButton.style.color = 'white';
+      resetButton.style.border = 'none';
+      resetButton.style.borderRadius = '3px';
+      resetButton.style.cursor = 'pointer';
+      resetButton.style.fontSize = '11px';
+      
+      // Add the main components
       toggle.appendChild(checkbox);
       toggle.appendChild(label);
+      toggle.appendChild(resetButton);
       
-      // Add event listener
+      // Add event listener for toggle
       checkbox.addEventListener('change', function(event) {
         // Prevent event bubbling
         event.stopPropagation();
-        
         setEnabled(this.checked);
+      });
+      
+      // Add reset button handler
+      resetButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        // Confirm before resetting
+        if (confirm('Reset all section identifiers? This will clear any saved IDs.')) {
+          debugLog('User initiated reset of all section identifiers');
+          resetIdentifiers();
+          
+          // Force refresh of the page to ensure clean state
+          window.location.reload();
+        }
       });
       
       document.body.appendChild(toggle);
@@ -255,51 +284,90 @@
    */
   function generateElementPath(element) {
     try {
-      // Special case for navigation elements - use a more consistent approach
+      // FIRST CHECK: Special case for navigation elements - use a more consistent approach
+      // Navigation elements get special fixed identifiers for consistent identification across pages
       const isNavElement = element.tagName.toLowerCase() === 'nav' || 
                            element.getAttribute('role') === 'navigation' ||
-                           (element.className && 
+                           (element.className && typeof element.className === 'string' && 
                             (element.className.includes('nav') || 
                              element.className.includes('menu') || 
-                             element.className.includes('header')));
+                             element.className.includes('header') ||
+                             element.className.includes('navbar')));
       
-      // Special case for layout containers that might change per page
-      const isLayoutContainer = element.className && 
+      // Second check: Special case for layout containers that might change per page
+      const isLayoutContainer = (element.className && typeof element.className === 'string' && 
                                (element.className.includes('container') ||
                                 element.className.includes('wrapper') ||
                                 element.className.includes('layout') ||
-                                element.className.includes('main')) ||
+                                element.className.includes('main'))) ||
                                element.tagName.toLowerCase() === 'main';
       
-      // For nav elements and main layout containers, use more structural identity
+      // For nav elements, use FIXED identifiers that won't change between pages
       if (isNavElement) {
-        // For navigation, create a path that focuses on structure not page-specific classes
+        // First, check for clear distinguishing features like IDs
+        if (element.id && element.id.trim() !== '') {
+          return `FIXED-NAV-ID-${element.id}`;
+        }
+        
+        // Use tag name + role as a reliable identifier
         const tagName = element.tagName.toLowerCase();
-        
-        // Use the ID if available as it's usually consistent
-        if (element.id) {
-          return `nav-element-${element.id}`;
-        }
-        
-        // For navigation, prioritize role and structure over classes
         const role = element.getAttribute('role');
+        
         if (role === 'navigation') {
-          return `nav-role-navigation`;
+          return `FIXED-NAV-ROLE-${tagName}`;
         }
         
-        // Check for common navigation patterns
+        // For main navigation element (we assume only one)
         if (tagName === 'nav') {
-          // Just use nav tag - it's semantic and consistent
-          return 'semantic-nav';
+          // Count which nav element this is (1st, 2nd, etc)
+          const allNavs = document.querySelectorAll('nav');
+          for (let i = 0; i < allNavs.length; i++) {
+            if (allNavs[i] === element) {
+              return `FIXED-SEMANTIC-NAV-${i + 1}`;
+            }
+          }
+          return 'FIXED-SEMANTIC-NAV';
         }
         
+        // Header is usually the main navigation container
         if (tagName === 'header') {
-          // Headers are usually consistent across pages
-          return 'semantic-header';
+          return 'FIXED-SEMANTIC-HEADER';
         }
         
-        // Create a simplified class-based identifier for nav elements
-        return `generic-navigation`;
+        // For UL/OL inside navigation - very common pattern
+        if ((tagName === 'ul' || tagName === 'ol') && 
+            element.parentElement && 
+            (element.parentElement.tagName.toLowerCase() === 'nav' || 
+             element.parentElement.getAttribute('role') === 'navigation')) {
+          return 'FIXED-NAV-LIST';
+        }
+        
+        // For common navbar patterns
+        if (element.className && typeof element.className === 'string') {
+          if (element.className.includes('navbar')) {
+            return 'FIXED-NAVBAR';
+          }
+          if (element.className.includes('nav-container')) {
+            return 'FIXED-NAV-CONTAINER';
+          }
+          if (element.className.includes('nav-menu')) {
+            return 'FIXED-NAV-MENU';
+          }
+          if (element.className.includes('topnav')) {
+            return 'FIXED-TOP-NAV';
+          }
+        }
+        
+        // Last resort - count position in DOM for nav elements
+        const allNavLike = document.querySelectorAll('[class*="nav"], [class*="menu"], header, [role="navigation"]');
+        for (let i = 0; i < allNavLike.length; i++) {
+          if (allNavLike[i] === element) {
+            return `FIXED-GENERIC-NAV-${i + 1}`;
+          }
+        }
+        
+        // Absolute fallback
+        return 'FIXED-GENERIC-NAV';
       }
       
       if (isLayoutContainer) {
@@ -1100,12 +1168,20 @@
       // Reset global counter
       globalCounter = 1;
       
-      // Clear the element map
+      // Clear all stored identifiers
       elementIdentifierMap.clear();
       
-      // Clear localStorage
-      localStorage.removeItem(IDENTIFIERS_COUNTER_KEY);
-      localStorage.removeItem(IDENTIFIERS_MAP_KEY);
+      // Force clearing in localStorage with error handling
+      try {
+        localStorage.removeItem(IDENTIFIERS_MAP_KEY);
+        localStorage.removeItem(IDENTIFIERS_COUNTER_KEY);
+        localStorage.setItem(IDENTIFIERS_COUNTER_KEY, "1"); // Reset to 1
+        
+        // Log successful reset
+        console.log("✅ Section identifiers have been completely reset! All elements will now receive new IDs.");
+      } catch (error) {
+        console.warn("Error clearing localStorage during reset:", error);
+      }
       
       // Force re-detection of all sections with fresh IDs
       setTimeout(function() {
@@ -1137,16 +1213,45 @@
     // Schedule a new save operation with a small delay to batch multiple saves
     saveTimeout = setTimeout(function() {
       try {
-        // Save the counter and map atomically
-        localStorage.setItem(IDENTIFIERS_COUNTER_KEY, globalCounter.toString());
+        // Try-catch blocks for each operation to ensure robustness
+        try {
+          // Save the counter with explicit validation
+          const counterValue = globalCounter.toString();
+          if (typeof counterValue === 'string' && counterValue.trim() !== '') {
+            localStorage.setItem(IDENTIFIERS_COUNTER_KEY, counterValue);
+            debugLog(`Saved counter value: ${counterValue}`);
+          } else {
+            console.warn('Invalid counter value, not saving to localStorage');
+          }
+        } catch (counterError) {
+          console.warn('Error saving counter to localStorage:', counterError);
+        }
         
-        // Convert the map to a JSON-compatible object and save
-        const mapObject = Object.fromEntries(elementIdentifierMap.entries());
-        localStorage.setItem(IDENTIFIERS_MAP_KEY, JSON.stringify(mapObject));
-        
-        debugLog(`Saved ${elementIdentifierMap.size} identifiers to localStorage`);
+        try {
+          // Convert the map to a JSON-compatible object, but enforce validation
+          const mapEntries = Array.from(elementIdentifierMap.entries())
+            .filter(([key, value]) => typeof key === 'string' && key.trim() !== '' && typeof value === 'number');
+            
+          // Only save if we have valid entries
+          if (mapEntries.length > 0) {
+            const mapObject = Object.fromEntries(mapEntries);
+            const jsonString = JSON.stringify(mapObject);
+            
+            // Verify the JSON string is valid before saving
+            if (jsonString && jsonString.length > 2) { // must be at least "{}"
+              localStorage.setItem(IDENTIFIERS_MAP_KEY, jsonString);
+              debugLog(`Saved ${mapEntries.length} identifiers to localStorage`);
+            } else {
+              console.warn('Generated invalid JSON for map, not saving');
+            }
+          } else {
+            console.warn('No valid map entries to save');
+          }
+        } catch (mapError) {
+          console.warn('Error saving map to localStorage:', mapError);
+        }
       } catch (e) {
-        console.warn('Error saving identifiers data to localStorage:', e);
+        console.warn('Error in saveIdentifiersData:', e);
         
         // Try a more conservative approach for large maps
         if (elementIdentifierMap.size > 100) {
