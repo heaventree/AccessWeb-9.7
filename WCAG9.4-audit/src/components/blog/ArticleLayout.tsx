@@ -169,13 +169,6 @@ export function ArticleLayout({ article, children }: ArticleLayoutProps) {
             </div>
           </div>
         </div>
-
-        {/* Compact WCAG Checker */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-t shadow-lg">
-          <div className="max-w-4xl mx-auto py-3 px-4">
-            <URLInput onSubmit={() => {}} isLoading={false} compact={true} />
-          </div>
-        </div>
       </div>
     </div>
   );
