@@ -854,27 +854,27 @@ export function WCAGColorPalette() {
         {/* Generated Palette */}
         {generatedPalette.length > 0 ? (
           <>
-          <div className="flex justify-end gap-4 mb-6">
-            <button
-              onClick={exportToText}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-            >
-              <FileText className="w-5 h-5 mr-2" />
-              Export as Text
-              <span className={proPillStyle}>PRO</span>
-            </button>
-            <button
-              onClick={exportToPDF}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-            >
-              <FileDown className="w-5 h-5 mr-2" />
-              Export as PDF
-              <span className={proPillStyle}>PRO</span>
-            </button>
-          </div>
-          <div ref={paletteRef}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {generatedPalette.map((combo, index) => (
+            <div className="flex justify-end gap-4 mb-6">
+              <button
+                onClick={exportToText}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              >
+                <FileText className="w-5 h-5 mr-2" />
+                Export as Text
+                <span className={proPillStyle}>PRO</span>
+              </button>
+              <button
+                onClick={exportToPDF}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              >
+                <FileDown className="w-5 h-5 mr-2" />
+                Export as PDF
+                <span className={proPillStyle}>PRO</span>
+              </button>
+            </div>
+            <div ref={paletteRef}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {generatedPalette.map((combo, index) => (
               <div
                 key={`${combo.background}-${combo.text}-${index}`}
                 className={`bg-white rounded-lg shadow-sm overflow-hidden ${
@@ -967,7 +967,7 @@ export function WCAGColorPalette() {
               </div>
             ))}
           </div>
-          </div>
+            </div>
           </>
         ) : (
           <EmptyState
