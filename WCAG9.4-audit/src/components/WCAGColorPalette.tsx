@@ -1,10 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { RefreshCw, Copy, Info, Check, FileText, FileDown, Palette } from 'lucide-react';
+import { RefreshCw, Copy, Info, Check, FileText, FileDown } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { LoadingSpinner } from './LoadingSpinner';
-import { EmptyState } from './EmptyState';
 
 interface ColorCombination {
   background: string;
@@ -852,7 +851,7 @@ export function WCAGColorPalette() {
         </div>
 
         {/* Generated Palette */}
-        {generatedPalette.length > 0 ? (
+        {generatedPalette.length > 0 && (
           <>
             <div className="flex justify-end gap-4 mb-6">
               <button
@@ -875,110 +874,100 @@ export function WCAGColorPalette() {
             <div ref={paletteRef}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {generatedPalette.map((combo, index) => (
-              <div
-                key={`${combo.background}-${combo.text}-${index}`}
-                className={`bg-white rounded-lg shadow-sm overflow-hidden ${
-                  combo.isBaseColor ? 'ring-2 ring-blue-500' : ''
-                }`}
-              >
-                <div
-                  style={{ backgroundColor: combo.background }}
-                  className="h-32 p-4 flex items-center justify-center"
-                >
-                  <p style={{ color: combo.text }} className="text-lg font-medium">
-                    Sample Text
-                  </p>
-                </div>
-
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className={`font-medium ${combo.isBaseColor ? 'text-blue-600 font-bold' : 'text-gray-900'}`}>
-                      {combo.isBaseColor ? (
-                        <div className="flex items-center">
-                          <span className="mr-1">🔍</span> {combo.name} Color
-                        </div>
-                      ) : (
-                        combo.name
-                      )}
-                    </h3>
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLevelBadgeColor(
-                        combo.wcagLevel
-                      )}`}
+                  <div
+                    key={`${combo.background}-${combo.text}-${index}`}
+                    className={`bg-white rounded-lg shadow-sm overflow-hidden ${
+                      combo.isBaseColor ? 'ring-2 ring-blue-500' : ''
+                    }`}
+                  >
+                    <div
+                      style={{ backgroundColor: combo.background }}
+                      className="h-32 p-4 flex items-center justify-center"
                     >
-                      {combo.wcagLevel}
-                    </span>
+                      <p style={{ color: combo.text }} className="text-lg font-medium">
+                        Sample Text
+                      </p>
+                    </div>
+
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className={`font-medium ${combo.isBaseColor ? 'text-blue-600 font-bold' : 'text-gray-900'}`}>
+                          {combo.isBaseColor ? (
+                            <div className="flex items-center">
+                              <span className="mr-1">🔍</span> {combo.name} Color
+                            </div>
+                          ) : (
+                            combo.name
+                          )}
+                        </h3>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLevelBadgeColor(
+                            combo.wcagLevel
+                          )}`}
+                        >
+                          {combo.wcagLevel}
+                        </span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div
+                              className="w-4 h-4 rounded mr-2"
+                              style={{ backgroundColor: combo.background }}
+                            />
+                            <span className="text-sm text-gray-600">Background</span>
+                          </div>
+                          <button
+                            onClick={() => copyToClipboard(combo.background)}
+                            className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+                          >
+                            {copiedColor === combo.background ? (
+                              <Check className="w-4 h-4 mr-1" />
+                            ) : (
+                              <Copy className="w-4 h-4 mr-1" />
+                            )}
+                            {combo.background}
+                          </button>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div
+                              className="w-4 h-4 rounded mr-2"
+                              style={{ backgroundColor: combo.text }}
+                            />
+                            <span className="text-sm text-gray-600">Text</span>
+                          </div>
+                          <button
+                            onClick={() => copyToClipboard(combo.text)}
+                            className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+                          >
+                            {copiedColor === combo.text ? (
+                              <Check className="w-4 h-4 mr-1" />
+                            ) : (
+                              <Copy className="w-4 h-4 mr-1" />
+                            )}
+                            {combo.text}
+                          </button>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Info className="w-4 h-4 mr-2 text-gray-400" />
+                            <span className="text-sm text-gray-600">Contrast</span>
+                          </div>
+                          <span className="text-sm text-gray-900 font-medium">
+                            {combo.ratio.toFixed(2)}:1
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div
-                          className="w-4 h-4 rounded mr-2"
-                          style={{ backgroundColor: combo.background }}
-                        />
-                        <span className="text-sm text-gray-600">Background</span>
-                      </div>
-                      <button
-                        onClick={() => copyToClipboard(combo.background)}
-                        className="flex items-center text-sm text-gray-500 hover:text-gray-700"
-                      >
-                        {copiedColor === combo.background ? (
-                          <Check className="w-4 h-4 mr-1" />
-                        ) : (
-                          <Copy className="w-4 h-4 mr-1" />
-                        )}
-                        {combo.background}
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div
-                          className="w-4 h-4 rounded mr-2"
-                          style={{ backgroundColor: combo.text }}
-                        />
-                        <span className="text-sm text-gray-600">Text</span>
-                      </div>
-                      <button
-                        onClick={() => copyToClipboard(combo.text)}
-                        className="flex items-center text-sm text-gray-500 hover:text-gray-700"
-                      >
-                        {copiedColor === combo.text ? (
-                          <Check className="w-4 h-4 mr-1" />
-                        ) : (
-                          <Copy className="w-4 h-4 mr-1" />
-                        )}
-                        {combo.text}
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <Info className="w-4 h-4 mr-2 text-gray-400" />
-                        <span className="text-sm text-gray-600">Contrast</span>
-                      </div>
-                      <span className="text-sm text-gray-900 font-medium">
-                        {combo.ratio.toFixed(2)}:1
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
             </div>
           </>
-        ) : (
-          <EmptyState
-            title="No Color Palette Generated"
-            description="Generate a new color palette to see accessible color combinations"
-            icon={<Palette className="h-6 w-6 text-gray-600" />}
-            action={{
-              label: 'Generate Palette',
-              onClick: generateNewPalette
-            }}
-          />
         )}
 
         {/* Usage Guidelines */}
