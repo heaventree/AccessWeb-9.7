@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Save, RefreshCw, Activity, Code, Key, Info, Book, ArrowRight, X, CheckCircle, Globe, Zap, FileText, HelpCircle, Download } from 'lucide-react';
+import { Save, RefreshCw, Activity, Code, Key, Info, Book, ArrowRight, ArrowLeft, X, CheckCircle, Globe, Zap, FileText, HelpCircle, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { wordPressAPI } from '../../lib/integrations/wordpress';
@@ -87,6 +87,16 @@ export function WordPressSetup() {
 
   return (
     <div className="space-y-6">
+      {/* Return to Connections Link */}
+      <div className="mb-2">
+        <Link 
+          to="/connections" 
+          className="inline-flex items-center text-blue-600 hover:text-blue-800"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Return to My Connections
+        </Link>
+      </div>
       {/* WordPress Plugin Documentation Link */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
         <div className="flex items-start">

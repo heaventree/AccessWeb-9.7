@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Save, RefreshCw, Activity, Key, Info, Book, ArrowRight, CheckCircle, Globe, FileText, ShoppingBag, Store, X, HelpCircle } from 'lucide-react';
+import { Save, RefreshCw, Activity, Key, Info, Book, ArrowRight, ArrowLeft, CheckCircle, Globe, FileText, ShoppingBag, Store, X, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { shopifyAPI } from '../../lib/integrations/shopify';
@@ -96,6 +96,16 @@ export function ShopifySetup() {
 
   return (
     <div className="space-y-6">
+      {/* Return to Connections Link */}
+      <div className="mb-2">
+        <Link 
+          to="/connections" 
+          className="inline-flex items-center text-blue-600 hover:text-blue-800"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Return to My Connections
+        </Link>
+      </div>
       {/* Shopify App Documentation Link */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
         <div className="flex items-start">
