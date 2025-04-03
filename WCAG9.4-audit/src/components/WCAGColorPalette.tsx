@@ -1,10 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { RefreshCw, Copy, Info, Check, Download, FileText, FileDown, Settings, X, Palette } from 'lucide-react';
+import { RefreshCw, Copy, Info, Check, FileText, FileDown, Settings, X } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { LoadingSpinner } from './LoadingSpinner';
-import { EmptyState } from './EmptyState';
 
 interface ColorCombination {
   background: string;
@@ -248,7 +246,6 @@ export function WCAGColorPalette() {
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const [baseColor, setBaseColor] = useState('#1a365d');
   const [generatedPalette, setGeneratedPalette] = useState<ColorCombination[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [showExpertSettings, setShowExpertSettings] = useState(false);
   const [expertSettings, setExpertSettings] = useState<ExpertSettings>({
     minContrast: 4.5,
@@ -274,9 +271,11 @@ export function WCAGColorPalette() {
 
   const handleBaseColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = e.target.value;
-    setBaseColor(newColor);
-    const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony);
-    setGeneratedPalette(newPalette);
+    if (newColor) {
+      setBaseColor(newColor);
+      const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony);
+      setGeneratedPalette(newPalette);
+    }
   };
 
   const getLevelBadgeColor = (level: 'AAA' | 'AA' | 'Fail') => {
@@ -350,14 +349,7 @@ export function WCAGColorPalette() {
           </p>
         </div>
 
-        {isGenerating && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <LoadingSpinner size="large" className="mb-4" />
-              <p className="text-gray-900 font-medium">Generating Color Palette...</p>
-            </div>
-          </div>
-        )}
+
 
         {/* Generator Section */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
@@ -518,10 +510,9 @@ export function WCAGColorPalette() {
             </div>
             <button
               onClick={generateNewPalette}
-              disabled={isGenerating}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
+              <RefreshCw className="w-4 h-4 mr-2" />
               Generate Random
             </button>
           </div>
