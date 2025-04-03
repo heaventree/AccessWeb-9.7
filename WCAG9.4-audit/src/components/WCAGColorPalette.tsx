@@ -540,12 +540,8 @@ export function WCAGColorPalette() {
                 ${expertSettings.colorHarmony === 'all' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
               onClick={() => {
                 setExpertSettings(prev => ({ ...prev, colorHarmony: 'all' }));
-                setIsGenerating(true);
-                setTimeout(() => {
-                  const newPalette = generateAccessiblePalette(baseColor, 'all');
-                  setGeneratedPalette(newPalette);
-                  setIsGenerating(false);
-                }, 300);
+                const newPalette = generateAccessiblePalette(baseColor, 'all');
+                setGeneratedPalette(newPalette);
               }}
             >
               <div className="font-medium">All Harmonies</div>
@@ -556,12 +552,8 @@ export function WCAGColorPalette() {
                 ${expertSettings.colorHarmony === 'complementary' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
               onClick={() => {
                 setExpertSettings(prev => ({ ...prev, colorHarmony: 'complementary' }));
-                setIsGenerating(true);
-                setTimeout(() => {
-                  const newPalette = generateAccessiblePalette(baseColor, 'complementary');
-                  setGeneratedPalette(newPalette);
-                  setIsGenerating(false);
-                }, 300);
+                const newPalette = generateAccessiblePalette(baseColor, 'complementary');
+                setGeneratedPalette(newPalette);
               }}
             >
               <div className="font-medium">Complementary</div>
@@ -572,12 +564,8 @@ export function WCAGColorPalette() {
                 ${expertSettings.colorHarmony === 'analogous' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
               onClick={() => {
                 setExpertSettings(prev => ({ ...prev, colorHarmony: 'analogous' }));
-                setIsGenerating(true);
-                setTimeout(() => {
-                  const newPalette = generateAccessiblePalette(baseColor, 'analogous');
-                  setGeneratedPalette(newPalette);
-                  setIsGenerating(false);
-                }, 300);
+                const newPalette = generateAccessiblePalette(baseColor, 'analogous');
+                setGeneratedPalette(newPalette);
               }}
             >
               <div className="font-medium">Analogous</div>
