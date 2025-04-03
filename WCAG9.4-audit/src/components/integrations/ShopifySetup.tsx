@@ -220,7 +220,7 @@ export function ShopifySetup() {
                   {showCredentials ? 'Hide' : 'Show'}
                 </button>
               </div>
-              <div className="mt-2 flex items-center">
+              <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <p className="text-xs text-green-600">
                   This token allows our app to access your Shopify store data
                 </p>
@@ -228,15 +228,15 @@ export function ShopifySetup() {
                   href="https://admin.shopify.com/settings/apps/development" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="ml-auto text-green-600 hover:text-green-800 text-sm font-medium flex items-center"
+                  className="inline-flex items-center px-4 py-2 bg-white border border-green-300 text-green-700 rounded-lg hover:bg-green-50 text-sm font-medium"
                 >
-                  Get your token
-                  <ArrowRight className="w-4 h-4 ml-1" />
+                  Get your access token
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </a>
               </div>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-4 flex justify-end">
               <button
                 onClick={handleValidateCredentials}
                 disabled={validating || !settings.shop || !settings.accessToken}
@@ -249,6 +249,7 @@ export function ShopifySetup() {
                   </>
                 ) : (
                   <>
+                    <CheckCircle className="-ml-1 mr-2 h-5 w-5" />
                     Validate Credentials
                   </>
                 )}

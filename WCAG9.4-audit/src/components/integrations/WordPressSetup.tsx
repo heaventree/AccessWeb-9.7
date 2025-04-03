@@ -253,33 +253,35 @@ export function WordPressSetup() {
 
           {/* Display newly generated key */}
           {newApiKey && (
-            <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-6">
+            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
               <div className="flex items-start">
-                <CheckCircle className="w-6 h-6 text-green-600 mt-1" />
+                <CheckCircle className="w-6 h-6 text-blue-600 mt-1" />
                 <div className="ml-3">
-                  <h3 className="text-lg font-semibold text-green-900">API Key Generated Successfully</h3>
-                  <p className="mt-1 text-green-700">
+                  <h3 className="text-lg font-semibold text-blue-900">API Key Generated Successfully</h3>
+                  <p className="mt-1 text-blue-700">
                     Your new WordPress API key has been generated. Copy this key and use it in your WordPress plugin settings.
                   </p>
                   <div className="mt-4">
-                    <div className="flex items-center space-x-4">
-                      <code className="flex-1 text-sm font-mono bg-white px-4 py-3 rounded-lg border border-green-200">
+                    <div className="relative">
+                      <code className="block w-full text-sm font-mono bg-white px-4 py-3 rounded-lg border border-blue-200 pr-20">
                         {showNewKey ? newApiKey : `${newApiKey.slice(0, 8)}...${newApiKey.slice(-8)}`}
                       </code>
-                      <button
-                        onClick={() => setShowNewKey(!showNewKey)}
-                        className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors"
-                      >
-                        {showNewKey ? 'Hide' : 'Show'}
-                      </button>
-                      <CopyToClipboard
-                        text={newApiKey}
-                        onCopy={() => toast.success('API key copied to clipboard')}
-                      >
-                        <button className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors">
-                          Copy
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <button
+                          onClick={() => setShowNewKey(!showNewKey)}
+                          className="text-gray-600 hover:text-gray-700 text-sm font-medium transition-colors mr-4"
+                        >
+                          {showNewKey ? 'Hide' : 'Show'}
                         </button>
-                      </CopyToClipboard>
+                        <CopyToClipboard
+                          text={newApiKey}
+                          onCopy={() => toast.success('API key copied to clipboard')}
+                        >
+                          <button className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                            Copy
+                          </button>
+                        </CopyToClipboard>
+                      </div>
                     </div>
                   </div>
                 </div>
