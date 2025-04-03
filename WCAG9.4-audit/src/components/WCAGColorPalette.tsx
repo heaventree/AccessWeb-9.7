@@ -141,7 +141,7 @@ function generateRandomColor(): string {
   return rgbToHex(rgb.r, rgb.g, rgb.b);
 }
 
-function generateAccessiblePalette(baseColor: string): ColorCombination[] {
+function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all'): ColorCombination[] {
   const combinations: ColorCombination[] = [];
   const baseRgb = hexToRgb(baseColor);
   const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
@@ -161,16 +161,50 @@ function generateAccessiblePalette(baseColor: string): ColorCombination[] {
   const splitComp1 = (baseHsl.h + 150) % 360;
   const splitComp2 = (baseHsl.h + 210) % 360;
 
-  const hues = [
-    { h: baseHsl.h, name: 'Base' },
-    { h: complementaryHue, name: 'Complementary' },
-    { h: analogousHue1, name: 'Analogous 1' },
-    { h: analogousHue2, name: 'Analogous 2' },
-    { h: triadicHue1, name: 'Triadic 1' },
-    { h: triadicHue2, name: 'Triadic 2' },
-    { h: splitComp1, name: 'Split Comp 1' },
-    { h: splitComp2, name: 'Split Comp 2' }
-  ];
+  // Define which hues to use based on harmony type
+  let hues: { h: number, name: string }[] = [];
+  
+  switch (harmonyType) {
+    case 'complementary':
+      hues = [
+        { h: baseHsl.h, name: 'Base' },
+        { h: complementaryHue, name: 'Complementary' }
+      ];
+      break;
+    case 'analogous':
+      hues = [
+        { h: baseHsl.h, name: 'Base' },
+        { h: analogousHue1, name: 'Analogous 1' },
+        { h: analogousHue2, name: 'Analogous 2' }
+      ];
+      break;
+    case 'triadic':
+      hues = [
+        { h: baseHsl.h, name: 'Base' },
+        { h: triadicHue1, name: 'Triadic 1' },
+        { h: triadicHue2, name: 'Triadic 2' }
+      ];
+      break;
+    case 'split-complementary':
+      hues = [
+        { h: baseHsl.h, name: 'Base' },
+        { h: splitComp1, name: 'Split Comp 1' },
+        { h: splitComp2, name: 'Split Comp 2' }
+      ];
+      break;
+    default: // 'all'
+      hues = [
+        { h: baseHsl.h, name: 'Base' },
+        { h: complementaryHue, name: 'Complementary' },
+        { h: analogousHue1, name: 'Analogous 1' },
+        { h: analogousHue2, name: 'Analogous 2' },
+        { h: triadicHue1, name: 'Triadic 1' },
+        { h: triadicHue2, name: 'Triadic 2' },
+        { h: splitComp1, name: 'Split Comp 1' },
+        { h: splitComp2, name: 'Split Comp 2' }
+      ];
+      break;
+  }
 
   // For each hue, generate variations with different saturations and lightnesses
   hues.forEach(({ h, name }) => {
@@ -236,7 +270,7 @@ export function WCAGColorPalette() {
     setTimeout(() => {
       const newBaseColor = generateRandomColor();
       setBaseColor(newBaseColor);
-      const newPalette = generateAccessiblePalette(newBaseColor);
+      const newPalette = generateAccessiblePalette(newBaseColor, expertSettings.colorHarmony);
       setGeneratedPalette(newPalette);
       setIsGenerating(false);
     }, 500);
@@ -245,7 +279,7 @@ export function WCAGColorPalette() {
   const handleBaseColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = e.target.value;
     setBaseColor(newColor);
-    const newPalette = generateAccessiblePalette(newColor);
+    const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony);
     setGeneratedPalette(newPalette);
   };
 
@@ -477,7 +511,7 @@ export function WCAGColorPalette() {
                     const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
                     if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
                       setBaseColor(newColor);
-                      const newPalette = generateAccessiblePalette(newColor);
+                      const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony);
                       setGeneratedPalette(newPalette);
                     }
                   }}
@@ -504,7 +538,15 @@ export function WCAGColorPalette() {
             <div 
               className={`cursor-pointer p-3 rounded-lg border text-center transition-all hover:shadow-md 
                 ${expertSettings.colorHarmony === 'all' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
-              onClick={() => setExpertSettings(prev => ({ ...prev, colorHarmony: 'all' }))}
+              onClick={() => {
+                setExpertSettings(prev => ({ ...prev, colorHarmony: 'all' }));
+                setIsGenerating(true);
+                setTimeout(() => {
+                  const newPalette = generateAccessiblePalette(baseColor, 'all');
+                  setGeneratedPalette(newPalette);
+                  setIsGenerating(false);
+                }, 300);
+              }}
             >
               <div className="font-medium">All Harmonies</div>
               <div className="text-xs mt-1 text-gray-500">Combined palette</div>
@@ -512,7 +554,15 @@ export function WCAGColorPalette() {
             <div 
               className={`cursor-pointer p-3 rounded-lg border text-center transition-all hover:shadow-md 
                 ${expertSettings.colorHarmony === 'complementary' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
-              onClick={() => setExpertSettings(prev => ({ ...prev, colorHarmony: 'complementary' }))}
+              onClick={() => {
+                setExpertSettings(prev => ({ ...prev, colorHarmony: 'complementary' }));
+                setIsGenerating(true);
+                setTimeout(() => {
+                  const newPalette = generateAccessiblePalette(baseColor, 'complementary');
+                  setGeneratedPalette(newPalette);
+                  setIsGenerating(false);
+                }, 300);
+              }}
             >
               <div className="font-medium">Complementary</div>
               <div className="text-xs mt-1 text-gray-500">Opposite colors</div>
@@ -520,7 +570,15 @@ export function WCAGColorPalette() {
             <div 
               className={`cursor-pointer p-3 rounded-lg border text-center transition-all hover:shadow-md 
                 ${expertSettings.colorHarmony === 'analogous' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
-              onClick={() => setExpertSettings(prev => ({ ...prev, colorHarmony: 'analogous' }))}
+              onClick={() => {
+                setExpertSettings(prev => ({ ...prev, colorHarmony: 'analogous' }));
+                setIsGenerating(true);
+                setTimeout(() => {
+                  const newPalette = generateAccessiblePalette(baseColor, 'analogous');
+                  setGeneratedPalette(newPalette);
+                  setIsGenerating(false);
+                }, 300);
+              }}
             >
               <div className="font-medium">Analogous</div>
               <div className="text-xs mt-1 text-gray-500">Adjacent colors</div>
@@ -528,7 +586,15 @@ export function WCAGColorPalette() {
             <div 
               className={`cursor-pointer p-3 rounded-lg border text-center transition-all hover:shadow-md 
                 ${expertSettings.colorHarmony === 'triadic' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
-              onClick={() => setExpertSettings(prev => ({ ...prev, colorHarmony: 'triadic' }))}
+              onClick={() => {
+                setExpertSettings(prev => ({ ...prev, colorHarmony: 'triadic' }));
+                setIsGenerating(true);
+                setTimeout(() => {
+                  const newPalette = generateAccessiblePalette(baseColor, 'triadic');
+                  setGeneratedPalette(newPalette);
+                  setIsGenerating(false);
+                }, 300);
+              }}
             >
               <div className="font-medium">Triadic</div>
               <div className="text-xs mt-1 text-gray-500">Three evenly spaced</div>
@@ -536,7 +602,15 @@ export function WCAGColorPalette() {
             <div 
               className={`cursor-pointer p-3 rounded-lg border text-center transition-all hover:shadow-md 
                 ${expertSettings.colorHarmony === 'split-complementary' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
-              onClick={() => setExpertSettings(prev => ({ ...prev, colorHarmony: 'split-complementary' }))}
+              onClick={() => {
+                setExpertSettings(prev => ({ ...prev, colorHarmony: 'split-complementary' }));
+                setIsGenerating(true);
+                setTimeout(() => {
+                  const newPalette = generateAccessiblePalette(baseColor, 'split-complementary');
+                  setGeneratedPalette(newPalette);
+                  setIsGenerating(false);
+                }, 300);
+              }}
             >
               <div className="font-medium">Split Complementary</div>
               <div className="text-xs mt-1 text-gray-500">Adjacent to opposite</div>
