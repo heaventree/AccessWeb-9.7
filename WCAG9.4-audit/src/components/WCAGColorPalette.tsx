@@ -973,23 +973,54 @@ export function WCAGColorPalette() {
         {/* Usage Guidelines */}
         <div className="mt-12 bg-white rounded-lg shadow-sm p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Usage Guidelines
+            WCAG Color Usage Guidelines
           </h3>
-          <div className="grid md:grid-cols-2 gap-6">
+          
+          <p className="text-gray-700 mb-6">
+            Proper color usage is crucial for accessibility. About 1 in 12 men and 1 in 200 women have some form of color vision deficiency, 
+            and many users have low vision or situational limitations like bright sunlight. Following WCAG guidelines ensures your content is 
+            accessible to all users regardless of their visual capabilities.
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">Color Contrast</h4>
-              <ul className="list-disc list-inside text-gray-600 space-y-1">
-                <li>AAA level requires 7:1 contrast ratio for normal text</li>
-                <li>AA level requires 4.5:1 contrast ratio for normal text</li>
-                <li>Large text (18pt+) requires 3:1 for AA, 4.5:1 for AAA</li>
+              <h4 className="font-medium text-gray-900 mb-3">Contrast Requirements (WCAG 1.4.3 & 1.4.6)</h4>
+              <ul className="list-disc list-inside text-gray-600 space-y-2">
+                <li>AAA level (Enhanced): 7:1 contrast ratio for normal text</li>
+                <li>AA level (Minimum): 4.5:1 contrast ratio for normal text</li>
+                <li>Large text (18pt+ or 14pt+ bold): 3:1 for AA, 4.5:1 for AAA</li>
+                <li>UI components and graphical objects: minimum 3:1 against adjacent colors</li>
+                <li>Focus indicators must have 3:1 contrast with surrounding content</li>
+              </ul>
+              
+              <h4 className="font-medium text-gray-900 mt-6 mb-3">Why Contrast Matters</h4>
+              <ul className="list-disc list-inside text-gray-600 space-y-2">
+                <li>Improves readability for all users, especially in poor lighting</li>
+                <li>Essential for people with low vision or color blindness</li>
+                <li>Helps maintain usability when screens are viewed outdoors</li>
+                <li>Can reduce eye strain during prolonged usage</li>
               </ul>
             </div>
+            
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">Best Practices</h4>
-              <ul className="list-disc list-inside text-gray-600 space-y-1">
-                <li>Use sufficient contrast for all text elements</li>
-                <li>Test colors under different lighting conditions</li>
-                <li>Consider color blindness when choosing combinations</li>
+              <h4 className="font-medium text-gray-900 mb-3">Beyond Contrast: Color Best Practices</h4>
+              <ul className="list-disc list-inside text-gray-600 space-y-2">
+                <li>Never use color as the only means to convey information (WCAG 1.4.1)</li>
+                <li>Provide additional indicators like icons, patterns, or text labels</li>
+                <li>Test your palette with color blindness simulators</li>
+                <li>Consider how your colors appear in high contrast modes</li>
+                <li>Maintain consistent color meaning throughout your interface</li>
+                <li>Limit your palette to 3-5 primary colors for better cohesion</li>
+              </ul>
+              
+              <h4 className="font-medium text-gray-900 mt-6 mb-3">Implementation Tips</h4>
+              <ul className="list-disc list-inside text-gray-600 space-y-2">
+                <li>Use the generated palettes for complementary elements</li>
+                <li>Text over colored backgrounds should meet minimum contrast</li>
+                <li>Apply your base color to primary interactive elements</li>
+                <li>Save AAA combinations for critical content and navigation</li>
+                <li>Test your design in different lighting conditions</li>
+                <li>Document your color system for consistent implementation</li>
               </ul>
             </div>
           </div>
