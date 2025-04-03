@@ -621,17 +621,7 @@ export function WCAGColorPalette() {
           </div>
           </div>
           </>
-        ) : (
-          <EmptyState
-            title="No Color Palette Generated"
-            description="Generate a new color palette to see accessible color combinations"
-            icon={<Palette className="h-6 w-6 text-gray-600" />}
-            action={{
-              label: 'Generate Palette',
-              onClick: generateNewPalette
-            }}
-          />
-        )}
+        ) : null}
 
         {/* Usage Guidelines */}
         <div className="mt-12 bg-white rounded-lg shadow-sm p-6">
