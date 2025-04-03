@@ -160,7 +160,7 @@
 /* Toggle control styling - moved to top right */
 .section-identifiers-toggle {
   position: fixed;
-  top: 15px; /* Moved higher for better visibility */
+  top: 65px; /* Moved lower to prevent overlapping with menu */
   right: 15px;
   background-color: rgba(255, 20, 147, 0.9); /* Match the marker color */
   color: white;
