@@ -174,11 +174,14 @@ export function WordPressSetup() {
           </div>
 
           {settings.apiKey ? (
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
               <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-base font-medium text-gray-900">WordPress API Key</h4>
-                  <p className="text-sm text-gray-500 mt-1">Use this key in your WordPress plugin configuration</p>
+                <div className="flex items-center">
+                  <Key className="w-6 h-6 text-blue-600" />
+                  <div className="ml-3">
+                    <h4 className="text-base font-medium text-gray-900">WordPress API Key</h4>
+                    <p className="text-sm text-gray-500 mt-1">Use this key in your WordPress plugin configuration</p>
+                  </div>
                 </div>
                 <div>
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
@@ -187,39 +190,41 @@ export function WordPressSetup() {
                 </div>
               </div>
               <div className="mt-4">
-                <div className="flex items-center space-x-4">
-                  <code className="flex-1 text-sm font-mono bg-gray-100 px-4 py-3 rounded-lg border border-gray-200">
+                <div className="relative">
+                  <code className="block w-full text-sm font-mono bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 pr-20">
                     {showExistingKey ? settings.apiKey : `${settings.apiKey.slice(0, 8)}...${settings.apiKey.slice(-8)}`}
                   </code>
-                  <button
-                    onClick={() => setShowExistingKey(!showExistingKey)}
-                    className="text-gray-600 hover:text-gray-700 text-sm font-medium transition-colors"
-                  >
-                    {showExistingKey ? 'Hide' : 'Show'}
-                  </button>
-                  <CopyToClipboard
-                    text={settings.apiKey}
-                    onCopy={() => toast.success('API key copied to clipboard')}
-                  >
-                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
-                      Copy
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <button
+                      onClick={() => setShowExistingKey(!showExistingKey)}
+                      className="text-gray-600 hover:text-gray-700 text-sm font-medium transition-colors mr-4"
+                    >
+                      {showExistingKey ? 'Hide' : 'Show'}
                     </button>
-                  </CopyToClipboard>
+                    <CopyToClipboard
+                      text={settings.apiKey}
+                      onCopy={() => toast.success('API key copied to clipboard')}
+                    >
+                      <button className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                        Copy
+                      </button>
+                    </CopyToClipboard>
+                  </div>
                 </div>
               </div>
               <div className="mt-6">
                 <button
                   onClick={handleGenerateApiKey}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
                 >
-                  <RefreshCw className="-ml-1 mr-2 h-4 w-4" />
+                  <RefreshCw className="-ml-1 mr-2 h-5 w-5" />
                   Regenerate Key
                 </button>
               </div>
             </div>
           ) : (
             <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-              <Globe className="mx-auto h-12 w-12 text-gray-400" />
+              <Globe className="mx-auto h-12 w-12 text-blue-400" />
               <h3 className="mt-2 text-sm font-medium text-gray-900">No WordPress API Key</h3>
               <p className="mt-1 text-sm text-gray-500">
                 Generate an API key to connect your WordPress site
@@ -228,7 +233,7 @@ export function WordPressSetup() {
                 <button
                   onClick={handleGenerateApiKey}
                   disabled={generating}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
                 >
                   {generating ? (
                     <>

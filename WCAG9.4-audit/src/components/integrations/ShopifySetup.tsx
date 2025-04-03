@@ -180,18 +180,19 @@ export function ShopifySetup() {
               <label htmlFor="shop" className="block text-sm font-medium text-gray-700">
                 Shopify Store URL
               </label>
-              <div className="mt-1">
-                <input
-                  type="text"
-                  id="shop"
-                  value={settings.shop}
-                  onChange={(e) => setSettings({...settings, shop: e.target.value})}
-                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                  placeholder="your-store.myshopify.com"
-                />
-              </div>
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="text-sm text-gray-500 mb-2">
                 Your Shopify store URL (must end with .myshopify.com)
+              </p>
+              <input
+                type="text"
+                id="shop"
+                value={settings.shop}
+                onChange={(e) => setSettings({...settings, shop: e.target.value})}
+                className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm font-medium text-gray-900 placeholder-gray-400"
+                placeholder="your-store.myshopify.com"
+              />
+              <p className="mt-2 text-xs text-green-600">
+                This is the domain of your Shopify store that you use to log in to your admin panel
               </p>
             </div>
 
@@ -199,13 +200,16 @@ export function ShopifySetup() {
               <label htmlFor="accessToken" className="block text-sm font-medium text-gray-700">
                 Access Token
               </label>
-              <div className="mt-1 relative">
+              <p className="text-sm text-gray-500 mb-2">
+                Access token from your custom Shopify app (starts with shpat_)
+              </p>
+              <div className="relative">
                 <input
                   type={showCredentials ? "text" : "password"}
                   id="accessToken"
                   value={settings.accessToken}
                   onChange={(e) => setSettings({...settings, accessToken: e.target.value})}
-                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md pr-12"
+                  className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm font-medium text-gray-900 placeholder-gray-400 pr-16"
                   placeholder="shpat_xxxxxxxxxxxxxxxxxxxx"
                 />
                 <button
@@ -216,32 +220,37 @@ export function ShopifySetup() {
                   {showCredentials ? 'Hide' : 'Show'}
                 </button>
               </div>
-              <p className="mt-2 text-sm text-gray-500">
-                Access token from your custom Shopify app (starts with shpat_)
+              <div className="mt-2 flex items-center">
+                <p className="text-xs text-green-600">
+                  This token allows our app to access your Shopify store data
+                </p>
                 <a 
                   href="https://admin.shopify.com/settings/apps/development" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="ml-1 text-green-600 hover:text-green-800"
+                  className="ml-auto text-green-600 hover:text-green-800 text-sm font-medium flex items-center"
                 >
-                  Get your access token →
+                  Get your token
+                  <ArrowRight className="w-4 h-4 ml-1" />
                 </a>
-              </p>
+              </div>
             </div>
 
-            <div className="flex justify-end">
+            <div className="pt-4">
               <button
                 onClick={handleValidateCredentials}
                 disabled={validating || !settings.shop || !settings.accessToken}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 transition-colors"
               >
                 {validating ? (
                   <>
-                    <RefreshCw className="animate-spin -ml-1 mr-2 h-4 w-4" />
+                    <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
                     Validating...
                   </>
                 ) : (
-                  'Validate Credentials'
+                  <>
+                    Validate Credentials
+                  </>
                 )}
               </button>
             </div>
