@@ -161,11 +161,11 @@ export function ShopifySetup() {
           <div className="mb-8">
             <div className="flex items-start mb-4">
               <div className="flex-shrink-0">
-                <Info className="h-5 w-5 text-green-400" />
+                <Info className="h-5 w-5 text-green-600" />
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-green-800">Why do we need these credentials?</h3>
-                <div className="mt-2 text-sm text-green-700">
+                <div className="mt-2 text-sm text-green-900">
                   <p>
                     To integrate with your Shopify store, we need access to your store through the Shopify API. 
                     This allows us to scan your theme for accessibility issues and provide fixes.
