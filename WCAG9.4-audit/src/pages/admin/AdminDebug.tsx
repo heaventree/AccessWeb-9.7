@@ -1,189 +1,318 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { HeadingSection } from '../../components/ui/HeadingSection';
-
-interface DebugItem {
-  id: number;
-  title: string;
-  description: string;
-  status: 'open' | 'in-progress' | 'resolved' | 'wont-fix';
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  component: string;
-  createdDate: string;
-  updatedDate: string;
-}
+import { debugItems, DebugItem, DebugItemCategory, DebugItemPriority, DebugItemStatus } from '../../data/debugData';
 
 export function AdminDebug() {
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  
-  const debugItems: DebugItem[] = [
-    {
-      id: 1,
-      title: "Section Identifiers disappear during page navigation",
-      description: "When navigating between pages, the section identifiers are not persisting correctly, causing IDs to change or disappear.",
-      status: "resolved",
-      severity: "high",
-      component: "Section Identifiers",
-      createdDate: "2023-03-20",
-      updatedDate: "2023-04-01"
-    },
-    {
-      id: 2,
-      title: "Section Identifiers overlapping with navigation menu",
-      description: "The identifiers for navigation elements are positioned incorrectly and overlap with the menu items, making them difficult to read.",
-      status: "resolved",
-      severity: "medium",
-      component: "Section Identifiers",
-      createdDate: "2023-03-22",
-      updatedDate: "2023-04-02"
-    },
-    {
-      id: 3,
-      title: "Mobile navigation menu is difficult to use on small screens",
-      description: "The mobile navigation menu has touch targets that are too small and the dropdown behavior is inconsistent on different devices.",
-      status: "open",
-      severity: "high",
-      component: "Navigation",
-      createdDate: "2023-03-25",
-      updatedDate: "2023-03-25"
-    },
-    {
-      id: 4,
-      title: "WCAG Color Palette doesn't handle alpha transparency correctly",
-      description: "When calculating contrast ratios for colors with alpha transparency, the results are incorrect and can lead to false positives/negatives.",
-      status: "in-progress",
-      severity: "medium",
-      component: "WCAG Color Palette",
-      createdDate: "2023-03-28",
-      updatedDate: "2023-04-05"
-    },
-    {
-      id: 5,
-      title: "WordPress integration fails with custom permalinks",
-      description: "When WordPress sites use custom permalink structures, the integration script fails to properly identify and scan all pages.",
-      status: "in-progress",
-      severity: "high",
-      component: "WordPress Integration",
-      createdDate: "2023-04-01",
-      updatedDate: "2023-04-10"
-    },
-    {
-      id: 6,
-      title: "Dark mode colors have insufficient contrast in some components",
-      description: "Several UI components don't adjust their colors properly in dark mode, resulting in text that's difficult to read.",
-      status: "open",
-      severity: "medium",
-      component: "Theme System",
-      createdDate: "2023-04-02",
-      updatedDate: "2023-04-02"
-    },
-    {
-      id: 7,
-      title: "Error messages not being read by screen readers",
-      description: "Form validation error messages are not properly announced by screen readers, making it difficult for users to identify and fix submission errors.",
-      status: "open",
-      severity: "critical",
-      component: "Forms",
-      createdDate: "2023-04-05",
-      updatedDate: "2023-04-05"
-    },
-    {
-      id: 8,
-      title: "Memory leak in Section Identifiers component",
-      description: "The Section Identifiers component is not properly cleaning up event listeners, causing memory usage to increase over time.",
-      status: "resolved",
-      severity: "critical",
-      component: "Section Identifiers",
-      createdDate: "2023-03-15",
-      updatedDate: "2023-04-08"
-    }
-  ];
+  const [statusFilter, setStatusFilter] = useState<DebugItemStatus | 'all'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<DebugItemCategory | 'all'>('all');
+  const [priorityFilter, setPriorityFilter] = useState<DebugItemPriority | 'all'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredItems = statusFilter === 'all' 
-    ? debugItems 
-    : debugItems.filter(item => item.status === statusFilter);
+  // Filter items based on selected filters and search query
+  const filteredItems = debugItems
+    .filter(item => statusFilter === 'all' || item.status === statusFilter)
+    .filter(item => categoryFilter === 'all' || item.category === categoryFilter)
+    .filter(item => priorityFilter === 'all' || item.priority === priorityFilter)
+    .filter(item => {
+      if (!searchQuery) return true;
+      const query = searchQuery.toLowerCase();
+      return (
+        item.title.toLowerCase().includes(query) ||
+        item.description.toLowerCase().includes(query) ||
+        (item.todoItems?.some(todo => todo.toLowerCase().includes(query))) ||
+        (item.notes?.toLowerCase().includes(query))
+      );
+    })
+    .sort((a, b) => {
+      // Sort by priority first
+      const priorityOrder = { 'critical': 0, 'high': 1, 'medium': 2, 'low': 3, 'very-low': 4 };
+      return (priorityOrder[a.priority] ?? 999) - (priorityOrder[b.priority] ?? 999);
+    });
+
+  // Get category counts
+  const categories: DebugItemCategory[] = ['ui', 'core', 'api', 'integration', 'performance', 'security', 'monitoring', 'accessibility', 'data', 'subscription', 'alerts', 'policies'];
+  const categoryCounts = categories.reduce((acc, category) => {
+    acc[category] = debugItems.filter(item => item.category === category).length;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Get status counts
+  const statuses: DebugItemStatus[] = ['identified', 'investigating', 'in-progress', 'testing', 'resolved', 'deferred'];
+  const statusCounts = statuses.reduce((acc, status) => {
+    acc[status] = debugItems.filter(item => item.status === status).length;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Get priority counts
+  const priorities: DebugItemPriority[] = ['critical', 'high', 'medium', 'low', 'very-low'];
+  const priorityCounts = priorities.reduce((acc, priority) => {
+    acc[priority] = debugItems.filter(item => item.priority === priority).length;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Helper functions for formatting
+  const getCategoryLabel = (category: DebugItemCategory): string => {
+    const labels: Record<DebugItemCategory, string> = {
+      'ui': 'UI/UX',
+      'core': 'Core',
+      'api': 'API',
+      'integration': 'Integration',
+      'performance': 'Performance',
+      'security': 'Security',
+      'monitoring': 'Monitoring',
+      'accessibility': 'Accessibility',
+      'data': 'Data',
+      'subscription': 'Subscription',
+      'alerts': 'Alerts',
+      'policies': 'Policies'
+    };
+    return labels[category] || category.charAt(0).toUpperCase() + category.slice(1);
+  };
+
+  const getStatusLabel = (status: DebugItemStatus): string => {
+    const labels: Record<DebugItemStatus, string> = {
+      'identified': 'Identified',
+      'investigating': 'Investigating',
+      'in-progress': 'In Progress',
+      'testing': 'Testing',
+      'resolved': 'Resolved',
+      'deferred': 'Deferred'
+    };
+    return labels[status];
+  };
+
+  const getPriorityLabel = (priority: DebugItemPriority): string => {
+    const labels: Record<DebugItemPriority, string> = {
+      'critical': 'Critical',
+      'high': 'High',
+      'medium': 'Medium',
+      'low': 'Low',
+      'very-low': 'Very Low'
+    };
+    return labels[priority];
+  };
+
+  const getCategoryColor = (category: DebugItemCategory): string => {
+    const colors: Record<DebugItemCategory, string> = {
+      'ui': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+      'core': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+      'api': 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200',
+      'integration': 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200',
+      'performance': 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
+      'security': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+      'monitoring': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+      'accessibility': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      'data': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      'subscription': 'bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200',
+      'alerts': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+      'policies': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200'
+    };
+    return colors[category];
+  };
+
+  const getStatusColor = (status: DebugItemStatus): string => {
+    const colors: Record<DebugItemStatus, string> = {
+      'identified': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      'investigating': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+      'in-progress': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      'testing': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+      'resolved': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      'deferred': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+    };
+    return colors[status];
+  };
+
+  const getPriorityColor = (priority: DebugItemPriority): string => {
+    const colors: Record<DebugItemPriority, string> = {
+      'critical': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+      'high': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+      'medium': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      'low': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      'very-low': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+    };
+    return colors[priority];
+  };
+
+  const getStatusIndicatorColor = (status: DebugItemStatus): string => {
+    const colors: Record<DebugItemStatus, string> = {
+      'identified': 'bg-blue-500',
+      'investigating': 'bg-purple-500',
+      'in-progress': 'bg-yellow-500',
+      'testing': 'bg-orange-500',
+      'resolved': 'bg-green-500',
+      'deferred': 'bg-gray-500'
+    };
+    return colors[status];
+  };
+
+  const renderDebugCard = (item: DebugItem) => {
+    return (
+      <Card key={item.id} className="overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className={`h-2 ${getStatusIndicatorColor(item.status)}`} />
+        <CardContent className="p-5">
+          <div className="flex justify-between items-start mb-3">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{item.title}</h3>
+            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${getPriorityColor(item.priority)}`}>
+              {getPriorityLabel(item.priority)}
+            </span>
+          </div>
+          
+          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{item.description}</p>
+          
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className={`text-xs font-medium px-2 py-1 rounded-md ${getCategoryColor(item.category)}`}>
+              {getCategoryLabel(item.category)}
+            </span>
+            <span className={`text-xs font-medium px-2 py-1 rounded-md ${getStatusColor(item.status)}`}>
+              {getStatusLabel(item.status)}
+            </span>
+            <span className="text-xs font-medium px-2 py-1 rounded-md bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+              {item.dateIdentified}
+            </span>
+          </div>
+          
+          {item.assignedTo && (
+            <div className="flex items-center mb-4">
+              <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-800 flex items-center justify-center text-xs text-primary-800 dark:text-primary-200 mr-2">
+                {item.assignedTo.split(' ').map(n => n[0]).join('')}
+              </div>
+              <span className="text-sm text-gray-600 dark:text-gray-300">{item.assignedTo}</span>
+            </div>
+          )}
+          
+          {item.todoItems && item.todoItems.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">To Do:</h4>
+              <ul className="list-disc pl-5 text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                {item.todoItems.slice(0, 3).map((todo, index) => (
+                  <li key={index}>{todo}</li>
+                ))}
+                {item.todoItems.length > 3 && (
+                  <li className="text-primary-600 dark:text-primary-400">+{item.todoItems.length - 3} more items</li>
+                )}
+              </ul>
+            </div>
+          )}
+          
+          {item.notes && (
+            <div className="text-sm italic text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 pt-2 mt-2">
+              {item.notes}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="container mx-auto py-6 px-4">
       <HeadingSection 
         title="Debug List" 
-        description="Track and manage bugs and issues within the AccessWeb platform." 
+        description="Track and manage current development issues, bugs, and improvements in progress." 
         className="mb-8"
       />
 
-      {/* Status Filters */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        <button 
-          className={`px-4 py-2 rounded-md ${statusFilter === 'all' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
-          onClick={() => setStatusFilter('all')}
-        >
-          All Issues
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-md ${statusFilter === 'open' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
-          onClick={() => setStatusFilter('open')}
-        >
-          Open
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-md ${statusFilter === 'in-progress' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
-          onClick={() => setStatusFilter('in-progress')}
-        >
-          In Progress
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-md ${statusFilter === 'resolved' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
-          onClick={() => setStatusFilter('resolved')}
-        >
-          Resolved
-        </button>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border-blue-200 dark:border-blue-800">
+          <CardContent className="p-4">
+            <h3 className="font-semibold text-blue-800 dark:text-blue-300">Total Issues</h3>
+            <p className="text-3xl font-bold text-blue-900 dark:text-blue-200">{debugItems.length}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 border-orange-200 dark:border-orange-800">
+          <CardContent className="p-4">
+            <h3 className="font-semibold text-orange-800 dark:text-orange-300">High Priority</h3>
+            <p className="text-3xl font-bold text-orange-900 dark:text-orange-200">
+              {debugItems.filter(item => item.priority === 'critical' || item.priority === 'high').length}
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/30 dark:to-yellow-800/30 border-yellow-200 dark:border-yellow-800">
+          <CardContent className="p-4">
+            <h3 className="font-semibold text-yellow-800 dark:text-yellow-300">In Progress</h3>
+            <p className="text-3xl font-bold text-yellow-900 dark:text-yellow-200">{statusCounts['in-progress'] || 0}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 border-green-200 dark:border-green-800">
+          <CardContent className="p-4">
+            <h3 className="font-semibold text-green-800 dark:text-green-300">Resolved</h3>
+            <p className="text-3xl font-bold text-green-900 dark:text-green-200">{statusCounts['resolved'] || 0}</p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Items List */}
-      <div className="space-y-4">
-        {filteredItems.map((item) => (
-          <Card key={item.id} className="overflow-hidden border border-gray-200 dark:border-gray-700">
-            <div className={`h-2 ${
-              item.severity === 'critical' ? 'bg-red-600' : 
-              item.severity === 'high' ? 'bg-orange-500' : 
-              item.severity === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'
-            }`} />
-            <CardContent className="p-5">
-              <div className="flex flex-wrap justify-between items-start gap-2 mb-3">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{item.title}</h3>
-                <div className="flex gap-2">
-                  <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                    item.severity === 'critical' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 
-                    item.severity === 'high' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' : 
-                    item.severity === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 
-                    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                  }`}>
-                    {item.severity.charAt(0).toUpperCase() + item.severity.slice(1)}
-                  </span>
-                  <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                    item.status === 'resolved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
-                    item.status === 'in-progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 
-                    item.status === 'wont-fix' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : 
-                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                  }`}>
-                    {item.status === 'in-progress' ? 'In Progress' : 
-                     item.status === 'wont-fix' ? "Won't Fix" :
-                     item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                  </span>
-                </div>
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{item.description}</p>
-              <div className="flex flex-wrap justify-between items-center text-sm gap-2">
-                <span className="text-gray-500 dark:text-gray-400">Component: <span className="font-medium text-gray-700 dark:text-gray-300">{item.component}</span></span>
-                <div className="flex gap-4">
-                  <span className="text-gray-500 dark:text-gray-400">Created: {item.createdDate}</span>
-                  <span className="text-gray-500 dark:text-gray-400">Updated: {item.updatedDate}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Search and Filters */}
+      <div className="mb-8">
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="w-full md:w-1/2">
+            <input
+              type="text"
+              placeholder="Search debug items..."
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="w-full md:w-1/2 flex gap-2 overflow-x-auto pb-2">
+            <select
+              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white"
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value as DebugItemPriority | 'all')}
+            >
+              <option value="all">All Priorities</option>
+              {priorities.map(priority => (
+                <option key={priority} value={priority}>
+                  {getPriorityLabel(priority)} ({priorityCounts[priority] || 0})
+                </option>
+              ))}
+            </select>
+            <select
+              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as DebugItemStatus | 'all')}
+            >
+              <option value="all">All Statuses</option>
+              {statuses.map(status => (
+                <option key={status} value={status}>
+                  {getStatusLabel(status)} ({statusCounts[status] || 0})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Category Filters */}
+        <div className="flex flex-wrap gap-2">
+          <button 
+            className={`px-3 py-1 rounded-md text-sm ${categoryFilter === 'all' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+            onClick={() => setCategoryFilter('all')}
+          >
+            All Categories
+          </button>
+          {categories.map(category => (
+            <button 
+              key={category}
+              className={`px-3 py-1 rounded-md text-sm ${categoryFilter === category ? 'bg-primary-500 text-white' : `bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200`}`}
+              onClick={() => setCategoryFilter(category)}
+            >
+              {getCategoryLabel(category)} ({categoryCounts[category] || 0})
+            </button>
+          ))}
+        </div>
       </div>
+
+      {/* Debug Items Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredItems.map(item => renderDebugCard(item))}
+      </div>
+
+      {filteredItems.length === 0 && (
+        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <p className="text-lg text-gray-500 dark:text-gray-400">No debug items found matching the selected filters.</p>
+        </div>
+      )}
     </div>
   );
 }
