@@ -253,7 +253,7 @@ export function ShopifySetup() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-green-50 border border-green-100 rounded-xl"
+          className="bg-white rounded-xl"
         >
           <div className="border-b border-gray-200 pb-5 mb-6">
             <div className="flex items-center justify-between">
