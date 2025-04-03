@@ -589,7 +589,11 @@ export function WCAGColorPalette() {
             
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
               <button
-                onClick={() => setColorHarmony('all')}
+                onClick={() => {
+                  setColorHarmony('all');
+                  const newPalette = generateAccessiblePalette(baseColor, 'all');
+                  setGeneratedPalette(newPalette);
+                }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'all' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
                 }`}
@@ -597,7 +601,11 @@ export function WCAGColorPalette() {
                 All Harmonies
               </button>
               <button
-                onClick={() => setColorHarmony('complementary')}
+                onClick={() => {
+                  setColorHarmony('complementary');
+                  const newPalette = generateAccessiblePalette(baseColor, 'complementary');
+                  setGeneratedPalette(newPalette);
+                }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
                 }`}
@@ -605,7 +613,11 @@ export function WCAGColorPalette() {
                 Complementary
               </button>
               <button
-                onClick={() => setColorHarmony('analogous')}
+                onClick={() => {
+                  setColorHarmony('analogous');
+                  const newPalette = generateAccessiblePalette(baseColor, 'analogous');
+                  setGeneratedPalette(newPalette);
+                }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'analogous' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
                 }`}
@@ -613,7 +625,11 @@ export function WCAGColorPalette() {
                 Analogous
               </button>
               <button
-                onClick={() => setColorHarmony('triadic')}
+                onClick={() => {
+                  setColorHarmony('triadic');
+                  const newPalette = generateAccessiblePalette(baseColor, 'triadic');
+                  setGeneratedPalette(newPalette);
+                }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'triadic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
                 }`}
@@ -621,7 +637,11 @@ export function WCAGColorPalette() {
                 Triadic
               </button>
               <button
-                onClick={() => setColorHarmony('split-complementary')}
+                onClick={() => {
+                  setColorHarmony('split-complementary');
+                  const newPalette = generateAccessiblePalette(baseColor, 'split-complementary');
+                  setGeneratedPalette(newPalette);
+                }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'split-complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
                 }`}
