@@ -399,7 +399,7 @@ export function Navigation() {
             <ThemeToggle />
             <Link
               to="/signup"
-              className="ml-8 inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
+              className="ml-8 inline-flex items-center justify-center px-4 py-2 border-none rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
             >
               Start Free Trial
             </Link>
@@ -507,7 +507,7 @@ export function Navigation() {
                 </Link>
                 <Link
                   to="/signup"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-white border-none bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Start Free Trial

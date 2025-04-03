@@ -50,7 +50,7 @@ export function Footer() {
                 />
                 <button
                   type="submit"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-lg text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
+                  className="inline-flex items-center px-4 py-2 border-none text-sm font-medium rounded-r-lg text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
                 >
                   Subscribe
                 </button>
