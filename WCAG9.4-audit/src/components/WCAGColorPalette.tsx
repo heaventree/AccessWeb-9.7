@@ -266,14 +266,10 @@ export function WCAGColorPalette() {
   };
 
   const generateNewPalette = () => {
-    setIsGenerating(true);
-    setTimeout(() => {
-      const newBaseColor = generateRandomColor();
-      setBaseColor(newBaseColor);
-      const newPalette = generateAccessiblePalette(newBaseColor, expertSettings.colorHarmony);
-      setGeneratedPalette(newPalette);
-      setIsGenerating(false);
-    }, 500);
+    const newBaseColor = generateRandomColor();
+    setBaseColor(newBaseColor);
+    const newPalette = generateAccessiblePalette(newBaseColor, expertSettings.colorHarmony);
+    setGeneratedPalette(newPalette);
   };
 
   const handleBaseColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -576,12 +572,8 @@ export function WCAGColorPalette() {
                 ${expertSettings.colorHarmony === 'triadic' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
               onClick={() => {
                 setExpertSettings(prev => ({ ...prev, colorHarmony: 'triadic' }));
-                setIsGenerating(true);
-                setTimeout(() => {
-                  const newPalette = generateAccessiblePalette(baseColor, 'triadic');
-                  setGeneratedPalette(newPalette);
-                  setIsGenerating(false);
-                }, 300);
+                const newPalette = generateAccessiblePalette(baseColor, 'triadic');
+                setGeneratedPalette(newPalette);
               }}
             >
               <div className="font-medium">Triadic</div>
@@ -592,12 +584,8 @@ export function WCAGColorPalette() {
                 ${expertSettings.colorHarmony === 'split-complementary' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700'}`}
               onClick={() => {
                 setExpertSettings(prev => ({ ...prev, colorHarmony: 'split-complementary' }));
-                setIsGenerating(true);
-                setTimeout(() => {
-                  const newPalette = generateAccessiblePalette(baseColor, 'split-complementary');
-                  setGeneratedPalette(newPalette);
-                  setIsGenerating(false);
-                }, 300);
+                const newPalette = generateAccessiblePalette(baseColor, 'split-complementary');
+                setGeneratedPalette(newPalette);
               }}
             >
               <div className="font-medium">Split Complementary</div>
