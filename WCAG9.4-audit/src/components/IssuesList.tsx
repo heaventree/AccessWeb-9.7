@@ -406,6 +406,7 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                         >
                           <Zap className="w-4 h-4 mr-2" aria-hidden="true" />
                           Apply Fix
+                          <span className="ml-2 px-1.5 py-0.5 text-xs font-semibold bg-yellow-400 text-green-800 rounded">PRO</span>
                         </button>
                       </div>
                       
