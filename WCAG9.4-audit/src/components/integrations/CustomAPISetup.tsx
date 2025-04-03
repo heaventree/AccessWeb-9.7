@@ -270,7 +270,7 @@ export function CustomAPISetup() {
                   </div>
                 </div>
               )}
-              <div className="pt-6">
+              <div className="pt-6 flex justify-end">
                 <button
                   type="submit"
                   disabled={generating || !name || selectedScopes.length === 0}
