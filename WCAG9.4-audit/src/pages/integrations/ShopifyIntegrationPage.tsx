@@ -108,21 +108,21 @@ export function ShopifyIntegrationPage() {
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">Increase Sales</h4>
-                    <p className="text-gray-600">Make your store accessible to all potential customers</p>
+                    <p className="text-gray-600">Make your store accessible to all potential customers, expanding your market reach</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">Improve SEO</h4>
-                    <p className="text-gray-600">Better accessibility means better search rankings</p>
+                    <p className="text-gray-600">Better accessibility means better search rankings and increased organic traffic</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
-                    <h4 className="font-medium text-gray-900">Reduce Risk</h4>
-                    <p className="text-gray-600">Stay compliant with accessibility regulations</p>
+                    <h4 className="font-medium text-gray-900">Reduce Legal Risk</h4>
+                    <p className="text-gray-600">Stay compliant with ADA, AODA, and EAA accessibility regulations</p>
                   </div>
                 </li>
               </ul>
@@ -133,14 +133,14 @@ export function ShopifyIntegrationPage() {
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">Easy Setup</h4>
-                    <p className="text-gray-600">No coding required - install and configure in minutes</p>
+                    <p className="text-gray-600">No coding required - install and configure in minutes with guided setup</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">Automated Fixes</h4>
-                    <p className="text-gray-600">Get suggestions to fix common accessibility issues</p>
+                    <p className="text-gray-600">Get AI-powered suggestions and automatic fixes for common accessibility issues</p>
                   </div>
                 </li>
                 <li className="flex items-start">
@@ -152,6 +152,12 @@ export function ShopifyIntegrationPage() {
                 </li>
               </ul>
             </div>
+          </div>
+          <div className="mt-6 text-center">
+            <Link to="/docs/shopify" className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
+              View full documentation 
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
           </div>
         </div>
 

@@ -94,21 +94,21 @@ await accessWeb.createWebhook({
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">Custom Integration</h4>
-                    <p className="text-gray-600">Build accessibility testing into your own applications</p>
+                    <p className="text-gray-600">Build accessibility testing into your own applications, dashboards, and workflows</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
-                    <h4 className="font-medium text-gray-900">Automation</h4>
-                    <p className="text-gray-600">Automate testing in your CI/CD pipeline</p>
+                    <h4 className="font-medium text-gray-900">CI/CD Automation</h4>
+                    <p className="text-gray-600">Integrate with GitHub, GitLab, Jenkins, and other CI/CD pipelines</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
-                    <h4 className="font-medium text-gray-900">Scalability</h4>
-                    <p className="text-gray-600">Test thousands of pages across multiple domains</p>
+                    <h4 className="font-medium text-gray-900">Enterprise Scalability</h4>
+                    <p className="text-gray-600">Test thousands of pages across multiple domains with high throughput</p>
                   </div>
                 </li>
               </ul>
@@ -118,26 +118,32 @@ await accessWeb.createWebhook({
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
-                    <h4 className="font-medium text-gray-900">Real-time Updates</h4>
-                    <p className="text-gray-600">Get instant notifications via webhooks</p>
+                    <h4 className="font-medium text-gray-900">Real-time Webhooks</h4>
+                    <p className="text-gray-600">Get instant notifications via webhooks with detailed payload options</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
-                    <h4 className="font-medium text-gray-900">Detailed Reports</h4>
-                    <p className="text-gray-600">Access comprehensive accessibility data</p>
+                    <h4 className="font-medium text-gray-900">Comprehensive Reporting</h4>
+                    <p className="text-gray-600">Access detailed accessibility data in JSON, CSV, PDF and HTML formats</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">Developer Support</h4>
-                    <p className="text-gray-600">Get help from our API experts</p>
+                    <p className="text-gray-600">Get help from our API experts with priority support channels</p>
                   </div>
                 </li>
               </ul>
             </div>
+          </div>
+          <div className="mt-6 text-center">
+            <Link to="/docs/api" className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
+              View full API documentation 
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
           </div>
         </div>
 
@@ -151,7 +157,7 @@ await accessWeb.createWebhook({
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              to="/help/custom-api-integration-guide"
+              to="/docs/api"
               className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-blue-700 bg-white hover:bg-blue-50"
             >
               Read Documentation

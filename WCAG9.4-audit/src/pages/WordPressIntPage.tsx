@@ -108,21 +108,21 @@ export function WordPressIntPage() {
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">Automated Testing</h4>
-                    <p className="text-gray-600">Continuous WCAG compliance monitoring</p>
+                    <p className="text-gray-600">Continuous WCAG compliance monitoring of posts, pages, and custom content</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">Auto-Fix Support</h4>
-                    <p className="text-gray-600">Automatically fix common accessibility issues</p>
+                    <p className="text-gray-600">Automatically fix common accessibility issues with one-click repairs</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">SEO Benefits</h4>
-                    <p className="text-gray-600">Improve search rankings with better accessibility</p>
+                    <p className="text-gray-600">Improve search rankings with better accessibility and semantic markup</p>
                   </div>
                 </li>
               </ul>
@@ -133,25 +133,31 @@ export function WordPressIntPage() {
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">Easy Integration</h4>
-                    <p className="text-gray-600">Works with any WordPress theme</p>
+                    <p className="text-gray-600">Works with any WordPress theme including Elementor, Divi, and WooCommerce</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">Compliance Reports</h4>
-                    <p className="text-gray-600">Detailed accessibility status reports</p>
+                    <p className="text-gray-600">Detailed accessibility status reports with exportable documentation</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
                   <div>
                     <h4 className="font-medium text-gray-900">Regular Updates</h4>
-                    <p className="text-gray-600">Stay current with accessibility standards</p>
+                    <p className="text-gray-600">Stay current with accessibility standards through automatic plugin updates</p>
                   </div>
                 </li>
               </ul>
             </div>
+          </div>
+          <div className="mt-6 text-center">
+            <Link to="/docs/wordpress" className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
+              View full documentation 
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
           </div>
         </div>
 
