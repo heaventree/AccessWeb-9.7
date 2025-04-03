@@ -135,7 +135,7 @@ export function WordPressSetup() {
       </div>
 
       {/* API Key Management */}
-      <div className="bg-white p-8">
+      <div>
         {/* API Key Generation */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -212,7 +212,7 @@ export function WordPressSetup() {
                   </div>
                 </div>
               </div>
-              <div className="mt-6">
+              <div className="mt-6 flex justify-end">
                 <button
                   onClick={handleGenerateApiKey}
                   className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
@@ -229,7 +229,7 @@ export function WordPressSetup() {
               <p className="mt-1 text-sm text-gray-500">
                 Generate an API key to connect your WordPress site
               </p>
-              <div className="mt-6">
+              <div className="mt-6 flex justify-end">
                 <button
                   onClick={handleGenerateApiKey}
                   disabled={generating}
