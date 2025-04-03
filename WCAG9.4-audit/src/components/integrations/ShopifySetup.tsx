@@ -218,6 +218,14 @@ export function ShopifySetup() {
               </div>
               <p className="mt-2 text-sm text-gray-500">
                 Access token from your custom Shopify app (starts with shpat_)
+                <a 
+                  href="https://admin.shopify.com/settings/apps/development" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="ml-1 text-blue-600 hover:text-blue-800"
+                >
+                  Get your access token →
+                </a>
               </p>
             </div>
 
@@ -453,6 +461,15 @@ export function ShopifySetup() {
                           <li>Set up Admin API access with the following scopes: read_themes, write_themes, read_content, write_content</li>
                           <li>Install the app to your store</li>
                           <li>Copy the access token and enter it in the form above</li>
+                          <li><a 
+                              href="https://admin.shopify.com/settings/apps/development" 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              Open Shopify app development page
+                            </a> to generate your token
+                          </li>
                         </ul>
                       </li>
                     </ol>
