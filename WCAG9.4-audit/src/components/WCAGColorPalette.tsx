@@ -236,8 +236,13 @@ function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all
     });
   }
   
-  // Sort combinations by WCAG level (AAA first, then AA, then fails)
-  return combinations.sort((a, b) => {
+  // First, make sure the base color is always at the front of the array, 
+  // regardless of its WCAG level or contrast ratio
+  const baseColorCombo = combinations.find(combo => combo.isBaseColor);
+  const otherCombos = combinations.filter(combo => !combo.isBaseColor);
+  
+  // Sort other combinations by WCAG level (AAA first, then AA, then fails)
+  const sortedOtherCombos = otherCombos.sort((a, b) => {
     if (a.wcagLevel !== b.wcagLevel) {
       if (a.wcagLevel === 'AAA') return -1;
       if (b.wcagLevel === 'AAA') return 1;
@@ -246,6 +251,9 @@ function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all
     }
     return b.ratio - a.ratio;
   });
+  
+  // Place the base color at the start of the array
+  return baseColorCombo ? [baseColorCombo, ...sortedOtherCombos] : sortedOtherCombos;
 }
 
 // Helper functions to create color palettes similar to Coolors.co
