@@ -1,18 +1,40 @@
 /**
- * Section Identifiers
+ * Section Identifiers - WCAG Accessibility Audit Tool
  * 
  * This script implements a non-breaking section identification system
  * that helps visualize the structure of the website during development.
+ * 
+ * Features:
+ * - Globally unique identifiers that persist across page navigation
+ * - Bright pink highlighting for maximum visibility
+ * - Detailed tooltips with component information
+ * - Consistent element identification with localStorage persistence
+ * - Smart detection of UI components and structures
+ * - Toggleable via the control panel in the top right corner
+ * 
+ * Usage:
+ * - Enable by clicking the "Section Identifiers" toggle
+ * - Hover over identifiers to see detailed component information
+ * - Use the ID numbers when communicating about specific UI elements
+ * - IDs remain consistent when navigating between pages
+ * 
+ * Developer API (via console):
+ * - window._devSectionIdentifiers.enable() - Turn on
+ * - window._devSectionIdentifiers.disable() - Turn off
+ * - window._devSectionIdentifiers.toggle() - Toggle state
+ * - window._devSectionIdentifiers.refresh() - Refresh all markers
+ * - window._devSectionIdentifiers.reset() - Clear all data and start fresh
  */
 
 (function() {
   // Ensure we don't pollute the global namespace
   'use strict';
 
-  // Configuration
-  const IDENTIFIERS_ENABLED_KEY = 'sectionIdentifiersEnabled';
-  const IDENTIFIERS_COUNTER_KEY = 'sectionIdentifiersCounter';
-  const IDENTIFIERS_MAP_KEY = 'sectionIdentifiersMap';
+  // Configuration with namespaced localStorage keys
+  const VERSION = '1.1';
+  const IDENTIFIERS_ENABLED_KEY = 'wcagAccessWeb_sectionIds_enabled_v' + VERSION;
+  const IDENTIFIERS_COUNTER_KEY = 'wcagAccessWeb_sectionIds_counter_v' + VERSION;
+  const IDENTIFIERS_MAP_KEY = 'wcagAccessWeb_sectionIds_map_v' + VERSION;
   
   // Global counter for unique identifiers
   let globalCounter = 1;
@@ -23,28 +45,59 @@
   // Cache DOM lookups
   let toggleButton = null;
   
+  // Enable debug logging
+  const DEBUG = true;
+  function debugLog(...args) {
+    if (DEBUG) {
+      console.log('[SectionIdentifiers]', ...args);
+    }
+  }
+  
   // Try to load the global counter from localStorage
   try {
     const savedCounter = parseInt(localStorage.getItem(IDENTIFIERS_COUNTER_KEY));
     if (!isNaN(savedCounter) && savedCounter > 1) {
       globalCounter = savedCounter;
+      debugLog(`Loaded counter from localStorage: ${globalCounter}`);
+    } else {
+      debugLog('Starting with fresh counter at 1');
     }
   } catch (e) {
     console.warn('Error loading saved counter:', e);
   }
   
-  // Try to load the element map from localStorage
+  // Try to load the element map from localStorage with error handling
   try {
     const savedMap = localStorage.getItem(IDENTIFIERS_MAP_KEY);
     if (savedMap) {
-      const parsedMap = JSON.parse(savedMap);
-      // Convert JSON object back to Map
-      Object.entries(parsedMap).forEach(([key, value]) => {
-        elementIdentifierMap.set(key, value);
-      });
+      try {
+        const parsedMap = JSON.parse(savedMap);
+        
+        // Convert JSON object back to Map with validation
+        Object.entries(parsedMap).forEach(([key, value]) => {
+          if (key && key.length > 0 && typeof value === 'number') {
+            elementIdentifierMap.set(key, value);
+          }
+        });
+        
+        debugLog(`Loaded element map from localStorage with ${elementIdentifierMap.size} entries`);
+        
+        // Check for map integrity - if we have a counter but no map entries, reset the counter
+        if (elementIdentifierMap.size === 0 && globalCounter > 1) {
+          debugLog('Warning: Counter exists but map is empty, resetting counter');
+          globalCounter = 1;
+        }
+      } catch (parseError) {
+        console.warn('Error parsing saved map, resetting:', parseError);
+        // Clear corrupted data
+        localStorage.removeItem(IDENTIFIERS_MAP_KEY);
+        elementIdentifierMap.clear();
+      }
+    } else {
+      debugLog('No element map found in localStorage, starting fresh');
     }
   } catch (e) {
-    console.warn('Error loading saved element map:', e);
+    console.warn('Error accessing localStorage for element map:', e);
   }
   
   /**
@@ -202,46 +255,135 @@
    */
   function generateElementPath(element) {
     try {
-      // Get element path components
+      // Get element tag name
       const tagName = element.tagName.toLowerCase();
-      const id = element.id ? `#${element.id}` : '';
-      const classes = Array.from(element.classList).map(c => `.${c}`).join('');
       
-      // Try to get text content hash for additional uniqueness
-      let contentHash = '';
-      if (element.textContent) {
-        const text = element.textContent.trim();
-        if (text.length > 0) {
-          // Simple hashing function for text content
-          let hash = 0;
-          for (let i = 0; i < Math.min(text.length, 50); i++) {
-            hash = ((hash << 5) - hash) + text.charCodeAt(i);
-            hash |= 0; // Convert to 32bit integer
+      // If element has an ID, that's the most reliable identifier
+      if (element.id) {
+        return `${tagName}#${element.id}`;
+      }
+      
+      // Collect element classes but filter out dynamic ones 
+      // (ones that might have numbers, timestamps, or randomly generated parts)
+      const classes = Array.from(element.classList)
+        .filter(cls => !cls.match(/\d+/)) // Filter out classes with numbers
+        .filter(cls => !cls.match(/random|uuid|guid|hash/i)) // Filter out likely dynamic classes
+        .map(c => `.${c}`)
+        .join('');
+      
+      // Get headings or strong textual elements that are likely to be stable
+      let stableText = '';
+      const headingElement = element.querySelector('h1, h2, h3, h4, h5, h6');
+      if (headingElement && headingElement.textContent) {
+        const headingText = headingElement.textContent.trim();
+        if (headingText.length > 0 && headingText.length < 50) { // Only use reasonably sized headings
+          stableText = `[heading="${headingText}"]`;
+        }
+      }
+      
+      // If no heading, check for other stable text like buttons, labels, etc.
+      if (!stableText) {
+        const stableElements = element.querySelectorAll('button, label, a[href], [aria-label]');
+        if (stableElements.length === 1) {
+          const textContent = stableElements[0].textContent || stableElements[0].getAttribute('aria-label');
+          if (textContent && textContent.trim().length > 0 && textContent.trim().length < 30) {
+            stableText = `[text="${textContent.trim()}"]`;
           }
-          contentHash = `::${Math.abs(hash)}`;
         }
       }
       
-      // Calculate position in parent if no ID
-      let positionInfo = '';
-      if (!id && element.parentElement) {
-        const siblings = Array.from(element.parentElement.children)
-          .filter(el => el.tagName === element.tagName);
-        const position = siblings.indexOf(element);
-        if (position !== -1) {
-          positionInfo = `:nth-of-type(${position + 1})`;
+      // For elements with no stable text or ID, try to compute a reliable position path
+      let positionPath = '';
+      if (!stableText && !element.id) {
+        // Get the location within the DOM hierarchy
+        positionPath = getPositionPath(element);
+      }
+      
+      // For elements with role, use it for identification
+      const role = element.getAttribute('role');
+      const roleInfo = role ? `[role="${role}"]` : '';
+      
+      // If element has a name attribute (inputs, forms, etc.), use it
+      const name = element.getAttribute('name');
+      const nameInfo = name ? `[name="${name}"]` : '';
+      
+      // Try to find data attributes that might be stable
+      const dataAttributes = [];
+      for (let i = 0; i < element.attributes.length; i++) {
+        const attr = element.attributes[i];
+        if (attr.name.startsWith('data-') && !attr.name.match(/data-id|data-key|data-index|data-v-/)) {
+          dataAttributes.push(`[${attr.name}="${attr.value}"]`);
         }
       }
       
-      // Generate a unique path
-      const path = `${tagName}${id}${classes}${positionInfo}${contentHash}`;
+      // Combine all the reliable identifiers
+      const path = `${tagName}${classes}${roleInfo}${nameInfo}${dataAttributes.join('')}${stableText}${positionPath}`;
       
-      return path;
+      // If path is empty or not specific enough, add more context
+      if (path === tagName || path === `${tagName}${classes}` && !classes) {
+        return `${getPositionPath(element, true)}`;
+      }
+      
+      // Make path more specific with a page context (pathname)
+      const pagePath = window.location.pathname;
+      const pageContext = `[page="${pagePath}"]`;
+      
+      return `${path}${pageContext}`;
     } catch (e) {
       console.warn('Error generating element path:', e);
-      // Fallback to random ID
+      // Fallback to random ID, but this will make identifiers inconsistent
       return `element-${Math.floor(Math.random() * 1000000)}`;
     }
+  }
+  
+  /**
+   * Get position path for an element
+   * @param {Element} element - The DOM element
+   * @param {boolean} extended - Whether to include more context
+   * @returns {string} Position path
+   */
+  function getPositionPath(element, extended = false) {
+    let path = '';
+    let current = element;
+    let depth = 0;
+    
+    // Traverse up to 5 levels to avoid too long paths
+    while (current && current !== document.body && depth < 5) {
+      // Get element's position among siblings of same type
+      const siblings = Array.from(current.parentElement?.children || [])
+        .filter(el => el.tagName === current.tagName);
+      const position = siblings.indexOf(current);
+      
+      // Add to path
+      if (position !== -1) {
+        const currentTag = current.tagName.toLowerCase();
+        
+        // For extended path, include more information
+        let additionalInfo = '';
+        if (extended && current !== element) {
+          // Add classes if available and not too many
+          const classes = Array.from(current.classList)
+            .filter(cls => !cls.match(/\d+/))
+            .filter(cls => !cls.match(/random|uuid|guid|hash/i));
+          
+          if (classes.length > 0 && classes.length < 3) {
+            additionalInfo = classes.map(c => `.${c}`).join('');
+          }
+          
+          // Add ID if available
+          if (current.id) {
+            additionalInfo = `#${current.id}`;
+          }
+        }
+        
+        path = `/${currentTag}${additionalInfo}[${position + 1}]${path}`;
+      }
+      
+      current = current.parentElement;
+      depth++;
+    }
+    
+    return path;
   }
   
   /**
@@ -277,16 +419,8 @@
           sectionId = globalCounter++;
           elementIdentifierMap.set(elementPath, sectionId);
           
-          // Save the updated counter to localStorage
-          localStorage.setItem(IDENTIFIERS_COUNTER_KEY, globalCounter.toString());
-          
-          // Save the updated map to localStorage (convert Map to object first)
-          try {
-            const mapObject = Object.fromEntries(elementIdentifierMap.entries());
-            localStorage.setItem(IDENTIFIERS_MAP_KEY, JSON.stringify(mapObject));
-          } catch (e) {
-            console.warn('Error saving element map:', e);
-          }
+          // Save the updated data to localStorage
+          saveIdentifiersData();
         }
         
         createIdentifier(section, sectionId);
@@ -518,7 +652,7 @@
   }
   
   /**
-   * Create an identifier for a section
+   * Create an identifier for a section with enhanced tooltip and appearance
    */
   function createIdentifier(section, index) {
     try {
@@ -547,9 +681,9 @@
       if (element.textContent) {
         const text = element.textContent.trim();
         if (text.length > 0) {
-          // Get first 30 chars of content as a preview
-          contentSummary = text.length > 30 ? 
-            text.substring(0, 30) + '...' : 
+          // Get first 50 chars of content as a preview (expanded from 30)
+          contentSummary = text.length > 50 ? 
+            text.substring(0, 50) + '...' : 
             text;
         }
       }
@@ -558,10 +692,26 @@
       const headingElement = element.querySelector('h1, h2, h3, h4, h5, h6');
       const headingText = headingElement ? headingElement.textContent.trim() : '';
       
-      // Count child elements
+      // Count child elements by type
+      const childButtonCount = element.querySelectorAll('button').length;
+      const childInputCount = element.querySelectorAll('input, select, textarea').length;
+      const childLinkCount = element.querySelectorAll('a').length;
+      const childImgCount = element.querySelectorAll('img, svg').length;
       const childCount = element.children.length;
       
-      // Get any ARIA attributes
+      // Get all the different types of child elements
+      const childTypes = {};
+      Array.from(element.children).forEach(child => {
+        const tagName = child.tagName.toLowerCase();
+        childTypes[tagName] = (childTypes[tagName] || 0) + 1;
+      });
+      
+      // Format child types for display
+      const childTypesFormatted = Object.entries(childTypes)
+        .map(([tag, count]) => `${tag}: ${count}`)
+        .join(', ');
+      
+      // Get any ARIA attributes with better formatting
       const ariaAttributes = [];
       for (let i = 0; i < element.attributes.length; i++) {
         const attr = element.attributes[i];
@@ -570,41 +720,73 @@
         }
       }
       
-      // Check for interactive elements
-      const hasButtons = element.querySelectorAll('button').length > 0;
-      const hasInputs = element.querySelectorAll('input, select, textarea').length > 0;
-      const hasLinks = element.querySelectorAll('a').length > 0;
+      // Find event handlers (if possible in this browser)
+      const hasClickHandler = element.onclick || element.getAttribute('onclick');
+      const hasChangeHandler = element.onchange || element.getAttribute('onchange');
+      const hasSubmitHandler = element.onsubmit || element.getAttribute('onsubmit');
+      const hasKeyboardHandler = 
+        element.onkeyup || element.onkeydown || element.onkeypress ||
+        element.getAttribute('onkeyup') || element.getAttribute('onkeydown') || element.getAttribute('onkeypress');
       
-      const interactiveInfo = [
-        hasButtons ? `Contains ${element.querySelectorAll('button').length} button(s)` : '',
-        hasInputs ? `Contains ${element.querySelectorAll('input, select, textarea').length} form field(s)` : '',
-        hasLinks ? `Contains ${element.querySelectorAll('a').length} link(s)` : ''
-      ].filter(Boolean);
+      // Event handler information
+      const eventHandlers = [];
+      if (hasClickHandler) eventHandlers.push('click');
+      if (hasChangeHandler) eventHandlers.push('change');
+      if (hasSubmitHandler) eventHandlers.push('submit');
+      if (hasKeyboardHandler) eventHandlers.push('keyboard');
+      
+      // Check for interactive elements with improved organization
+      const interactiveInfo = [];
+      if (childButtonCount > 0) interactiveInfo.push(`${childButtonCount} button(s)`);
+      if (childInputCount > 0) interactiveInfo.push(`${childInputCount} form field(s)`);
+      if (childLinkCount > 0) interactiveInfo.push(`${childLinkCount} link(s)`);
+      if (childImgCount > 0) interactiveInfo.push(`${childImgCount} image(s)`);
       
       // Generate a unique selector for this element (for developer reference)
       const elementPath = generateElementPath(element);
       const shortPath = elementPath.length > 80 ? elementPath.substring(0, 80) + '...' : elementPath;
       
-      // Build enhanced tooltip info
+      // Structured data for tooltip
+      const tooltipData = {
+        id: `${index}`,
+        type: type,
+        element: `${elementTag}${elementId}${elementClass}`,
+        size: `${width}×${height}px`,
+        children: childCount > 0 ? `${childCount} total` + (childTypesFormatted ? ` (${childTypesFormatted})` : '') : null,
+        aria: ariaAttributes.length > 0 ? ariaAttributes.join(', ') : null,
+        interactive: interactiveInfo.length > 0 ? interactiveInfo.join(', ') : null,
+        events: eventHandlers.length > 0 ? eventHandlers.join(', ') : null,
+        heading: headingText || null,
+        content: contentSummary || null,
+        path: shortPath
+      };
+      
+      // Store the tooltip data as a JSON string for the custom tooltip
+      identifier.setAttribute('data-tooltip-json', JSON.stringify(tooltipData));
+      
+      // Also build a plain text version for fallback
       const tooltipInfo = [
-        `ID: ${index} (${type})`,
-        `Element: ${elementTag}${elementId}${elementClass}`,
-        `Size: ${width}×${height}px`,
-        childCount > 0 ? `Children: ${childCount} element(s)` : '',
-        ariaAttributes.length > 0 ? `ARIA: ${ariaAttributes.join(', ')}` : '',
-        interactiveInfo.length > 0 ? `Interactive: ${interactiveInfo.join(', ')}` : '',
-        headingText ? `Heading: ${headingText}` : '',
-        contentSummary ? `Content: "${contentSummary}"` : '',
-        `Path: ${shortPath}`
+        `ID: ${tooltipData.id} (${tooltipData.type})`,
+        `Element: ${tooltipData.element}`,
+        `Size: ${tooltipData.size}`,
+        tooltipData.children ? `Children: ${tooltipData.children}` : '',
+        tooltipData.aria ? `ARIA: ${tooltipData.aria}` : '',
+        tooltipData.interactive ? `Interactive: ${tooltipData.interactive}` : '',
+        tooltipData.events ? `Events: ${tooltipData.events}` : '',
+        tooltipData.heading ? `Heading: ${tooltipData.heading}` : '',
+        tooltipData.content ? `Content: "${tooltipData.content}"` : '',
+        `Path: ${tooltipData.path}`
       ].filter(Boolean).join('\n');
       
-      // Set tooltip info
       identifier.setAttribute('data-info', tooltipInfo);
+      identifier.setAttribute('title', tooltipInfo); // Fallback tooltip
       
-      // Set bright pink color for high visibility
+      // Set bright pink color for high visibility with improved styling
       identifier.style.backgroundColor = '#FF1493'; // Deep Pink
       identifier.style.color = 'white';
       identifier.style.fontWeight = 'bold';
+      identifier.style.zIndex = '9999'; // Ensure it's on top
+      identifier.style.boxShadow = '0 0 0 1px #fff'; // White outline for visibility against dark backgrounds
       
       // Position the identifier correctly based on element position
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -613,10 +795,149 @@
       identifier.style.top = rect.top + scrollTop + 'px';
       identifier.style.left = rect.left + scrollLeft + 'px';
       
+      // Add custom tooltip event listeners
+      identifier.addEventListener('mouseenter', function() {
+        // Create or show tooltip
+        showEnhancedTooltip(identifier, tooltipData);
+      });
+      
+      identifier.addEventListener('mouseleave', function() {
+        // Hide tooltip
+        hideEnhancedTooltip();
+      });
+      
       // Append to document body (not to the element itself)
       document.body.appendChild(identifier);
+      
+      // Return the created identifier element
+      return identifier;
     } catch (error) {
       console.warn('Error creating identifier:', error);
+      return null;
+    }
+  }
+  
+  /**
+   * Show enhanced tooltip with structured data
+   */
+  function showEnhancedTooltip(identifier, data) {
+    try {
+      // Remove any existing tooltips
+      hideEnhancedTooltip();
+      
+      // Create tooltip container
+      const tooltip = document.createElement('div');
+      tooltip.className = 'section-identifier-tooltip';
+      tooltip.id = 'section-identifier-tooltip';
+      
+      // Create tooltip header
+      const header = document.createElement('div');
+      header.className = 'tooltip-header';
+      header.innerHTML = `<strong>Section ID: ${data.id}</strong> <span class="tooltip-type">${data.type}</span>`;
+      tooltip.appendChild(header);
+      
+      // Create tooltip content
+      const content = document.createElement('div');
+      content.className = 'tooltip-content';
+      
+      // Add all data sections
+      const addSection = (title, value) => {
+        if (value) {
+          const section = document.createElement('div');
+          section.className = 'tooltip-section';
+          section.innerHTML = `<strong>${title}:</strong> ${value}`;
+          content.appendChild(section);
+        }
+      };
+      
+      addSection('Element', data.element);
+      addSection('Size', data.size);
+      addSection('Children', data.children);
+      
+      // Group interaction info
+      if (data.interactive || data.events || data.aria) {
+        const interactionSection = document.createElement('div');
+        interactionSection.className = 'tooltip-section interaction';
+        
+        let interactionContent = '<strong>Interaction:</strong> ';
+        if (data.interactive) interactionContent += `<div>${data.interactive}</div>`;
+        if (data.events) interactionContent += `<div>Events: ${data.events}</div>`;
+        if (data.aria) interactionContent += `<div>ARIA: ${data.aria}</div>`;
+        
+        interactionSection.innerHTML = interactionContent;
+        content.appendChild(interactionSection);
+      }
+      
+      // Content info
+      if (data.heading || data.content) {
+        const contentSection = document.createElement('div');
+        contentSection.className = 'tooltip-section content';
+        
+        let contentInfo = '<strong>Content:</strong> ';
+        if (data.heading) contentInfo += `<div>Heading: "${data.heading}"</div>`;
+        if (data.content) contentInfo += `<div>Text: "${data.content}"</div>`;
+        
+        contentSection.innerHTML = contentInfo;
+        content.appendChild(contentSection);
+      }
+      
+      // Add path info
+      const pathSection = document.createElement('div');
+      pathSection.className = 'tooltip-section path';
+      pathSection.innerHTML = `<strong>Path:</strong> <span class="tooltip-path">${data.path}</span>`;
+      content.appendChild(pathSection);
+      
+      tooltip.appendChild(content);
+      
+      // Position tooltip relative to identifier
+      const identifierRect = identifier.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+      
+      // Add tooltip to document
+      document.body.appendChild(tooltip);
+      
+      // Position after adding to get accurate size
+      const tooltipRect = tooltip.getBoundingClientRect();
+      
+      // Check if tooltip would go outside viewport
+      let left = identifierRect.right + scrollLeft + 10;
+      let top = identifierRect.top + scrollTop;
+      
+      // If tooltip would go outside right edge, position it to the left
+      if (left + tooltipRect.width > window.innerWidth) {
+        left = identifierRect.left + scrollLeft - tooltipRect.width - 10;
+      }
+      
+      // If tooltip would go outside bottom edge, adjust top position
+      if (top + tooltipRect.height > window.innerHeight + scrollTop) {
+        top = window.innerHeight + scrollTop - tooltipRect.height - 10;
+      }
+      
+      // Keep it within top bounds too
+      top = Math.max(scrollTop + 5, top);
+      
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+      
+      // Make tooltip visible
+      tooltip.style.opacity = '1';
+    } catch (error) {
+      console.warn('Error showing enhanced tooltip:', error);
+    }
+  }
+  
+  /**
+   * Hide enhanced tooltip
+   */
+  function hideEnhancedTooltip() {
+    try {
+      const existing = document.getElementById('section-identifier-tooltip');
+      if (existing) {
+        existing.remove();
+      }
+    } catch (error) {
+      console.warn('Error hiding enhanced tooltip:', error);
     }
   }
   
@@ -650,6 +971,14 @@
    */
   function resetIdentifiers() {
     try {
+      debugLog('Resetting all section identifiers');
+      
+      // Remove existing identifiers from DOM
+      const existingIdentifiers = document.querySelectorAll('.section-identifier');
+      existingIdentifiers.forEach(function(identifier) {
+        identifier.remove();
+      });
+      
       // Reset global counter
       globalCounter = 1;
       
@@ -660,13 +989,62 @@
       localStorage.removeItem(IDENTIFIERS_COUNTER_KEY);
       localStorage.removeItem(IDENTIFIERS_MAP_KEY);
       
-      // Refresh identifiers
-      refreshIdentifiers();
+      // Force re-detection of all sections with fresh IDs
+      setTimeout(function() {
+        refreshIdentifiers();
+        
+        // Save the fresh data to localStorage
+        saveIdentifiersData();
+        
+        debugLog('Section identifiers have been completely reset and regenerated');
+      }, 100);
       
-      console.info('Section identifiers have been reset');
+      return true;
     } catch (error) {
       console.warn('Error resetting section identifiers:', error);
+      return false;
     }
+  }
+  
+  /**
+   * Save identifiers data to localStorage with throttling
+   */
+  let saveTimeout = null;
+  function saveIdentifiersData() {
+    // Clear any pending save operation
+    if (saveTimeout) {
+      clearTimeout(saveTimeout);
+    }
+    
+    // Schedule a new save operation with a small delay to batch multiple saves
+    saveTimeout = setTimeout(function() {
+      try {
+        // Save the counter and map atomically
+        localStorage.setItem(IDENTIFIERS_COUNTER_KEY, globalCounter.toString());
+        
+        // Convert the map to a JSON-compatible object and save
+        const mapObject = Object.fromEntries(elementIdentifierMap.entries());
+        localStorage.setItem(IDENTIFIERS_MAP_KEY, JSON.stringify(mapObject));
+        
+        debugLog(`Saved ${elementIdentifierMap.size} identifiers to localStorage`);
+      } catch (e) {
+        console.warn('Error saving identifiers data to localStorage:', e);
+        
+        // Try a more conservative approach for large maps
+        if (elementIdentifierMap.size > 100) {
+          try {
+            // Just save the counter if the map is too large to save
+            localStorage.setItem(IDENTIFIERS_COUNTER_KEY, globalCounter.toString());
+            console.warn('Map too large, only saved counter');
+          } catch (innerError) {
+            console.error('Failed to save even the counter:', innerError);
+          }
+        }
+      }
+      
+      // Clear the timeout reference
+      saveTimeout = null;
+    }, 250); // Throttle to prevent excessive storage operations
   }
   
   // Export API for debugging purpose only (not for application use)
@@ -675,6 +1053,7 @@
     enable: function() { setEnabled(true); },
     disable: function() { setEnabled(false); },
     toggle: function() { setEnabled(!document.body.classList.contains('section-identifiers-enabled')); },
-    reset: resetIdentifiers
+    reset: resetIdentifiers,
+    saveData: saveIdentifiersData
   };
 })();

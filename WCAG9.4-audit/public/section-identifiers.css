@@ -1,8 +1,18 @@
 /**
- * Section Identifiers CSS
+ * Section Identifiers CSS - WCAG Accessibility Audit Tool
  * 
  * This stylesheet provides isolated styles for section identifiers.
  * It uses specific class selectors and is conditionally activated.
+ * 
+ * Features:
+ * - High visibility colors for easy spotting
+ * - Enhanced tooltips with detailed component information
+ * - Non-intrusive implementation
+ * - Persisted identifiers across page loads
+ * - Type-specific colors for better categorization
+ * - Structured, rich tooltip display with improved readability
+ * - Focused section highlighting
+ * - Smart positioning to avoid viewport edges
  */
 
 /* Base styles for section identifiers - hidden by default */
@@ -201,4 +211,101 @@
 
 .section-identifiers-toggle:hover::after {
   opacity: 1;
+}
+
+/**
+ * Enhanced Tooltip Styling
+ * This replaces the CSS ::after pseudo-element tooltips with 
+ * richer, interactive and better positioned tooltips
+ */
+
+/* Hide the default tooltips when using enhanced tooltips */
+.section-identifiers-enabled .section-identifier::after {
+  display: none;
+}
+
+/* Custom enhanced tooltip */
+.section-identifier-tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.95);
+  color: white;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 10002; /* Higher than identifiers */
+  max-width: 450px;
+  min-width: 320px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  pointer-events: none; /* Allow clicking through */
+  backdrop-filter: blur(8px); /* Modern glass effect */
+  transform: translateY(5px);
+  overflow: hidden;
+}
+
+/* Header of the tooltip */
+.tooltip-header {
+  background-color: rgba(255, 20, 147, 0.9); /* Match the marker color */
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: bold;
+}
+
+/* Type badge in the header */
+.tooltip-type {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Content area of the tooltip */
+.tooltip-content {
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Section within tooltip */
+.tooltip-section {
+  margin-bottom: 6px;
+}
+
+/* Path display */
+.tooltip-path {
+  font-family: monospace;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+  word-break: break-all;
+  display: block;
+  margin-top: 4px;
+}
+
+/* Style for interaction section */
+.tooltip-section.interaction {
+  border-left: 2px solid rgba(255, 20, 147, 0.5);
+  padding-left: 8px;
+}
+
+/* Style for content section */
+.tooltip-section.content {
+  border-left: 2px solid rgba(5, 150, 105, 0.7);
+  padding-left: 8px;
+}
+
+/* Special hover state for section identifiers with enhanced tooltips */
+.section-identifier:hover {
+  transform: scale(1.1) translate(-4px, -4px);
+  box-shadow: 0 0 0 3px white; /* Thicker white outline for focused identifiers */
+  z-index: 10001; /* Bring to front when hovered */
 }
