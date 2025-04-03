@@ -141,115 +141,222 @@ function generateRandomColor(): string {
   return rgbToHex(rgb.r, rgb.g, rgb.b);
 }
 
-function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all', settings?: ExpertSettings): ColorCombination[] {
+function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all'): ColorCombination[] {
   const combinations: ColorCombination[] = [];
   const baseRgb = hexToRgb(baseColor);
   const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+  
+  // More Coolors.co-style approach - create a cohesive palette first
+  let colorPalette: string[] = [];
+  
+  // First, let's create a palette based on the harmony type
+  switch (harmonyType) {
+    case 'complementary':
+      // Base color + variations + complementary + variations
+      colorPalette = createComplementaryPalette(baseHsl);
+      break;
+    
+    case 'analogous':
+      // Base color + adjacent colors with variations
+      colorPalette = createAnalogousPalette(baseHsl);
+      break;
+      
+    case 'triadic':
+      // Base color + two colors evenly spaced on the color wheel
+      colorPalette = createTriadicPalette(baseHsl);
+      break;
+      
+    case 'split-complementary':
+      // Base color + colors adjacent to the complement
+      colorPalette = createSplitComplementaryPalette(baseHsl);
+      break;
+      
+    case 'all':
+    default:
+      // Mix of techniques based on the base color
+      colorPalette = createMixedPalette(baseHsl);
+      break;
+  }
+  
+  // Limit to 5 colors max like Coolors.co
+  colorPalette = colorPalette.slice(0, 5);
+  
+  // Now generate accessible combinations using the palette
+  for (const bgColor of colorPalette) {
+    const bgRgb = hexToRgb(bgColor);
+    const bgHsl = rgbToHsl(bgRgb.r, bgRgb.g, bgRgb.b);
+    const bgLuminance = getLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
+    
+    // Test with white text
+    const whiteLuminance = 1; // White has luminance of 1
+    const whiteContrast = getContrastRatio(whiteLuminance, bgLuminance);
+    
+    // Test with black text
+    const blackLuminance = 0; // Black has luminance of 0
+    const blackContrast = getContrastRatio(blackLuminance, bgLuminance);
+    
+    // Use the better contrast option
+    const textColor = whiteContrast > blackContrast ? '#FFFFFF' : '#000000';
+    const ratio = Math.max(whiteContrast, blackContrast);
+    
+    // Determine WCAG level
+    const wcagLevel = getWCAGLevel(ratio);
+    
+    // Name the combination based on the relationship to the base color
+    let name = determineColorName(baseHsl, bgHsl, harmonyType);
+    
+    // Add to combinations
+    combinations.push({
+      background: bgColor,
+      text: textColor,
+      name,
+      ratio,
+      wcagLevel
+    });
+  }
+  
+  // Sort combinations by WCAG level (AAA first, then AA, then fails)
+  return combinations.sort((a, b) => {
+    if (a.wcagLevel !== b.wcagLevel) {
+      if (a.wcagLevel === 'AAA') return -1;
+      if (b.wcagLevel === 'AAA') return 1;
+      if (a.wcagLevel === 'AA') return -1;
+      if (b.wcagLevel === 'AA') return 1;
+    }
+    return b.ratio - a.ratio;
+  });
+}
 
-  // Get expert settings or use defaults
-  const minContrast = settings?.minContrast || 4.5;
-  const maxContrast = settings?.maxContrast || 21;
-  const saturationRange = settings?.saturationRange || [60, 100];
-  const lightnessRange = settings?.lightnessRange || [20, 80];
+// Helper functions to create color palettes similar to Coolors.co
 
-  // Generate complementary colors
+function createComplementaryPalette(baseHsl: { h: number, s: number, l: number }): string[] {
+  const palette: string[] = [];
   const complementaryHue = (baseHsl.h + 180) % 360;
   
-  // Generate analogous colors
-  const analogousHue1 = (baseHsl.h + 30) % 360;
-  const analogousHue2 = (baseHsl.h - 30 + 360) % 360;
+  // Add variations of the base color
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l));
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 15, 10)));
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 15, 90)));
   
-  // Generate triadic colors
+  // Add complementary color and variation
+  palette.push(hslToHexString(complementaryHue, baseHsl.s, baseHsl.l));
+  palette.push(hslToHexString(complementaryHue, baseHsl.s, Math.max(baseHsl.l - 15, 10)));
+  
+  return palette;
+}
+
+function createAnalogousPalette(baseHsl: { h: number, s: number, l: number }): string[] {
+  const palette: string[] = [];
+  
+  // Create a smooth progression of analogous colors
+  palette.push(hslToHexString((baseHsl.h - 30 + 360) % 360, baseHsl.s, baseHsl.l + 5));
+  palette.push(hslToHexString((baseHsl.h - 15 + 360) % 360, baseHsl.s, baseHsl.l));
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l));
+  palette.push(hslToHexString((baseHsl.h + 15) % 360, baseHsl.s, baseHsl.l));
+  palette.push(hslToHexString((baseHsl.h + 30) % 360, baseHsl.s, baseHsl.l - 5));
+  
+  return palette;
+}
+
+function createTriadicPalette(baseHsl: { h: number, s: number, l: number }): string[] {
+  const palette: string[] = [];
   const triadicHue1 = (baseHsl.h + 120) % 360;
   const triadicHue2 = (baseHsl.h + 240) % 360;
-
-  // Generate split complementary colors
-  const splitComp1 = (baseHsl.h + 150) % 360;
-  const splitComp2 = (baseHsl.h + 210) % 360;
-
-  // Create array of hues based on the selected harmony type
-  let hues: Array<{ h: number, name: string }> = [];
   
-  // Always include the base color
-  hues.push({ h: baseHsl.h, name: 'Base' });
+  // Base color and variations
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l));
   
-  // Add colors based on harmony type
-  if (harmonyType === 'all' || harmonyType === 'complementary') {
-    hues.push({ h: complementaryHue, name: 'Complementary' });
+  // First triadic color and variations
+  palette.push(hslToHexString(triadicHue1, baseHsl.s, Math.min(baseHsl.l + 10, 90)));
+  palette.push(hslToHexString(triadicHue1, baseHsl.s - 10, baseHsl.l));
+  
+  // Second triadic color and variations
+  palette.push(hslToHexString(triadicHue2, baseHsl.s, Math.max(baseHsl.l - 10, 10)));
+  palette.push(hslToHexString(triadicHue2, baseHsl.s - 10, baseHsl.l));
+  
+  return palette;
+}
+
+function createSplitComplementaryPalette(baseHsl: { h: number, s: number, l: number }): string[] {
+  const palette: string[] = [];
+  const complementaryHue = (baseHsl.h + 180) % 360;
+  const splitComp1 = (complementaryHue - 30 + 360) % 360;
+  const splitComp2 = (complementaryHue + 30) % 360;
+  
+  // Base color
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l));
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s - 10, Math.min(baseHsl.l + 15, 90)));
+  
+  // Split complementary colors
+  palette.push(hslToHexString(splitComp1, baseHsl.s, baseHsl.l));
+  palette.push(hslToHexString(splitComp2, baseHsl.s, baseHsl.l));
+  palette.push(hslToHexString(complementaryHue, baseHsl.s - 5, baseHsl.l - 5));
+  
+  return palette;
+}
+
+function createMixedPalette(baseHsl: { h: number, s: number, l: number }): string[] {
+  const palette: string[] = [];
+  
+  // Base color
+  palette.push(hslToHexString(baseHsl.h, baseHsl.s, baseHsl.l));
+  
+  // Analogous
+  palette.push(hslToHexString((baseHsl.h + 30) % 360, baseHsl.s, baseHsl.l - 10));
+  
+  // Split complementary
+  const complementaryHue = (baseHsl.h + 180) % 360;
+  palette.push(hslToHexString((complementaryHue - 30 + 360) % 360, baseHsl.s - 5, baseHsl.l + 5));
+  
+  // Triadic
+  palette.push(hslToHexString((baseHsl.h + 120) % 360, baseHsl.s - 10, baseHsl.l + 10));
+  
+  // Complementary
+  palette.push(hslToHexString(complementaryHue, baseHsl.s, baseHsl.l));
+  
+  return palette;
+}
+
+function hslToHexString(h: number, s: number, l: number): string {
+  const rgb = hslToRgb(h, s, l);
+  return rgbToHex(rgb.r, rgb.g, rgb.b);
+}
+
+function determineColorName(baseHsl: { h: number, s: number, l: number }, colorHsl: { h: number, s: number, l: number }, harmonyType: string): string {
+  // Calculate hue difference
+  const hueDiff = Math.abs(baseHsl.h - colorHsl.h);
+  
+  // Base color or variation
+  if (hueDiff < 15) {
+    if (Math.abs(baseHsl.l - colorHsl.l) < 5) {
+      return 'Base';
+    } else {
+      return colorHsl.l > baseHsl.l ? 'Lighter Base' : 'Darker Base';
+    }
   }
   
-  if (harmonyType === 'all' || harmonyType === 'analogous') {
-    hues.push({ h: analogousHue1, name: 'Analogous 1' });
-    hues.push({ h: analogousHue2, name: 'Analogous 2' });
+  // Check for complementary (180° away)
+  if (Math.abs(hueDiff - 180) < 15) {
+    return 'Complementary';
   }
   
-  if (harmonyType === 'all' || harmonyType === 'triadic') {
-    hues.push({ h: triadicHue1, name: 'Triadic 1' });
-    hues.push({ h: triadicHue2, name: 'Triadic 2' });
+  // Check for analogous (30° away)
+  if (hueDiff <= 40) {
+    return 'Analogous';
   }
   
-  if (harmonyType === 'all' || harmonyType === 'split-complementary') {
-    hues.push({ h: splitComp1, name: 'Split Comp 1' });
-    hues.push({ h: splitComp2, name: 'Split Comp 2' });
+  // Check for triadic (120° away)
+  if (Math.abs(hueDiff - 120) < 15 || Math.abs(hueDiff - 240) < 15) {
+    return 'Triadic';
   }
-
-  // For each hue, generate variations with different saturations and lightnesses
-  hues.forEach(({ h, name }) => {
-    // Generate dynamic variations based on saturation and lightness ranges
-    const satStep = (saturationRange[1] - saturationRange[0]) / 3;
-    const lightStep = (lightnessRange[1] - lightnessRange[0]) / 3;
-    
-    const variations = [
-      { 
-        s: Math.min(saturationRange[1], 90), 
-        l: lightnessRange[0], 
-        suffix: 'Dark' 
-      },
-      { 
-        s: saturationRange[0] + satStep * 2, 
-        l: lightnessRange[0] + lightStep, 
-        suffix: 'Deep' 
-      },
-      { 
-        s: saturationRange[0] + satStep, 
-        l: lightnessRange[0] + lightStep * 2, 
-        suffix: 'Medium' 
-      },
-      { 
-        s: saturationRange[0], 
-        l: lightnessRange[1], 
-        suffix: 'Light' 
-      }
-    ];
-
-    variations.forEach(({ s, l, suffix }) => {
-      const bgRgb = hslToRgb(h, s, l);
-      const bgHex = rgbToHex(bgRgb.r, bgRgb.g, bgRgb.b);
-      const bgLuminance = getLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
-
-      // Test with white and black text
-      const whiteContrast = getContrastRatio(bgLuminance, 1);
-      const blackContrast = getContrastRatio(bgLuminance, 0);
-      
-      const ratio = Math.max(whiteContrast, blackContrast);
-      
-      // Only include combinations that meet the contrast requirements
-      if (ratio >= minContrast && ratio <= maxContrast) {
-        const textColor = whiteContrast > blackContrast ? '#ffffff' : '#000000';
-
-        combinations.push({
-          background: bgHex,
-          text: textColor,
-          name: `${name} ${suffix}`,
-          ratio,
-          wcagLevel: getWCAGLevel(ratio)
-        });
-      }
-    });
-  });
-
-  // Sort by contrast ratio
-  return combinations.sort((a, b) => b.ratio - a.ratio);
+  
+  // Check for split complementary
+  if (Math.abs(hueDiff - 150) < 15 || Math.abs(hueDiff - 210) < 15) {
+    return 'Split Complementary';
+  }
+  
+  // If it doesn't match a specific relationship, use the harmony type
+  return harmonyType.charAt(0).toUpperCase() + harmonyType.slice(1);
 }
 
 export function WCAGColorPalette() {
@@ -278,7 +385,7 @@ export function WCAGColorPalette() {
     setTimeout(() => {
       const newBaseColor = generateRandomColor();
       setBaseColor(newBaseColor);
-      const newPalette = generateAccessiblePalette(newBaseColor, expertSettings.colorHarmony, expertSettings);
+      const newPalette = generateAccessiblePalette(newBaseColor, expertSettings.colorHarmony);
       setGeneratedPalette(newPalette);
       setIsGenerating(false);
     }, 500);
@@ -287,7 +394,7 @@ export function WCAGColorPalette() {
   const handleBaseColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = e.target.value;
     setBaseColor(newColor);
-    const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony, expertSettings);
+    const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony);
     setGeneratedPalette(newPalette);
   };
 
@@ -537,7 +644,7 @@ export function WCAGColorPalette() {
                     const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
                     if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
                       setBaseColor(newColor);
-                      const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony, expertSettings);
+                      const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony);
                       setGeneratedPalette(newPalette);
                     }
                   }}
