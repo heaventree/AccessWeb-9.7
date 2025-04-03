@@ -415,19 +415,28 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                             };
                             
                             try {
+                              // Sanitize the target selector to make it safe
+                              const sanitizeSelector = (selector: string) => {
+                                return selector
+                                  .replace(/[^\w\s\-_.#[\]='"]/g, '')  // Remove potentially unsafe characters
+                                  .trim() || 'body';  // Default to body if empty after sanitizing
+                              };
+                              
                               fixEngine.applyFix(selectedSite, {
                                 id: issue.id,
-                                targetSelector: issue.nodes[0] || 'body',
+                                targetSelector: sanitizeSelector(issue.nodes[0] || 'body'),
                                 cssProperties: [
                                   { name: 'outline', value: '2px solid red' },
                                   { name: 'position', value: 'relative' }
                                 ],
-                                wcagCriteria: issue.wcagCriteria || ['2.4.1'],
+                                wcagCriteria: issue.wcagCriteria && issue.wcagCriteria.length > 0 
+                                  ? issue.wcagCriteria 
+                                  : ['1.4.3'], // Default to contrast ratio if none specified
                                 description: `Fix for: ${issue.description}`,
                                 createdAt: new Date().toISOString(),
                                 metadata: {
                                   issueId: issue.id,
-                                  impact: issue.impact,
+                                  impact: issue.impact || 'moderate',
                                   nodes: issue.nodes
                                 }
                               }).then(result => {
