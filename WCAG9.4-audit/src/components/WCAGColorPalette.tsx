@@ -179,8 +179,47 @@ function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all
       break;
   }
   
-  // Limit to 5 colors max like Coolors.co
-  colorPalette = colorPalette.slice(0, 5);
+  // Limit to either 6 or 9 colors for a tidy layout (3x2 or 3x3 grid)
+  // If we have between 4 and 6 colors, keep them all
+  // If we have more than 6, extend to 9 by adding variations
+  // If we have less than 4, extend to 6 by adding more variations
+  
+  if (colorPalette.length > 6 && colorPalette.length < 9) {
+    // Extend to 9 colors by adding variations (lighten/darken) of existing colors
+    const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+    while (colorPalette.length < 9) {
+      // Add more variations based on the base color and existing palette colors
+      if (colorPalette.length % 2 === 0) {
+        // Add a lighter variation of the base
+        colorPalette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 25, 90)));
+      } else {
+        // Add a darker variation of the base
+        colorPalette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.max(baseHsl.l - 25, 10)));
+      }
+    }
+  } else if (colorPalette.length < 4) {
+    // Extend to 6 colors
+    const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+    const complementHue = (baseHsl.h + 180) % 360;
+    
+    // Add variations to reach 6 colors
+    while (colorPalette.length < 6) {
+      const index = colorPalette.length;
+      if (index % 3 === 0) {
+        // Add lighter variations
+        colorPalette.push(hslToHexString(baseHsl.h, baseHsl.s, Math.min(baseHsl.l + 20, 90)));
+      } else if (index % 3 === 1) {
+        // Add complementary variations
+        colorPalette.push(hslToHexString(complementHue, baseHsl.s, baseHsl.l));
+      } else {
+        // Add darker variations
+        colorPalette.push(hslToHexString(baseHsl.h, baseHsl.s - 10, Math.max(baseHsl.l - 20, 10)));
+      }
+    }
+  } else if (colorPalette.length > 9) {
+    // If more than 9, trim to exactly 9
+    colorPalette = colorPalette.slice(0, 9);
+  }
   
   // Make sure the base color is always first in the palette
   // First, check if the base color is already in the palette
@@ -188,8 +227,13 @@ function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all
   if (!colorPalette.includes(baseColorHex)) {
     // If not, add it to the beginning
     colorPalette.unshift(baseColorHex);
-    // Keep the palette limited to 5 colors
-    colorPalette = colorPalette.slice(0, 5);
+    
+    // Now make sure we still have either 6 or 9 colors total
+    if (colorPalette.length > 9) {
+      colorPalette = colorPalette.slice(0, 9);
+    } else if (colorPalette.length > 6 && colorPalette.length < 9) {
+      colorPalette = colorPalette.slice(0, 6);
+    }
   } else {
     // If it exists, move it to the front
     const index = colorPalette.indexOf(baseColorHex);
