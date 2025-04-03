@@ -10,7 +10,8 @@ import {
   CheckCircle, 
   Video, 
   Headphones, 
-  MonitorSmartphone 
+  MonitorSmartphone,
+  Zap
 } from 'lucide-react';
 import type { AccessibilityIssue, WCAGInfo } from '../types';
 import { Modal } from './Modal';
@@ -381,7 +382,7 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
 
                   {type !== 'passes' && (
                     <>
-                      <div className="mt-4 flex gap-2">
+                      <div className="mt-4 flex gap-2 flex-wrap">
                         <button
                           onClick={() => openIssueFix(issue)}
                           className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors border border-blue-200 shadow-sm"
@@ -397,6 +398,14 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                         >
                           <Info className="w-4 h-4 mr-2" aria-hidden="true" />
                           Learn More
+                        </button>
+                        <button
+                          onClick={() => console.log(`Implement fix for issue: ${issue.id}`)}
+                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition-colors border border-green-200 shadow-sm"
+                          aria-label={`Apply fix for ${issue.description}`}
+                        >
+                          <Zap className="w-4 h-4 mr-2" aria-hidden="true" />
+                          Apply Fix
                         </button>
                       </div>
                       

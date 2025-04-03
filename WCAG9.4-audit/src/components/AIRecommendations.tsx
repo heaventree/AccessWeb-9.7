@@ -58,6 +58,7 @@ export function AIRecommendations({ issue }: AIRecommendationsProps) {
         >
           <Brain className="w-4 h-4 mr-2" />
           Get AI Suggestions
+          <span className="ml-2 px-1.5 py-0.5 text-xs font-semibold bg-yellow-400 text-blue-800 rounded">PRO</span>
         </button>
       )}
 
