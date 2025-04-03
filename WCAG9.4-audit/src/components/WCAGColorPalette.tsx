@@ -141,10 +141,16 @@ function generateRandomColor(): string {
   return rgbToHex(rgb.r, rgb.g, rgb.b);
 }
 
-function generateAccessiblePalette(baseColor: string): ColorCombination[] {
+function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all', settings?: ExpertSettings): ColorCombination[] {
   const combinations: ColorCombination[] = [];
   const baseRgb = hexToRgb(baseColor);
   const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+
+  // Get expert settings or use defaults
+  const minContrast = settings?.minContrast || 4.5;
+  const maxContrast = settings?.maxContrast || 21;
+  const saturationRange = settings?.saturationRange || [60, 100];
+  const lightnessRange = settings?.lightnessRange || [20, 80];
 
   // Generate complementary colors
   const complementaryHue = (baseHsl.h + 180) % 360;
@@ -161,25 +167,59 @@ function generateAccessiblePalette(baseColor: string): ColorCombination[] {
   const splitComp1 = (baseHsl.h + 150) % 360;
   const splitComp2 = (baseHsl.h + 210) % 360;
 
-  const hues = [
-    { h: baseHsl.h, name: 'Base' },
-    { h: complementaryHue, name: 'Complementary' },
-    { h: analogousHue1, name: 'Analogous 1' },
-    { h: analogousHue2, name: 'Analogous 2' },
-    { h: triadicHue1, name: 'Triadic 1' },
-    { h: triadicHue2, name: 'Triadic 2' },
-    { h: splitComp1, name: 'Split Comp 1' },
-    { h: splitComp2, name: 'Split Comp 2' }
-  ];
+  // Create array of hues based on the selected harmony type
+  let hues: Array<{ h: number, name: string }> = [];
+  
+  // Always include the base color
+  hues.push({ h: baseHsl.h, name: 'Base' });
+  
+  // Add colors based on harmony type
+  if (harmonyType === 'all' || harmonyType === 'complementary') {
+    hues.push({ h: complementaryHue, name: 'Complementary' });
+  }
+  
+  if (harmonyType === 'all' || harmonyType === 'analogous') {
+    hues.push({ h: analogousHue1, name: 'Analogous 1' });
+    hues.push({ h: analogousHue2, name: 'Analogous 2' });
+  }
+  
+  if (harmonyType === 'all' || harmonyType === 'triadic') {
+    hues.push({ h: triadicHue1, name: 'Triadic 1' });
+    hues.push({ h: triadicHue2, name: 'Triadic 2' });
+  }
+  
+  if (harmonyType === 'all' || harmonyType === 'split-complementary') {
+    hues.push({ h: splitComp1, name: 'Split Comp 1' });
+    hues.push({ h: splitComp2, name: 'Split Comp 2' });
+  }
 
   // For each hue, generate variations with different saturations and lightnesses
   hues.forEach(({ h, name }) => {
-    // Generate variations
+    // Generate dynamic variations based on saturation and lightness ranges
+    const satStep = (saturationRange[1] - saturationRange[0]) / 3;
+    const lightStep = (lightnessRange[1] - lightnessRange[0]) / 3;
+    
     const variations = [
-      { s: 90, l: 20, suffix: 'Dark' },
-      { s: 80, l: 40, suffix: 'Deep' },
-      { s: 70, l: 60, suffix: 'Medium' },
-      { s: 60, l: 80, suffix: 'Light' }
+      { 
+        s: Math.min(saturationRange[1], 90), 
+        l: lightnessRange[0], 
+        suffix: 'Dark' 
+      },
+      { 
+        s: saturationRange[0] + satStep * 2, 
+        l: lightnessRange[0] + lightStep, 
+        suffix: 'Deep' 
+      },
+      { 
+        s: saturationRange[0] + satStep, 
+        l: lightnessRange[0] + lightStep * 2, 
+        suffix: 'Medium' 
+      },
+      { 
+        s: saturationRange[0], 
+        l: lightnessRange[1], 
+        suffix: 'Light' 
+      }
     ];
 
     variations.forEach(({ s, l, suffix }) => {
@@ -190,10 +230,12 @@ function generateAccessiblePalette(baseColor: string): ColorCombination[] {
       // Test with white and black text
       const whiteContrast = getContrastRatio(bgLuminance, 1);
       const blackContrast = getContrastRatio(bgLuminance, 0);
-
-      if (whiteContrast >= 4.5 || blackContrast >= 4.5) {
+      
+      const ratio = Math.max(whiteContrast, blackContrast);
+      
+      // Only include combinations that meet the contrast requirements
+      if (ratio >= minContrast && ratio <= maxContrast) {
         const textColor = whiteContrast > blackContrast ? '#ffffff' : '#000000';
-        const ratio = Math.max(whiteContrast, blackContrast);
 
         combinations.push({
           background: bgHex,
@@ -236,7 +278,7 @@ export function WCAGColorPalette() {
     setTimeout(() => {
       const newBaseColor = generateRandomColor();
       setBaseColor(newBaseColor);
-      const newPalette = generateAccessiblePalette(newBaseColor);
+      const newPalette = generateAccessiblePalette(newBaseColor, expertSettings.colorHarmony, expertSettings);
       setGeneratedPalette(newPalette);
       setIsGenerating(false);
     }, 500);
@@ -245,7 +287,7 @@ export function WCAGColorPalette() {
   const handleBaseColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = e.target.value;
     setBaseColor(newColor);
-    const newPalette = generateAccessiblePalette(newColor);
+    const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony, expertSettings);
     setGeneratedPalette(newPalette);
   };
 
@@ -495,7 +537,7 @@ export function WCAGColorPalette() {
                     const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
                     if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
                       setBaseColor(newColor);
-                      const newPalette = generateAccessiblePalette(newColor);
+                      const newPalette = generateAccessiblePalette(newColor, expertSettings.colorHarmony, expertSettings);
                       setGeneratedPalette(newPalette);
                     }
                   }}
@@ -621,7 +663,17 @@ export function WCAGColorPalette() {
           </div>
           </div>
           </>
-        ) : null}
+        ) : (
+          <EmptyState
+            title="No Color Palette Generated"
+            description="Generate a new color palette to see accessible color combinations"
+            icon={<Palette className="h-6 w-6 text-gray-600" />}
+            action={{
+              label: 'Generate Palette',
+              onClick: generateNewPalette
+            }}
+          />
+        )}
 
         {/* Usage Guidelines */}
         <div className="mt-12 bg-white rounded-lg shadow-sm p-6">
