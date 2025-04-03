@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './providers/AppProvider';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ContainerIdProvider } from './contexts/ContainerIdContext';
 import { LandingPage } from './pages/LandingPage';
 import { PricingPage } from './pages/PricingPage';
 import { SubscriptionDashboard } from './pages/SubscriptionDashboard';
@@ -64,75 +65,77 @@ import { ErrorPage } from './components/ErrorPage';
 function App() {
   return (
     <AppProvider>
-      <ErrorBoundary>
-        <Router>
-          <ScrollToTop />
-          <Toaster position="top-center" />
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <a href="#main-content" className="skip-to-main">Skip to main content</a>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<><Navigation /><main id="main-content"><LandingPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/pricing" element={<><Navigation /><main id="main-content"><PricingPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/wordpressint" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/checker" element={<><Navigation /><main id="main-content"><WCAGCheckerPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/tools/wcag-standards" element={<WCAGStandardsTable />} />
-              <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
-              <Route path="/tools/monitoring" element={<MonitoringPage />} />
-              <Route path="/tools/realtime" element={<RealTimeMonitorPage />} />
-              <Route path="/my-account/connections" element={<ProtectedRoute><ConnectionsPage /></ProtectedRoute>} />
-              <Route path="/my-account/connections/custom-api" element={<ProtectedRoute><CustomAPIPage /></ProtectedRoute>} />
-              <Route path="/my-account/connections/shopify" element={<ProtectedRoute><ShopifyAPIPage /></ProtectedRoute>} />
-              <Route path="/my-account/connections/wordpress" element={<ProtectedRoute><WordPressAPIPage /></ProtectedRoute>} />
-              <Route path="/integrations/wordpress" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/tools/analytics" element={<><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/tools/compliance" element={<><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></>} />
-              <Route path="/integrations/api" element={<><Navigation /><main id="main-content"><APIIntegrationPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/integrations/compliance" element={<><Navigation /><main id="main-content"><ComplianceIntegrationPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/integrations/enterprise" element={<><Navigation /><main id="main-content"><EnterpriseIntegrationPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/docs" element={<><Navigation /><main id="main-content"><DocumentationPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/docs/api" element={<><Navigation /><main id="main-content"><APIGuide /></main><Footer /><BackToTop /></>} />
-              <Route path="/knowledge-base" element={<><Navigation /><main id="main-content"><KnowledgeBasePage /></main><Footer /><BackToTop /></>} />
-              <Route path="/blog" element={<><Navigation /><main id="main-content"><BlogPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/blog/:slug" element={<><Navigation /><main id="main-content"><ArticlePage /></main><Footer /><BackToTop /></>} />
-              <Route path="/wcag-resources" element={<><Navigation /><main id="main-content"><WcagResourcesPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/help" element={<HelpCenter />} />
-              <Route path="/help/:slug" element={<HelpArticle />} />
-              <Route path="/login" element={<AuthPage />} />
-              <Route path="/signup" element={<AuthPage />} />
-              <Route path="/admin/login" element={<AdminLoginPage />} />
+      <ContainerIdProvider>
+        <ErrorBoundary>
+          <Router>
+            <ScrollToTop />
+            <Toaster position="top-center" />
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+              <a href="#main-content" className="skip-to-main">Skip to main content</a>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<><Navigation /><main id="main-content"><LandingPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/pricing" element={<><Navigation /><main id="main-content"><PricingPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/wordpressint" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/checker" element={<><Navigation /><main id="main-content"><WCAGCheckerPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/tools/wcag-standards" element={<WCAGStandardsTable />} />
+                <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
+                <Route path="/tools/monitoring" element={<MonitoringPage />} />
+                <Route path="/tools/realtime" element={<RealTimeMonitorPage />} />
+                <Route path="/my-account/connections" element={<ProtectedRoute><ConnectionsPage /></ProtectedRoute>} />
+                <Route path="/my-account/connections/custom-api" element={<ProtectedRoute><CustomAPIPage /></ProtectedRoute>} />
+                <Route path="/my-account/connections/shopify" element={<ProtectedRoute><ShopifyAPIPage /></ProtectedRoute>} />
+                <Route path="/my-account/connections/wordpress" element={<ProtectedRoute><WordPressAPIPage /></ProtectedRoute>} />
+                <Route path="/integrations/wordpress" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/tools/analytics" element={<><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/tools/compliance" element={<><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></>} />
+                <Route path="/integrations/api" element={<><Navigation /><main id="main-content"><APIIntegrationPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/integrations/compliance" element={<><Navigation /><main id="main-content"><ComplianceIntegrationPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/integrations/enterprise" element={<><Navigation /><main id="main-content"><EnterpriseIntegrationPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/docs" element={<><Navigation /><main id="main-content"><DocumentationPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/docs/api" element={<><Navigation /><main id="main-content"><APIGuide /></main><Footer /><BackToTop /></>} />
+                <Route path="/knowledge-base" element={<><Navigation /><main id="main-content"><KnowledgeBasePage /></main><Footer /><BackToTop /></>} />
+                <Route path="/blog" element={<><Navigation /><main id="main-content"><BlogPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/blog/:slug" element={<><Navigation /><main id="main-content"><ArticlePage /></main><Footer /><BackToTop /></>} />
+                <Route path="/wcag-resources" element={<><Navigation /><main id="main-content"><WcagResourcesPage /></main><Footer /><BackToTop /></>} />
+                <Route path="/help" element={<HelpCenter />} />
+                <Route path="/help/:slug" element={<HelpArticle />} />
+                <Route path="/login" element={<AuthPage />} />
+                <Route path="/signup" element={<AuthPage />} />
+                <Route path="/admin/login" element={<AdminLoginPage />} />
 
-              {/* Protected Routes */}
-              <Route path="/dashboard" element={<ProtectedRoute><><Navigation /><main id="main-content"><SubscriptionDashboard /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/billing" element={<ProtectedRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><><Navigation /><main id="main-content"><SettingsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/team" element={<ProtectedRoute><><Navigation /><main id="main-content"><TeamPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/integrations/shopify" element={<ProtectedRoute><><Navigation /><main id="main-content"><ShopifyIntegrationPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/payment/:planId" element={<ProtectedRoute><><Navigation /><main id="main-content"><PaymentPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+                {/* Protected Routes */}
+                <Route path="/dashboard" element={<ProtectedRoute><><Navigation /><main id="main-content"><SubscriptionDashboard /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+                <Route path="/billing" element={<ProtectedRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><><Navigation /><main id="main-content"><SettingsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+                <Route path="/team" element={<ProtectedRoute><><Navigation /><main id="main-content"><TeamPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+                <Route path="/integrations/shopify" element={<ProtectedRoute><><Navigation /><main id="main-content"><ShopifyIntegrationPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+                <Route path="/payment/:planId" element={<ProtectedRoute><><Navigation /><main id="main-content"><PaymentPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
 
-              {/* Admin Routes */}
-              <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="packages" element={<AdminPackages />} />
-                <Route path="clients" element={<AdminClients />} />
-                <Route path="reports" element={<AdminReports />} />
-                <Route path="payments" element={<AdminPayments />} />
-                <Route path="payment-gateways" element={<AdminPaymentGateways />} />
-                <Route path="cms/*" element={<AdminCMS />} />
-              </Route>
+                {/* Admin Routes */}
+                <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="packages" element={<AdminPackages />} />
+                  <Route path="clients" element={<AdminClients />} />
+                  <Route path="reports" element={<AdminReports />} />
+                  <Route path="payments" element={<AdminPayments />} />
+                  <Route path="payment-gateways" element={<AdminPaymentGateways />} />
+                  <Route path="cms/*" element={<AdminCMS />} />
+                </Route>
 
-              {/* 404 Route */}
-              <Route path="*" element={
-                <ErrorPage
-                  title="Page Not Found"
-                  message="The page you're looking for doesn't exist. Please check the URL or navigate back to the homepage."
-                />
-              } />
-            </Routes>
-            <AccessibilityToolbar />
-          </div>
-        </Router>
-      </ErrorBoundary>
+                {/* 404 Route */}
+                <Route path="*" element={
+                  <ErrorPage
+                    title="Page Not Found"
+                    message="The page you're looking for doesn't exist. Please check the URL or navigate back to the homepage."
+                  />
+                } />
+              </Routes>
+              <AccessibilityToolbar />
+            </div>
+          </Router>
+        </ErrorBoundary>
+      </ContainerIdProvider>
     </AppProvider>
   );
 }
