@@ -92,6 +92,17 @@ export function CustomAPISetup() {
 
   return (
     <div className="space-y-6">
+      {/* Return to My Connections link */}
+      <div className="mb-6">
+        <Link 
+          to="/my-account/connections" 
+          className="inline-flex items-center text-blue-600 hover:text-blue-800"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Return to My Connections
+        </Link>
+      </div>
+      
       {/* API Documentation Link */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
         <div className="flex items-start">
@@ -357,17 +368,6 @@ export function CustomAPISetup() {
               </div>
             </div>
           </motion.div>
-        </div>
-        
-        {/* Return to My Connections link */}
-        <div className="mt-8">
-          <Link 
-            to="/my-account/connections" 
-            className="inline-flex items-center text-blue-600 hover:text-blue-800"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Return to My Connections
-          </Link>
         </div>
     </div>
   );
