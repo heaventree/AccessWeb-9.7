@@ -116,6 +116,10 @@ function App() {
 
               {/* Protected Routes */}
               <Route path="/dashboard" element={<ProtectedRoute><><Navigation /><main id="main-content"><SubscriptionDashboard /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/my-account/billing" element={<ProtectedRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/my-account/settings" element={<ProtectedRoute><><Navigation /><main id="main-content"><SettingsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/my-account/team" element={<ProtectedRoute><><Navigation /><main id="main-content"><TeamPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              {/* Keep old routes for backwards compatibility */}
               <Route path="/billing" element={<ProtectedRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><><Navigation /><main id="main-content"><SettingsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               <Route path="/team" element={<ProtectedRoute><><Navigation /><main id="main-content"><TeamPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />

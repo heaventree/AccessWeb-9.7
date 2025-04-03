@@ -11,96 +11,55 @@ interface UsageAlert {
   created_at: string;
 }
 
+// Mock data for development
+const mockAlerts: UsageAlert[] = [
+  {
+    id: '1',
+    feature_key: 'Scan Limit',
+    message: 'You have used 85% of your monthly scans (85/100)',
+    type: 'warning',
+    acknowledged: false,
+    created_at: new Date(Date.now() - 86400000).toISOString() // 1 day ago
+  },
+  {
+    id: '2',
+    feature_key: 'API Calls',
+    message: 'You have exceeded your API call limit (1050/1000)',
+    type: 'critical',
+    acknowledged: false,
+    created_at: new Date(Date.now() - 43200000).toISOString() // 12 hours ago
+  },
+  {
+    id: '3',
+    feature_key: 'Storage',
+    message: 'You have used 60% of your storage limit (600MB/1GB)',
+    type: 'warning',
+    acknowledged: true,
+    created_at: new Date(Date.now() - 172800000).toISOString() // 2 days ago
+  }
+];
+
 export function UsageAlerts() {
   const [alerts, setAlerts] = useState<UsageAlert[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadAlerts();
-    subscribeToAlerts();
+    // Simulate loading delay
+    const timer = setTimeout(() => {
+      setAlerts(mockAlerts);
+      setLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
   }, []);
 
-  const loadAlerts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('usage_alerts')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      setAlerts(data || []);
-    } catch (error) {
-      console.error('Error loading alerts:', error);
-      toast.error('Failed to load usage alerts');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const subscribeToAlerts = () => {
-    const subscription = supabase
-      .channel('usage_alerts')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'usage_alerts'
-        },
-        (payload) => {
-          const newAlert = payload.new as UsageAlert;
-          setAlerts(prev => [newAlert, ...prev]);
-          
-          // Show toast notification for new alerts
-          toast(
-            (t) => (
-              <div className="flex items-center">
-                {newAlert.type === 'critical' ? (
-                  <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
-                ) : (
-                  <Bell className="w-5 h-5 text-yellow-500 mr-2" />
-                )}
-                <div>
-                  <p className="font-medium">{newAlert.feature_key}</p>
-                  <p className="text-sm">{newAlert.message}</p>
-                </div>
-              </div>
-            ),
-            {
-              duration: 5000,
-              style: {
-                background: newAlert.type === 'critical' ? '#FEE2E2' : '#FEF3C7',
-                color: newAlert.type === 'critical' ? '#991B1B' : '#92400E'
-              }
-            }
-          );
-        }
+  const acknowledgeAlert = (alertId: string) => {
+    setAlerts(prev => 
+      prev.map(alert => 
+        alert.id === alertId ? { ...alert, acknowledged: true } : alert
       )
-      .subscribe();
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  };
-
-  const acknowledgeAlert = async (alertId: string) => {
-    try {
-      const { error } = await supabase
-        .from('usage_alerts')
-        .update({ acknowledged: true })
-        .eq('id', alertId);
-
-      if (error) throw error;
-      setAlerts(prev => 
-        prev.map(alert => 
-          alert.id === alertId ? { ...alert, acknowledged: true } : alert
-        )
-      );
-    } catch (error) {
-      console.error('Error acknowledging alert:', error);
-      toast.error('Failed to acknowledge alert');
-    }
+    );
+    toast.success('Alert acknowledged');
   };
 
   if (loading) {
