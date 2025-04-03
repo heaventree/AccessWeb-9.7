@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { format } from 'date-fns';
 import {
   CreditCard,
@@ -16,26 +16,13 @@ import {
   XCircle,
   AlertTriangle,
   LineChart,
-  Zap,
   RefreshCw,
   Shield,
-  PieChart,
   Layers,
   MonitorPlay,
   Gauge
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Line
-} from 'recharts';
 
 // Mock data for monitoring and analytics
 const monitoringData = {
@@ -136,7 +123,7 @@ export function SubscriptionDashboard() {
   };
 
   // Helper function for alert icons
-  const getAlertIcon = (type) => {
+  const getAlertIcon = (type: string) => {
     switch (type) {
       case 'info':
         return <CheckCircle className="w-5 h-5 text-green-500" />;
@@ -515,34 +502,28 @@ export function SubscriptionDashboard() {
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-6">Compliance Trend</h3>
                 <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={analyticsData.chartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="compliance" stroke="#3b82f6" name="Compliance %" />
-                      <Line type="monotone" dataKey="issues" stroke="#ef4444" name="Issues" />
-                      <Line type="monotone" dataKey="fixes" stroke="#10b981" name="Fixes" />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  {/* Placeholder for chart - using a div until chart issues are resolved */}
+                  <div className="w-full h-full bg-gray-50 rounded-lg flex items-center justify-center">
+                    <div className="text-center">
+                      <LineChart className="w-10 h-10 mb-2 text-blue-500 mx-auto" />
+                      <p className="text-gray-600">Compliance trend chart showing improving metrics over time</p>
+                      <p className="text-gray-400 text-sm mt-1">Shows compliance increases from 65% to 90% over 6 weeks</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-6">Issues By Type</h3>
                 <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={analyticsData.issuesByType}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="value" fill="#8884d8" name="Number of Issues" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {/* Placeholder for chart - using a div until chart issues are resolved */}
+                  <div className="w-full h-full bg-gray-50 rounded-lg flex items-center justify-center">
+                    <div className="text-center">
+                      <BarChart2 className="w-10 h-10 mb-2 text-purple-500 mx-auto" />
+                      <p className="text-gray-600">Issues breakdown by category</p>
+                      <p className="text-gray-400 text-sm mt-1">Contrast: 32, Alt Text: 28, ARIA: 18, Keyboard: 12, Other: 10</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
