@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { RefreshCw, Copy, Info, Check, FileText, FileDown, Settings, X } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
@@ -144,21 +144,6 @@ function generateAccessiblePalette(baseColor: string, harmonyType: string = 'all
   const baseRgb = hexToRgb(baseColor);
   const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
 
-  // Always include exact base color first
-  const exactBaseColorLuminance = getLuminance(baseRgb.r, baseRgb.g, baseRgb.b);
-  const whiteContrastBase = getContrastRatio(exactBaseColorLuminance, 1);
-  const blackContrastBase = getContrastRatio(exactBaseColorLuminance, 0);
-  const textColorBase = whiteContrastBase > blackContrastBase ? '#ffffff' : '#000000';
-  const ratioBase = Math.max(whiteContrastBase, blackContrastBase);
-  
-  combinations.push({
-    background: baseColor,
-    text: textColorBase,
-    name: 'Base Color',
-    ratio: ratioBase,
-    wcagLevel: getWCAGLevel(ratioBase)
-  });
-
   // Generate complementary colors
   const complementaryHue = (baseHsl.h + 180) % 360;
   
@@ -262,13 +247,6 @@ export function WCAGColorPalette() {
   const [baseColor, setBaseColor] = useState('#1a365d');
   const [generatedPalette, setGeneratedPalette] = useState<ColorCombination[]>([]);
   const [showExpertSettings, setShowExpertSettings] = useState(false);
-  
-  // Initialize palette when component loads
-  useEffect(() => {
-    // Generate the initial palette using default base color
-    const initialPalette = generateAccessiblePalette(baseColor, 'all');
-    setGeneratedPalette(initialPalette);
-  }, []);
   const [expertSettings, setExpertSettings] = useState<ExpertSettings>({
     minContrast: 4.5,
     maxContrast: 21,
