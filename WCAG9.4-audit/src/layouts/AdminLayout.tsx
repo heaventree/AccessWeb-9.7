@@ -58,6 +58,14 @@ export function AdminLayout() {
       <div className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 shadow-lg pt-16">
         <nav className="mt-5 px-2">
           <NavLink
+            to="/"
+            className="flex items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-900 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 mb-3"
+          >
+            <Home className="w-5 h-5 mr-3" />
+            Back to Home
+          </NavLink>
+          <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+          <NavLink
             to="/admin"
             end
             className={({ isActive }) =>
