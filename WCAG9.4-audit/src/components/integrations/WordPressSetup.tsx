@@ -174,7 +174,7 @@ export function WordPressSetup() {
           </div>
 
           {settings.apiKey ? (
-            <div className="bg-white rounded-xl p-6">
+            <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Key className="w-6 h-6 text-blue-600" />
