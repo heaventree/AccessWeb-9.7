@@ -85,6 +85,7 @@ function App() {
               <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/monitoring" element={<><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/realtime" element={<><Navigation /><main id="main-content"><RealTimeMonitorPage /></main><Footer /><BackToTop /></>} />
+              <Route path="/my-account" element={<ProtectedRoute><><Navigation /><main id="main-content"><SubscriptionDashboard /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               <Route path="/my-account/monitoring" element={<ProtectedRoute><><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               <Route path="/my-account/analytics" element={<ProtectedRoute><><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               <Route path="/my-account/alerts" element={<ProtectedRoute><><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></></ProtectedRoute>} />

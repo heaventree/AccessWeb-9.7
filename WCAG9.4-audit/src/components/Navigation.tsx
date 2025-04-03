@@ -127,8 +127,8 @@ export function Navigation() {
 
   const accountItems = [
     {
-      name: 'Dashboard',
-      path: '/dashboard',
+      name: 'Account Dashboard',
+      path: '/my-account',
       icon: LayoutDashboard,
       description: 'View your account dashboard'
     },
