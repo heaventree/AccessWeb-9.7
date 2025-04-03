@@ -99,7 +99,7 @@ export function ShopifySetup() {
       {/* Return to Connections Link */}
       <div className="mb-2">
         <Link 
-          to="/connections" 
+          to="/my-account/connections" 
           className="inline-flex items-center text-blue-600 hover:text-blue-800"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
