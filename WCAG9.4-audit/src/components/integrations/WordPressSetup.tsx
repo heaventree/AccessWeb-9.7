@@ -141,7 +141,7 @@ export function WordPressSetup() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-xl shadow-sm mb-8"
+          className="bg-white rounded-xl mb-8"
         >
           <div className="border-b border-gray-200 pb-5 mb-6">
             <div className="flex items-center justify-between">
@@ -174,7 +174,7 @@ export function WordPressSetup() {
           </div>
 
           {settings.apiKey ? (
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-xl p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Key className="w-6 h-6 text-blue-600" />
