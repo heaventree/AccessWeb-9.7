@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Save, RefreshCw, Activity, Key, Info, Book, ArrowRight, CheckCircle, Globe, FileText, ShoppingBag, Store } from 'lucide-react';
+import { Save, RefreshCw, Activity, Key, Info, Book, ArrowRight, CheckCircle, Globe, FileText, ShoppingBag, Store, X, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { shopifyAPI } from '../../lib/integrations/shopify';
@@ -24,6 +24,7 @@ export function ShopifySetup() {
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(false);
   const [showCredentials, setShowCredentials] = useState(false);
+  const [showInstructionsModal, setShowInstructionsModal] = useState(false);
 
   // Load existing settings
   React.useEffect(() => {
@@ -104,14 +105,22 @@ export function ShopifySetup() {
             <p className="mt-1 text-blue-700">
               Before connecting your Shopify store, you'll need to create a custom app in your Shopify admin. Follow our comprehensive documentation to get started.
             </p>
-            <Link
-              to="/docs/shopify"
-              className="inline-flex items-center mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              <Book className="w-5 h-5 mr-2" />
-              View Shopify Documentation
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
+            <div className="flex mt-3 space-x-3">
+              <Link
+                to="/docs/shopify"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                <Book className="w-5 h-5 mr-2" />
+                View Documentation
+              </Link>
+              <button
+                onClick={() => setShowInstructionsModal(true)}
+                className="inline-flex items-center px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50"
+              >
+                <HelpCircle className="w-5 h-5 mr-2" />
+                Setup Instructions
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -249,7 +258,8 @@ export function ShopifySetup() {
                   id="scanFrequency"
                   value={settings.scanFrequency}
                   onChange={(e) => setSettings({ ...settings, scanFrequency: e.target.value })}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  style={{ maxWidth: '280px' }}
                 >
                   <option value="realtime">Real-time</option>
                   <option value="hourly">Hourly</option>
@@ -259,7 +269,7 @@ export function ShopifySetup() {
                 </select>
               </div>
 
-              <div className="space-y-4">
+              <div className="flex flex-wrap items-center space-x-6">
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
                     <input
@@ -273,7 +283,6 @@ export function ShopifySetup() {
                   </div>
                   <div className="ml-3 text-sm">
                     <label htmlFor="autoFix" className="font-medium text-gray-700">Auto-fix Issues</label>
-                    <p className="text-gray-500">Automatically apply fixes to your Shopify theme when possible</p>
                   </div>
                 </div>
 
@@ -290,7 +299,6 @@ export function ShopifySetup() {
                   </div>
                   <div className="ml-3 text-sm">
                     <label htmlFor="notifyAdmin" className="font-medium text-gray-700">Notify Admin</label>
-                    <p className="text-gray-500">Send notifications to Shopify store owner</p>
                   </div>
                 </div>
               </div>
@@ -385,6 +393,84 @@ export function ShopifySetup() {
           </div>
         </motion.div>
       </div>
+
+      {/* Instructions Modal */}
+      {showInstructionsModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            {/* Background overlay */}
+            <div 
+              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
+              aria-hidden="true"
+              onClick={() => setShowInstructionsModal(false)}
+            ></div>
+
+            {/* Modal panel */}
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
+              <div className="absolute top-0 right-0 pt-4 pr-4">
+                <button
+                  type="button"
+                  className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  onClick={() => setShowInstructionsModal(false)}
+                >
+                  <span className="sr-only">Close</span>
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <ShoppingBag className="h-6 w-6 text-blue-600" />
+                </div>
+                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                    Shopify Integration Steps
+                  </h3>
+                  <div className="mt-4">
+                    <ol className="list-decimal list-inside space-y-3 text-gray-600">
+                      <li>Go to your Shopify admin dashboard</li>
+                      <li>Navigate to Settings &gt; Apps and sales channels</li>
+                      <li>Click on "Develop apps for your store"</li>
+                      <li>Create a new app with a descriptive name</li>
+                      <li>Set up Admin API access with the following scopes:
+                        <ul className="list-disc list-inside pl-6 mt-2 text-sm text-gray-500 space-y-1">
+                          <li>read_themes, write_themes</li>
+                          <li>read_content, write_content</li>
+                        </ul>
+                      </li>
+                      <li>Install the app to your store</li>
+                      <li>Copy the access token and enter it in the form above</li>
+                    </ol>
+                    
+                    <div className="mt-6 bg-blue-50 p-4 rounded-md">
+                      <h4 className="font-medium text-blue-800">Important Security Note</h4>
+                      <p className="mt-2 text-sm text-blue-700">
+                        Your access token is sensitive information. We securely store and encrypt this token,
+                        and only use it to scan and fix accessibility issues in your Shopify theme.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={() => setShowInstructionsModal(false)}
+                >
+                  Got it
+                </button>
+                <Link
+                  to="/docs/shopify"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm"
+                >
+                  View Full Documentation
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

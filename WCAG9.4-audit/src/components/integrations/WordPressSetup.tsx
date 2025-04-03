@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Save, RefreshCw, Activity, Code, Key, Info, Book, ArrowRight, X, CheckCircle, Globe, Zap, FileText } from 'lucide-react';
+import { Save, RefreshCw, Activity, Code, Key, Info, Book, ArrowRight, X, CheckCircle, Globe, Zap, FileText, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { wordPressAPI } from '../../lib/integrations/wordpress';
@@ -20,6 +20,7 @@ export function WordPressSetup() {
   const [newApiKey, setNewApiKey] = useState<string | null>(null);
   const [showNewKey, setShowNewKey] = useState(false);
   const [showExistingKey, setShowExistingKey] = useState(false);
+  const [showInstructionsModal, setShowInstructionsModal] = useState(false);
 
   // Load existing settings
   React.useEffect(() => {
@@ -95,14 +96,22 @@ export function WordPressSetup() {
             <p className="mt-1 text-blue-700">
               Before connecting your WordPress site, you'll need to install our WordPress plugin. Follow our comprehensive documentation to get started.
             </p>
-            <Link
-              to="/docs/wordpress"
-              className="inline-flex items-center mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              <Book className="w-5 h-5 mr-2" />
-              View WordPress Documentation
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
+            <div className="flex mt-3 space-x-3">
+              <Link
+                to="/docs/wordpress"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                <Book className="w-5 h-5 mr-2" />
+                View Documentation
+              </Link>
+              <button
+                onClick={() => setShowInstructionsModal(true)}
+                className="inline-flex items-center px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50"
+              >
+                <HelpCircle className="w-5 h-5 mr-2" />
+                Setup Instructions
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -284,7 +293,8 @@ export function WordPressSetup() {
                   id="scanFrequency"
                   value={settings.scanFrequency}
                   onChange={(e) => setSettings({ ...settings, scanFrequency: e.target.value })}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  style={{ maxWidth: '280px' }}
                 >
                   <option value="realtime">Real-time</option>
                   <option value="hourly">Hourly</option>
@@ -294,7 +304,7 @@ export function WordPressSetup() {
                 </select>
               </div>
 
-              <div className="space-y-4">
+              <div className="flex flex-wrap items-center space-x-6">
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
                     <input
@@ -308,7 +318,6 @@ export function WordPressSetup() {
                   </div>
                   <div className="ml-3 text-sm">
                     <label htmlFor="autoFix" className="font-medium text-gray-700">Auto-fix Issues</label>
-                    <p className="text-gray-500">Automatically apply fixes when possible</p>
                   </div>
                 </div>
 
@@ -325,7 +334,6 @@ export function WordPressSetup() {
                   </div>
                   <div className="ml-3 text-sm">
                     <label htmlFor="notifyAdmin" className="font-medium text-gray-700">Notify Admin</label>
-                    <p className="text-gray-500">Send notifications to WordPress admin</p>
                   </div>
                 </div>
               </div>
@@ -341,7 +349,7 @@ export function WordPressSetup() {
                   rows={3}
                   value={settings.excludedPaths.join('\n')}
                   onChange={(e) => setSettings({ ...settings, excludedPaths: e.target.value.split('\n').filter(p => p.trim()) })}
-                  className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border border-gray-300 rounded-md"
                   placeholder="/wp-admin/&#10;/wp-login.php&#10;/exclude-this-path"
                 />
               </div>
@@ -371,39 +379,82 @@ export function WordPressSetup() {
             </div>
           </div>
         </motion.div>
+      </div>
 
-        {/* WordPress Integration Guide */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-8 bg-blue-50 rounded-xl p-6 border border-blue-200"
-        >
-          <div className="flex items-start">
-            <FileText className="w-6 h-6 text-blue-600 mt-1" />
-            <div className="ml-3">
-              <h3 className="text-lg font-semibold text-blue-900">WordPress Integration Steps</h3>
-              <ol className="mt-2 text-blue-700 space-y-3 list-decimal list-inside">
-                <li>Generate an API key (shown above)</li>
-                <li>Install our WordPress plugin from the WordPress plugin directory</li>
-                <li>Activate the plugin in your WordPress admin dashboard</li>
-                <li>Navigate to Settings {`>`} Accessibility Scanner in your WordPress admin</li>
-                <li>Enter your API key and configure scanning options</li>
-                <li>Save settings and start your first scan</li>
-              </ol>
-              <div className="mt-4">
-                <Link
-                  to="/help/wordpress-integration-guide"
-                  className="inline-flex items-center text-blue-600 hover:text-blue-700"
+      {/* Instructions Modal */}
+      {showInstructionsModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            {/* Background overlay */}
+            <div 
+              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
+              aria-hidden="true"
+              onClick={() => setShowInstructionsModal(false)}
+            ></div>
+
+            {/* Modal panel */}
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
+              <div className="absolute top-0 right-0 pt-4 pr-4">
+                <button
+                  type="button"
+                  className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  onClick={() => setShowInstructionsModal(false)}
                 >
-                  Read the full integration guide
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <span className="sr-only">Close</span>
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <Book className="h-6 w-6 text-blue-600" />
+                </div>
+                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                    WordPress Integration Steps
+                  </h3>
+                  <div className="mt-4">
+                    <ol className="list-decimal list-inside space-y-3 text-gray-600">
+                      <li>Generate an API key (shown above)</li>
+                      <li>Install our WordPress plugin from the WordPress plugin directory</li>
+                      <li>Activate the plugin in your WordPress admin dashboard</li>
+                      <li>Navigate to Settings {`>`} Accessibility Scanner in your WordPress admin</li>
+                      <li>Enter your API key and configure scanning options</li>
+                      <li>Save settings and start your first scan</li>
+                    </ol>
+                    
+                    <div className="mt-6 bg-blue-50 p-4 rounded-md">
+                      <h4 className="font-medium text-blue-800">Plugin Installation Options</h4>
+                      <p className="mt-2 text-sm text-blue-700">
+                        You can install our plugin in one of two ways:
+                      </p>
+                      <ul className="mt-2 space-y-1 text-sm text-blue-700 list-disc list-inside">
+                        <li>Search for "WCAG Accessibility Scanner" in the WordPress plugin directory</li>
+                        <li>Download the plugin zip file from our website and upload it to your WordPress site</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={() => setShowInstructionsModal(false)}
+                >
+                  Got it
+                </button>
+                <Link
+                  to="/docs/wordpress"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm"
+                >
+                  View Full Documentation
                 </Link>
               </div>
             </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
