@@ -123,7 +123,7 @@ export function CustomAPISetup() {
           </div>
         </div>
       </div>
-      <div className="bg-white rounded-xl shadow-sm p-8">
+      <div className="bg-purple-50 border border-purple-100 rounded-xl shadow-sm p-8">
           {/* API Key Generation */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

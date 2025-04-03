@@ -136,7 +136,7 @@ export function ShopifySetup() {
       </div>
 
       {/* Credentials Management */}
-      <div className="bg-green-50 border border-green-100 rounded-xl shadow-sm p-8">
+      <div className="bg-white rounded-xl shadow-sm p-8">
         {/* Shopify Credentials */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -233,7 +233,7 @@ export function ShopifySetup() {
               <button
                 onClick={handleValidateCredentials}
                 disabled={validating || !settings.shop || !settings.accessToken}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
               >
                 {validating ? (
                   <>
@@ -361,7 +361,7 @@ export function ShopifySetup() {
               <button
                 onClick={handleSaveSettings}
                 disabled={loading || !settings.shop || !settings.accessToken}
-                className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -487,7 +487,7 @@ export function ShopifySetup() {
               <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                 <button
                   type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
                   onClick={() => setShowInstructionsModal(false)}
                 >
                   Got it
