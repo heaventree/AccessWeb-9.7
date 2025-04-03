@@ -158,19 +158,19 @@ export function Navigation() {
     },
     {
       name: 'Settings',
-      path: '/settings',
+      path: '/my-account/settings',
       icon: Settings,
       description: 'Manage account settings'
     },
     {
       name: 'Billing',
-      path: '/billing',
+      path: '/my-account/billing',
       icon: CreditCard,
       description: 'Manage billing and subscriptions'
     },
     {
       name: 'Team',
-      path: '/team',
+      path: '/my-account/team',
       icon: Users,
       description: 'Manage team members'
     }
