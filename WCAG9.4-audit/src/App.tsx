@@ -85,10 +85,13 @@ function App() {
               <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/monitoring" element={<><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/realtime" element={<><Navigation /><main id="main-content"><RealTimeMonitorPage /></main><Footer /><BackToTop /></>} />
-              <Route path="/my-account/connections" element={<ProtectedRoute><ConnectionsPage /></ProtectedRoute>} />
-              <Route path="/my-account/connections/custom-api" element={<ProtectedRoute><CustomAPIPage /></ProtectedRoute>} />
-              <Route path="/my-account/connections/shopify" element={<ProtectedRoute><ShopifyAPIPage /></ProtectedRoute>} />
-              <Route path="/my-account/connections/wordpress" element={<ProtectedRoute><WordPressAPIPage /></ProtectedRoute>} />
+              <Route path="/my-account/monitoring" element={<ProtectedRoute><><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/my-account/analytics" element={<ProtectedRoute><><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/my-account/alerts" element={<ProtectedRoute><><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/my-account/connections" element={<ProtectedRoute><><Navigation /><main id="main-content"><ConnectionsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/my-account/connections/custom-api" element={<ProtectedRoute><><Navigation /><main id="main-content"><CustomAPIPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/my-account/connections/shopify" element={<ProtectedRoute><><Navigation /><main id="main-content"><ShopifyAPIPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/my-account/connections/wordpress" element={<ProtectedRoute><><Navigation /><main id="main-content"><WordPressAPIPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               <Route path="/integrations/wordpress" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/analytics" element={<><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/compliance" element={<><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></>} />

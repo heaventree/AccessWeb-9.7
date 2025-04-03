@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Gauge, Palette, FileText, Zap, Settings, Store, Globe, Activity, Book, HelpCircle, BarChart2, Bell, Shield, Building, LayoutDashboard, CreditCard, Users, User, Code } from 'lucide-react';
+import { Menu, X, ChevronDown, Gauge, Palette, FileText, Zap, Settings, Store, Globe, Activity, ActivitySquare, Book, HelpCircle, BarChart2, Bell, Shield, Building, LayoutDashboard, CreditCard, Users, User, Code } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 
 export function Navigation() {
@@ -62,30 +62,6 @@ export function Navigation() {
       path: '/tools/wcag-standards',
       icon: FileText,
       description: 'Browse WCAG 2.1 standards and requirements'
-    },
-    { 
-      name: 'Monitoring',
-      path: '/tools/monitoring',
-      icon: Zap,
-      description: 'Real-time accessibility monitoring'
-    },
-    {
-      name: 'Analytics',
-      path: '/tools/analytics',
-      icon: BarChart2,
-      description: 'Accessibility analytics and insights'
-    },
-    {
-      name: 'Alerts',
-      path: '/tools/alerts',
-      icon: Bell,
-      description: 'Configure accessibility alerts'
-    },
-    {
-      name: 'Compliance',
-      path: '/tools/compliance',
-      icon: Shield,
-      description: 'Compliance monitoring & reporting'
     }
   ];
 
@@ -155,6 +131,24 @@ export function Navigation() {
       path: '/dashboard',
       icon: LayoutDashboard,
       description: 'View your account dashboard'
+    },
+    {
+      name: 'Monitoring & Compliance',
+      path: '/my-account/monitoring',
+      icon: ActivitySquare,
+      description: 'Real-time monitoring & compliance'
+    },
+    {
+      name: 'Analytics',
+      path: '/my-account/analytics',
+      icon: BarChart2,
+      description: 'Accessibility analytics and insights'
+    },
+    {
+      name: 'Alerts',
+      path: '/my-account/alerts',
+      icon: Bell,
+      description: 'Configure accessibility alerts'
     },
     {
       name: 'Connections',
