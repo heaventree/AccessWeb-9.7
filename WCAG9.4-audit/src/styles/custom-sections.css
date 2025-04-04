@@ -2,5 +2,5 @@
 
 /* Section 120 - Dark mode background color override */
 .dark [data-section-id="120"] {
-  background-color: #070D19 !important; /* Match the exact color requested */
+  background-color: #111827 !important; /* Match the exact color requested */
 }
