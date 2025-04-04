@@ -33,7 +33,7 @@ export function UiDemo() {
             icon={<Info className="w-5 h-5" />}
             action={<Button variant="ghost" size="sm">Action</Button>}
           >
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-gray-700 dark:text-gray-200">
               This is a default card with header and footer.
               Cards are designed to match the Noble UI aesthetic.
             </p>
@@ -46,7 +46,7 @@ export function UiDemo() {
             variant="primary"
             hoverable
           >
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-gray-700 dark:text-gray-200">
               This card uses the primary color as an accent on the left border.
               It also has a hover effect for interactive cards.
             </p>
@@ -59,7 +59,7 @@ export function UiDemo() {
             variant="secondary"
             compact
           >
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-gray-700 dark:text-gray-200">
               This card uses the secondary color as an accent and has compact padding.
               Good for dense information display.
             </p>
@@ -71,7 +71,7 @@ export function UiDemo() {
             icon={<Check className="w-5 h-5" />}
             title="Success Card"
           >
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-gray-700 dark:text-gray-200">
               Used to indicate successful operations or positive statuses.
             </p>
           </Card>
@@ -82,7 +82,7 @@ export function UiDemo() {
             icon={<AlertTriangle className="w-5 h-5" />}
             title="Warning Card"
           >
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-gray-700 dark:text-gray-200">
               Used to highlight potential issues that need attention.
             </p>
           </Card>
@@ -93,7 +93,7 @@ export function UiDemo() {
             icon={<X className="w-5 h-5" />}
             title="Error Card"
           >
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-gray-700 dark:text-gray-200">
               Used to indicate errors or critical issues that need immediate attention.
             </p>
           </Card>
@@ -110,7 +110,7 @@ export function UiDemo() {
               </div>
             }
           >
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-gray-700 dark:text-gray-200">
               This card includes a footer with action buttons.
               Useful for forms or interactive content.
             </p>
@@ -129,7 +129,7 @@ export function UiDemo() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 dark:text-gray-300">
+              <p className="text-gray-700 dark:text-gray-200">
                 This card uses the composite CardHeader, CardContent, and CardFooter
                 components for more complex layouts.
               </p>

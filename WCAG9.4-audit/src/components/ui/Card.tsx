@@ -56,7 +56,7 @@ export function Card({
   return (
     <div 
       className={twMerge(
-        'bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden text-gray-700 dark:text-gray-200',
+        'bg-white dark:bg-gray-800 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden text-gray-700 dark:text-gray-100',
         bordered && 'border border-gray-200 dark:border-gray-700',
         hoverable && 'transition-shadow hover:shadow-md',
         variantStyles[variant],
@@ -102,7 +102,7 @@ export interface CardHeaderProps {
 export function CardHeader({ children, className = '', actions }: CardHeaderProps) {
   return (
     <div className={twMerge(
-      'p-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center text-gray-700 dark:text-gray-200',
+      'p-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center text-gray-700 dark:text-gray-100',
       className
     )}>
       <div>{children}</div>
@@ -121,7 +121,7 @@ export interface CardContentProps {
  */
 export function CardContent({ children, className = '' }: CardContentProps) {
   return (
-    <div className={twMerge('p-5 text-gray-700 dark:text-gray-200', className)}>
+    <div className={twMerge('p-5 text-gray-700 dark:text-gray-100', className)}>
       {children}
     </div>
   );
@@ -143,7 +143,7 @@ export function CardFooter({
 }: CardFooterProps) {
   return (
     <div className={twMerge(
-      'p-5 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200',
+      'p-5 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-100',
       divider && 'border-t border-gray-200 dark:border-gray-700',
       className
     )}>
