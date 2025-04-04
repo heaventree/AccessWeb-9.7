@@ -87,7 +87,7 @@ function App() {
               <Route path="/tools/monitoring" element={<><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/realtime" element={<><Navigation /><main id="main-content"><RealTimeMonitorPage /></main><Footer /><BackToTop /></>} />
               {/* Account Routes with shared layout */}
-              <Route path="/my-account" element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
+              <Route path="/my-account" element={<ProtectedRoute><><Navigation /><AccountLayout /></></ProtectedRoute>}>
                 <Route index element={<SubscriptionDashboard />} />
                 <Route path="monitoring" element={<MonitoringPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
