@@ -1,9 +1,8 @@
 import React from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import localforage from 'localforage';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from './ThemeProvider';
 import { Toaster } from 'react-hot-toast';
 import { retryFunction } from '../utils/retryFunction';
@@ -96,7 +95,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         <Toaster position="top-center" />
         {children}
       </ThemeProvider>
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </PersistQueryClientProvider>
   );
 }
