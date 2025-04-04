@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { Code, Store, Globe, ArrowRight, Plus, PlugZap } from 'lucide-react';
 
@@ -49,30 +48,34 @@ export function ConnectionsPage() {
   ];
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-      <div className="sm:flex sm:justify-between sm:items-center mb-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          API Connections
+        </h1>
+        <p className="text-lg text-gray-600 dark:text-gray-400">
+          Connect your platforms for seamless accessibility monitoring and automated fixes
+        </p>
+      </div>
+      <div className="sm:flex sm:justify-between sm:items-center mb-6">
         <div className="mb-4 sm:mb-0">
-          <h1 className="text-2xl font-bold text-gray-900">API Connections</h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Connect your platforms for seamless accessibility monitoring and automated fixes
-          </p>
         </div>
         <div>
-          <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+          <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600">
             <Plus className="h-4 w-4 mr-2" />
             Add New Connection
           </button>
         </div>
       </div>
       
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-        <div className="px-4 py-5 border-b border-gray-200 sm:px-6">
-          <h2 className="text-lg leading-6 font-medium text-gray-900 flex items-center">
-            <PlugZap className="h-5 w-5 mr-2 text-blue-500" />
+      <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
+        <div className="px-4 py-5 border-b border-gray-200 dark:border-gray-700 sm:px-6">
+          <h2 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 flex items-center">
+            <PlugZap className="h-5 w-5 mr-2 text-primary-500" />
             Available Integrations
           </h2>
         </div>
-        <ul className="divide-y divide-gray-200">
+        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
           {connections.map((connection) => (
             <li key={connection.id}>
               <div className="px-4 py-4 sm:px-6">
@@ -90,8 +93,8 @@ export function ConnectionsPage() {
                       }`} />
                     </div>
                     <div className="ml-4">
-                      <h3 className="text-lg font-medium text-gray-900">{connection.name}</h3>
-                      <p className="text-sm text-gray-500">{connection.description}</p>
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">{connection.name}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{connection.description}</p>
                     </div>
                   </div>
                   <div className="flex items-center">
@@ -104,7 +107,7 @@ export function ConnectionsPage() {
                     </span>
                     <Link
                       to={connection.path}
-                      className={`inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50`}
+                      className={`inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600`}
                     >
                       Configure
                       <ArrowRight className="ml-2 -mr-0.5 h-4 w-4" />
@@ -118,7 +121,7 @@ export function ConnectionsPage() {
                       <svg className="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-sm text-gray-600">{feature}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">{feature}</span>
                     </div>
                   ))}
                 </div>
