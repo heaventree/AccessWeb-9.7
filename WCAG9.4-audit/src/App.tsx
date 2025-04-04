@@ -21,6 +21,8 @@ import { AdminPaymentGateways } from './pages/admin/AdminPaymentGateways';
 import { AdminCMS } from './pages/admin/AdminCMS';
 import { AdminRoadmap } from './pages/admin/AdminRoadmap';
 import { AdminDebug } from './pages/admin/AdminDebug';
+import { ChatbotManagement } from './pages/admin/ChatbotManagement';
+import { SupportChat } from './components/support/SupportChat';
 import { IntegrationsOverview } from './pages/integrations/IntegrationsOverview';
 import { ConnectionsPage } from './pages/connections/ConnectionsPage';
 import { CustomAPIPage } from './pages/connections/CustomAPIPage';
@@ -143,6 +145,7 @@ function App() {
                 <Route path="cms/*" element={<AdminCMS />} />
                 <Route path="roadmap" element={<AdminRoadmap />} />
                 <Route path="debug" element={<AdminDebug />} />
+                <Route path="chatbot" element={<ChatbotManagement />} />
               </Route>
 
               {/* 404 Route */}
@@ -154,6 +157,7 @@ function App() {
               } />
             </Routes>
             <AccessibilityToolbar />
+            <SupportChat />
           </div>
         </Router>
       </ErrorBoundary>

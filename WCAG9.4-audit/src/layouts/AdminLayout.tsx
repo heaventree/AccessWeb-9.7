@@ -7,7 +7,8 @@ import {
   FileEdit,
   Wallet,
   List,
-  Bug
+  Bug,
+  MessageSquare
 } from 'lucide-react';
 import { DashboardLayout } from './DashboardLayout';
 
@@ -58,6 +59,11 @@ export function AdminLayout() {
       path: "/admin/debug",
       label: "Debug List",
       icon: <Bug className="w-5 h-5" />
+    },
+    {
+      path: "/admin/chatbot",
+      label: "Chatbot Management",
+      icon: <MessageSquare className="w-5 h-5" />
     }
   ];
 
