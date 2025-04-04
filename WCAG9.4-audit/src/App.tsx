@@ -4,6 +4,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { LandingPage } from './pages/LandingPage';
 import { PricingPage } from './pages/PricingPage';
 import { SubscriptionDashboard } from './pages/SubscriptionDashboard';
+import { Dashboard } from './pages/Dashboard';
 import { PaymentPage } from './pages/PaymentPage';
 import { IntegrationsPage } from './pages/integrations/IntegrationsPage';
 import { AuthPage } from './pages/AuthPage';
@@ -90,7 +91,7 @@ function App() {
               <Route path="/ui-demo" element={<><Navigation /><main id="main-content"><UiDemo /></main><Footer /><BackToTop /></>} />
               {/* Account Routes with shared layout */}
               <Route path="/my-account" element={<ProtectedRoute><><Navigation /><AccountLayout /></></ProtectedRoute>}>
-                <Route index element={<SubscriptionDashboard />} />
+                <Route index element={<Dashboard />} />
                 <Route path="monitoring" element={<MonitoringPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="alerts" element={<CompliancePage />} />
@@ -124,7 +125,7 @@ function App() {
               <Route path="/admin/login" element={<AdminLoginPage />} />
 
               {/* Protected Routes */}
-              <Route path="/dashboard" element={<ProtectedRoute><><Navigation /><main id="main-content"><SubscriptionDashboard /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><><Navigation /><main id="main-content"><Dashboard /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               {/* Keep old routes for backwards compatibility */}
               <Route path="/billing" element={<ProtectedRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><><Navigation /><main id="main-content"><SettingsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />

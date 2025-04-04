@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export interface CardProps {
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
   title?: string;
   subtitle?: string;
@@ -56,7 +56,7 @@ export function Card({
   return (
     <div 
       className={twMerge(
-        'bg-white dark:bg-gray-800 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden text-gray-700 dark:text-gray-100',
+        'bg-white dark:bg-card-bg dark:border-gray-700 rounded-lg shadow-sm overflow-hidden text-gray-700 dark:text-gray-100',
         bordered && 'border border-gray-200 dark:border-gray-700',
         hoverable && 'transition-shadow hover:shadow-md',
         variantStyles[variant],
@@ -82,7 +82,7 @@ export function Card({
 
       {/* Card Footer */}
       {footer && (
-        <div className={`${padding} border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900`}>
+        <div className={`${padding} border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-card-bg-secondary`}>
           {footer}
         </div>
       )}
@@ -143,7 +143,7 @@ export function CardFooter({
 }: CardFooterProps) {
   return (
     <div className={twMerge(
-      'p-5 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-100',
+      'p-5 bg-gray-50 dark:bg-card-bg-secondary text-gray-700 dark:text-gray-100',
       divider && 'border-t border-gray-200 dark:border-gray-700',
       className
     )}>
