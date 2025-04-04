@@ -64,6 +64,7 @@ import { TeamPage } from './pages/team/TeamPage';
 import { HelpCenter } from './pages/HelpCenter';
 import { HelpArticle } from './pages/HelpArticle';
 import { KnowledgeBasePage } from './pages/KnowledgeBasePage';
+import { UiDemo } from './pages/UiDemo';
 
 import { ErrorPage } from './components/ErrorPage';
 
@@ -86,6 +87,7 @@ function App() {
               <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/monitoring" element={<><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/realtime" element={<><Navigation /><main id="main-content"><RealTimeMonitorPage /></main><Footer /><BackToTop /></>} />
+              <Route path="/ui-demo" element={<><Navigation /><main id="main-content"><UiDemo /></main><Footer /><BackToTop /></>} />
               {/* Account Routes with shared layout */}
               <Route path="/my-account" element={<ProtectedRoute><><Navigation /><AccountLayout /></></ProtectedRoute>}>
                 <Route index element={<SubscriptionDashboard />} />

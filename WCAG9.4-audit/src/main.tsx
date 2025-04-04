@@ -1,6 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+// Import theme variables first for proper CSS cascade
+import './styles/theme-variables.css';
 import './styles/main.css';
 import './styles/accessibility.css';
 import './styles/blog.css';
