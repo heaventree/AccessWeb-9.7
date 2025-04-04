@@ -96,7 +96,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         <Toaster position="top-center" />
         {children}
       </ThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </PersistQueryClientProvider>
   );
 }

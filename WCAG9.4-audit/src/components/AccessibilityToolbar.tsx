@@ -98,15 +98,15 @@ export function AccessibilityToolbar() {
     <>
       <button
         onClick={() => setIsOpen(prev => !prev)}
-        className="fixed bottom-4 left-4 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+        className="fixed bottom-4 right-4 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
         aria-label="Toggle Accessibility Tools"
       >
         <Glasses className="w-6 h-6" />
       </button>
 
       <div
-        className={`fixed left-4 bottom-20 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl transition-transform duration-200 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed right-4 bottom-20 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl transition-transform duration-200 ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="p-4 space-y-4 max-h-[80vh] overflow-y-auto">

@@ -12,7 +12,7 @@
     .${containerClass} {
       position: fixed;
       bottom: 20px;
-      right: 20px;
+      left: 20px; /* Moved from right to left */
       z-index: 2147483647; /* Highest possible z-index */
       pointer-events: none; /* Allow clicking through the container */
     }
@@ -78,7 +78,7 @@
     @media (max-width: 640px) {
       .${containerClass} {
         bottom: 70px; /* Avoid mobile navigation bars */
-        right: 10px;
+        left: 10px; /* Moved from right to left */
       }
 
       .${badgeClass} {
