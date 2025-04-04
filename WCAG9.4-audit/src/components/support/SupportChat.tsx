@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { MessageSquare, X, Send, User, Bot } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useChatbot } from '../../hooks/useChatbot';
+import { SuggestedActions } from './SuggestedActions';
+import { MessageContent } from './MessageContent';
 
 export function SupportChat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +11,12 @@ export function SupportChat() {
   const messageEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { messages, sendMessage, isLoading } = useChatbot();
+  
+  // Show suggested actions when there are no messages or after greeting
+  const showSuggestions = messages.length === 0 || 
+    (messages.length === 2 && messages[0].role === 'user' && 
+     (messages[0].content.toLowerCase().includes('hi') || 
+      messages[0].content.toLowerCase().includes('hello')));
 
   // Focus input when chat opens
   useEffect(() => {
@@ -40,6 +48,11 @@ export function SupportChat() {
       e.preventDefault();
       handleSubmit(e);
     }
+  };
+
+  // Handle suggested question selection
+  const handleSuggestedQuestion = (question: string) => {
+    sendMessage(question);
   };
 
   return (
@@ -81,29 +94,60 @@ export function SupportChat() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.length === 0 ? (
                 <div className="text-center text-gray-500 my-8">
-                  <MessageSquare className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                  <Bot className="w-12 h-12 mx-auto mb-2 text-gray-400" />
                   <p>How can I help you with web accessibility today?</p>
+                  {/* Show suggested actions for empty chat */}
+                  <SuggestedActions onSelect={handleSuggestedQuestion} />
                 </div>
               ) : (
-                messages.map((msg: { role: string; content: string }, index: number) => (
-                  <div 
-                    key={index} 
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
+                <>
+                  {messages.map((msg, index) => (
                     <div 
-                      className={`max-w-[80%] rounded-lg p-3 ${
-                        msg.role === 'user' 
-                          ? 'bg-blue-600 text-white rounded-br-none' 
-                          : 'bg-gray-100 text-gray-800 rounded-bl-none'
-                      }`}
+                      key={index} 
+                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      {msg.content}
+                      {/* Bot avatar for assistant messages */}
+                      {msg.role === 'assistant' && (
+                        <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 flex-shrink-0">
+                          <Bot className="h-5 w-5 text-gray-600" />
+                        </div>
+                      )}
+                      
+                      <div 
+                        className={`max-w-[80%] rounded-lg p-3 ${
+                          msg.role === 'user' 
+                            ? 'bg-blue-600 text-white rounded-br-none' 
+                            : 'bg-gray-100 text-gray-800 rounded-bl-none'
+                        }`}
+                      >
+                        <MessageContent 
+                          content={msg.content}
+                          isAssistant={msg.role === 'assistant'} 
+                        />
+                      </div>
+                      
+                      {/* User avatar for user messages */}
+                      {msg.role === 'user' && (
+                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center ml-2 flex-shrink-0">
+                          <User className="h-5 w-5 text-blue-600" />
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))
+                  ))}
+                  
+                  {/* Show suggestions after greeting */}
+                  {showSuggestions && (
+                    <SuggestedActions onSelect={handleSuggestedQuestion} />
+                  )}
+                </>
               )}
+              
+              {/* Loading indicator */}
               {isLoading && (
                 <div className="flex justify-start">
+                  <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 flex-shrink-0">
+                    <Bot className="h-5 w-5 text-gray-600" />
+                  </div>
                   <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-800 rounded-bl-none">
                     <div className="flex space-x-2">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
