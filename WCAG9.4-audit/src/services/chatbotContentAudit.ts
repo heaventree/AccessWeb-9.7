@@ -1,95 +1,164 @@
-import { ChatSettings } from '../types/chat';
-
-interface ContentItem {
-  id: string;
-  title: string;
-  content: string;
-  url: string;
-  lastUpdated: string;
-  category: string;
-  tags: string[];
-}
-
-interface AuditResult {
-  timestamp: string;
-  newContent: ContentItem[];
-  updatedContent: ContentItem[];
-  totalItems: number;
-  processedItems: number;
-}
+import { ContentAuditResult, ChatSettings } from '../types/chat';
+import { extractTopics, htmlToText } from '../lib/utils';
 
 /**
- * Scans the site's content to keep the chatbot knowledge base up-to-date
- * This would typically integrate with a real content management system or API
+ * Chatbot Content Audit Service
+ * 
+ * This service regularly scans the website content to keep the chatbot
+ * knowledge base up to date. It extracts topics, identifies content gaps,
+ * and provides suggestions for improving the chatbot's responses.
  */
-export async function auditSiteContent(settings: ChatSettings): Promise<AuditResult> {
-  console.log('Starting content audit with settings:', settings);
 
-  // In a real implementation, this would:
-  // 1. Query the site's content (articles, pages, etc.) using an API
-  // 2. Process new or updated content since the last scan
-  // 3. Parse and format the content for the chatbot's knowledge base
-  // 4. Trigger updates to the chatbot's learning system
-  
-  // Simulated delay for demonstration
+// Mock scan results for demonstration (in a real app, this would come from a real scan)
+const mockScanResults: ContentAuditResult = {
+  lastScan: new Date().toISOString(),
+  scannedPages: 127,
+  extractedTopics: [
+    'WCAG 2.1', 
+    'WCAG 2.2', 
+    'Color contrast', 
+    'Keyboard navigation', 
+    'Screen readers',
+    'Semantic HTML', 
+    'ARIA attributes', 
+    'Focus management',
+    'Alt text', 
+    'Form labels', 
+    'Error identification',
+    'Audio descriptions', 
+    'Captions'
+  ],
+  newTopics: [
+    'WCAG 2.2 target size', 
+    'Focus visible', 
+    'Gesture alternatives'
+  ],
+  contentGaps: [
+    {
+      topic: 'WCAG 2.2 compliance',
+      confidence: 0.87,
+      suggestion: 'Add specific information about the new WCAG 2.2 requirements and how to implement them'
+    },
+    {
+      topic: 'Mobile accessibility',
+      confidence: 0.79,
+      suggestion: 'Include more content about touch target sizes and gesture alternatives'
+    },
+    {
+      topic: 'PDF accessibility',
+      confidence: 0.68,
+      suggestion: 'Create content covering how to make PDF documents accessible'
+    }
+  ]
+};
+
+/**
+ * Scan the website for content to update the chatbot's knowledge
+ * (In a real implementation, this would actually crawl the site)
+ */
+export async function scanWebsiteContent(): Promise<ContentAuditResult> {
+  // Simulate scanning delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
-  // Sample result - in a real app this would be actual results from scanning content
-  const result: AuditResult = {
-    timestamp: new Date().toISOString(),
-    newContent: [
-      {
-        id: 'art_123',
-        title: 'What is WCAG 2.1?',
-        content: 'The Web Content Accessibility Guidelines (WCAG) 2.1 is...',
-        url: '/resources/what-is-wcag-2-1',
-        lastUpdated: new Date().toISOString(),
-        category: 'Fundamentals',
-        tags: ['WCAG', 'Guidelines', 'Basics']
-      },
-      {
-        id: 'art_124',
-        title: 'Understanding Color Contrast Requirements',
-        content: 'Color contrast is essential for users with visual impairments...',
-        url: '/resources/color-contrast-requirements',
-        lastUpdated: new Date().toISOString(),
-        category: 'Visual',
-        tags: ['Color', 'Contrast', 'Visual Impairment']
-      }
-    ],
-    updatedContent: [
-      {
-        id: 'art_089',
-        title: 'Keyboard Navigation Best Practices',
-        content: 'Ensuring your website can be navigated via keyboard is critical...',
-        url: '/resources/keyboard-navigation',
-        lastUpdated: new Date().toISOString(),
-        category: 'Input Methods',
-        tags: ['Keyboard', 'Navigation', 'Motor Disabilities']
-      }
-    ],
-    totalItems: 50,
-    processedItems: 50
+  // In a real implementation, this would:
+  // 1. Fetch sitemap or crawl the site
+  // 2. Extract content from each page
+  // 3. Process the content to identify topics
+  // 4. Compare with the chatbot's existing knowledge base
+  // 5. Identify gaps and generate suggestions
+  
+  console.log('[Chatbot Content Audit] Completed website content scan');
+  
+  // Return mock results for demo
+  return {
+    ...mockScanResults,
+    lastScan: new Date().toISOString()
   };
-  
-  // In a real implementation, we would update the chatbot's knowledge base with this content
-  console.log('Content audit completed:', result);
-  
-  return result;
 }
 
 /**
- * Updates the chatbot settings with the latest audit timestamp
+ * Check if a content scan is due based on settings
  */
-export async function updateLastScanTimestamp(settings: ChatSettings): Promise<ChatSettings> {
-  // In a real implementation, this would update the database
-  const updatedSettings: ChatSettings = {
-    ...settings,
-    autoScan: {
-      ...settings.autoScan,
-      lastScan: new Date().toISOString()
-    }
-  };
+export function isScanDue(settings: ChatSettings, lastScanTime?: string): boolean {
+  if (!settings.enableContentScanning) return false;
   
-  return updatedSettings;
+  // If no previous scan, a scan is due
+  if (!lastScanTime) return true;
+  
+  const now = new Date();
+  const lastScan = new Date(lastScanTime);
+  const hoursSinceLastScan = (now.getTime() - lastScan.getTime()) / (1000 * 60 * 60);
+  
+  switch (settings.scanningFrequency) {
+    case 'hourly':
+      return hoursSinceLastScan >= 1;
+    case 'daily':
+      return hoursSinceLastScan >= 24;
+    case 'weekly':
+      return hoursSinceLastScan >= 168; // 24 * 7
+    default:
+      return false;
+  }
+}
+
+/**
+ * Auto-scan content if enabled and due
+ */
+export async function autoScanIfDue(settings: ChatSettings): Promise<ContentAuditResult | null> {
+  // Check if auto-scanning is enabled and due
+  const lastScanStr = localStorage.getItem('chatbot-last-content-scan');
+  
+  if (settings.enableContentScanning && isScanDue(settings, lastScanStr)) {
+    console.log('[Chatbot Content Audit] Starting automated content scan');
+    const results = await scanWebsiteContent();
+    
+    // Save the scan time
+    localStorage.setItem('chatbot-last-content-scan', results.lastScan);
+    
+    // Save audit results
+    localStorage.setItem('chatbot-content-audit', JSON.stringify(results));
+    
+    return results;
+  }
+  
+  return null;
+}
+
+/**
+ * Get the latest content audit results
+ */
+export function getLatestAuditResults(): ContentAuditResult | null {
+  const savedResults = localStorage.getItem('chatbot-content-audit');
+  if (savedResults) {
+    try {
+      return JSON.parse(savedResults);
+    } catch (error) {
+      console.error('[Chatbot Content Audit] Error parsing audit results:', error);
+    }
+  }
+  return null;
+}
+
+/**
+ * Extract topics from a specific piece of content
+ */
+export function extractContentTopics(content: string): string[] {
+  // For demo purposes, we'll use the simple utility function
+  // In a real app, this would use more sophisticated NLP
+  return extractTopics(content);
+}
+
+/**
+ * Process HTML content for the chatbot
+ */
+export function processHtmlContent(html: string): string {
+  // Convert HTML to plain text
+  const text = htmlToText(html);
+  
+  // In a real implementation, you might:
+  // 1. Extract structured information
+  // 2. Remove irrelevant content
+  // 3. Format the text for better chatbot training
+  
+  return text;
 }

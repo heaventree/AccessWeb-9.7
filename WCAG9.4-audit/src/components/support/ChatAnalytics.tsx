@@ -1,237 +1,326 @@
-import { useState } from 'react';
-import { Card } from '../ui/Card';
-import { ChatStats } from '../../types/chat';
+import React, { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { ChatStatistics } from '../../types/chat';
+import { Card, CardContent } from '../ui/Card';
+
+// Mock data for demonstration (in a real app, this would come from your API)
+const mockData: ChatStatistics = {
+  totalSessions: 487,
+  totalMessages: 2893,
+  averageSessionLength: 6.2,
+  averageResponseTime: 0.8,
+  userSatisfactionScore: 4.3,
+  commonTopics: [
+    { topic: 'WCAG Compliance', count: 98 },
+    { topic: 'Color Contrast', count: 76 },
+    { topic: 'Screen Readers', count: 53 },
+    { topic: 'Keyboard Navigation', count: 47 },
+    { topic: 'Form Accessibility', count: 42 },
+    { topic: 'ARIA Attributes', count: 39 },
+    { topic: 'Semantic HTML', count: 27 },
+  ],
+  dailyActivity: [
+    { date: '2025-03-28', sessions: 21 },
+    { date: '2025-03-29', sessions: 18 },
+    { date: '2025-03-30', sessions: 24 },
+    { date: '2025-03-31', sessions: 29 },
+    { date: '2025-04-01', sessions: 34 },
+    { date: '2025-04-02', sessions: 32 },
+    { date: '2025-04-03', sessions: 28 },
+    { date: '2025-04-04', sessions: 27 },
+  ],
+};
+
+// List of top queries with answers for review (in a real app, this would come from your API)
+const mockTopQueries = [
+  { 
+    query: "What is WCAG compliance?", 
+    count: 34,
+    answer: "WCAG (Web Content Accessibility Guidelines) are developed through the W3C process in cooperation with individuals and organizations around the world, with a goal of providing a single shared standard for web content accessibility.",
+    accuracy: 4.8
+  },
+  { 
+    query: "How do I check color contrast?", 
+    count: 29,
+    answer: "You can check color contrast using our contrast checker tool. WCAG 2.1 requires a contrast ratio of at least 4.5:1 for normal text and 3:1 for large text. The tool will show you if your colors pass these requirements.",
+    accuracy: 4.9
+  },
+  { 
+    query: "What are aria labels?", 
+    count: 27,
+    answer: "ARIA labels (aria-label attribute) provide an accessible name for elements when the visual text can't be used or doesn't exist. They're read by screen readers to help users understand the purpose of elements, especially for interactive controls.",
+    accuracy: 4.7
+  },
+  { 
+    query: "How do I make forms accessible?", 
+    count: 26,
+    answer: "To make forms accessible: 1) Use proper labels for all form fields, 2) Provide clear error messages, 3) Use fieldset and legend for grouping, 4) Ensure keyboard navigation works, 5) Don't rely solely on color for error states, 6) Add aria-required to required fields.",
+    accuracy: 4.5
+  },
+  { 
+    query: "What is a screen reader?", 
+    count: 22,
+    answer: "A screen reader is assistive technology that converts digital text into synthesized speech. It allows visually impaired users to hear the content displayed on their screen or read it via refreshable Braille display.",
+    accuracy: 4.9
+  },
+];
+
+// WCAG categories for filtering (in a real app, this might be dynamic)
+const wcagCategories = [
+  'All',
+  'Perceivable',
+  'Operable',
+  'Understandable',
+  'Robust'
+];
+
+// Colors for charts
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 export function ChatAnalytics() {
-  // This would typically come from an API
-  const [stats] = useState<ChatStats>({
-    totalSessions: 142,
-    activeSessionsCount: 3,
-    averageSessionDuration: 4.2, // minutes
-    messagesPerSession: 6.8,
-    topQueries: [
-      { query: "WCAG compliance", count: 28 },
-      { query: "color contrast", count: 22 },
-      { query: "keyboard navigation", count: 18 },
-      { query: "screen reader compatibility", count: 15 },
-      { query: "form validation", count: 12 }
-    ],
-    resolvedWithoutHuman: 106,
-    sentimentAnalysis: {
-      positive: 68,
-      neutral: 55,
-      negative: 19
-    },
-    timeOfDay: {
-      morning: 42,
-      afternoon: 65,
-      evening: 30,
-      night: 5
-    }
-  });
-
-  // Date ranges for filtering
-  const dateRanges = [
-    { label: 'Last 7 days', value: '7d' },
-    { label: 'Last 30 days', value: '30d' },
-    { label: 'Last 90 days', value: '90d' },
-    { label: 'Year to date', value: 'ytd' },
-    { label: 'All time', value: 'all' }
-  ];
-
-  // Sample data for conversation flow visualization
-  const flowData = [
-    { from: 'Initial Question', to: 'Bot Response', value: 142 },
-    { from: 'Bot Response', to: 'Follow-up Question', value: 98 },
-    { from: 'Bot Response', to: 'Conversation End', value: 44 },
-    { from: 'Follow-up Question', to: 'Bot Response 2', value: 98 },
-    { from: 'Bot Response 2', to: 'Further Question', value: 67 },
-    { from: 'Bot Response 2', to: 'Conversation End', value: 31 },
-    { from: 'Further Question', to: 'Bot Response 3', value: 67 },
-    { from: 'Bot Response 3', to: 'Human Transfer', value: 15 },
-    { from: 'Bot Response 3', to: 'Conversation End', value: 52 }
-  ];
-
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [dateRange, setDateRange] = useState('7days');
+  
+  // In a real component, these would fetch from an API
+  const stats = mockData;
+  
+  // Filter queries by search term
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredQueries = mockTopQueries.filter(query => 
+    query.query.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
   return (
-    <div className="space-y-8">
-      {/* Date range filter */}
-      <div className="flex justify-end">
-        <div className="inline-flex rounded-md shadow-sm">
-          {dateRanges.map((range, i) => (
-            <button
-              key={range.value}
-              className={`relative inline-flex items-center px-4 py-2 text-sm font-medium ${
-                i === 0 ? 'rounded-l-md' : ''
-              } ${
-                i === dateRanges.length - 1 ? 'rounded-r-md' : ''
-              } ${
-                i === 0 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-              }`}
+    <div className="space-y-6">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardContent>
+            <div className="flex flex-col">
+              <h3 className="text-sm font-medium text-gray-500">Total Sessions</h3>
+              <p className="text-3xl font-bold text-blue-600">{stats.totalSessions}</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent>
+            <div className="flex flex-col">
+              <h3 className="text-sm font-medium text-gray-500">Total Messages</h3>
+              <p className="text-3xl font-bold text-blue-600">{stats.totalMessages}</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent>
+            <div className="flex flex-col">
+              <h3 className="text-sm font-medium text-gray-500">Avg. Response Time</h3>
+              <p className="text-3xl font-bold text-blue-600">{stats.averageResponseTime}s</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent>
+            <div className="flex flex-col">
+              <h3 className="text-sm font-medium text-gray-500">User Satisfaction</h3>
+              <p className="text-3xl font-bold text-blue-600">{stats.userSatisfactionScore}/5</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Activity Chart */}
+      <Card>
+        <CardContent>
+          <h3 className="text-lg font-medium mb-4">Chat Activity</h3>
+          <div className="flex justify-end mb-4">
+            <select 
+              className="bg-white border border-gray-300 rounded-md px-3 py-1 text-sm"
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
             >
-              {range.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Summary metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="p-4">
-          <h3 className="text-sm font-medium text-gray-500">Total Conversations</h3>
-          <p className="text-3xl font-bold mt-1">{stats.totalSessions}</p>
-          <div className="mt-1 flex items-center text-sm text-green-600">
-            <span className="font-medium">+12.5%</span>
-            <span className="ml-1">from previous period</span>
+              <option value="7days">Last 7 days</option>
+              <option value="30days">Last 30 days</option>
+              <option value="90days">Last 90 days</option>
+            </select>
           </div>
-        </Card>
-        
-        <Card className="p-4">
-          <h3 className="text-sm font-medium text-gray-500">Avg. Messages</h3>
-          <p className="text-3xl font-bold mt-1">{stats.messagesPerSession}</p>
-          <div className="mt-1 flex items-center text-sm text-green-600">
-            <span className="font-medium">+3.2%</span>
-            <span className="ml-1">from previous period</span>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={stats.dailyActivity}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="date" 
+                  tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                />
+                <YAxis />
+                <Tooltip 
+                  formatter={(value) => [`${value} sessions`, 'Activity']}
+                  labelFormatter={(date) => new Date(date).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="sessions" 
+                  stroke="#0088FE" 
+                  activeDot={{ r: 8 }} 
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-        </Card>
-        
-        <Card className="p-4">
-          <h3 className="text-sm font-medium text-gray-500">Resolved by Bot</h3>
-          <p className="text-3xl font-bold mt-1">{Math.round((stats.resolvedWithoutHuman / stats.totalSessions) * 100)}%</p>
-          <div className="mt-1 flex items-center text-sm text-green-600">
-            <span className="font-medium">+5.3%</span>
-            <span className="ml-1">from previous period</span>
-          </div>
-        </Card>
-        
-        <Card className="p-4">
-          <h3 className="text-sm font-medium text-gray-500">User Satisfaction</h3>
-          <p className="text-3xl font-bold mt-1">{Math.round((stats.sentimentAnalysis.positive / stats.totalSessions) * 100)}%</p>
-          <div className="mt-1 flex items-center text-sm text-yellow-600">
-            <span className="font-medium">-2.1%</span>
-            <span className="ml-1">from previous period</span>
-          </div>
-        </Card>
-      </div>
-
-      {/* Top queries */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Top User Queries</h3>
-        <div className="space-y-4">
-          {stats.topQueries.map((query, i) => (
-            <div key={i} className="flex items-center justify-between">
-              <div className="flex items-center">
-                <span className="text-sm font-medium text-gray-800">{i + 1}.</span>
-                <span className="ml-2 text-sm text-gray-800">{query.query}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-sm font-medium mr-2">{query.count}</span>
-                <div className="w-40 bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-blue-600 h-2.5 rounded-full" 
-                    style={{ width: `${(query.count / stats.topQueries[0].count) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 text-sm text-blue-600 font-medium">
-          <button className="hover:underline">View all queries</button>
-        </div>
+        </CardContent>
       </Card>
-
-      {/* Conversation Flow Visualization */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Conversation Flow</h3>
-        <div className="h-60 overflow-auto">
-          <div className="flex flex-nowrap">
-            {flowData.map((flow, i) => (
-              <div key={i} className="flex items-center flex-shrink-0">
-                <div className="p-3 bg-blue-100 rounded-lg border border-blue-200 text-center min-w-[120px]">
-                  <span className="text-sm font-medium text-blue-800">{flow.from}</span>
-                </div>
-                <div className="flex flex-col items-center px-2">
-                  <div className="w-12 h-0.5 bg-blue-300"></div>
-                  <span className="text-xs text-gray-500 mt-1">{flow.value}</span>
-                </div>
-                {i === flowData.length - 1 && (
-                  <div className="p-3 bg-blue-100 rounded-lg border border-blue-200 text-center min-w-[120px]">
-                    <span className="text-sm font-medium text-blue-800">{flow.to}</span>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </Card>
-
-      {/* Sentiment Analysis */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">User Sentiment</h3>
-        <div className="flex justify-around items-center mt-4">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-2">
-              <span className="text-xl font-semibold">{Math.round((stats.sentimentAnalysis.positive / stats.totalSessions) * 100)}%</span>
+      
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top Topics */}
+        <Card>
+          <CardContent>
+            <h3 className="text-lg font-medium mb-4">Top Discussion Topics</h3>
+            <div className="flex justify-end mb-4">
+              <select 
+                className="bg-white border border-gray-300 rounded-md px-3 py-1 text-sm"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                {wcagCategories.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
             </div>
-            <p className="text-sm text-gray-500 font-medium">Positive</p>
-          </div>
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 text-gray-600 mb-2">
-              <span className="text-xl font-semibold">{Math.round((stats.sentimentAnalysis.neutral / stats.totalSessions) * 100)}%</span>
-            </div>
-            <p className="text-sm text-gray-500 font-medium">Neutral</p>
-          </div>
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 text-red-600 mb-2">
-              <span className="text-xl font-semibold">{Math.round((stats.sentimentAnalysis.negative / stats.totalSessions) * 100)}%</span>
-            </div>
-            <p className="text-sm text-gray-500 font-medium">Negative</p>
-          </div>
-        </div>
-        <div className="mt-6">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Sentiment Trend</h4>
-          <div className="w-full h-32 bg-gray-50 rounded-lg border border-gray-200 p-4">
-            <div className="w-full h-full flex items-end">
-              {Array.from({ length: 30 }).map((_, i) => (
-                <div 
-                  key={i} 
-                  className="flex-1 flex flex-col items-center"
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={stats.commonTopics}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
                 >
-                  <div 
-                    className={`w-2 ${i % 3 === 0 ? 'bg-green-500' : i % 3 === 1 ? 'bg-gray-400' : 'bg-red-500'}`} 
-                    style={{ 
-                      height: `${Math.random() * 70 + 10}%`, 
-                    }}
-                  ></div>
-                </div>
-              ))}
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis 
+                    type="category" 
+                    dataKey="topic" 
+                    width={80}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <Tooltip />
+                  <Bar 
+                    dataKey="count" 
+                    fill="#0088FE" 
+                    radius={[0, 4, 4, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* User Satisfaction */}
+        <Card>
+          <CardContent>
+            <h3 className="text-lg font-medium mb-4">Response Accuracy</h3>
+            <div className="h-80 flex justify-center items-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: 'Excellent (5★)', value: 45 },
+                      { name: 'Good (4★)', value: 35 },
+                      { name: 'Average (3★)', value: 15 },
+                      { name: 'Fair (2★)', value: 4 },
+                      { name: 'Poor (1★)', value: 1 },
+                    ]}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    innerRadius={60}
+                    dataKey="value"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {[
+                      { name: 'Excellent (5★)', value: 45 },
+                      { name: 'Good (4★)', value: 35 },
+                      { name: 'Average (3★)', value: 15 },
+                      { name: 'Fair (2★)', value: 4 },
+                      { name: 'Poor (1★)', value: 1 },
+                    ].map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => `${value} responses`} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Top Queries Table */}
+      <Card>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+            <h3 className="text-lg font-medium">Top Queries</h3>
+            <div className="mt-2 sm:mt-0">
+              <input
+                type="text"
+                placeholder="Search queries..."
+                className="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-1 text-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
-        </div>
-      </Card>
-
-      {/* Time of Day Analysis */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Usage by Time of Day</h3>
-        <div className="h-60 mt-4">
-          <div className="flex h-full items-end">
-            {Object.entries(stats.timeOfDay).map(([time, count], i) => (
-              <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
-                <div 
-                  className="w-16 bg-blue-600 rounded-t-md" 
-                  style={{ 
-                    height: `${(count / Math.max(...Object.values(stats.timeOfDay))) * 100}%`,
-                    opacity: 0.6 + (i * 0.1)
-                  }}
-                ></div>
-                <span className="mt-2 text-xs text-gray-500 capitalize">{time}</span>
-                <span className="text-xs font-medium text-gray-700">{count}</span>
-              </div>
-            ))}
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Query</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Accuracy</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Answer</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredQueries.map((item, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-normal text-sm text-gray-900">{item.query}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.count}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <div className="flex items-center">
+                        <span className={`mr-2 font-medium ${
+                          item.accuracy >= 4.5 ? 'text-green-600' : 
+                          item.accuracy >= 3.5 ? 'text-blue-600' : 
+                          item.accuracy >= 2.5 ? 'text-yellow-600' : 'text-red-600'
+                        }`}>{item.accuracy.toFixed(1)}</span>
+                        <div className="flex">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <svg 
+                              key={star} 
+                              className={`w-4 h-4 ${star <= Math.round(item.accuracy) ? 'text-yellow-400' : 'text-gray-300'}`}
+                              fill="currentColor" 
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          ))}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-normal text-sm text-gray-500 max-w-md">
+                      {item.answer}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
+        </CardContent>
       </Card>
     </div>
   );

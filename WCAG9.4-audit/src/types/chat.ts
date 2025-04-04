@@ -1,82 +1,67 @@
-/**
- * Chat Message Types
- * Defines the structure of chat messages in the support system
- */
-
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'bot' | 'system';
+// Chat Message Types
+export interface Message {
+  role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: string;
-  metadata?: {
-    sentimentScore?: number;
-    category?: string;
-    wasHelpful?: boolean;
-    relatedArticles?: string[];
-    [key: string]: any;
-  };
 }
 
+// Chat Session Types
 export interface ChatSession {
   id: string;
   userId?: string;
-  userIp: string;
-  userAgent: string;
   startTime: string;
   endTime?: string;
-  messages: ChatMessage[];
-  resolved: boolean;
-  transferredToHuman: boolean;
-  feedback?: {
-    rating?: number;
-    comments?: string;
-  };
+  messages: Message[];
+  userRating?: number;
+  feedback?: string;
 }
 
-export interface ChatStats {
+// Analytics Types
+export interface ChatStatistics {
   totalSessions: number;
-  activeSessionsCount: number;
-  averageSessionDuration: number;
-  messagesPerSession: number;
-  topQueries: {
-    query: string;
+  totalMessages: number;
+  averageSessionLength: number;
+  averageResponseTime: number;
+  userSatisfactionScore: number;
+  commonTopics: {
+    topic: string;
     count: number;
   }[];
-  resolvedWithoutHuman: number;
-  sentimentAnalysis: {
-    positive: number;
-    neutral: number;
-    negative: number;
-  };
-  timeOfDay: {
-    morning: number;
-    afternoon: number;
-    evening: number;
-    night: number;
-  };
+  dailyActivity: {
+    date: string;
+    sessions: number;
+  }[];
 }
 
+// Settings Types
 export interface ChatSettings {
-  enabled: boolean;
-  initialMessage: string;
-  botName: string;
-  maxAttachmentSize: number;
-  supportedFileTypes: string[];
-  offHoursMessage: string;
-  workingHours: {
-    start: string;
-    end: string;
-    timezone: string;
-    workDays: number[];
-  };
-  thresholdForHumanTransfer: number;
-  enableVoiceInput: boolean;
-  enableAttachments: boolean;
-  enableFeedbackCollection: boolean;
-  enableAnalytics: boolean;
-  autoScan: {
-    enabled: boolean;
-    interval: number; // hours
-    lastScan?: string;
-  };
+  greeting: string;
+  enableAutoSuggestions: boolean;
+  enableContentScanning: boolean;
+  scanningFrequency: 'hourly' | 'daily' | 'weekly';
+  aiModel: string;
+  maxHistoryLength: number;
+  autoLearningEnabled: boolean;
+}
+
+// Training Data Types
+export interface TrainingTopic {
+  id: string;
+  name: string;
+  examples: string[];
+  responses: string[];
+  priority: number;
+}
+
+// Content Audit Types
+export interface ContentAuditResult {
+  lastScan: string;
+  scannedPages: number;
+  extractedTopics: string[];
+  newTopics: string[];
+  contentGaps: {
+    topic: string;
+    confidence: number;
+    suggestion: string;
+  }[];
 }

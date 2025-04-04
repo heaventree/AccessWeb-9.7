@@ -1,10 +1,9 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
 
-type PageHeaderProps = {
+interface PageHeaderProps {
   title: string;
   description?: string;
-  icon?: React.ReactNode;
   actions?: React.ReactNode;
   className?: string;
 }
@@ -12,24 +11,28 @@ type PageHeaderProps = {
 export function PageHeader({ 
   title, 
   description, 
-  icon, 
-  actions,
+  actions, 
   className 
 }: PageHeaderProps) {
   return (
-    <div className={cn('flex flex-col sm:flex-row sm:items-center justify-between', className)}>
-      <div className="flex items-center space-x-3 mb-4 sm:mb-0">
-        {icon && <div className="flex-shrink-0">{icon}</div>}
+    <div className={cn('mb-8', className)}>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            {title}
+          </h1>
           {description && (
-            <p className="mt-1 text-gray-500 max-w-2xl">{description}</p>
+            <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+              {description}
+            </p>
           )}
         </div>
+        {actions && (
+          <div className="mt-4 sm:mt-0 flex space-x-3">
+            {actions}
+          </div>
+        )}
       </div>
-      {actions && (
-        <div className="flex space-x-3">{actions}</div>
-      )}
     </div>
   );
 }

@@ -1,449 +1,528 @@
-import React, { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs';
+import React, { useState, useEffect } from 'react';
+import { Tabs } from '../../components/ui/Tabs';
 import { PageHeader } from '../../components/ui/PageHeader';
-import { Card } from '../../components/ui/Card';
-import { ChatSettings, ChatStats } from '../../types/chat';
-import { MessageSquare, Settings, BarChart2, BookOpen, PlusCircle } from 'lucide-react';
+import { Card, CardContent } from '../../components/ui/Card';
+import { ChatStatistics, TrainingTopic } from '../../types/chat';
+import { ChatAnalytics } from '../../components/support/ChatAnalytics';
+import { useChatbot } from '../../hooks/useChatbot';
+import { scanWebsiteContent, getLatestAuditResults } from '../../services/chatbotContentAudit';
 
 export function ChatbotManagement() {
-  // Sample initial settings - in a real app, these would come from an API
-  const [settings, setSettings] = useState<ChatSettings>({
-    enabled: true,
-    initialMessage: "Hello! I'm your accessibility assistant. How can I help you today?",
-    botName: "WCAG Assistant",
-    maxAttachmentSize: 5, // MB
-    supportedFileTypes: [".jpg", ".png", ".pdf", ".txt"],
-    offHoursMessage: "Our support team is currently unavailable. Please check back during business hours.",
-    workingHours: {
-      start: "09:00",
-      end: "17:00",
-      timezone: "UTC",
-      workDays: [1, 2, 3, 4, 5] // Monday to Friday
-    },
-    thresholdForHumanTransfer: 3,
-    enableVoiceInput: true,
-    enableAttachments: true,
-    enableFeedbackCollection: true,
-    enableAnalytics: true,
-    autoScan: {
-      enabled: true,
-      interval: 24, // daily
-      lastScan: new Date().toISOString()
-    }
-  });
-
-  // Sample chatbot stats - in a real app, these would come from an API
-  const [stats, setStats] = useState<ChatStats>({
-    totalSessions: 142,
-    activeSessionsCount: 3,
-    averageSessionDuration: 4.2, // minutes
-    messagesPerSession: 6.8,
-    topQueries: [
-      { query: "WCAG compliance", count: 28 },
-      { query: "color contrast", count: 22 },
-      { query: "keyboard navigation", count: 18 },
-      { query: "screen reader compatibility", count: 15 },
-      { query: "form validation", count: 12 }
+  const { settings, updateSettings, clearHistory } = useChatbot();
+  
+  // Content Audit State
+  const [scanning, setScanning] = useState(false);
+  const [auditResults, setAuditResults] = useState(getLatestAuditResults());
+  
+  // Analytics State (in a real app, these would come from an API)
+  const [stats, setStats] = useState<ChatStatistics>({
+    totalSessions: 487,
+    totalMessages: 2893,
+    averageSessionLength: 6.2,
+    averageResponseTime: 0.8,
+    userSatisfactionScore: 4.3,
+    commonTopics: [
+      { topic: 'WCAG Compliance', count: 98 },
+      { topic: 'Color Contrast', count: 76 },
+      { topic: 'Screen Readers', count: 53 },
+      { topic: 'Keyboard Navigation', count: 47 },
+      { topic: 'Form Accessibility', count: 42 },
     ],
-    resolvedWithoutHuman: 106,
-    sentimentAnalysis: {
-      positive: 68,
-      neutral: 55,
-      negative: 19
-    },
-    timeOfDay: {
-      morning: 42,
-      afternoon: 65,
-      evening: 30,
-      night: 5
-    }
+    dailyActivity: [
+      { date: '2025-03-28', sessions: 21 },
+      { date: '2025-03-29', sessions: 18 },
+      { date: '2025-03-30', sessions: 24 },
+      { date: '2025-03-31', sessions: 29 },
+      { date: '2025-04-01', sessions: 34 },
+      { date: '2025-04-02', sessions: 32 },
+      { date: '2025-04-03', sessions: 28 },
+      { date: '2025-04-04', sessions: 27 },
+    ],
   });
-
-  // Sample training topics - in a real app, these would come from an API
-  const [trainingTopics, setTrainingTopics] = useState([
-    { topic: "WCAG 2.1 Guidelines", trained: true, accuracy: 92 },
-    { topic: "Assistive Technologies", trained: true, accuracy: 88 },
-    { topic: "Common Accessibility Issues", trained: true, accuracy: 94 },
-    { topic: "Testing Methodologies", trained: true, accuracy: 85 },
-    { topic: "Mobile Accessibility", trained: true, accuracy: 81 },
-    { topic: "PDF Accessibility", trained: false, accuracy: 0 },
-    { topic: "Multimedia Accessibility", trained: false, accuracy: 0 }
+  
+  // Training Data State (in a real app, this would come from an API)
+  const [trainingTopics, setTrainingTopics] = useState<TrainingTopic[]>([
+    {
+      id: '1',
+      name: 'WCAG Compliance',
+      examples: [
+        'What is WCAG compliance?',
+        'How do I make my site WCAG compliant?',
+        'What are the WCAG levels?'
+      ],
+      responses: [
+        'WCAG (Web Content Accessibility Guidelines) are developed through the W3C process in cooperation with individuals and organizations around the world, with a goal of providing a single shared standard for web content accessibility.',
+        'WCAG has three conformance levels: A (minimum), AA (standard), and AAA (enhanced). Most organizations aim for AA compliance.'
+      ],
+      priority: 1
+    },
+    {
+      id: '2',
+      name: 'Color Contrast',
+      examples: [
+        'How do I check color contrast?',
+        'What contrast ratio is needed for accessibility?',
+        'Are my colors accessible?'
+      ],
+      responses: [
+        'You can check color contrast using our contrast checker tool. WCAG 2.1 requires a contrast ratio of at least 4.5:1 for normal text and 3:1 for large text.',
+        'For enhanced accessibility (AAA), aim for 7:1 contrast ratio for normal text and 4.5:1 for large text.'
+      ],
+      priority: 2
+    },
   ]);
-
-  // Handler for toggling chatbot enabled state
-  const toggleChatbot = () => {
-    setSettings(prev => ({
-      ...prev,
-      enabled: !prev.enabled
-    }));
+  
+  // Initiate content scan
+  const startContentScan = async () => {
+    setScanning(true);
+    try {
+      const results = await scanWebsiteContent();
+      setAuditResults(results);
+      console.log('Content scan completed:', results);
+    } catch (error) {
+      console.error('Error scanning content:', error);
+    } finally {
+      setScanning(false);
+    }
   };
-
-  // Handler for updating chatbot settings
-  const updateSettings = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // This would typically save the settings to an API
-    console.log("Saving settings:", settings);
-    alert("Settings updated successfully!");
+  
+  // Clear chat history with confirmation
+  const handleClearHistory = () => {
+    if (window.confirm('Are you sure you want to clear all chat history? This action cannot be undone.')) {
+      clearHistory();
+      alert('Chat history has been cleared.');
+    }
   };
-
+  
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4">
-      <PageHeader
-        title="Chatbot Management"
-        description="Configure and monitor your site's support chatbot"
-        icon={<MessageSquare className="w-8 h-8 text-blue-600" />}
+    <div className="p-6">
+      <PageHeader 
+        title="Chatbot Management" 
+        description="Configure and monitor your WCAG Accessibility Support Chatbot"
       />
       
-      <Tabs defaultValue="settings" className="mt-8">
-        <TabsList>
-          <TabsTrigger value="settings">
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
-          </TabsTrigger>
-          <TabsTrigger value="analytics">
-            <BarChart2 className="w-4 h-4 mr-2" />
-            Analytics
-          </TabsTrigger>
-          <TabsTrigger value="training">
-            <BookOpen className="w-4 h-4 mr-2" />
-            Knowledge Base
-          </TabsTrigger>
-        </TabsList>
-        
-        {/* Settings Tab */}
-        <TabsContent value="settings">
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">Chatbot Configuration</h2>
-              <div className="flex items-center">
-                <span className="mr-3 text-sm font-medium">
-                  {settings.enabled ? "Enabled" : "Disabled"}
-                </span>
-                <button
-                  type="button"
-                  onClick={toggleChatbot}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                    settings.enabled ? "bg-blue-600" : "bg-gray-200"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      settings.enabled ? "translate-x-6" : "translate-x-1"
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
-            
-            <form onSubmit={updateSettings}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Bot Name
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.botName}
-                    onChange={(e) => setSettings({...settings, botName: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Initial Greeting Message
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.initialMessage}
-                    onChange={(e) => setSettings({...settings, initialMessage: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Off-Hours Message
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.offHoursMessage}
-                    onChange={(e) => setSettings({...settings, offHoursMessage: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Max Human Transfer Attempts
-                  </label>
-                  <input
-                    type="number"
-                    value={settings.thresholdForHumanTransfer}
-                    onChange={(e) => setSettings({...settings, thresholdForHumanTransfer: parseInt(e.target.value)})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    min="1"
-                    max="10"
-                  />
-                </div>
-              </div>
-              
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="voice-input"
-                    checked={settings.enableVoiceInput}
-                    onChange={(e) => setSettings({...settings, enableVoiceInput: e.target.checked})}
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                  />
-                  <label htmlFor="voice-input" className="ml-2 text-sm text-gray-700">
-                    Enable Voice Input
-                  </label>
-                </div>
-                
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="attachments"
-                    checked={settings.enableAttachments}
-                    onChange={(e) => setSettings({...settings, enableAttachments: e.target.checked})}
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                  />
-                  <label htmlFor="attachments" className="ml-2 text-sm text-gray-700">
-                    Enable Attachments
-                  </label>
-                </div>
-                
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="feedback"
-                    checked={settings.enableFeedbackCollection}
-                    onChange={(e) => setSettings({...settings, enableFeedbackCollection: e.target.checked})}
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                  />
-                  <label htmlFor="feedback" className="ml-2 text-sm text-gray-700">
-                    Collect User Feedback
-                  </label>
-                </div>
-                
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="analytics"
-                    checked={settings.enableAnalytics}
-                    onChange={(e) => setSettings({...settings, enableAnalytics: e.target.checked})}
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                  />
-                  <label htmlFor="analytics" className="ml-2 text-sm text-gray-700">
-                    Enable Analytics
-                  </label>
-                </div>
-                
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="auto-scan"
-                    checked={settings.autoScan.enabled}
-                    onChange={(e) => setSettings({
-                      ...settings, 
-                      autoScan: {
-                        ...settings.autoScan,
-                        enabled: e.target.checked
-                      }
-                    })}
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                  />
-                  <label htmlFor="auto-scan" className="ml-2 text-sm text-gray-700">
-                    Automatic Content Scanning
-                  </label>
-                </div>
-              </div>
-              
-              <div className="mt-8 flex justify-end">
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                >
-                  Save Settings
-                </button>
-              </div>
-            </form>
-          </Card>
-        </TabsContent>
-        
-        {/* Analytics Tab */}
-        <TabsContent value="analytics">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="p-4">
-              <h3 className="text-sm font-medium text-gray-500">Total Sessions</h3>
-              <p className="text-3xl font-bold mt-1">{stats.totalSessions}</p>
-            </Card>
-            <Card className="p-4">
-              <h3 className="text-sm font-medium text-gray-500">Active Now</h3>
-              <p className="text-3xl font-bold mt-1">{stats.activeSessionsCount}</p>
-            </Card>
-            <Card className="p-4">
-              <h3 className="text-sm font-medium text-gray-500">Avg. Duration</h3>
-              <p className="text-3xl font-bold mt-1">{stats.averageSessionDuration} min</p>
-            </Card>
-            <Card className="p-4">
-              <h3 className="text-sm font-medium text-gray-500">Self-Resolved</h3>
-              <p className="text-3xl font-bold mt-1">{Math.round((stats.resolvedWithoutHuman / stats.totalSessions) * 100)}%</p>
-            </Card>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Top User Queries</h3>
-              <div className="space-y-3">
-                {stats.topQueries.map((query, i) => (
-                  <div key={i} className="flex items-center justify-between">
-                    <span className="text-sm">{query.query}</span>
-                    <div className="flex items-center">
-                      <span className="text-sm font-medium mr-2">{query.count}</span>
-                      <div className="w-40 bg-gray-200 rounded-full h-2.5">
-                        <div 
-                          className="bg-blue-600 h-2.5 rounded-full" 
-                          style={{ width: `${(query.count / stats.topQueries[0].count) * 100}%` }}
-                        ></div>
+      <Tabs
+        tabs={[
+          {
+            id: 'settings',
+            label: 'Settings',
+            content: (
+              <div className="space-y-6">
+                {/* General Settings */}
+                <Card>
+                  <CardContent>
+                    <h3 className="text-lg font-semibold mb-4">General Settings</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Enable Chatbot</h4>
+                          <p className="text-sm text-gray-500">Show the chat widget to users</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.enableAutoSuggestions}
+                            onChange={(e) => updateSettings({ enableAutoSuggestions: e.target.checked })}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Auto-suggestions</h4>
+                          <p className="text-sm text-gray-500">Suggest responses based on user input</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.enableAutoSuggestions}
+                            onChange={(e) => updateSettings({ enableAutoSuggestions: e.target.checked })}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Learning Mode</h4>
+                          <p className="text-sm text-gray-500">Improve responses based on user interactions</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.autoLearningEnabled}
+                            onChange={(e) => updateSettings({ autoLearningEnabled: e.target.checked })}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Bot Name
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.greeting}
+                            onChange={(e) => updateSettings({ greeting: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Initial Greeting Message
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.greeting}
+                            onChange={(e) => updateSettings({ greeting: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            After Hours Message
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.greeting}
+                            onChange={(e) => updateSettings({ greeting: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Human Transfer Threshold
+                          </label>
+                          <select
+                            value={settings.maxHistoryLength}
+                            onChange={(e) => updateSettings({ maxHistoryLength: parseInt(e.target.value) })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          >
+                            <option value="2">After 2 failed responses</option>
+                            <option value="3">After 3 failed responses</option>
+                            <option value="4">After 4 failed responses</option>
+                            <option value="5">After 5 failed responses</option>
+                          </select>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Voice Input</h4>
+                          <p className="text-sm text-gray-500">Allow users to speak instead of typing</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.enableAutoSuggestions}
+                            onChange={(e) => updateSettings({ enableAutoSuggestions: e.target.checked })}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">File Attachments</h4>
+                          <p className="text-sm text-gray-500">Allow users to upload files in chat</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.enableAutoSuggestions}
+                            onChange={(e) => updateSettings({ enableAutoSuggestions: e.target.checked })}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Feedback Collection</h4>
+                          <p className="text-sm text-gray-500">Ask users to rate responses</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.enableAutoSuggestions}
+                            onChange={(e) => updateSettings({ enableAutoSuggestions: e.target.checked })}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Usage Analytics</h4>
+                          <p className="text-sm text-gray-500">Collect anonymous usage data</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.enableAutoSuggestions}
+                            onChange={(e) => updateSettings({ enableAutoSuggestions: e.target.checked })}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-            
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">User Sentiment</h3>
-              <div className="flex justify-between items-center mt-8">
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-500 mb-2">
-                    <span className="text-lg font-semibold">{Math.round((stats.sentimentAnalysis.positive / stats.totalSessions) * 100)}%</span>
-                  </div>
-                  <p className="text-sm text-gray-500">Positive</p>
-                </div>
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-500 mb-2">
-                    <span className="text-lg font-semibold">{Math.round((stats.sentimentAnalysis.neutral / stats.totalSessions) * 100)}%</span>
-                  </div>
-                  <p className="text-sm text-gray-500">Neutral</p>
-                </div>
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-500 mb-2">
-                    <span className="text-lg font-semibold">{Math.round((stats.sentimentAnalysis.negative / stats.totalSessions) * 100)}%</span>
-                  </div>
-                  <p className="text-sm text-gray-500">Negative</p>
-                </div>
-              </div>
-            </Card>
-          </div>
-          
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Usage by Time of Day</h3>
-            <div className="h-60 mt-4">
-              <div className="flex h-full items-end">
-                {Object.entries(stats.timeOfDay).map(([time, count], i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
-                    <div 
-                      className="w-16 bg-blue-600 rounded-t-md" 
-                      style={{ 
-                        height: `${(count / Math.max(...Object.values(stats.timeOfDay))) * 100}%`,
-                        opacity: 0.6 + (i * 0.1)
-                      }}
-                    ></div>
-                    <span className="mt-2 text-xs text-gray-500 capitalize">{time}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
-        
-        {/* Knowledge Base Tab */}
-        <TabsContent value="training">
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">Knowledge Base Topics</h2>
-              <button 
-                className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <PlusCircle className="w-4 h-4 mr-2" />
-                Add New Topic
-              </button>
-            </div>
-            
-            <div className="mt-4">
-              <div className="grid grid-cols-6 gap-4 text-sm font-medium text-gray-500 border-b border-gray-200 pb-2">
-                <div className="col-span-3">Topic</div>
-                <div className="col-span-1">Status</div>
-                <div className="col-span-1">Accuracy</div>
-                <div className="col-span-1">Actions</div>
-              </div>
-              
-              <div className="space-y-3 mt-2">
-                {trainingTopics.map((topic, i) => (
-                  <div key={i} className="grid grid-cols-6 gap-4 items-center py-3 border-b border-gray-100">
-                    <div className="col-span-3 font-medium">{topic.topic}</div>
-                    <div className="col-span-1">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        topic.trained ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {topic.trained ? 'Trained' : 'Pending'}
-                      </span>
+                  </CardContent>
+                </Card>
+                
+                {/* Content Scanning */}
+                <Card>
+                  <CardContent>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold">Content Scanning</h3>
+                        <p className="text-sm text-gray-500">Automatically scan website content to improve chatbot responses</p>
+                      </div>
+                      <div className="mt-2 sm:mt-0 inline-flex rounded-md shadow-sm">
+                        <button
+                          type="button"
+                          onClick={startContentScan}
+                          disabled={scanning}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {scanning ? 'Scanning...' : 'Scan Now'}
+                        </button>
+                      </div>
                     </div>
-                    <div className="col-span-1">
-                      {topic.trained ? (
-                        <div className="flex items-center">
-                          <span className="text-sm font-medium mr-2">{topic.accuracy}%</span>
-                          <div className="w-16 bg-gray-200 rounded-full h-1.5">
-                            <div 
-                              className={`h-1.5 rounded-full ${
-                                topic.accuracy > 90 ? 'bg-green-500' : 
-                                topic.accuracy > 80 ? 'bg-yellow-500' : 'bg-red-500'
-                              }`} 
-                              style={{ width: `${topic.accuracy}%` }}
-                            ></div>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Auto Scanning</h4>
+                          <p className="text-sm text-gray-500">Automatically scan content for chatbot training</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.enableContentScanning}
+                            onChange={(e) => updateSettings({ enableContentScanning: e.target.checked })}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Scanning Frequency
+                        </label>
+                        <select
+                          value={settings.scanningFrequency}
+                          onChange={(e) => updateSettings({ scanningFrequency: e.target.value as 'hourly' | 'daily' | 'weekly' })}
+                          disabled={!settings.enableContentScanning}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <option value="hourly">Hourly</option>
+                          <option value="daily">Daily</option>
+                          <option value="weekly">Weekly</option>
+                        </select>
+                      </div>
+                      
+                      {auditResults && (
+                        <div className="mt-4">
+                          <h4 className="font-medium mb-2">Last Scan Results</h4>
+                          <div className="bg-gray-50 p-4 rounded-md text-sm">
+                            <p><span className="font-medium">Last Scan:</span> {new Date(auditResults.lastScan).toLocaleString()}</p>
+                            <p><span className="font-medium">Pages Scanned:</span> {auditResults.scannedPages}</p>
+                            <p><span className="font-medium">Topics Extracted:</span> {auditResults.extractedTopics.length}</p>
+                            {auditResults.newTopics.length > 0 && (
+                              <div className="mt-2">
+                                <p className="font-medium">New Topics Discovered:</p>
+                                <ul className="list-disc list-inside mt-1 pl-2">
+                                  {auditResults.newTopics.map((topic, i) => (
+                                    <li key={i}>{topic}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {auditResults.contentGaps.length > 0 && (
+                              <div className="mt-2">
+                                <p className="font-medium">Content Gaps:</p>
+                                <ul className="list-disc list-inside mt-1 pl-2">
+                                  {auditResults.contentGaps.map((gap, i) => (
+                                    <li key={i}>{gap.topic} - {gap.suggestion}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
                           </div>
                         </div>
-                      ) : (
-                        <span className="text-gray-400">-</span>
                       )}
                     </div>
-                    <div className="col-span-1">
-                      <button 
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                      >
-                        {topic.trained ? 'Retrain' : 'Train Now'}
-                      </button>
+                  </CardContent>
+                </Card>
+                
+                {/* Advanced Settings */}
+                <Card>
+                  <CardContent>
+                    <h3 className="text-lg font-semibold mb-4">Advanced Settings</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          AI Model
+                        </label>
+                        <select
+                          value={settings.aiModel}
+                          onChange={(e) => updateSettings({ aiModel: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        >
+                          <option value="gpt-3.5">GPT-3.5 (Standard)</option>
+                          <option value="gpt-4">GPT-4 (Enhanced)</option>
+                          <option value="custom">Custom Model</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Message History Length
+                        </label>
+                        <select
+                          value={settings.maxHistoryLength}
+                          onChange={(e) => updateSettings({ maxHistoryLength: parseInt(e.target.value) })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        >
+                          <option value="10">10 messages</option>
+                          <option value="20">20 messages</option>
+                          <option value="50">50 messages</option>
+                          <option value="100">100 messages</option>
+                        </select>
+                      </div>
+                      
+                      <div className="pt-4 border-t border-gray-200">
+                        <h4 className="font-medium text-red-600 mb-2">Danger Zone</h4>
+                        <button
+                          type="button"
+                          onClick={handleClearHistory}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                        >
+                          Clear Chat History
+                        </button>
+                        <p className="mt-1 text-xs text-gray-500">This will delete all chat history and cannot be undone.</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  </CardContent>
+                </Card>
               </div>
-            </div>
-            
-            <div className="mt-8 bg-blue-50 rounded-lg p-4">
-              <h3 className="text-md font-semibold text-blue-800 mb-2">Content Auto-Scan</h3>
-              <p className="text-sm text-blue-700 mb-2">
-                Last scan: {new Date(settings.autoScan.lastScan || '').toLocaleString()}
-              </p>
-              <div className="flex space-x-2">
-                <button 
-                  className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700"
-                >
-                  Scan Content Now
-                </button>
-                <button 
-                  className="px-3 py-1.5 border border-blue-600 text-blue-600 text-sm font-medium rounded hover:bg-blue-50"
-                >
-                  View Scan History
-                </button>
+            ),
+          },
+          {
+            id: 'analytics',
+            label: 'Analytics & Insights',
+            content: <ChatAnalytics />,
+          },
+          {
+            id: 'training',
+            label: 'Knowledge Base',
+            content: (
+              <div className="space-y-6">
+                <Card>
+                  <CardContent>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold">Training Topics</h3>
+                        <p className="text-sm text-gray-500">Manage the topics your chatbot is trained on</p>
+                      </div>
+                      <div className="mt-2 sm:mt-0">
+                        <button
+                          type="button"
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                          Add Topic
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                      <table className="min-w-full divide-y divide-gray-300">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Topic</th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Examples</th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Priority</th>
+                            <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                              <span className="sr-only">Actions</span>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 bg-white">
+                          {trainingTopics.map((topic) => (
+                            <tr key={topic.id}>
+                              <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{topic.name}</td>
+                              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{topic.examples.length} examples</td>
+                              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                {topic.priority === 1 ? 'High' : topic.priority === 2 ? 'Medium' : 'Low'}
+                              </td>
+                              <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                <button 
+                                  type="button" 
+                                  className="text-blue-600 hover:text-blue-900 mr-4"
+                                >
+                                  Edit
+                                </button>
+                                <button 
+                                  type="button" 
+                                  className="text-red-600 hover:text-red-900"
+                                >
+                                  Delete
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent>
+                    <h3 className="text-lg font-semibold mb-4">Integration with Help Center</h3>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Your chatbot automatically integrates with your knowledge base and help center articles.
+                      When content scanning is enabled, new articles are automatically detected and used to improve responses.
+                    </p>
+                    
+                    <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                      <div className="flex">
+                        <div className="flex-shrink-0">
+                          <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm text-blue-700">
+                            Content scanning is currently {settings.enableContentScanning ? 'enabled' : 'disabled'}.
+                            {settings.enableContentScanning 
+                              ? ' Your chatbot will automatically update its knowledge when new content is published.' 
+                              : ' Enable content scanning in the Settings tab to keep your chatbot up to date.'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            </div>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 }

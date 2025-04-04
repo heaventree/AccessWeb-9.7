@@ -16,3 +16,16 @@ export function Card({ children, className }: CardProps) {
     </div>
   );
 }
+
+type CardContentProps = {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function CardContent({ children, className }: CardContentProps) {
+  return (
+    <div className={cn('p-6', className)}>
+      {children}
+    </div>
+  );
+}

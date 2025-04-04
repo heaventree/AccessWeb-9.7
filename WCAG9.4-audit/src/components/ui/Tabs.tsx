@@ -1,114 +1,53 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { cn } from '../../lib/utils';
 
-type TabsContextType = {
-  activeTab: string;
-  setActiveTab: (id: string) => void;
-};
-
-const TabsContext = createContext<TabsContextType | undefined>(undefined);
-
-function useTabs() {
-  const context = useContext(TabsContext);
-  if (!context) {
-    throw new Error('Tabs components must be used within a TabsProvider');
-  }
-  return context;
+interface TabsProps {
+  tabs: {
+    id: string;
+    label: string;
+    content: React.ReactNode;
+  }[];
+  className?: string;
+  defaultTabId?: string;
 }
 
-export function Tabs({ 
-  defaultValue, 
-  className, 
-  children 
-}: { 
-  defaultValue: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  const [activeTab, setActiveTab] = useState(defaultValue);
+export function Tabs({ tabs, className, defaultTabId }: TabsProps) {
+  const [activeTab, setActiveTab] = useState(defaultTabId || tabs[0].id);
 
   return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
-      <div className={cn('', className)}>
-        {children}
+    <div className={cn('', className)}>
+      <div className="border-b border-gray-200">
+        <nav className="flex -mb-px space-x-6" aria-label="Tabs">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                'py-3 px-1 border-b-2 font-medium text-sm',
+                activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                'transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
+              )}
+              aria-current={activeTab === tab.id ? 'page' : undefined}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
       </div>
-    </TabsContext.Provider>
-  );
-}
-
-export function TabsList({ 
-  className, 
-  children 
-}: { 
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div 
-      className={cn('flex flex-wrap border-b border-gray-200', className)}
-      role="tablist"
-    >
-      {children}
-    </div>
-  );
-}
-
-export function TabsTrigger({ 
-  value, 
-  className, 
-  children 
-}: { 
-  value: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  const { activeTab, setActiveTab } = useTabs();
-  const isActive = activeTab === value;
-
-  return (
-    <button
-      role="tab"
-      type="button"
-      aria-selected={isActive}
-      aria-controls={`tab-${value}`}
-      id={`tab-trigger-${value}`}
-      className={cn(
-        'px-4 py-3 text-sm font-medium transition-all -mb-px',
-        isActive 
-          ? 'border-b-2 border-blue-600 text-blue-600' 
-          : 'text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300',
-        className
-      )}
-      onClick={() => setActiveTab(value)}
-    >
-      {children}
-    </button>
-  );
-}
-
-export function TabsContent({ 
-  value, 
-  className, 
-  children 
-}: { 
-  value: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  const { activeTab } = useTabs();
-  const isActive = activeTab === value;
-
-  if (!isActive) return null;
-
-  return (
-    <div
-      role="tabpanel"
-      tabIndex={0}
-      aria-labelledby={`tab-trigger-${value}`}
-      id={`tab-${value}`}
-      className={cn('pt-4', className)}
-    >
-      {children}
+      <div className="pt-4">
+        {tabs.map((tab) => (
+          <div
+            key={tab.id}
+            className={cn(activeTab === tab.id ? 'block' : 'hidden')}
+            role="tabpanel"
+            aria-labelledby={`${tab.id}-tab`}
+          >
+            {tab.content}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
