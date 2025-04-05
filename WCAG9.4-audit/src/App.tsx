@@ -6,6 +6,7 @@ import { PricingPage } from './pages/PricingPage';
 import { SubscriptionDashboard } from './pages/SubscriptionDashboard';
 import { PaymentPage } from './pages/PaymentPage';
 import { IntegrationsPage } from './pages/integrations/IntegrationsPage';
+import { Integrations } from './pages/Integrations';
 import { AuthPage } from './pages/AuthPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { Navigation } from './components/Navigation';
@@ -90,6 +91,7 @@ function App() {
               <Route path="/tools/monitoring" element={<><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/realtime" element={<><Navigation /><main id="main-content"><RealTimeMonitorPage /></main><Footer /><BackToTop /></>} />
               <Route path="/ui-demo" element={<><Navigation /><main id="main-content"><UiDemo /></main><Footer /><BackToTop /></>} />
+              <Route path="/integrations" element={<><Navigation /><main id="main-content"><Integrations /></main><Footer /><BackToTop /></>} />
               {/* Account Routes with shared layout */}
               <Route path="/my-account" element={<ProtectedRoute><><Navigation /><AccountLayout /></></ProtectedRoute>}>
                 <Route index element={<SubscriptionDashboard />} />
