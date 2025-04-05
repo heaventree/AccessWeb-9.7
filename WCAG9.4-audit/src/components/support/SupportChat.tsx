@@ -98,10 +98,10 @@ export function SupportChat() {
 
   return (
     <>
-      {/* Chat toggle button */}
+      {/* Chat toggle button - positioned a bit higher to avoid overlapping with accessibility toolbar */}
       <button
         aria-label={isOpen ? "Close accessibility support chat" : "Open accessibility support chat"}
-        className="fixed bottom-4 right-6 z-40 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="fixed bottom-20 right-6 z-40 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         onClick={toggleChat}
       >
         {isOpen ? <X className="w-6 h-6" /> : <LifeBuoy className="w-6 h-6" />}
@@ -115,7 +115,7 @@ export function SupportChat() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-20 right-6 z-40 w-80 sm:w-96 h-[70vh] max-h-[600px] bg-white rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200"
+            className="fixed bottom-36 right-6 z-40 w-80 sm:w-96 h-[70vh] max-h-[600px] bg-white rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200"
             role="dialog"
             aria-labelledby="chat-title"
           >
