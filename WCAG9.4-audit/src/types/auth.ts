@@ -1,35 +1,103 @@
+/**
+ * User role type 
+ */
+export type UserRole = 'admin' | 'user' | 'guest' | 'developer';
+
+/**
+ * User interface representing a user in the system
+ */
 export interface User {
   id: string;
   name: string;
   email: string;
   role: UserRole;
-  isEmailVerified: boolean;
-  createdAt: string;
-  lastLogin?: string;
+  organization?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  avatar?: string;
+  settings?: UserSettings;
 }
 
-export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
+/**
+ * User settings interface for user preferences
+ */
+export interface UserSettings {
+  darkMode?: boolean;
+  notifications?: NotificationSettings;
+  accessibility?: AccessibilitySettings;
+  dashboardLayout?: string;
 }
 
-export interface RegisterParams {
-  name: string;
+/**
+ * Notification settings for user
+ */
+export interface NotificationSettings {
+  email: boolean;
+  browser: boolean;
+  reportFrequency?: 'daily' | 'weekly' | 'monthly' | 'never';
+  newIssues: boolean;
+  regressions: boolean;
+  scanCompletion: boolean;
+}
+
+/**
+ * Accessibility settings for user preferences
+ */
+export interface AccessibilitySettings {
+  highContrast?: boolean;
+  largeText?: boolean;
+  reducedMotion?: boolean;
+}
+
+/**
+ * Authentication error interface
+ */
+export interface AuthError {
+  code: string;
+  message: string;
+}
+
+/**
+ * Login response from the server
+ */
+export interface LoginResponse {
+  success: boolean;
+  token?: string;
+  user?: User;
+  error?: AuthError;
+}
+
+/**
+ * Registration data sent to the server
+ */
+export interface RegistrationData {
   email: string;
   password: string;
+  name: string;
+  organization?: string;
 }
 
-export type AuthError = 
-  | 'invalid-credentials'
-  | 'user-not-found'
-  | 'email-already-exists'
-  | 'password-too-weak'
-  | 'network-error'
-  | 'server-error'
-  | 'verification-failed'
-  | 'token-expired';
+/**
+ * Registration response from the server
+ */
+export interface RegistrationResponse {
+  success: boolean;
+  token?: string;
+  user?: User;
+  error?: AuthError;
+}
 
-export interface LoginResponse {
-  user: User;
-  token: string;
+/**
+ * Password reset request
+ */
+export interface PasswordResetRequest {
+  email: string;
+}
+
+/**
+ * Password update request
+ */
+export interface PasswordUpdateRequest {
+  currentPassword: string;
+  newPassword: string;
 }

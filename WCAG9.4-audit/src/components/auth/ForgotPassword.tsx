@@ -1,86 +1,77 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import { createPasswordResetToken } from '../../utils/auth';
-import { motion } from 'framer-motion';
+import { useAuth } from '../../hooks/useAuth';
 
-export function ForgotPassword() {
+/**
+ * Forgot password component that allows users to request a password reset email
+ */
+export const ForgotPassword = () => {
   const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
-
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { createPasswordResetToken } = useAuth();
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
     
-    if (!email) {
-      toast.error('Please enter your email address');
+    if (!email.trim()) {
+      setError('Please enter your email address.');
+      setIsLoading(false);
       return;
     }
     
-    setIsSubmitting(true);
-    
     try {
-      await createPasswordResetToken(email);
-      setEmailSent(true);
-      toast.success('Password reset instructions have been sent to your email');
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'An error occurred');
+      const success = await createPasswordResetToken(email);
+      
+      if (success) {
+        setSubmitted(true);
+      } else {
+        setError('Failed to send password reset email. Please try again later.');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again later.');
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
-
-  if (emailSent) {
-    return (
-      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-md w-full space-y-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="bg-green-50 p-6 rounded-lg border border-green-200">
-              <h1 className="text-2xl font-bold mb-4 text-green-700">Check Your Email</h1>
-              <p className="mb-4 text-gray-600">
-                We've sent password reset instructions to <strong>{email}</strong>. 
-                Please check your inbox and follow the instructions to reset your password.
-              </p>
-              <p className="text-sm text-gray-500 mb-4">
-                The link in the email will expire in 1 hour for security reasons.
-              </p>
-              <Link
-                to="/login"
-                className="inline-block bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150"
-              >
-                Return to Login
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
+  
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Reset Your Password
-          </h1>
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Reset your password
+          </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Enter the email address associated with your account and we'll send you instructions to reset your password.
+            Enter your email address and we will send you a link to reset your password.
           </p>
-        </motion.div>
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm">
+        </div>
+        
+        {!submitted ? (
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="rounded-md bg-red-50 p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-red-800">
+                      {error}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div>
-              <label htmlFor="email-address" className="sr-only">
+              <label htmlFor="email-address" className="form-label">
                 Email address
               </label>
               <input
@@ -89,41 +80,80 @@ export function ForgotPassword() {
                 type="email"
                 autoComplete="email"
                 required
+                className="form-input"
+                placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
               />
             </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-2 px-4 border-none text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            
+            <div>
+              <button
+                type="submit"
+                className="btn w-full flex justify-center"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Sending...
+                  </>
+                ) : (
+                  'Send reset link'
+                )}
+              </button>
+            </div>
+            
+            <div className="text-center">
+              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
+                Back to login
+              </Link>
+            </div>
+          </form>
+        ) : (
+          <div className="mt-8">
+            <div className="rounded-md bg-green-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Processing...
-                </span>
-              ) : (
-                'Send Reset Instructions'
-              )}
-            </button>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-green-800">
+                    Password reset link has been sent to your email.
+                  </p>
+                  <p className="mt-2 text-sm text-green-700">
+                    Please check your inbox and follow the instructions to reset your password.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">
+                Didn't receive the email?{' '}
+                <button
+                  type="button"
+                  className="font-medium text-primary-600 hover:text-primary-500"
+                  onClick={() => setSubmitted(false)}
+                >
+                  Try again
+                </button>
+              </p>
+            </div>
+            
+            <div className="mt-4 text-center">
+              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
+                Back to login
+              </Link>
+            </div>
           </div>
-        </form>
-
-        <div className="text-center mt-4">
-          <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
-            Back to Login
-          </Link>
-        </div>
+        )}
       </div>
     </div>
   );
-}
+};

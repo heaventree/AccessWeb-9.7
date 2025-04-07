@@ -1,23 +1,12 @@
-import React, { createContext, useReducer, useEffect } from 'react';
-import { 
-  getCurrentUser, 
-  login as loginApi, 
-  logout as logoutApi, 
-  register as registerApi,
-  verifyEmail as verifyEmailApi,
-  createPasswordResetToken as createPasswordResetTokenApi,
-  resetPassword as resetPasswordApi,
-  saveToken
-} from '../utils/auth';
-import { User, AuthError, RegisterParams } from '../types/auth';
+import React, { createContext, useState, useEffect } from 'react';
+import { generateToken, validateToken } from '../utils/auth';
+import { User, AuthError } from '../types/auth';
 
-// Define the Auth Context type
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: AuthError }>;
-  register: (params: RegisterParams) => Promise<{ success: boolean; verificationToken?: string; error?: AuthError }>;
+  login: (username: string, password: string) => Promise<{ success: boolean; error?: AuthError }>;
   logout: () => void;
   verifyEmail: (token: string) => Promise<boolean>;
   createPasswordResetToken: (email: string) => Promise<boolean>;
@@ -25,176 +14,159 @@ interface AuthContextType {
   isDevelopmentMode: boolean;
 }
 
-// Define actions for our reducer
-type AuthAction = 
-  | { type: 'SET_USER'; payload: User }
-  | { type: 'CLEAR_USER' }
-  | { type: 'SET_LOADING'; payload: boolean };
+// Create the Auth Context with a default empty value
+export const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  user: null,
+  loading: true,
+  login: async () => ({ success: false }),
+  logout: () => {},
+  verifyEmail: async () => false,
+  createPasswordResetToken: async () => false,
+  resetPassword: async () => false,
+  isDevelopmentMode: process.env.NODE_ENV === 'development'
+});
 
-// Define our Auth State
-interface AuthState {
-  user: User | null;
-  loading: boolean;
+interface AuthProviderProps {
+  children: React.ReactNode;
 }
 
-// Initial state
-const initialState: AuthState = {
-  user: null,
-  loading: true
-};
-
-// Reducer function
-const authReducer = (state: AuthState, action: AuthAction): AuthState => {
-  switch (action.type) {
-    case 'SET_USER':
-      return {
-        ...state,
-        user: action.payload,
-        loading: false
-      };
-    case 'CLEAR_USER':
-      return {
-        ...state,
-        user: null,
-        loading: false
-      };
-    case 'SET_LOADING':
-      return {
-        ...state,
-        loading: action.payload
-      };
-    default:
-      return state;
-  }
-};
-
-// Create the context
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Provider component
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const isDevelopmentMode = process.env.NODE_ENV === 'development';
 
-  // Check if user is authenticated on initial load
+  // Check for existing authentication on mount
   useEffect(() => {
-    const initAuth = async () => {
+    const checkAuth = async () => {
       try {
-        const user = await getCurrentUser();
-        if (user) {
-          dispatch({ type: 'SET_USER', payload: user });
-        } else {
-          dispatch({ type: 'CLEAR_USER' });
+        const token = localStorage.getItem('token');
+        if (token) {
+          const userData = validateToken(token);
+          if (userData) {
+            setUser({
+              id: userData.id,
+              email: userData.email,
+              role: userData.role,
+              name: userData.name || '',
+              organization: userData.organization || ''
+            });
+          } else {
+            // Token is invalid or expired, remove it
+            localStorage.removeItem('token');
+          }
         }
       } catch (error) {
-        console.error('Failed to initialize auth state:', error);
-        dispatch({ type: 'CLEAR_USER' });
+        console.error('Authentication check failed:', error);
+        localStorage.removeItem('token');
+      } finally {
+        setLoading(false);
       }
     };
 
-    initAuth();
+    checkAuth();
   }, []);
 
   // Login function
   const login = async (email: string, password: string) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
-    
     try {
-      const response = await loginApi(email, password);
-      saveToken(response.token);
-      dispatch({ type: 'SET_USER', payload: response.user });
-      return { success: true };
-    } catch (error) {
-      dispatch({ type: 'SET_LOADING', payload: false });
-      let authError: AuthError;
-      
-      if (error instanceof Error) {
-        authError = error.message as AuthError;
-      } else {
-        authError = 'server-error';
+      // Mock login for development
+      if (isDevelopmentMode) {
+        const mockUser: User = {
+          id: '123',
+          name: 'Demo User',
+          email: email,
+          role: 'user',
+          organization: 'Demo Org'
+        };
+        
+        const token = generateToken(mockUser);
+        localStorage.setItem('token', token);
+        setUser(mockUser);
+        
+        return { success: true };
       }
       
-      return { 
-        success: false, 
-        error: authError
-      };
-    }
-  };
-
-  // Register function
-  const register = async (params: RegisterParams) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
-    
-    try {
-      const response = await registerApi(params);
-      dispatch({ type: 'SET_LOADING', payload: false });
-      return { 
-        success: true,
-        verificationToken: response.verificationToken
-      };
+      // In production, this would call an API
+      // const response = await loginUser(email, password);
+      // localStorage.setItem('token', response.token);
+      // setUser(response.user);
+      
+      return { success: false, error: { code: 'auth/not-implemented', message: 'Login functionality not implemented yet.' } };
     } catch (error) {
-      dispatch({ type: 'SET_LOADING', payload: false });
-      let authError: AuthError;
-      
-      if (error instanceof Error) {
-        authError = error.message as AuthError;
-      } else {
-        authError = 'server-error';
-      }
-      
+      console.error('Login failed:', error);
       return { 
         success: false, 
-        error: authError
+        error: { 
+          code: 'auth/unknown-error', 
+          message: 'An unexpected error occurred during login.' 
+        } 
       };
     }
   };
 
   // Logout function
   const logout = () => {
-    logoutApi();
-    dispatch({ type: 'CLEAR_USER' });
+    localStorage.removeItem('token');
+    setUser(null);
   };
-
+  
   // Verify email function
   const verifyEmail = async (token: string) => {
     try {
-      await verifyEmailApi(token);
-      return true;
+      // Mock implementation for development
+      if (isDevelopmentMode) {
+        // Simulate email verification success
+        return true;
+      }
+      
+      // In production, this would call an API
+      return false;
     } catch (error) {
-      console.error('Failed to verify email:', error);
+      console.error('Email verification failed:', error);
       return false;
     }
   };
-
+  
   // Create password reset token function
   const createPasswordResetToken = async (email: string) => {
     try {
-      await createPasswordResetTokenApi(email);
-      return true;
+      // Mock implementation for development
+      if (isDevelopmentMode) {
+        // Simulate sending reset email
+        return true;
+      }
+      
+      // In production, this would call an API
+      return false;
     } catch (error) {
-      console.error('Failed to create password reset token:', error);
+      console.error('Password reset token creation failed:', error);
       return false;
     }
   };
-
+  
   // Reset password function
   const resetPassword = async (token: string, newPassword: string) => {
     try {
-      await resetPasswordApi(token, newPassword);
-      return true;
+      // Mock implementation for development
+      if (isDevelopmentMode) {
+        // Simulate password reset
+        return true;
+      }
+      
+      // In production, this would call an API
+      return false;
     } catch (error) {
-      console.error('Failed to reset password:', error);
+      console.error('Password reset failed:', error);
       return false;
     }
   };
 
-  // Context value
-  const value = {
-    isAuthenticated: !!state.user,
-    user: state.user,
-    loading: state.loading,
+  const contextValue: AuthContextType = {
+    isAuthenticated: !!user,
+    user,
+    loading,
     login,
-    register,
     logout,
     verifyEmail,
     createPasswordResetToken,
@@ -203,7 +175,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

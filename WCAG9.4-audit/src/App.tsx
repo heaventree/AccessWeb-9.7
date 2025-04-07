@@ -1,16 +1,16 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { AuthPage } from './pages/AuthPage';
-import { ForgotPassword } from './components/auth/ForgotPassword';
-import { ResetPassword } from './components/auth/ResetPassword';
-import { EmailVerification } from './components/auth/EmailVerification';
-import { AccessibilityToolbar } from './components/AccessibilityToolbar';
-import { AccessibilityTipsDemo } from './components/demos/AccessibilityTipsDemo';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 
-// Protected route wrapper
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+// Import authentication components
+import { EmailVerification } from './components/auth/EmailVerification';
+import { ForgotPassword } from './components/auth/ForgotPassword';
+import { ResetPassword } from './components/auth/ResetPassword';
+
+/**
+ * Main application component with routing
+ */
+const App: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
   
   if (loading) {
@@ -21,62 +21,66 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  return <>{children}</>;
-};
-
-function App() {
   return (
-    <>
-      <Helmet>
-        <title>WCAG 9.4 Audit Tool</title>
-        <meta name="description" content="A comprehensive web accessibility audit and compliance tool" />
-      </Helmet>
+    <Routes>
+      {/* Authentication Routes */}
+      <Route path="/verify-email/:token" element={<EmailVerification />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
       
-      <Router>
-        <AccessibilityToolbar />
-        
-        <Routes>
-          {/* Auth routes */}
-          <Route path="/login" element={<AuthPage />} />
-          <Route path="/register" element={<AuthPage />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/verify-email/:token" element={<EmailVerification />} />
-          
-          {/* Demo routes */}
-          <Route path="/demo/accessibility-tips" element={<AccessibilityTipsDemo />} />
-          
-          {/* Protected routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <div className="p-4">
-                <h1 className="text-2xl font-bold">Dashboard</h1>
-                <p>This is a protected route.</p>
-              </div>
-            </ProtectedRoute>
-          } />
-          
-          {/* Redirect root to login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          
-          {/* 404 route */}
-          <Route path="*" element={
-            <div className="min-h-screen flex flex-col items-center justify-center">
-              <h1 className="text-4xl font-bold mb-4">404</h1>
-              <p className="text-gray-600 mb-6">Page not found</p>
-              <a href="/" className="text-primary-600 hover:text-primary-800">
-                Return to Home
-              </a>
+      {/* Default Route */}
+      <Route 
+        path="/" 
+        element={
+          <div className="flex min-h-screen flex-col items-center justify-center p-4 text-center">
+            <h1 className="text-3xl font-bold">
+              WCAG 9.4 Accessibility Audit Tool
+            </h1>
+            <p className="mt-4 max-w-lg text-gray-600">
+              A comprehensive platform for evaluating and improving web accessibility
+              compliance, designed with intelligent tools to simplify the implementation
+              of WCAG standards.
+            </p>
+            
+            <div className="mt-8">
+              <button className="btn mr-4">
+                Sign In
+              </button>
+              <button className="btn bg-white text-primary-600 border border-primary-600 hover:bg-gray-50">
+                Sign Up
+              </button>
             </div>
-          } />
-        </Routes>
-      </Router>
-    </>
+            
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl">
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-3">Intelligent Scanning</h2>
+                <p className="text-gray-600">
+                  Automatically detect accessibility issues with our AI-powered scanning engine.
+                </p>
+              </div>
+              
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-3">Real-time Monitoring</h2>
+                <p className="text-gray-600">
+                  Monitor your site continuously for compliance as content changes.
+                </p>
+              </div>
+              
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-3">Actionable Reports</h2>
+                <p className="text-gray-600">
+                  Get clear guidance on how to fix issues with prioritized recommendations.
+                </p>
+              </div>
+            </div>
+          </div>
+        }
+      />
+      
+      {/* Catch-all Route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
-}
+};
 
 export default App;

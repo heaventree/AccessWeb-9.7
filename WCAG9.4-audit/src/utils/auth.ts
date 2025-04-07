@@ -1,243 +1,242 @@
-import { v4 as uuidv4 } from 'uuid';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { User, UserRole, RegisterParams, LoginResponse } from '../types/auth';
+import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
+import { 
+  User, 
+  LoginResponse, 
+  RegistrationData, 
+  RegistrationResponse, 
+  AuthError, 
+  UserRole 
+} from '../types/auth';
 
-// Secret key for JWT
-const JWT_SECRET = process.env.JWT_SECRET || 'wcag-audit-secret-key';
+// JWT secret key - in production, this would come from an environment variable
+const JWT_SECRET = 'wcag94-accessibility-platform-secret-key';
+const TOKEN_EXPIRY = '24h';
 
-// Token storage key
-const TOKEN_KEY = 'wcag_auth_token';
-
-// In-memory user store (replace with API calls to your backend)
-let users: User[] = [];
-
-// For development purposes, we'll initialize with a test admin user
-if (process.env.NODE_ENV === 'development') {
-  users.push({
-    id: '1',
-    name: 'Admin User',
-    email: 'admin@example.com',
-    role: UserRole.ADMIN,
-    isEmailVerified: true,
-    createdAt: new Date().toISOString(),
-    lastLogin: new Date().toISOString(),
-  });
-}
-
-// In-memory user passwords (in a real app, these would be stored in a database)
-const userPasswords: Record<string, string> = {
-  '1': bcrypt.hashSync('admin123', 10)
+/**
+ * Hashes a password using bcrypt
+ * @param password The plain text password
+ * @returns The hashed password
+ */
+export const hashPassword = async (password: string): Promise<string> => {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
 };
 
 /**
- * Get the authentication token from localStorage
+ * Compares a plain text password with a hashed password
+ * @param password The plain text password
+ * @param hashedPassword The hashed password
+ * @returns True if the passwords match
  */
-export const getToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
+export const comparePasswords = async (
+  password: string,
+  hashedPassword: string
+): Promise<boolean> => {
+  return bcrypt.compare(password, hashedPassword);
 };
 
 /**
- * Save the authentication token to localStorage
+ * Generates a JWT token for an authenticated user
+ * @param user The user data to encode in the token
+ * @returns The JWT token string
  */
-export const saveToken = (token: string): void => {
-  localStorage.setItem(TOKEN_KEY, token);
-};
-
-/**
- * Remove the authentication token from localStorage
- */
-export const removeToken = (): void => {
-  localStorage.removeItem(TOKEN_KEY);
-};
-
-/**
- * Register a new user
- */
-export const register = async (params: RegisterParams): Promise<{ verificationToken: string }> => {
-  // Check if email already exists
-  const existingUser = users.find(u => u.email === params.email);
-  if (existingUser) {
-    throw new Error('email-already-exists');
-  }
-
-  // Validate password strength
-  if (params.password.length < 8) {
-    throw new Error('password-too-weak');
-  }
-
-  // Hash password
-  const hashedPassword = await bcrypt.hash(params.password, 10);
-
-  // Create new user with a unique ID
-  const userId = uuidv4();
-  const newUser: User = {
-    id: userId,
-    name: params.name,
-    email: params.email,
-    role: UserRole.USER,
-    isEmailVerified: false,
-    createdAt: new Date().toISOString(),
+export const generateToken = (user: Partial<User>): string => {
+  const payload = {
+    id: user.id,
+    email: user.email,
+    role: user.role
   };
-  
-  // Store the password hash
-  userPasswords[userId] = hashedPassword;
 
-  // Add user to in-memory store
-  users.push(newUser);
-
-  // Generate verification token
-  const verificationToken = jwt.sign(
-    { userId: newUser.id, purpose: 'email-verification' },
-    JWT_SECRET,
-    { expiresIn: '24h' }
-  );
-
-  return { verificationToken };
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
 };
 
 /**
- * Verify a user's email address
+ * Validates a JWT token and extracts the user data
+ * @param token The JWT token to validate
+ * @returns User data if valid, null if invalid
  */
-export const verifyEmail = async (token: string): Promise<void> => {
+export const validateToken = (
+  token: string
+): { id: string; email: string; role: UserRole; name?: string; organization?: string } | null => {
   try {
-    // Verify token
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; purpose: string };
-    
-    if (decoded.purpose !== 'email-verification') {
-      throw new Error('verification-failed');
-    }
-    
-    // Find user
-    const userIndex = users.findIndex(u => u.id === decoded.userId);
-    if (userIndex === -1) {
-      throw new Error('user-not-found');
-    }
-    
-    // Update user
-    users[userIndex] = {
-      ...users[userIndex],
-      isEmailVerified: true
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    return {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role as UserRole,
+      name: decoded.name,
+      organization: decoded.organization
     };
   } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
-      throw new Error('token-expired');
-    }
-    throw error;
-  }
-};
-
-/**
- * Login a user
- */
-export const login = async (email: string, password: string): Promise<LoginResponse> => {
-  // Find user
-  const user = users.find(u => u.email === email);
-  if (!user) {
-    throw new Error('invalid-credentials');
-  }
-
-  // Check if password is valid
-  const storedHash = userPasswords[user.id];
-  if (!storedHash || !(await bcrypt.compare(password, storedHash))) {
-    throw new Error('invalid-credentials');
-  }
-  
-  // Update last login
-  user.lastLogin = new Date().toISOString();
-
-  // Generate JWT token
-  const token = jwt.sign(
-    { userId: user.id, role: user.role },
-    JWT_SECRET,
-    { expiresIn: '7d' }
-  );
-
-  return { user, token };
-};
-
-/**
- * Logout user
- */
-export const logout = async (): Promise<void> => {
-  removeToken();
-};
-
-/**
- * Get the current user from the JWT token
- */
-export const getCurrentUser = async (): Promise<User | null> => {
-  try {
-    const token = getToken();
-    if (!token) {
-      return null;
-    }
-
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; role: UserRole };
-    const user = users.find(u => u.id === decoded.userId);
-    
-    return user || null;
-  } catch (error) {
-    // Token is invalid
-    removeToken();
     return null;
   }
 };
 
 /**
- * Create a password reset token
+ * Makes a login API request to authenticate the user
+ * @param email User's email
+ * @param password User's password
+ * @returns LoginResponse with token and user information
  */
-export const createPasswordResetToken = async (email: string): Promise<void> => {
-  // Find user
-  const user = users.find(u => u.email === email);
-  if (!user) {
-    // For security reasons, don't reveal if user exists
-    return;
+export const loginUser = async (
+  email: string,
+  password: string
+): Promise<LoginResponse> => {
+  try {
+    // This would typically be an API call to authenticate the user
+    // For demonstration purposes, we'll mock the response
+    
+    // In development mode, always succeed with a mock user
+    if (process.env.NODE_ENV === 'development') {
+      const mockUser: User = {
+        id: uuidv4(),
+        name: 'Development User',
+        email: email,
+        role: 'user',
+        organization: 'WCAG Compliance Team'
+      };
+      
+      const token = generateToken(mockUser);
+      
+      return {
+        success: true,
+        token,
+        user: mockUser
+      };
+    }
+    
+    // In production this would verify credentials against a database
+    return {
+      success: false,
+      error: {
+        code: 'auth/not-implemented',
+        message: 'Authentication not implemented in this environment'
+      }
+    };
+  } catch (error) {
+    console.error('Login error:', error);
+    return {
+      success: false,
+      error: {
+        code: 'auth/server-error',
+        message: 'An error occurred during authentication'
+      }
+    };
   }
-
-  // Generate reset token
-  const resetToken = jwt.sign(
-    { userId: user.id, purpose: 'password-reset' },
-    JWT_SECRET,
-    { expiresIn: '1h' }
-  );
-
-  // In a real app, we would send this token to the user's email
-  console.log(`Password reset token for ${email}: ${resetToken}`);
 };
 
 /**
- * Reset a user's password
+ * Registers a new user
+ * @param data User registration data
+ * @returns Registration response
  */
-export const resetPassword = async (token: string, newPassword: string): Promise<void> => {
+export const registerUser = async (
+  data: RegistrationData
+): Promise<RegistrationResponse> => {
   try {
-    // Verify token
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; purpose: string };
+    // This would typically be an API call to register the user
+    // For demonstration purposes, we'll mock the response
     
-    if (decoded.purpose !== 'password-reset') {
-      throw new Error('verification-failed');
+    // In development mode, always succeed with a new user
+    if (process.env.NODE_ENV === 'development') {
+      const newUser: User = {
+        id: uuidv4(),
+        name: data.name,
+        email: data.email,
+        role: 'user',
+        organization: data.organization
+      };
+      
+      const token = generateToken(newUser);
+      
+      return {
+        success: true,
+        token,
+        user: newUser
+      };
     }
     
-    // Find user
-    const userIndex = users.findIndex(u => u.id === decoded.userId);
-    if (userIndex === -1) {
-      throw new Error('user-not-found');
-    }
-    
-    // Validate new password
-    if (newPassword.length < 8) {
-      throw new Error('password-too-weak');
-    }
-
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    
-    // Update password in storage
-    userPasswords[decoded.userId] = hashedPassword;
+    // In production this would create a user in the database
+    return {
+      success: false,
+      error: {
+        code: 'auth/not-implemented',
+        message: 'Registration not implemented in this environment'
+      }
+    };
   } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
-      throw new Error('token-expired');
-    }
-    throw error;
+    console.error('Registration error:', error);
+    return {
+      success: false,
+      error: {
+        code: 'auth/server-error',
+        message: 'An error occurred during registration'
+      }
+    };
   }
+};
+
+/**
+ * Verifies a user's email using a verification token
+ * @param token Email verification token
+ * @returns True if verification successful
+ */
+export const verifyEmail = async (token: string): Promise<boolean> => {
+  // This would typically be an API call to verify the email
+  // For demonstration purposes, we'll mock the response
+  return process.env.NODE_ENV === 'development';
+};
+
+/**
+ * Requests a password reset for the given email
+ * @param email User's email address
+ * @returns True if reset token was created and email sent
+ */
+export const createPasswordResetToken = async (email: string): Promise<boolean> => {
+  // This would typically be an API call to create a reset token
+  // For demonstration purposes, we'll mock the response
+  return process.env.NODE_ENV === 'development';
+};
+
+/**
+ * Resets a user's password using a reset token
+ * @param token Password reset token
+ * @param newPassword New password
+ * @returns True if password reset successful
+ */
+export const resetPassword = async (
+  token: string,
+  newPassword: string
+): Promise<boolean> => {
+  // This would typically be an API call to reset the password
+  // For demonstration purposes, we'll mock the response
+  return process.env.NODE_ENV === 'development';
+};
+
+/**
+ * Updates a user's profile information
+ * @param data Partial user data to update
+ * @returns True if update successful
+ */
+export const updateUserProfile = async (data: Partial<User>): Promise<boolean> => {
+  // This would typically be an API call to update the profile
+  // For demonstration purposes, we'll mock the response
+  return process.env.NODE_ENV === 'development';
+};
+
+/**
+ * Updates a user's password
+ * @param currentPassword Current password for verification
+ * @param newPassword New password
+ * @returns True if password update successful
+ */
+export const updatePassword = async (
+  currentPassword: string,
+  newPassword: string
+): Promise<boolean> => {
+  // This would typically be an API call to update the password
+  // For demonstration purposes, we'll mock the response
+  return process.env.NODE_ENV === 'development';
 };

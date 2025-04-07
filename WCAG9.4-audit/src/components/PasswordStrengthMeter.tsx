@@ -1,126 +1,74 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 interface PasswordStrengthMeterProps {
   password: string;
 }
 
-type StrengthLevel = 'none' | 'weak' | 'medium' | 'strong' | 'very-strong';
-
-export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) {
-  const [strength, setStrength] = useState<StrengthLevel>('none');
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    calculateStrength(password);
-  }, [password]);
-
-  const calculateStrength = (password: string) => {
+/**
+ * Password strength indicator that provides visual feedback
+ * about the security level of the entered password
+ */
+export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password }) => {
+  // Calculate password strength
+  const calculateStrength = (): { score: number; label: string; color: string } => {
     if (!password) {
-      setStrength('none');
-      setMessage('');
-      return;
+      return { score: 0, label: 'None', color: 'bg-gray-200' };
     }
-
-    // Scoring system
+    
+    // Basic scoring system
     let score = 0;
     
     // Length check
     if (password.length >= 8) score += 1;
     if (password.length >= 12) score += 1;
     
-    // Complexity checks
+    // Character variety checks
     if (/[A-Z]/.test(password)) score += 1; // Has uppercase
     if (/[a-z]/.test(password)) score += 1; // Has lowercase
     if (/[0-9]/.test(password)) score += 1; // Has number
     if (/[^A-Za-z0-9]/.test(password)) score += 1; // Has special char
     
-    // Common patterns check (deduct points)
-    if (/^[A-Za-z]+$/.test(password)) score -= 1; // Letters only
-    if (/^[0-9]+$/.test(password)) score -= 1; // Numbers only
-    if (/password/i.test(password)) score -= 2; // Contains "password"
-    if (/12345|qwerty|asdfg/i.test(password)) score -= 2; // Common sequences
-    
-    // Ensure score is at least 0
-    score = Math.max(0, score);
-    
-    // Determine strength level based on score
-    let strengthLevel: StrengthLevel;
-    let msg = '';
-    
-    if (score <= 1) {
-      strengthLevel = 'weak';
-      msg = 'Weak: Add length and complexity';
-    } else if (score <= 3) {
-      strengthLevel = 'medium';
-      msg = 'Medium: Consider adding more complexity';
-    } else if (score <= 5) {
-      strengthLevel = 'strong';
-      msg = 'Strong: Good password strength';
-    } else {
-      strengthLevel = 'very-strong';
-      msg = 'Very Strong: Excellent password';
-    }
-    
-    setStrength(strengthLevel);
-    setMessage(msg);
-  };
-
-  const getColorClass = () => {
-    switch (strength) {
-      case 'weak':
-        return 'bg-red-500';
-      case 'medium':
-        return 'bg-yellow-500';
-      case 'strong':
-        return 'bg-green-500';
-      case 'very-strong':
-        return 'bg-green-600';
+    // Score interpretation
+    switch (true) {
+      case (score >= 6):
+        return { score: 4, label: 'Very Strong', color: 'bg-green-500' };
+      case (score >= 4):
+        return { score: 3, label: 'Strong', color: 'bg-green-400' };
+      case (score >= 3):
+        return { score: 2, label: 'Moderate', color: 'bg-yellow-500' };
+      case (score >= 1):
+        return { score: 1, label: 'Weak', color: 'bg-red-500' };
       default:
-        return 'bg-gray-200';
+        return { score: 0, label: 'None', color: 'bg-gray-200' };
     }
   };
-
-  const getWidthClass = () => {
-    switch (strength) {
-      case 'weak':
-        return 'w-1/4';
-      case 'medium':
-        return 'w-2/4';
-      case 'strong':
-        return 'w-3/4';
-      case 'very-strong':
-        return 'w-full';
-      default:
-        return 'w-0';
-    }
-  };
-
-  if (strength === 'none') {
-    return null;
-  }
-
+  
+  const strength = calculateStrength();
+  
   return (
     <div className="mt-1 mb-4">
-      <div className="relative pt-1">
-        <div className="flex mb-2 items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-gray-600 bg-gray-100">
-              Password Strength
-            </span>
-          </div>
-          <div className="text-right">
-            <span className="text-xs font-semibold inline-block text-gray-600">
-              {message}
-            </span>
-          </div>
+      <div className="flex items-center">
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
+          <div 
+            className={`h-2.5 rounded-full ${strength.color}`} 
+            style={{ width: `${(strength.score / 4) * 100}%` }}
+            role="progressbar"
+            aria-valuenow={strength.score}
+            aria-valuemin={0}
+            aria-valuemax={4}
+          />
         </div>
-        <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
-          <div
-            style={{ transition: 'width 0.5s ease' }}
-            className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${getColorClass()} ${getWidthClass()}`}
-          ></div>
-        </div>
+        <span className="text-xs text-gray-600 min-w-[80px]">{strength.label}</span>
+      </div>
+      
+      {/* Accessibility helpers and tips */}
+      <div className="mt-1">
+        <p className="text-xs text-gray-500">
+          {strength.score < 2 && (
+            "Aim for at least 8 characters with uppercase, lowercase, numbers, and special characters."
+          )}
+        </p>
       </div>
     </div>
   );
-}
+};

@@ -1,53 +1,27 @@
 import React from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'react-hot-toast';
+// import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '../contexts/AuthContext';
-import { HelmetProvider } from 'react-helmet-async';
-import { AccessibilityTipsProvider } from '../contexts/AccessibilityTipsContext';
 
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
+// Create a mock HelmetProvider for now since it's causing compatibility issues
+const MockHelmetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <>{children}</>;
+};
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <HelmetProvider>
-        <AuthProvider>
-          <AccessibilityTipsProvider>
-            <Toaster 
-              position="top-right"
-              toastOptions={{
-                duration: 5000,
-                style: {
-                  background: '#363636',
-                  color: '#fff',
-                  borderRadius: '8px',
-                  padding: '16px 24px',
-                },
-                success: {
-                  iconTheme: {
-                    primary: '#4ade80',
-                    secondary: '#fff',
-                  },
-                },
-                error: {
-                  iconTheme: {
-                    primary: '#ef4444',
-                    secondary: '#fff',
-                  },
-                },
-              }}
-            />
-            {children}
-          </AccessibilityTipsProvider>
-        </AuthProvider>
-      </HelmetProvider>
-    </QueryClientProvider>
-  );
+interface AppProviderProps {
+  children: React.ReactNode;
 }
+
+/**
+ * AppProvider component that wraps the application with all necessary context providers
+ * This component serves as the root provider for all application-wide contexts
+ */
+export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
+  return (
+    // Add new providers here as needed
+    <AuthProvider>
+      <MockHelmetProvider>
+        {children}
+      </MockHelmetProvider>
+    </AuthProvider>
+  );
+};
