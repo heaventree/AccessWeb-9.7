@@ -69,6 +69,7 @@ import { HelpCenter } from './pages/HelpCenter';
 import { HelpArticle } from './pages/HelpArticle';
 import { KnowledgeBasePage } from './pages/KnowledgeBasePage';
 import { UiDemo } from './pages/UiDemo';
+import { AltTextGuide } from './pages/help/AltTextGuide';
 
 import { ErrorPage } from './components/ErrorPage';
 
@@ -124,6 +125,7 @@ function App() {
               <Route path="/wcag-resources" element={<><Navigation /><main id="main-content"><WcagResourcesPage /></main><Footer /><BackToTop /></>} />
               <Route path="/non-destructive-fixes" element={<><Navigation /><main id="main-content"><NonDestructiveFixPage /></main><Footer /><BackToTop /></>} />
               <Route path="/help" element={<><Navigation /><main id="main-content"><HelpCenter /></main><Footer /><BackToTop /></>} />
+              <Route path="/help/alt-text-guide" element={<><Navigation /><main id="main-content"><AltTextGuide /></main><Footer /><BackToTop /></>} />
               <Route path="/help/:slug" element={<><Navigation /><main id="main-content"><HelpArticle /></main><Footer /><BackToTop /></>} />
               <Route path="/login" element={<AuthPage />} />
               <Route path="/signup" element={<AuthPage />} />

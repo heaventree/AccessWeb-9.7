@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import ImageAltScanner from '../../components/tools/ImageAltScanner';
-import { Info } from 'lucide-react';
+import ImageAltScannerInfo from '../../components/tools/ImageAltScannerInfo';
+import { ExternalLink, HelpCircle, Info, Link as LinkIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { ScanResult, ImageIssue, ScanOptions } from '../../services/imageAltScanService';
 
 export function ImageAltScannerPage() {
@@ -38,8 +40,28 @@ export function ImageAltScannerPage() {
               Find and fix image accessibility issues to ensure WCAG 1.1.1 compliance
             </p>
           </div>
+          
+          <div className="mt-4 md:mt-0 flex space-x-3">
+            <Link 
+              to="/help/alt-text-guide" 
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              <HelpCircle className="-ml-1 mr-2 h-5 w-5" />
+              Alt Text Guide
+            </Link>
+            <a 
+              href="https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              <ExternalLink className="-ml-1 mr-2 h-5 w-5" />
+              WCAG 1.1.1 Spec
+            </a>
+          </div>
         </div>
         
+        {/* Scan Settings */}
         <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-700">
           <div className="md:flex md:items-center md:justify-between">
             <div className="flex-1 min-w-0">
@@ -111,6 +133,10 @@ export function ImageAltScannerPage() {
           )}
         </div>
         
+        {/* Info Section */}
+        <ImageAltScannerInfo />
+        
+        {/* Scanner Component */}
         <ImageAltScanner 
           url={urlToScan || undefined} 
           initialOptions={defaultOptions}
@@ -119,6 +145,90 @@ export function ImageAltScannerPage() {
           onIssuesFixed={handleIssuesFixed}
         />
         
+        {/* Resource Links */}
+        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+            Additional Resources
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a 
+              href="https://www.w3.org/WAI/tutorials/images/decision-tree/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150"
+            >
+              <div className="flex-shrink-0">
+                <LinkIcon className="h-6 w-6 text-primary-500" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  Alt Text Decision Tree
+                </h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
+                  W3C's guide for determining appropriate alt text based on image context
+                </p>
+              </div>
+            </a>
+            
+            <a 
+              href="https://webaim.org/techniques/alttext/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150"
+            >
+              <div className="flex-shrink-0">
+                <LinkIcon className="h-6 w-6 text-primary-500" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  WebAIM Alt Text Guide
+                </h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
+                  Comprehensive guide to alternative text for images
+                </p>
+              </div>
+            </a>
+            
+            <Link 
+              to="/help/alt-text-guide"
+              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150"
+            >
+              <div className="flex-shrink-0">
+                <HelpCircle className="h-6 w-6 text-primary-500" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  Complete Alt Text Guide
+                </h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
+                  Our detailed guide with examples and best practices
+                </p>
+              </div>
+            </Link>
+            
+            <a 
+              href="https://www.deque.com/blog/great-alt-text-introduction/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150"
+            >
+              <div className="flex-shrink-0">
+                <LinkIcon className="h-6 w-6 text-primary-500" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  Deque's Introduction to Alt Text
+                </h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
+                  Practical guidance on writing effective alternative text
+                </p>
+              </div>
+            </a>
+          </div>
+        </div>
+        
+        {/* Scan History */}
         {scanHistory.length > 0 && (
           <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 border border-gray-200 dark:border-gray-700">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
