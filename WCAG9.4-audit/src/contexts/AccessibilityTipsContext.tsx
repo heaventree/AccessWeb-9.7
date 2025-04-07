@@ -1,110 +1,116 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import accessibilityTips, { AccessibilityTip } from '../data/accessibilityTips';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+
+interface AccessibilityTip {
+  id: string;
+  title: string;
+  description: string;
+  wcagReference: string;
+  element?: Element | null;
+  elementSelector?: string;
+}
 
 interface AccessibilityTipsContextType {
+  tips: AccessibilityTip[];
+  activeTip: AccessibilityTip | null;
   isEnabled: boolean;
-  toggleEnabled: () => void;
   setIsEnabled: (enabled: boolean) => void;
-  getTipsByElement: (elementType: string) => AccessibilityTip[];
-  getTipById: (id: string) => AccessibilityTip | undefined;
-  getAllTips: () => AccessibilityTip[];
-  setFilteredTips: (tips: AccessibilityTip[]) => void;
-  filteredTips: AccessibilityTip[];
-  searchTips: (query: string) => void;
+  addTip: (tip: AccessibilityTip) => void;
+  removeTip: (id: string) => void;
+  setActiveTip: (id: string | null) => void;
+  clearTips: () => void;
 }
 
-const AccessibilityTipsContext = createContext<AccessibilityTipsContextType | undefined>(undefined);
-
-export const useAccessibilityTips = () => {
-  const context = useContext(AccessibilityTipsContext);
-  if (!context) {
-    throw new Error('useAccessibilityTips must be used within an AccessibilityTipsProvider');
-  }
-  return context;
+const defaultContext: AccessibilityTipsContextType = {
+  tips: [],
+  activeTip: null,
+  isEnabled: false,
+  setIsEnabled: () => {},
+  addTip: () => {},
+  removeTip: () => {},
+  setActiveTip: () => {},
+  clearTips: () => {},
 };
 
-interface AccessibilityTipsProviderProps {
-  children: ReactNode;
-}
+export const AccessibilityTipsContext = createContext<AccessibilityTipsContextType>(defaultContext);
 
-export const AccessibilityTipsProvider: React.FC<AccessibilityTipsProviderProps> = ({ children }) => {
-  const [isEnabled, setIsEnabled] = useState<boolean>(false);
-  const [filteredTips, setFilteredTips] = useState<AccessibilityTip[]>([]);
+export const useAccessibilityTips = () => useContext(AccessibilityTipsContext);
 
+export const AccessibilityTipsProvider = ({ children }: { children: React.ReactNode }) => {
+  const [tips, setTips] = useState<AccessibilityTip[]>([]);
+  const [activeTip, setActiveTipState] = useState<AccessibilityTip | null>(null);
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  // Load state from localStorage on mount
   useEffect(() => {
-    // Check localStorage for saved preference
-    const savedPreference = localStorage.getItem('accessibility_tips_enabled');
-    if (savedPreference === 'true') {
-      setIsEnabled(true);
+    const savedState = localStorage.getItem('accessibility-tips-state');
+    if (savedState) {
+      try {
+        const { isEnabled: savedIsEnabled } = JSON.parse(savedState);
+        setIsEnabled(savedIsEnabled);
+      } catch (error) {
+        console.error('Error loading accessibility tips state:', error);
+      }
     }
-
-    // Make the toggle function available globally for external scripts
-    interface CustomWindow extends Window {
-      __accessibilityTipsToggle?: (newValue: boolean) => void;
-    }
-
-    (window as CustomWindow).__accessibilityTipsToggle = (newValue: boolean) => {
-      setIsEnabled(newValue);
-      localStorage.setItem('accessibility_tips_enabled', String(newValue));
-    };
-
-    return () => {
-      delete (window as CustomWindow).__accessibilityTipsToggle;
-    };
   }, []);
 
-  const toggleEnabled = () => {
-    const newValue = !isEnabled;
-    setIsEnabled(newValue);
-    localStorage.setItem('accessibility_tips_enabled', String(newValue));
+  // Save state to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('accessibility-tips-state', JSON.stringify({ isEnabled }));
+  }, [isEnabled]);
+
+  const addTip = (tip: AccessibilityTip) => {
+    setTips(prevTips => {
+      // Check if a tip with this ID already exists
+      const existingTipIndex = prevTips.findIndex(t => t.id === tip.id);
+      if (existingTipIndex !== -1) {
+        // Replace the existing tip
+        const newTips = [...prevTips];
+        newTips[existingTipIndex] = tip;
+        return newTips;
+      }
+      // Add new tip
+      return [...prevTips, tip];
+    });
   };
 
-  const getTipsByElement = (elementType: string): AccessibilityTip[] => {
-    return accessibilityTips.filter(tip => tip.element === elementType);
+  const removeTip = (id: string) => {
+    setTips(prevTips => prevTips.filter(tip => tip.id !== id));
+    if (activeTip?.id === id) {
+      setActiveTipState(null);
+    }
   };
 
-  const getTipById = (id: string): AccessibilityTip | undefined => {
-    return accessibilityTips.find(tip => tip.id === id);
-  };
-
-  const getAllTips = (): AccessibilityTip[] => {
-    return accessibilityTips;
-  };
-
-  const searchTips = (query: string): void => {
-    if (!query.trim()) {
-      setFilteredTips([]);
+  const setActiveTip = (id: string | null) => {
+    if (id === null) {
+      setActiveTipState(null);
       return;
     }
-
-    const lowerQuery = query.toLowerCase();
-    const filtered = accessibilityTips.filter(tip => 
-      tip.title.toLowerCase().includes(lowerQuery) || 
-      tip.tip.toLowerCase().includes(lowerQuery) ||
-      (tip.wcagReference && tip.wcagReference.toLowerCase().includes(lowerQuery)) ||
-      tip.element.toLowerCase().includes(lowerQuery)
-    );
     
-    setFilteredTips(filtered);
+    const tip = tips.find(t => t.id === id);
+    if (tip) {
+      setActiveTipState(tip);
+    }
   };
 
-  const value: AccessibilityTipsContextType = {
-    isEnabled,
-    toggleEnabled,
-    setIsEnabled,
-    getTipsByElement,
-    getTipById,
-    getAllTips,
-    setFilteredTips,
-    filteredTips,
-    searchTips
+  const clearTips = () => {
+    setTips([]);
+    setActiveTipState(null);
   };
 
   return (
-    <AccessibilityTipsContext.Provider value={value}>
+    <AccessibilityTipsContext.Provider
+      value={{
+        tips,
+        activeTip,
+        isEnabled,
+        setIsEnabled,
+        addTip,
+        removeTip,
+        setActiveTip,
+        clearTips,
+      }}
+    >
       {children}
     </AccessibilityTipsContext.Provider>
   );
 };
-
-export default AccessibilityTipsProvider;

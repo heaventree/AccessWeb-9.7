@@ -40,7 +40,72 @@ export const roadmapFeatures: RoadmapFeature[] = [
     completedDate: '2025-03-24'
   },
   
-  // Next priority features
+  // Next priority features - User Authentication System
+  {
+    id: 'user-authentication',
+    title: 'User Authentication System',
+    description: 'Complete user authentication system with signup, login, and account management',
+    status: 'planned',
+    priority: 1,
+    category: 'core',
+    dependencies: []
+  },
+  {
+    id: 'email-verification',
+    title: 'Email Verification System',
+    description: 'Email verification flow for new user signups with secure token handling',
+    status: 'planned',
+    priority: 1,
+    category: 'core',
+    dependencies: ['user-authentication']
+  },
+  {
+    id: 'password-recovery',
+    title: 'Password Recovery System',
+    description: 'Secure password reset and recovery workflow with email verification',
+    status: 'planned',
+    priority: 1,
+    category: 'core',
+    dependencies: ['user-authentication', 'email-verification']
+  },
+  {
+    id: 'oauth-integration',
+    title: 'OAuth Integration',
+    description: 'Support for third-party authentication via OAuth (Google, GitHub, etc.)',
+    status: 'planned',
+    priority: 2,
+    category: 'integration',
+    dependencies: ['user-authentication']
+  },
+  {
+    id: 'external-api-security',
+    title: 'External Integration Security',
+    description: 'Secure API communication for WordPress, Shopify, and custom site integrations',
+    status: 'planned',
+    priority: 2,
+    category: 'integration',
+    dependencies: ['user-authentication', 'api-integrations']
+  },
+  {
+    id: 'stripe-payments',
+    title: 'Stripe Payment Processing',
+    description: 'Integration with Stripe for secure payment processing and subscription management',
+    status: 'planned',
+    priority: 1,
+    category: 'core',
+    dependencies: ['user-authentication']
+  },
+  {
+    id: 'subscription-management',
+    title: 'Subscription Management System',
+    description: 'User interface for managing subscription plans, billing, and payment methods',
+    status: 'planned',
+    priority: 2,
+    category: 'ui',
+    dependencies: ['stripe-payments', 'user-dashboard']
+  },
+  
+  // Other priority features
   {
     id: 'compliance-badges',
     title: 'WCAG Compliance Badges',

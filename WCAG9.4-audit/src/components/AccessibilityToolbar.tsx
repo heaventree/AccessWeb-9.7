@@ -1,322 +1,142 @@
-import { useState, useEffect } from 'react';
-import { 
-  ZoomIn, 
-  ZoomOut,
-  Glasses,
-  AlignLeft,
-  AlignCenter,
-  Eye,
-  Keyboard,
-  Volume2,
-  RotateCcw,
-  MousePointer2,
-  Underline,
-  Palette,
-  HelpCircle,
-  Lightbulb
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-
-// Define the global window interface
-declare global {
-  interface Window {
-    __accessibilityTipsToggle?: (enabled: boolean) => void;
-  }
-}
-
-interface AccessibilitySettings {
-  fontSize: number;
-  textAlign: 'left' | 'center' | 'right';
-  cursor: 'normal' | 'large';
-  highlightLinks: boolean;
-  highlightFocus: boolean;
-  virtualKeyboard: boolean;
-  highContrast: boolean;
-  showAccessibilityTips: boolean;
-}
-
-const defaultSettings: AccessibilitySettings = {
-  fontSize: 100,
-  textAlign: 'left',
-  cursor: 'normal',
-  highlightLinks: false,
-  highlightFocus: false,
-  virtualKeyboard: false,
-  highContrast: false,
-  showAccessibilityTips: true
-};
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { FiEye, FiPlusCircle, FiX, FiMessageCircle, FiAlertCircle, FiHelpCircle } from 'react-icons/fi';
+import { useAccessibilityTips } from '../contexts/AccessibilityTipsContext';
+import { AccessibilityTipTooltip } from './accessibility/AccessibilityTipTooltip';
 
 export function AccessibilityToolbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [settings, setSettings] = useState<AccessibilitySettings>(() => {
-    const saved = localStorage.getItem('accessibility-settings');
-    return saved ? JSON.parse(saved) : defaultSettings;
-  });
+  const { isEnabled, setIsEnabled, tips } = useAccessibilityTips();
+  const [hidePosition, setHidePosition] = useState(false);
 
+  // Handle toolbar position to be completly offscreen when hidden
   useEffect(() => {
-    localStorage.setItem('accessibility-settings', JSON.stringify(settings));
-    applySettings(settings);
-    
-    // Update the global access to tips as well
-    if (window.__accessibilityTipsToggle) {
-      window.__accessibilityTipsToggle(settings.showAccessibilityTips);
+    if (!isOpen) {
+      // Delay hiding position until after animation completes
+      const timer = setTimeout(() => {
+        setHidePosition(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setHidePosition(false);
     }
-  }, [settings]);
+  }, [isOpen]);
 
-  const applySettings = (newSettings: AccessibilitySettings) => {
-    const root = document.documentElement;
-    
-    // Font size
-    root.style.fontSize = `${newSettings.fontSize}%`;
-
-    // Text alignment
-    root.style.textAlign = newSettings.textAlign;
-
-    // Cursor
-    root.classList.toggle('large-cursor', newSettings.cursor === 'large');
-
-    // Links
-    root.classList.toggle('highlight-links', newSettings.highlightLinks);
-
-    // Focus
-    root.classList.toggle('highlight-focus', newSettings.highlightFocus);
-
-    // High Contrast
-    root.classList.toggle('high-contrast', newSettings.highContrast);
-    
-    // Accessibility Tips
-    root.classList.toggle('show-accessibility-tips', newSettings.showAccessibilityTips);
+  // Toggle tips and store in preferences
+  const handleToggleTips = () => {
+    setIsEnabled(!isEnabled);
   };
 
-  const updateSetting = <K extends keyof AccessibilitySettings>(
-    key: K,
-    value: AccessibilitySettings[K]
-  ) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
-  };
-
-  const resetSettings = () => {
-    setSettings(defaultSettings);
-  };
-
-  const toggleVirtualKeyboard = () => {
-    const keyboard = document.getElementById('virtual-keyboard');
-    if (!settings.virtualKeyboard) {
-      if (!keyboard) {
-        const newKeyboard = document.createElement('div');
-        newKeyboard.id = 'virtual-keyboard';
-        newKeyboard.className = 'fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg p-4 z-50';
-        document.body.appendChild(newKeyboard);
+  // Keyboard shortcut to toggle toolbar
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Alt+A to toggle toolbar
+      if (e.altKey && e.key === 'a') {
+        setIsOpen(prev => !prev);
       }
-    } else if (keyboard) {
-      keyboard.remove();
-    }
-    updateSetting('virtualKeyboard', !settings.virtualKeyboard);
-  };
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   return (
     <>
-      <button
-        onClick={() => setIsOpen(prev => !prev)}
-        className="fixed bottom-4 right-4 z-50 p-3 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-colors"
-        aria-label="Toggle Accessibility Tools"
+      <motion.div
+        initial={{ x: '100%' }}
+        animate={{ x: isOpen ? 0 : '100%' }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className={`fixed right-0 top-24 bg-white rounded-l-lg shadow-lg z-50 overflow-hidden ${hidePosition && !isOpen ? 'right-[-280px]' : ''}`}
+        style={{ width: 280 }}
       >
-        <Glasses className="w-6 h-6" />
-      </button>
-
-      <div
-        className={`fixed right-4 bottom-20 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl transition-transform duration-200 ${
-          isOpen ? 'translate-x-0' : 'translate-x-[150%]'
-        }`}
-      >
-        <div className="p-4 space-y-4 max-h-[80vh] overflow-y-auto">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Accessibility Tools
-            </h2>
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">Accessibility Tools</h2>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label="Close toolbar"
             >
-              ×
+              <FiX size={20} />
             </button>
           </div>
 
-          <div className="space-y-6">
-            {/* Text Size */}
-            <div className="space-y-2">
-              <label className="text-sm text-gray-600 dark:text-gray-400">Text Size</label>
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={() => updateSetting('fontSize', Math.max(80, settings.fontSize - 10))}
-                  className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
-                  aria-label="Decrease Font Size"
-                >
-                  <ZoomOut className="w-4 h-4" />
-                </button>
-                <span className="text-sm">{settings.fontSize}%</span>
-                <button
-                  onClick={() => updateSetting('fontSize', Math.min(200, settings.fontSize + 10))}
-                  className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
-                  aria-label="Increase Font Size"
-                >
-                  <ZoomIn className="w-4 h-4" />
-                </button>
+          <div className="space-y-4">
+            {/* Quick Tips Toggle */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <FiEye className="mr-2 text-primary-600" size={18} />
+                <span className="text-sm font-medium text-gray-700">Accessibility Tips</span>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={isEnabled}
+                  onChange={handleToggleTips}
+                  className="sr-only peer" 
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+
+            {/* Tip stats */}
+            <div className="bg-gray-50 p-3 rounded-md">
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <span>Active tips:</span>
+                <span className="font-semibold">{tips.length}</span>
               </div>
             </div>
 
-            {/* Text Alignment */}
-            <div className="space-y-2">
-              <label className="text-sm text-gray-600 dark:text-gray-400">Text Alignment</label>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => updateSetting('textAlign', 'left')}
-                  className={`p-2 rounded-lg ${
-                    settings.textAlign === 'left'
-                      ? 'bg-blue-100 dark:bg-blue-900'
-                      : 'bg-gray-100 dark:bg-gray-700'
-                  }`}
-                  aria-label="Align Left"
-                >
-                  <AlignLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => updateSetting('textAlign', 'center')}
-                  className={`p-2 rounded-lg ${
-                    settings.textAlign === 'center'
-                      ? 'bg-blue-100 dark:bg-blue-900'
-                      : 'bg-gray-100 dark:bg-gray-700'
-                  }`}
-                  aria-label="Align Center"
-                >
-                  <AlignCenter className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Toggle Buttons */}
+            {/* Tools */}
             <div className="space-y-2">
               <button
-                onClick={() => updateSetting('cursor', settings.cursor === 'normal' ? 'large' : 'normal')}
-                className={`w-full flex items-center justify-between p-2 rounded-lg ${
-                  settings.cursor === 'large'
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
+                className="w-full flex items-center p-2 text-left text-sm bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                onClick={() => {}}
               >
-                <span className="flex items-center">
-                  <MousePointer2 className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Large Cursor</span>
-                </span>
-              </button>
-
-              <button
-                onClick={() => updateSetting('highlightLinks', !settings.highlightLinks)}
-                className={`w-full flex items-center justify-between p-2 rounded-lg ${
-                  settings.highlightLinks
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                <span className="flex items-center">
-                  <Underline className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Highlight Links</span>
-                </span>
-              </button>
-
-              <button
-                onClick={() => updateSetting('highlightFocus', !settings.highlightFocus)}
-                className={`w-full flex items-center justify-between p-2 rounded-lg ${
-                  settings.highlightFocus
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                <span className="flex items-center">
-                  <Eye className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Highlight Focus</span>
-                </span>
-              </button>
-
-              <button
-                onClick={() => updateSetting('highContrast', !settings.highContrast)}
-                className={`w-full flex items-center justify-between p-2 rounded-lg ${
-                  settings.highContrast
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                <span className="flex items-center">
-                  <Palette className="w-4 h-4 mr-2" />
-                  <span className="text-sm">High Contrast</span>
-                </span>
-              </button>
-
-              <button
-                onClick={toggleVirtualKeyboard}
-                className={`w-full flex items-center justify-between p-2 rounded-lg ${
-                  settings.virtualKeyboard
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                <span className="flex items-center">
-                  <Keyboard className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Virtual Keyboard</span>
-                </span>
-              </button>
-
-              <button
-                onClick={() => {
-                  // First update our local state
-                  updateSetting('showAccessibilityTips', !settings.showAccessibilityTips);
-                  
-                  // Also update the tips context if it's available via the global variable
-                  if (window.__accessibilityTipsToggle) {
-                    window.__accessibilityTipsToggle(!settings.showAccessibilityTips);
-                  }
-                }}
-                className={`w-full flex items-center justify-between p-2 rounded-lg ${
-                  settings.showAccessibilityTips
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                <span className="flex items-center">
-                  <HelpCircle className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Accessibility Tips</span>
-                </span>
-                <Link 
-                  to="/help/accessibility-tips"
-                  className="text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 ml-2"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Lightbulb size={14} />
-                </Link>
+                <FiAlertCircle className="mr-2 text-yellow-500" size={16} />
+                <span>Run accessibility audit</span>
               </button>
               
               <button
-                onClick={() => alert('Text-to-speech feature coming soon!')}
-                className="w-full flex items-center justify-between p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                className="w-full flex items-center p-2 text-left text-sm bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                onClick={() => {}}
               >
-                <span className="flex items-center">
-                  <Volume2 className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Text to Speech</span>
-                </span>
+                <FiMessageCircle className="mr-2 text-blue-500" size={16} />
+                <span>Open live chat support</span>
+              </button>
+              
+              <button
+                className="w-full flex items-center p-2 text-left text-sm bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                onClick={() => {}}
+              >
+                <FiHelpCircle className="mr-2 text-purple-500" size={16} />
+                <span>View accessibility guide</span>
               </button>
             </div>
 
-            {/* Reset Button */}
-            <button
-              onClick={resetSettings}
-              className="w-full flex items-center justify-center p-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
-            >
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Reset All Settings
-            </button>
+            <div className="text-xs text-gray-500 pt-2 border-t border-gray-100">
+              Press <kbd className="px-2 py-0.5 bg-gray-100 rounded text-xs">Alt + A</kbd> to toggle toolbar
+            </div>
           </div>
         </div>
-      </div>
+      </motion.div>
+
+      {/* Toggle button */}
+      <motion.button
+        className="fixed right-0 top-24 bg-primary-600 hover:bg-primary-700 text-white p-3 rounded-l-md shadow-lg z-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+        onClick={() => setIsOpen(!isOpen)}
+        initial={{ x: isOpen ? '100%' : 0 }}
+        animate={{ x: isOpen ? '100%' : 0 }}
+        transition={{ duration: 0.3 }}
+        aria-label="Toggle accessibility toolbar"
+      >
+        <FiPlusCircle size={20} />
+      </motion.button>
+
+      {/* Accessibility Tip Tooltip */}
+      <AccessibilityTipTooltip />
     </>
   );
 }
