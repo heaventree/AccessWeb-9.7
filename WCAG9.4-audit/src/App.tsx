@@ -38,6 +38,7 @@ import { AccessibilityToolbar } from './components/AccessibilityToolbar';
 import { WCAGCheckerPage } from './pages/WCAGCheckerPage';
 import { WCAGStandardsTable } from './pages/WCAGStandardsTable';
 import WCAGColorPalette from './pages/tools/WCAGColorPalette';
+import ImageAltScannerPage from './pages/tools/ImageAltScannerPage';
 import { WordPressDashboard } from './components/integrations/WordPressDashboard';
 import { CustomAPISetup } from './components/integrations/CustomAPISetup';
 import { MonitoringDashboard } from './components/MonitoringDashboard';
@@ -90,6 +91,7 @@ function App() {
               <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/monitoring" element={<><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/realtime" element={<><Navigation /><main id="main-content"><RealTimeMonitorPage /></main><Footer /><BackToTop /></>} />
+              <Route path="/tools/image-alt-scanner" element={<><Navigation /><main id="main-content"><ImageAltScannerPage /></main><Footer /><BackToTop /></>} />
               <Route path="/ui-demo" element={<><Navigation /><main id="main-content"><UiDemo /></main><Footer /><BackToTop /></>} />
               <Route path="/integrations" element={<><Navigation /><main id="main-content"><Integrations /></main><Footer /><BackToTop /></>} />
               {/* Account Routes with shared layout */}

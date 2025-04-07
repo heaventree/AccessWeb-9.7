@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Gauge, Palette, FileText, Zap, Settings, Store, Globe, Activity, ActivitySquare, Book, HelpCircle, BarChart2, Bell, Shield, Building, LayoutDashboard, CreditCard, Users, User, Code } from 'lucide-react';
+import { Menu, X, ChevronDown, Gauge, Palette, FileText, Zap, Settings, Store, Globe, Activity, ActivitySquare, Book, HelpCircle, BarChart2, Bell, Shield, Building, LayoutDashboard, CreditCard, Users, User, Image } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 
 export function Navigation() {
@@ -62,6 +62,12 @@ export function Navigation() {
       path: '/tools/wcag-standards',
       icon: FileText,
       description: 'Browse WCAG 2.1 standards and requirements'
+    },
+    { 
+      name: 'Image Alt Scanner',
+      path: '/tools/image-alt-scanner',
+      icon: Image,
+      description: 'Find and fix image accessibility issues'
     }
   ];
 
