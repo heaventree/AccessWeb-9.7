@@ -11,8 +11,11 @@ import {
   RotateCcw,
   MousePointer2,
   Underline,
-  Palette
+  Palette,
+  HelpCircle,
+  Lightbulb
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface AccessibilitySettings {
   fontSize: number;
@@ -22,6 +25,7 @@ interface AccessibilitySettings {
   highlightFocus: boolean;
   virtualKeyboard: boolean;
   highContrast: boolean;
+  showAccessibilityTips: boolean;
 }
 
 const defaultSettings: AccessibilitySettings = {
@@ -31,7 +35,8 @@ const defaultSettings: AccessibilitySettings = {
   highlightLinks: false,
   highlightFocus: false,
   virtualKeyboard: false,
-  highContrast: false
+  highContrast: false,
+  showAccessibilityTips: true
 };
 
 export function AccessibilityToolbar() {
@@ -246,6 +251,27 @@ export function AccessibilityToolbar() {
                 </span>
               </button>
 
+              <button
+                onClick={() => updateSetting('showAccessibilityTips', !settings.showAccessibilityTips)}
+                className={`w-full flex items-center justify-between p-2 rounded-lg ${
+                  settings.showAccessibilityTips
+                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                <span className="flex items-center">
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  <span className="text-sm">Accessibility Tips</span>
+                </span>
+                <Link 
+                  to="/help/accessibility-tips"
+                  className="text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 ml-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Lightbulb size={14} />
+                </Link>
+              </button>
+              
               <button
                 onClick={() => alert('Text-to-speech feature coming soon!')}
                 className="w-full flex items-center justify-between p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
