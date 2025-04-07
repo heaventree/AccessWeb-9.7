@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ImageAltScanner from '../../components/tools/ImageAltScanner';
-import ImageAltScannerInfo from '../../components/tools/ImageAltScannerInfo';
+import { ImageAltScannerInfo } from '../../components/tools/ImageAltScannerInfo';
 import { ExternalLink, HelpCircle, Info, Link as LinkIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { ScanResult, ImageIssue, ScanOptions } from '../../services/imageAltScanService';
