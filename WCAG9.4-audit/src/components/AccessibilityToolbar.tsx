@@ -17,6 +17,13 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+// Define the global window interface
+declare global {
+  interface Window {
+    __accessibilityTipsToggle?: (enabled: boolean) => void;
+  }
+}
+
 interface AccessibilitySettings {
   fontSize: number;
   textAlign: 'left' | 'center' | 'right';
@@ -49,6 +56,11 @@ export function AccessibilityToolbar() {
   useEffect(() => {
     localStorage.setItem('accessibility-settings', JSON.stringify(settings));
     applySettings(settings);
+    
+    // Update the global access to tips as well
+    if (window.__accessibilityTipsToggle) {
+      window.__accessibilityTipsToggle(settings.showAccessibilityTips);
+    }
   }, [settings]);
 
   const applySettings = (newSettings: AccessibilitySettings) => {
@@ -71,6 +83,9 @@ export function AccessibilityToolbar() {
 
     // High Contrast
     root.classList.toggle('high-contrast', newSettings.highContrast);
+    
+    // Accessibility Tips
+    root.classList.toggle('show-accessibility-tips', newSettings.showAccessibilityTips);
   };
 
   const updateSetting = <K extends keyof AccessibilitySettings>(
@@ -252,7 +267,15 @@ export function AccessibilityToolbar() {
               </button>
 
               <button
-                onClick={() => updateSetting('showAccessibilityTips', !settings.showAccessibilityTips)}
+                onClick={() => {
+                  // First update our local state
+                  updateSetting('showAccessibilityTips', !settings.showAccessibilityTips);
+                  
+                  // Also update the tips context if it's available via the global variable
+                  if (window.__accessibilityTipsToggle) {
+                    window.__accessibilityTipsToggle(!settings.showAccessibilityTips);
+                  }
+                }}
                 className={`w-full flex items-center justify-between p-2 rounded-lg ${
                   settings.showAccessibilityTips
                     ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100'

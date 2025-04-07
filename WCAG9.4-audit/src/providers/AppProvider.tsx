@@ -6,6 +6,7 @@ import localforage from 'localforage';
 import { ThemeProvider } from './ThemeProvider';
 import { Toaster } from 'react-hot-toast';
 import { retryFunction } from '../utils/retryFunction';
+import { AccessibilityTipsProvider } from '../contexts/AccessibilityTipsContext';
 
 // Initialize storage
 const storage = localforage.createInstance({
@@ -92,8 +93,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       <ThemeProvider>
-        <Toaster position="top-center" />
-        {children}
+        <AccessibilityTipsProvider>
+          <Toaster position="top-center" />
+          {children}
+        </AccessibilityTipsProvider>
       </ThemeProvider>
     </PersistQueryClientProvider>
   );

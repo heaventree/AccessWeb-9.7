@@ -72,6 +72,8 @@ import { UiDemo } from './pages/UiDemo';
 import { AltTextGuide } from './pages/help/AltTextGuide';
 
 import { ErrorPage } from './components/ErrorPage';
+import AccessibilityTipsPage from './pages/help/AccessibilityTipsPage';
+import { AccessibilityTipsDemo } from './components/demo/AccessibilityTipsDemo';
 
 function App() {
   return (
@@ -126,6 +128,8 @@ function App() {
               <Route path="/non-destructive-fixes" element={<><Navigation /><main id="main-content"><NonDestructiveFixPage /></main><Footer /><BackToTop /></>} />
               <Route path="/help" element={<><Navigation /><main id="main-content"><HelpCenter /></main><Footer /><BackToTop /></>} />
               <Route path="/help/alt-text-guide" element={<><Navigation /><main id="main-content"><AltTextGuide /></main><Footer /><BackToTop /></>} />
+              <Route path="/help/accessibility-tips" element={<><Navigation /><main id="main-content"><AccessibilityTipsPage /></main><Footer /><BackToTop /></>} />
+              <Route path="/help/accessibility-demo" element={<><Navigation /><main id="main-content"><AccessibilityTipsDemo /></main><Footer /><BackToTop /></>} />
               <Route path="/help/:slug" element={<><Navigation /><main id="main-content"><HelpArticle /></main><Footer /><BackToTop /></>} />
               <Route path="/login" element={<AuthPage />} />
               <Route path="/signup" element={<AuthPage />} />
