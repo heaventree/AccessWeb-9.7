@@ -9,6 +9,7 @@ import {
   AuthError, 
   UserRole 
 } from '../types/auth';
+import { IS_DEVELOPMENT_MODE } from './environment';
 
 // JWT secret key - in production, this would come from an environment variable
 const JWT_SECRET = 'wcag94-accessibility-platform-secret-key';
@@ -89,7 +90,7 @@ export const loginUser = async (
     // For demonstration purposes, we'll mock the response
     
     // In development mode, always succeed with a mock user
-    if (process.env.NODE_ENV === 'development') {
+    if (IS_DEVELOPMENT_MODE) {
       const mockUser: User = {
         id: uuidv4(),
         name: 'Development User',
@@ -140,7 +141,7 @@ export const registerUser = async (
     // For demonstration purposes, we'll mock the response
     
     // In development mode, always succeed with a new user
-    if (process.env.NODE_ENV === 'development') {
+    if (IS_DEVELOPMENT_MODE) {
       const newUser: User = {
         id: uuidv4(),
         name: data.name,
@@ -186,7 +187,7 @@ export const registerUser = async (
 export const verifyEmail = async (token: string): Promise<boolean> => {
   // This would typically be an API call to verify the email
   // For demonstration purposes, we'll mock the response
-  return process.env.NODE_ENV === 'development';
+  return IS_DEVELOPMENT_MODE;
 };
 
 /**
@@ -197,7 +198,7 @@ export const verifyEmail = async (token: string): Promise<boolean> => {
 export const createPasswordResetToken = async (email: string): Promise<boolean> => {
   // This would typically be an API call to create a reset token
   // For demonstration purposes, we'll mock the response
-  return process.env.NODE_ENV === 'development';
+  return IS_DEVELOPMENT_MODE;
 };
 
 /**
@@ -212,7 +213,7 @@ export const resetPassword = async (
 ): Promise<boolean> => {
   // This would typically be an API call to reset the password
   // For demonstration purposes, we'll mock the response
-  return process.env.NODE_ENV === 'development';
+  return IS_DEVELOPMENT_MODE;
 };
 
 /**
@@ -223,7 +224,7 @@ export const resetPassword = async (
 export const updateUserProfile = async (data: Partial<User>): Promise<boolean> => {
   // This would typically be an API call to update the profile
   // For demonstration purposes, we'll mock the response
-  return process.env.NODE_ENV === 'development';
+  return IS_DEVELOPMENT_MODE;
 };
 
 /**
@@ -238,5 +239,5 @@ export const updatePassword = async (
 ): Promise<boolean> => {
   // This would typically be an API call to update the password
   // For demonstration purposes, we'll mock the response
-  return process.env.NODE_ENV === 'development';
+  return IS_DEVELOPMENT_MODE;
 };

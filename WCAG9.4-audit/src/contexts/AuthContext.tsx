@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { generateToken, validateToken } from '../utils/auth';
 import { User, AuthError } from '../types/auth';
+import { IS_DEVELOPMENT_MODE } from '../utils/environment';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -24,7 +25,7 @@ export const AuthContext = createContext<AuthContextType>({
   verifyEmail: async () => false,
   createPasswordResetToken: async () => false,
   resetPassword: async () => false,
-  isDevelopmentMode: process.env.NODE_ENV === 'development'
+  isDevelopmentMode: IS_DEVELOPMENT_MODE
 });
 
 interface AuthProviderProps {
@@ -34,7 +35,6 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const isDevelopmentMode = process.env.NODE_ENV === 'development';
 
   // Check for existing authentication on mount
   useEffect(() => {
@@ -71,7 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string) => {
     try {
       // Mock login for development
-      if (isDevelopmentMode) {
+      if (IS_DEVELOPMENT_MODE) {
         const mockUser: User = {
           id: '123',
           name: 'Demo User',
@@ -115,7 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const verifyEmail = async (token: string) => {
     try {
       // Mock implementation for development
-      if (isDevelopmentMode) {
+      if (IS_DEVELOPMENT_MODE) {
         // Simulate email verification success
         return true;
       }
@@ -132,7 +132,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const createPasswordResetToken = async (email: string) => {
     try {
       // Mock implementation for development
-      if (isDevelopmentMode) {
+      if (IS_DEVELOPMENT_MODE) {
         // Simulate sending reset email
         return true;
       }
@@ -149,7 +149,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const resetPassword = async (token: string, newPassword: string) => {
     try {
       // Mock implementation for development
-      if (isDevelopmentMode) {
+      if (IS_DEVELOPMENT_MODE) {
         // Simulate password reset
         return true;
       }
@@ -171,7 +171,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     verifyEmail,
     createPasswordResetToken,
     resetPassword,
-    isDevelopmentMode
+    isDevelopmentMode: IS_DEVELOPMENT_MODE
   };
 
   return (

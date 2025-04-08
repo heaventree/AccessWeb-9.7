@@ -10,10 +10,17 @@ import { AppProvider } from './providers/AppProvider';
 
 // Fix for polyfills in browser environment
 window.Buffer = window.Buffer || Buffer;
-window.process = window.process || { env: {} }; // Minimal process polyfill
 
-// Fix for util polyfill
+// Define process in the browser environment
 if (typeof window !== 'undefined') {
+  // @ts-ignore
+  window.process = {
+    env: {
+      NODE_ENV: import.meta.env.MODE || 'development'
+    }
+  };
+  
+  // Fix for util polyfill
   // @ts-ignore
   window.util = util;
   // @ts-ignore
