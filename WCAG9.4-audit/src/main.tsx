@@ -10,7 +10,11 @@ import { AppProvider } from './providers/AppProvider';
 
 // Fix for polyfills in browser environment
 window.Buffer = window.Buffer || Buffer;
-window.process = window.process || { env: {} }; // Minimal process polyfill
+
+// Create a minimal process polyfill if it doesn't exist
+if (typeof window.process === 'undefined') {
+  window.process = { env: {} };
+}
 
 // Fix for util polyfill
 if (typeof window !== 'undefined') {

@@ -12,6 +12,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
+      // Add Node.js polyfills
+      'process': 'process/browser',
+      'stream': 'stream-browserify',
+      'util': 'util',
     },
+  },
+  define: {
+    // Define global process variable
+    'process.env': process.env,
+    'global': {},
   },
 });
