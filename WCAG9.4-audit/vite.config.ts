@@ -12,24 +12,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      // Node.js polyfills
-      'process': resolve(__dirname, 'src/polyfills/process.js'),
-      'util': 'util',
-      'stream': 'stream-browserify',
-      'buffer': 'buffer',
     },
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      define: {
-        global: 'globalThis',
-      },
-    },
-  },
-  define: {
-    'process.env': {
-      'NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-    },
-    'global': 'window',
   },
 });

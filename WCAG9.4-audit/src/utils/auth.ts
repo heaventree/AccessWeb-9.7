@@ -1,76 +1,62 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { 
   User, 
   LoginResponse, 
   RegistrationData, 
   RegistrationResponse, 
-  AuthError, 
   UserRole 
 } from '../types/auth';
 import { IS_DEVELOPMENT_MODE } from './environment';
 
-// JWT secret key - in production, this would come from an environment variable
-const JWT_SECRET = 'wcag94-accessibility-platform-secret-key';
-const TOKEN_EXPIRY = '24h';
+// Browser-friendly token utilities without relying on Node.js modules
+const TOKEN_EXPIRY_HOURS = 24;
 
 /**
- * Hashes a password using bcrypt
- * @param password The plain text password
- * @returns The hashed password
- */
-export const hashPassword = async (password: string): Promise<string> => {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
-};
-
-/**
- * Compares a plain text password with a hashed password
- * @param password The plain text password
- * @param hashedPassword The hashed password
- * @returns True if the passwords match
- */
-export const comparePasswords = async (
-  password: string,
-  hashedPassword: string
-): Promise<boolean> => {
-  return bcrypt.compare(password, hashedPassword);
-};
-
-/**
- * Generates a JWT token for an authenticated user
+ * Simplified token generation for browser environments
  * @param user The user data to encode in the token
- * @returns The JWT token string
+ * @returns A browser-compatible token string
  */
 export const generateToken = (user: Partial<User>): string => {
+  // Create a payload with user data and an expiration
   const payload = {
     id: user.id,
     email: user.email,
-    role: user.role
+    role: user.role,
+    name: user.name,
+    organization: user.organization,
+    exp: Date.now() + (TOKEN_EXPIRY_HOURS * 60 * 60 * 1000) // hours to milliseconds
   };
-
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+  
+  // Simple base64 encoding (not secure for production)
+  return btoa(JSON.stringify(payload));
 };
 
 /**
- * Validates a JWT token and extracts the user data
- * @param token The JWT token to validate
+ * Validates a token and extracts the user data
+ * @param token The token to validate
  * @returns User data if valid, null if invalid
  */
 export const validateToken = (
   token: string
 ): { id: string; email: string; role: UserRole; name?: string; organization?: string } | null => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const decoded = JSON.parse(atob(token));
+    
+    // Check expiration
+    if (decoded.exp && decoded.exp < Date.now()) {
+      console.log('Token expired');
+      return null;
+    }
+    
     return {
       id: decoded.id,
       email: decoded.email,
       role: decoded.role as UserRole,
-      name: decoded.name,
-      organization: decoded.organization
+      name: decoded.name || '',
+      organization: decoded.organization || ''
     };
   } catch (error) {
+    console.error('Token validation error:', error);
     return null;
   }
 };
@@ -91,6 +77,8 @@ export const loginUser = async (
     
     // In development mode, always succeed with a mock user
     if (IS_DEVELOPMENT_MODE) {
+      console.log('🔓 Running in DEVELOPMENT MODE - Authentication is disabled');
+      
       const mockUser: User = {
         id: uuidv4(),
         name: 'Development User',

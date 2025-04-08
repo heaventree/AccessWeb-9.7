@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { IS_DEVELOPMENT_MODE } from '../utils/environment';
 
 interface ErrorFallbackProps {
   error: Error;
@@ -20,7 +21,7 @@ export function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps)
           <p className="mt-2 text-center text-sm text-gray-600">
             We're sorry, but something went wrong. Please try again or contact support if the problem persists.
           </p>
-          {process.env.NODE_ENV === 'development' && (
+          {IS_DEVELOPMENT_MODE && (
             <pre className="mt-4 p-4 bg-red-50 rounded-lg text-left text-sm text-red-700 overflow-auto">
               {error.message}
             </pre>

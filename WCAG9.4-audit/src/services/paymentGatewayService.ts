@@ -1,4 +1,5 @@
 import type { PaymentGateway } from '../types';
+import { getEnvVariable } from '../utils/environment';
 
 // Simulated database
 let gateways: PaymentGateway[] = [
@@ -8,8 +9,8 @@ let gateways: PaymentGateway[] = [
     isActive: true,
     config: {
       mode: 'test',
-      apiKey: process.env.VITE_STRIPE_PUBLISHABLE_KEY,
-      secretKey: process.env.VITE_STRIPE_SECRET_KEY,
+      apiKey: getEnvVariable('VITE_STRIPE_PUBLISHABLE_KEY', 'pk_test_placeholder'),
+      secretKey: getEnvVariable('VITE_STRIPE_SECRET_KEY', 'sk_test_placeholder'),
       webhookSecret: ''
     },
     lastUpdated: new Date().toISOString()
