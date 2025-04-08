@@ -6,6 +6,8 @@ import * as util from 'util';
 import * as stream from 'stream-browserify';
 import App from './App';
 import './index.css';
+import './styles/theme-variables.css';
+import './styles/main.css';
 import { AppProvider } from './providers/AppProvider';
 
 // Fix for polyfills in browser environment
