@@ -10,7 +10,7 @@ export function AccessibilityBadge() {
     <>
       {/* Simple pill badge button - matching previous design */}
       <motion.button
-        className="fixed right-5 bottom-5 bg-green-600 text-white p-0 rounded-full shadow-md z-40 h-12 w-12
+        className="fixed right-5 bottom-4 bg-green-600 text-white p-0 rounded-full shadow-md z-40 h-12 w-12
                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
                    flex items-center justify-center"
         onClick={() => setShowDetails(!showDetails)}
