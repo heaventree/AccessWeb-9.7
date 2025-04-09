@@ -1,9 +1,5 @@
-/**
- * UI Component Library
- * 
- * This file exports all UI components inspired by Noble UI design patterns
- * for consistent usage throughout the application.
- */
-
-export * from './Button';
-export * from './Card';
+// Re-export all UI components
+export { Card, CardHeader, CardContent, CardFooter } from './Card';
+export { Progress } from './Progress';
+export { HeadingSection } from './HeadingSection';
+export { Button } from './Button';

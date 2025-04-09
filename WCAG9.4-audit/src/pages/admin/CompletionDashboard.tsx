@@ -1,7 +1,5 @@
 
-import { HeadingSection } from '../../components/ui/HeadingSection';
-import { Card } from '../../components/ui/Card';
-import { Progress } from '../../components/ui/Progress';
+import { Card, HeadingSection, Progress } from '../../components/ui';
 
 // Type definitions for our completion data
 interface CategoryCompletion {
