@@ -39,7 +39,7 @@ const featureCompletions: FeatureStatus[] = [
   { name: 'Payment Processing', percentage: 60, status: 'in-progress' },
   { name: 'External Integration Security', percentage: 50, status: 'in-progress' },
   { name: 'Media Accessibility Testing', percentage: 40, status: 'in-progress' },
-  { name: 'Dark Mode Implementation', percentage: 30, status: 'critical' },
+  { name: 'Accessibility Compliance - WCAG 2.2', percentage: 35, status: 'critical' },
   { name: 'Admin Dashboard Stats', percentage: 50, status: 'in-progress' },
   { name: 'Monitoring System', percentage: 40, status: 'in-progress' },
   { name: 'Subscription System', percentage: 30, status: 'critical' },
@@ -55,16 +55,16 @@ const featureCompletions: FeatureStatus[] = [
 // Critical issues list
 const criticalIssues = [
   {
+    title: 'Accessibility Compliance Issues',
+    description: 'Several components not meeting WCAG 2.2 standards - HIGH PRIORITY'
+  },
+  {
     title: 'Database Migration Issues',
     description: 'Migrations failing with column name errors and policy conflicts'
   },
   {
     title: 'Subscription System Issues',
     description: 'Missing RPC functions and tables for subscription management'
-  },
-  {
-    title: 'Accessibility Compliance Issues',
-    description: 'Several components not meeting WCAG 2.2 standards'
   },
   {
     title: 'Authentication Implementation',
@@ -101,7 +101,7 @@ export default function CompletionDashboard() {
         <Card className="col-span-1 flex flex-col items-center justify-center p-6">
           <h3 className="text-lg font-medium mb-2">Overall Completion</h3>
           <div className="relative flex items-center justify-center w-32 h-32">
-            <svg className="w-full h-full" viewBox="0 0 100 100">
+            <svg className="w-full h-full" viewBox="0 0 100 100" aria-hidden="true">
               <circle 
                 className="text-gray-200" 
                 strokeWidth="10" 
@@ -130,28 +130,28 @@ export default function CompletionDashboard() {
         
         <Card className="col-span-1 flex flex-col items-center justify-center p-6 bg-green-50">
           <div className="flex items-center mb-2">
-            <div className="text-green-500 mr-2 text-xl">✓</div>
-            <h3 className="text-lg font-medium">Completed</h3>
+            <div className="text-green-500 mr-2 text-xl" aria-hidden="true">✓</div>
+            <h3 className="text-lg font-medium" id="completed-features">Completed</h3>
           </div>
-          <p className="text-4xl font-bold text-green-600">{completedCount}</p>
+          <p className="text-4xl font-bold text-green-600" aria-labelledby="completed-features">{completedCount}</p>
           <p className="text-sm text-gray-500 mt-2">Features</p>
         </Card>
         
         <Card className="col-span-1 flex flex-col items-center justify-center p-6 bg-blue-50">
           <div className="flex items-center mb-2">
-            <div className="text-blue-500 mr-2 text-xl">⏱</div>
-            <h3 className="text-lg font-medium">In Progress</h3>
+            <div className="text-blue-500 mr-2 text-xl" aria-hidden="true">⏱</div>
+            <h3 className="text-lg font-medium" id="in-progress-features">In Progress</h3>
           </div>
-          <p className="text-4xl font-bold text-blue-600">{inProgressCount}</p>
+          <p className="text-4xl font-bold text-blue-600" aria-labelledby="in-progress-features">{inProgressCount}</p>
           <p className="text-sm text-gray-500 mt-2">Features</p>
         </Card>
         
         <Card className="col-span-1 flex flex-col items-center justify-center p-6 bg-red-50">
           <div className="flex items-center mb-2">
-            <div className="text-red-500 mr-2 text-xl">⚠</div>
-            <h3 className="text-lg font-medium">Critical Issues</h3>
+            <div className="text-red-500 mr-2 text-xl" aria-hidden="true">⚠</div>
+            <h3 className="text-lg font-medium" id="critical-features">Critical Issues</h3>
           </div>
-          <p className="text-4xl font-bold text-red-600">{criticalCount}</p>
+          <p className="text-4xl font-bold text-red-600" aria-labelledby="critical-features">{criticalCount}</p>
           <p className="text-sm text-gray-500 mt-2">Features</p>
         </Card>
       </div>
@@ -258,13 +258,13 @@ export default function CompletionDashboard() {
       </div>
       
       {/* Critical Issues */}
-      <h2 className="text-xl font-semibold mb-4">Critical Issues</h2>
-      <Card className="p-4 bg-red-50 mb-8">
+      <h2 className="text-xl font-semibold mb-4" id="critical-issues">Critical Issues</h2>
+      <Card className="p-4 bg-red-50 mb-8 border-l-4 border-red-600" aria-labelledby="critical-issues">
         <div className="space-y-4">
           {criticalIssues.map((issue, index) => (
             <div key={index} className="border-b border-red-100 pb-3 last:border-0 last:pb-0">
               <div className="flex items-start">
-                <div className="text-red-500 mr-2 mt-1 flex-shrink-0">⚠</div>
+                <div className="text-red-500 mr-2 mt-1 flex-shrink-0" aria-hidden="true">⚠</div>
                 <div>
                   <h3 className="font-medium text-red-700">{issue.title}</h3>
                   <p className="text-sm text-gray-700">{issue.description}</p>
@@ -276,15 +276,33 @@ export default function CompletionDashboard() {
       </Card>
       
       {/* Next Steps */}
-      <h2 className="text-xl font-semibold mb-4">Recommendations</h2>
-      <Card className="p-4 bg-blue-50">
+      <h2 className="text-xl font-semibold mb-4" id="recommendations">Recommendations</h2>
+      <Card className="p-4 bg-blue-50 border-l-4 border-blue-600" aria-labelledby="recommendations">
         <ol className="list-decimal list-inside space-y-2 ml-2">
-          <li className="text-blue-800">Prioritize fixing the critical database migration issues</li>
-          <li className="text-blue-800">Re-implement authentication with proper security measures</li>
-          <li className="text-blue-800">Address subscription and payment system issues</li>
-          <li className="text-blue-800">Focus on improving accessibility compliance of our own components</li>
-          <li className="text-blue-800">Complete the monitoring and alerts system implementation</li>
-          <li className="text-blue-800">Address performance optimization issues</li>
+          <li className="font-bold text-red-800">
+            <span className="mr-2">1.</span>
+            <span>Focus on improving accessibility compliance of our own components - TOP PRIORITY</span>
+          </li>
+          <li className="text-blue-800">
+            <span className="mr-2">2.</span>
+            <span>Prioritize fixing the critical database migration issues</span>
+          </li>
+          <li className="text-blue-800">
+            <span className="mr-2">3.</span>
+            <span>Re-implement authentication with proper security measures</span>
+          </li>
+          <li className="text-blue-800">
+            <span className="mr-2">4.</span>
+            <span>Address subscription and payment system issues</span>
+          </li>
+          <li className="text-blue-800">
+            <span className="mr-2">5.</span>
+            <span>Complete the monitoring and alerts system implementation</span>
+          </li>
+          <li className="text-blue-800">
+            <span className="mr-2">6.</span>
+            <span>Address performance optimization issues</span>
+          </li>
         </ol>
       </Card>
     </div>
