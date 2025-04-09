@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiEye, FiPlusCircle, FiX, FiMessageCircle, FiAlertCircle, FiHelpCircle } from 'react-icons/fi';
+import { FiEye, FiX, FiMessageCircle, FiAlertCircle, FiHelpCircle, FiPlusCircle } from 'react-icons/fi';
 import { useAccessibilityTips } from '../contexts/AccessibilityTipsContext';
 import { AccessibilityTipTooltip } from './accessibility/AccessibilityTipTooltip';
 
@@ -125,14 +125,14 @@ export function AccessibilityToolbar() {
 
       {/* Toggle button */}
       <motion.button
-        className="fixed right-0 top-24 bg-primary-600 hover:bg-primary-700 text-white p-3 rounded-l-md shadow-lg z-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+        className="fixed right-0 top-24 bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-l-md shadow-lg z-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
         onClick={() => setIsOpen(!isOpen)}
         initial={{ x: isOpen ? '100%' : 0 }}
         animate={{ x: isOpen ? '100%' : 0 }}
         transition={{ duration: 0.3 }}
         aria-label="Toggle accessibility toolbar"
       >
-        <FiPlusCircle size={20} />
+        <Glasses size={20} />
       </motion.button>
 
       {/* Accessibility Tip Tooltip */}

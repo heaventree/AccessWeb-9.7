@@ -1,97 +1,54 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Check } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { accessibilityCompliancePercentage } from '../utils/accessibility-compliance';
 
 export function AccessibilityBadge() {
   const [showDetails, setShowDetails] = useState(false);
-  const compliancePercentage = accessibilityCompliancePercentage();
   
   return (
     <>
-      {/* Badge button */}
+      {/* Simple pill badge button - matching previous design */}
       <motion.button
-        className="fixed right-5 bottom-5 bg-white dark:bg-gray-800 text-green-600 dark:text-green-400 p-2 rounded-full shadow-lg z-40 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center justify-center"
+        className="fixed right-5 bottom-20 bg-green-600 text-white py-1.5 px-3 rounded-full shadow-md z-40 
+                   focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
+                   flex items-center gap-1.5"
         onClick={() => setShowDetails(!showDetails)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Show accessibility compliance details"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        aria-label="WCAG Compliance Status"
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 1 }}
+        transition={{ delay: 0.5 }}
       >
-        <div className="relative h-10 w-10 flex items-center justify-center">
-          <Shield className="h-8 w-8" />
-          <span className="absolute text-xs font-bold">{compliancePercentage}%</span>
-        </div>
+        <CheckCircle className="h-4 w-4" aria-hidden="true" />
+        <span className="text-sm font-medium">WCAG 2.1 Compliant</span>
       </motion.button>
       
-      {/* Details tooltip */}
-      <motion.div
-        initial={{ opacity: 0, y: 10, scale: 0.9 }}
-        animate={showDetails ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 10, scale: 0.9 }}
-        transition={{ duration: 0.2 }}
-        className={`fixed right-5 bottom-20 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-40 p-4 max-w-xs w-full ${!showDetails && 'pointer-events-none'}`}
-      >
-        <div className="flex flex-col items-center">
-          <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Accessibility Status</h3>
-          
-          <div className="flex items-center justify-center w-20 h-20 mb-2 relative">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
-              <circle 
-                className="text-gray-200 dark:text-gray-700" 
-                strokeWidth="10" 
-                stroke="currentColor" 
-                fill="transparent" 
-                r="40" 
-                cx="50" 
-                cy="50" 
-              />
-              <circle 
-                className="text-green-500" 
-                strokeWidth="10" 
-                strokeDasharray={250.8} 
-                strokeDashoffset={250.8 - (compliancePercentage / 100) * 250.8} 
-                strokeLinecap="round" 
-                stroke="currentColor" 
-                fill="transparent" 
-                r="40" 
-                cx="50" 
-                cy="50" 
-              />
-            </svg>
-            <span className="absolute text-xl font-semibold">{compliancePercentage}%</span>
+      {/* Simpler details tooltip - only show when needed */}
+      {showDetails && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.2 }}
+          className="fixed right-5 bottom-32 bg-white rounded-lg shadow-lg z-40 p-3 max-w-[250px]"
+        >
+          <div className="flex flex-col">
+            <h3 className="text-sm font-medium mb-2 text-gray-900">Compliance Details</h3>
+            <p className="text-xs text-gray-600 mb-3">
+              This application is compliant with WCAG 2.1 Level AA success criteria, 
+              ensuring accessibility for people with disabilities.
+            </p>
+            <button 
+              className="text-xs text-gray-500 hover:text-gray-700 self-end"
+              onClick={() => setShowDetails(false)}
+            >
+              Close
+            </button>
           </div>
-          
-          <div className="text-center mb-4">
-            <div className="inline-flex items-center text-green-600 dark:text-green-400 font-medium">
-              <Check className="w-4 h-4 mr-1" />
-              WCAG 2.2 AA Compliant
-            </div>
-          </div>
-          
-          <a 
-            href="/accessibility-demo" 
-            className="text-sm text-blue-600 dark:text-blue-400 hover:underline mb-1"
-            onClick={(e) => {
-              // Allow the link to work
-              e.stopPropagation();
-            }}
-          >
-            View accessibility features
-          </a>
-          
-          <button 
-            className="text-xs text-gray-500 mt-2 hover:text-gray-700 dark:hover:text-gray-300"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowDetails(false);
-            }}
-          >
-            Close
-          </button>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
     </>
   );
 }

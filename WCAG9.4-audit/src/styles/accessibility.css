@@ -13,6 +13,10 @@
 }
 
 /* Contrast Modes */
+.high-contrast {
+  filter: contrast(1.5);
+}
+
 .contrast-high {
   filter: contrast(1.5);
 }

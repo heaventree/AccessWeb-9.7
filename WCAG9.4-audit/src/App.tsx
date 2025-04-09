@@ -37,7 +37,7 @@ import { WordPressGuide } from './pages/docs/WordPressGuide';
 import { ShopifyGuide } from './pages/docs/ShopifyGuide';
 import { DocumentationPage } from './pages/docs/DocumentationPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { AccessibilityToolbar } from './components/AccessibilityToolbar';
+import { AccessibilityControls } from './components/accessibility/AccessibilityControls';
 import { WCAGCheckerPage } from './pages/WCAGCheckerPage';
 import { WCAGStandardsTable } from './pages/WCAGStandardsTable';
 import WCAGColorPalette from './pages/tools/WCAGColorPalette';
@@ -166,9 +166,9 @@ function App() {
             />
           } />
         </Routes>
-        <AccessibilityToolbar />
         <SupportChat />
         <AccessibilityBadge />
+        <AccessibilityControls />
       </div>
     </ErrorBoundary>
   );

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, User, Bot, Sparkles, LifeBuoy } from 'lucide-react';
+import { X, Send, User, Bot, Sparkles, MessageCircleQuestion } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useChatbot } from '../../hooks/useChatbot';
 import { FollowUpSuggestion } from '../../types/chat';
@@ -98,14 +98,16 @@ export function SupportChat() {
 
   return (
     <>
-      {/* Chat toggle button - positioned a bit higher to avoid overlapping with accessibility toolbar */}
-      <button
+      {/* Chat toggle button - matching previous toolbar icon */}
+      <motion.button
         aria-label={isOpen ? "Close accessibility support chat" : "Open accessibility support chat"}
-        className="fixed bottom-20 right-6 z-40 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="fixed bottom-5 right-5 z-40 p-2 bg-blue-500 text-white rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 h-10 w-10 flex items-center justify-center"
         onClick={toggleChat}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
-        {isOpen ? <X className="w-6 h-6" /> : <LifeBuoy className="w-6 h-6" />}
-      </button>
+        {isOpen ? <X className="w-5 h-5" /> : <MessageCircleQuestion className="w-5 h-5" />}
+      </motion.button>
 
       {/* Chat window */}
       <AnimatePresence>
@@ -115,14 +117,14 @@ export function SupportChat() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-36 right-6 z-40 w-80 sm:w-96 h-[70vh] max-h-[600px] bg-white rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200"
+            className="fixed bottom-20 right-5 z-40 w-80 sm:w-96 h-[70vh] max-h-[600px] bg-white rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200"
             role="dialog"
             aria-labelledby="chat-title"
           >
             {/* Chat header */}
             <div className="p-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <LifeBuoy className="w-5 h-5" />
+                <MessageCircleQuestion className="w-5 h-5" />
                 <h2 id="chat-title" className="font-semibold">Accessibility Support</h2>
               </div>
               <button
