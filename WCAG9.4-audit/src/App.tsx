@@ -22,6 +22,7 @@ import { AdminCMS } from './pages/admin/AdminCMS';
 import { AdminRoadmap } from './pages/admin/AdminRoadmap';
 import { AdminDebug } from './pages/admin/AdminDebug';
 import { ChatbotManagement } from './pages/admin/ChatbotManagement';
+import CompletionDashboard from './pages/admin/CompletionDashboard';
 import { SupportChat } from './components/support/SupportChat';
 import { IntegrationsOverview } from './pages/integrations/IntegrationsOverview';
 import { ConnectionsPage } from './pages/connections/ConnectionsPage';
@@ -149,6 +150,7 @@ function App() {
             <Route path="cms/*" element={<AdminCMS />} />
             <Route path="roadmap" element={<AdminRoadmap />} />
             <Route path="debug" element={<AdminDebug />} />
+            <Route path="completion" element={<CompletionDashboard />} />
             <Route path="chatbot" element={<ChatbotManagement />} />
           </Route>
 

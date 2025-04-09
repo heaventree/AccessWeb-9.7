@@ -61,6 +61,11 @@ export function AdminLayout() {
       icon: <Bug className="w-5 h-5" />
     },
     {
+      path: "/admin/completion",
+      label: "Project Completion",
+      icon: <FileText className="w-5 h-5" />
+    },
+    {
       path: "/admin/chatbot",
       label: "Chatbot Management",
       icon: <MessageSquare className="w-5 h-5" />
