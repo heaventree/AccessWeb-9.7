@@ -10,7 +10,7 @@ export function AccessibilityBadge() {
     <>
       {/* Simple pill badge button - matching previous design */}
       <motion.button
-        className="fixed right-5 bottom-20 bg-green-600 text-white py-1.5 px-3 rounded-full shadow-md z-40 
+        className="fixed left-5 bottom-5 bg-green-600 text-white py-1.5 px-3 rounded-full shadow-md z-40 
                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
                    flex items-center gap-1.5"
         onClick={() => setShowDetails(!showDetails)}
@@ -32,7 +32,7 @@ export function AccessibilityBadge() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2 }}
-          className="fixed right-5 bottom-32 bg-white rounded-lg shadow-lg z-40 p-3 max-w-[250px]"
+          className="fixed left-5 bottom-16 bg-white rounded-lg shadow-lg z-40 p-3 max-w-[250px]"
         >
           <div className="flex flex-col">
             <h3 className="text-sm font-medium mb-2 text-gray-900">Compliance Details</h3>

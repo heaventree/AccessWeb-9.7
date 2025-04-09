@@ -125,10 +125,10 @@ export function AccessibilityControls() {
       {/* Accessibility toggle button - fixed to the right side of the screen */}
       <button
         onClick={toggleMenu}
-        className="fixed top-24 right-4 z-50 bg-blue-500 text-white p-2 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+        className="fixed bottom-20 right-5 z-50 bg-blue-500 text-white p-2 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 h-10 w-10 flex items-center justify-center"
         aria-label={isOpen ? "Close accessibility menu" : "Open accessibility menu"}
       >
-        <Eye size={24} />
+        <Eye size={20} />
       </button>
 
       {/* Accessibility tools panel */}
@@ -139,7 +139,7 @@ export function AccessibilityControls() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.2 }}
-            className="fixed top-24 right-16 z-50 bg-white rounded-lg shadow-xl border border-gray-200 w-72 p-4"
+            className="fixed bottom-20 right-16 z-50 bg-white rounded-lg shadow-xl border border-gray-200 w-72 p-4"
           >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">Accessibility Tools</h2>
