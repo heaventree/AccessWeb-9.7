@@ -6,6 +6,9 @@ import { SubscriptionDashboard } from './pages/SubscriptionDashboard';
 import { PaymentPage } from './pages/PaymentPage';
 import { IntegrationsPage } from './pages/integrations/IntegrationsPage';
 import { Integrations } from './pages/Integrations';
+import { AccessibilityDemo } from './pages/AccessibilityDemo';
+import { AccessibilityBadge } from './components/AccessibilityBadge';
+import { SkipLink } from './components/ui';
 import { AuthPage } from './pages/AuthPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { Navigation } from './components/Navigation';
@@ -78,7 +81,7 @@ function App() {
     <ErrorBoundary>
       <ScrollToTop />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <a href="#main-content" className="skip-to-main">Skip to main content</a>
+        <SkipLink targetId="main-content" />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<><Navigation /><main id="main-content"><LandingPage /></main><Footer /><BackToTop /></>} />
@@ -91,6 +94,7 @@ function App() {
           <Route path="/tools/realtime" element={<><Navigation /><main id="main-content"><RealTimeMonitorPage /></main><Footer /><BackToTop /></>} />
           <Route path="/tools/image-alt-scanner" element={<><Navigation /><main id="main-content"><ImageAltScannerPage /></main><Footer /><BackToTop /></>} />
           <Route path="/ui-demo" element={<><Navigation /><main id="main-content"><UiDemo /></main><Footer /><BackToTop /></>} />
+          <Route path="/accessibility-demo" element={<><Navigation /><main id="main-content"><AccessibilityDemo /></main><Footer /><BackToTop /></>} />
           <Route path="/integrations" element={<><Navigation /><main id="main-content"><Integrations /></main><Footer /><BackToTop /></>} />
           {/* Account Routes with shared layout */}
           <Route path="/my-account" element={<ProtectedRoute><><Navigation /><AccountLayout /></></ProtectedRoute>}>
@@ -164,6 +168,7 @@ function App() {
         </Routes>
         <AccessibilityToolbar />
         <SupportChat />
+        <AccessibilityBadge />
       </div>
     </ErrorBoundary>
   );
