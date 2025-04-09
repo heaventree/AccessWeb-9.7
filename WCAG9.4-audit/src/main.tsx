@@ -5,12 +5,30 @@ import { Buffer } from 'buffer';
 import * as util from 'util';
 import * as stream from 'stream-browserify';
 import App from './App';
+
 // Import global styles for accessibility features
 import './index.css';
+
 // Import theme variables first for proper CSS cascade
 import './styles/theme-variables.css';
 import './styles/main.css';
+
+// Import module styles
+import './styles/modules/animations.css';
+import './styles/modules/banner.css';
+import './styles/modules/cta.css';
+import './styles/modules/features.css';
+import './styles/modules/footer.css';
+import './styles/modules/header.css';
+import './styles/modules/pricing.css';
+import './styles/modules/testimonials.css';
+
+// Import other styles
 import './styles/accessibility.css';
+import './styles/blog.css';
+import './styles/custom-sections.css';
+import './styles/accessibilityTips.css';
+
 import { AppProvider } from './providers/AppProvider';
 
 // Fix for polyfills in browser environment
