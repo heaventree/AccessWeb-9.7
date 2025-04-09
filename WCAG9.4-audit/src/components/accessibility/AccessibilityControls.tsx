@@ -125,10 +125,10 @@ export function AccessibilityControls() {
       {/* Accessibility toggle button - fixed to the right side of the screen */}
       <button
         onClick={toggleMenu}
-        className="fixed bottom-20 right-5 z-50 bg-blue-500 text-white p-2 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 h-10 w-10 flex items-center justify-center"
+        className="fixed bottom-20 right-5 z-50 bg-cyan-500 text-white p-0 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 h-12 w-12 flex items-center justify-center"
         aria-label={isOpen ? "Close accessibility menu" : "Open accessibility menu"}
       >
-        <Eye size={20} />
+        <Eye size={24} />
       </button>
 
       {/* Accessibility tools panel */}

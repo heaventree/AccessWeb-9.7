@@ -10,9 +10,9 @@ export function AccessibilityBadge() {
     <>
       {/* Simple pill badge button - matching previous design */}
       <motion.button
-        className="fixed left-5 bottom-5 bg-green-600 text-white py-1.5 px-3 rounded-full shadow-md z-40 
+        className="fixed left-5 bottom-5 bg-green-600 text-white p-0 rounded-full shadow-md z-40 h-12 w-12
                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
-                   flex items-center gap-1.5"
+                   flex items-center justify-center"
         onClick={() => setShowDetails(!showDetails)}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -21,8 +21,7 @@ export function AccessibilityBadge() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <CheckCircle className="h-4 w-4" aria-hidden="true" />
-        <span className="text-sm font-medium">WCAG 2.1 Compliant</span>
+        <CheckCircle className="h-6 w-6" aria-hidden="true" />
       </motion.button>
       
       {/* Simpler details tooltip - only show when needed */}

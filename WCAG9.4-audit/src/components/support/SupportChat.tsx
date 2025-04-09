@@ -101,12 +101,12 @@ export function SupportChat() {
       {/* Chat toggle button - matching previous toolbar icon */}
       <motion.button
         aria-label={isOpen ? "Close accessibility support chat" : "Open accessibility support chat"}
-        className="fixed bottom-5 right-5 z-40 p-2 bg-blue-500 text-white rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 h-10 w-10 flex items-center justify-center"
+        className="fixed bottom-5 right-5 z-40 p-0 bg-indigo-500 text-white rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 h-12 w-12 flex items-center justify-center"
         onClick={toggleChat}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        {isOpen ? <X className="w-5 h-5" /> : <MessageCircleQuestion className="w-5 h-5" />}
+        {isOpen ? <X className="w-6 h-6" /> : <MessageCircleQuestion className="w-6 h-6" />}
       </motion.button>
 
       {/* Chat window */}
