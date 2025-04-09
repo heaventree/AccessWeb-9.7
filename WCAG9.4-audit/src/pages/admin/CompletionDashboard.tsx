@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { HeadingSection } from '../../components/ui/HeadingSection';
 import { Card } from '../../components/ui/Card';
 import { Progress } from '../../components/ui/Progress';
@@ -18,6 +18,7 @@ interface FeatureStatus {
 
 // Data for the completion charts
 const categoryCompletions: CategoryCompletion[] = [
+  { name: 'Accessibility Compliance', percentage: 75, color: '#ef4444' },
   { name: 'Core Features', percentage: 65, color: '#4ade80' },
   { name: 'UI/UX Implementation', percentage: 70, color: '#3b82f6' },
   { name: 'Backend Systems', percentage: 50, color: '#f97316' },
@@ -39,7 +40,7 @@ const featureCompletions: FeatureStatus[] = [
   { name: 'Payment Processing', percentage: 60, status: 'in-progress' },
   { name: 'External Integration Security', percentage: 50, status: 'in-progress' },
   { name: 'Media Accessibility Testing', percentage: 40, status: 'in-progress' },
-  { name: 'Accessibility Compliance - WCAG 2.2', percentage: 35, status: 'critical' },
+  { name: 'Accessibility Compliance - WCAG 2.2', percentage: 50, status: 'in-progress' },
   { name: 'Admin Dashboard Stats', percentage: 50, status: 'in-progress' },
   { name: 'Monitoring System', percentage: 40, status: 'in-progress' },
   { name: 'Subscription System', percentage: 30, status: 'critical' },
@@ -56,7 +57,7 @@ const featureCompletions: FeatureStatus[] = [
 const criticalIssues = [
   {
     title: 'Accessibility Compliance Issues',
-    description: 'Several components not meeting WCAG 2.2 standards - HIGH PRIORITY'
+    description: 'Several components not meeting WCAG 2.2 standards - TOP PRIORITY, BEING ADDRESSED'
   },
   {
     title: 'Database Migration Issues',
@@ -86,7 +87,7 @@ export default function CompletionDashboard() {
   const completedCount = featureCompletions.filter(f => f.status === 'completed').length;
   const inProgressCount = featureCompletions.filter(f => f.status === 'in-progress').length;
   const criticalCount = featureCompletions.filter(f => f.status === 'critical').length;
-  const notStartedCount = featureCompletions.filter(f => f.status === 'not-started').length;
+  // const notStartedCount = featureCompletions.filter(f => f.status === 'not-started').length;
   
   return (
     <div className="container mx-auto py-6 px-4">

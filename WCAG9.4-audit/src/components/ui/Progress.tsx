@@ -8,28 +8,25 @@ interface ProgressProps {
   style?: React.CSSProperties;
 }
 
-export const Progress: React.FC<ProgressProps> = ({ 
+export function Progress({ 
   value, 
   max, 
-  className, 
-  barClassName,
-  style
-}) => {
-  const percentage = Math.min(100, Math.max(0, (value / max) * 100));
+  className = "", 
+  barClassName = "", 
+  style = {} 
+}: ProgressProps) {
+  // Calculate the percentage value
+  const percentage = Math.round((value / max) * 100);
   
   return (
-    <div className={`w-full ${className || ''}`}>
+    <div className={className} role="progressbar" aria-valuenow={value} aria-valuemin={0} aria-valuemax={max} aria-label={`${percentage}% complete`}>
       <div 
-        className={`${barClassName || 'bg-blue-600'}`} 
+        className={barClassName} 
         style={{ 
-          width: `${percentage}%`, 
+          width: `${percentage}%`,
           ...style 
         }}
-        role="progressbar"
-        aria-valuenow={value}
-        aria-valuemin={0}
-        aria-valuemax={max}
       />
     </div>
   );
-};
+}
