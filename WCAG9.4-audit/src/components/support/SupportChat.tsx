@@ -101,7 +101,7 @@ export function SupportChat() {
       {/* Chat toggle button - matching previous toolbar icon */}
       <motion.button
         aria-label={isOpen ? "Close accessibility support chat" : "Open accessibility support chat"}
-        className="fixed bottom-5 right-5 z-40 p-0 bg-indigo-500 text-white rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 h-12 w-12 flex items-center justify-center"
+        className="fixed bottom-[70px] right-5 z-40 p-0 bg-indigo-500 text-white rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 h-12 w-12 flex items-center justify-center"
         onClick={toggleChat}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
