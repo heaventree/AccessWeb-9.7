@@ -1,164 +1,217 @@
-import React, { useEffect, useRef } from 'react';
-import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { FeedbackItem, FeedbackCategory, FeedbackStatus } from '../../types/feedback';
+import { findElementByPath, getElementPosition } from '../../utils/elementFinder';
 
-// FeedbackItem type
-interface Position {
-  x: number;
-  y: number;
-}
-
-type FeedbackStatus = 'pending' | 'inProgress' | 'resolved';
-type FeedbackCategory = 'debug' | 'roadmap';
-
-interface FeedbackItem {
-  id: string;
-  position: Position;
-  elementPath: string;
-  comment: string;
-  status: FeedbackStatus;
-  createdAt: string;
-  category: FeedbackCategory;
-  page: string;
-}
-
-// Props for FeedbackMarker component
 interface FeedbackMarkerProps {
-  item: FeedbackItem;
-  onStatusChange: (id: string) => void;
-  onDelete: (id: string) => void;
+  feedback: FeedbackItem;
+  onStatusChange?: (id: string, status: FeedbackStatus) => void;
+  onDelete?: (id: string) => void;
+  showDetails?: boolean;
 }
-
-// StatusIcon component
-const StatusIcon: React.FC<{ status: FeedbackStatus }> = ({ status }) => {
-  if (status === 'resolved') return <CheckCircle className="h-3 w-3" />;
-  if (status === 'inProgress') return <Clock className="h-3 w-3" />;
-  return <AlertCircle className="h-3 w-3" />;
-};
-
-// Function to get color for status
-const getStatusColor = (status: FeedbackStatus, category: FeedbackCategory): string => {
-  if (status === 'pending') {
-    return category === 'roadmap' ? 'bg-blue-500' : 'bg-red-500';
-  } else if (status === 'inProgress') {
-    return 'bg-yellow-500';
-  } else {
-    return 'bg-green-500';
-  }
-};
 
 /**
- * FeedbackMarker Component
- * Displays a marker for feedback that sticks to the target element when scrolling
+ * A marker that is attached to a specific element on the page and shows feedback information
  */
-const FeedbackMarker: React.FC<FeedbackMarkerProps> = ({ item, onStatusChange, onDelete }) => {
+const FeedbackMarker: React.FC<FeedbackMarkerProps> = ({
+  feedback,
+  onStatusChange,
+  onDelete,
+  showDetails = false
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [position, setPosition] = useState(feedback.position);
   const markerRef = useRef<HTMLDivElement>(null);
   
-  // Effect to attach marker to element on scroll
-  useEffect(() => {
-    // Find the element by its path
-    let targetElement: Element | null = null;
-    
-    try {
-      // Try to simplify the selector to improve chances of finding it
-      const simplifiedSelector = item.elementPath
-        .split('>')
-        .pop()
-        ?.trim() || '';
-        
-      if (simplifiedSelector) {
-        // Try to find the element using the selector
-        const possibleElements = document.querySelectorAll(simplifiedSelector);
-        
-        if (possibleElements.length === 1) {
-          targetElement = possibleElements[0];
-        } else if (possibleElements.length > 1) {
-          // If multiple elements match, find the one closest to the original click position
-          const originalX = item.position.x;
-          const originalY = item.position.y;
-          
-          let closestElement = null;
-          let closestDistance = Infinity;
-          
-          possibleElements.forEach(el => {
-            const rect = el.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2 + window.scrollX;
-            const centerY = rect.top + rect.height / 2 + window.scrollY;
-            
-            const distance = Math.sqrt(
-              Math.pow(centerX - originalX, 2) + 
-              Math.pow(centerY - originalY, 2)
-            );
-            
-            if (distance < closestDistance) {
-              closestDistance = distance;
-              closestElement = el;
-            }
-          });
-          
-          if (closestElement) {
-            targetElement = closestElement;
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error finding element by path:', error);
-    }
-    
-    // If no element found, use the original fixed position
-    if (!targetElement) {
-      if (markerRef.current) {
-        markerRef.current.style.position = 'absolute';
-        markerRef.current.style.left = `${item.position.x}px`;
-        markerRef.current.style.top = `${item.position.y}px`;
-      }
-      return;
-    }
-    
-    // Function to update marker position based on element position
-    const updatePosition = () => {
-      if (!markerRef.current || !targetElement) return;
-      
-      const rect = targetElement.getBoundingClientRect();
-      const scrollX = window.scrollX;
-      const scrollY = window.scrollY;
-      
-      // Position at the top-right corner of the element
-      markerRef.current.style.position = 'absolute';
-      markerRef.current.style.left = `${rect.right + scrollX}px`;
-      markerRef.current.style.top = `${rect.top + scrollY}px`;
+  // Category color mapping
+  const getCategoryColor = () => {
+    const colorMap: Record<FeedbackCategory, string> = {
+      [FeedbackCategory.ACCESSIBILITY]: 'bg-blue-500',
+      [FeedbackCategory.USABILITY]: 'bg-purple-500',
+      [FeedbackCategory.PERFORMANCE]: 'bg-orange-500',
+      [FeedbackCategory.VISUAL]: 'bg-pink-500',
+      [FeedbackCategory.FUNCTIONALITY]: 'bg-red-500',
+      [FeedbackCategory.CONTENT]: 'bg-green-500',
+      [FeedbackCategory.OTHER]: 'bg-gray-500',
     };
     
-    // Set initial position
+    return colorMap[feedback.category] || 'bg-gray-500';
+  };
+  
+  // Status color mapping
+  const getStatusColor = () => {
+    const colorMap: Record<FeedbackStatus, string> = {
+      [FeedbackStatus.PENDING]: 'bg-yellow-500',
+      [FeedbackStatus.IN_PROGRESS]: 'bg-blue-500',
+      [FeedbackStatus.COMPLETED]: 'bg-green-500',
+      [FeedbackStatus.REJECTED]: 'bg-red-500',
+    };
+    
+    return colorMap[feedback.status] || 'bg-gray-500';
+  };
+  
+  // Update marker position when element moves or page scrolls
+  useEffect(() => {
+    const updatePosition = () => {
+      const element = findElementByPath(feedback.elementPath);
+      if (element) {
+        const newPosition = getElementPosition(element);
+        setPosition(newPosition);
+      }
+    };
+    
+    // Initial position update
     updatePosition();
     
-    // Update position on scroll and resize
+    // Add event listeners
     window.addEventListener('scroll', updatePosition);
     window.addEventListener('resize', updatePosition);
     
-    // Clean up event listeners
+    // For elements that might change position due to DOM updates
+    const observer = new MutationObserver(updatePosition);
+    
+    const element = findElementByPath(feedback.elementPath);
+    if (element && element.parentElement) {
+      observer.observe(element.parentElement, { 
+        childList: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class'] 
+      });
+    }
+    
     return () => {
       window.removeEventListener('scroll', updatePosition);
       window.removeEventListener('resize', updatePosition);
+      observer.disconnect();
     };
-  }, [item.elementPath, item.position.x, item.position.y]);
+  }, [feedback.elementPath]);
+  
+  // Close the popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (markerRef.current && !markerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+  
+  // Handle status change
+  const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStatus = event.target.value as FeedbackStatus;
+    if (onStatusChange) {
+      onStatusChange(feedback.id, newStatus);
+    }
+  };
+  
+  // Handle delete
+  const handleDelete = () => {
+    if (onDelete && window.confirm('Are you sure you want to delete this feedback?')) {
+      onDelete(feedback.id);
+    }
+  };
+  
+  // Format the date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
   
   return (
     <div
       ref={markerRef}
-      className={`absolute z-40 rounded-full w-6 h-6 flex items-center justify-center cursor-pointer shadow-md text-white hover:scale-110 transition-transform ${getStatusColor(item.status, item.category)}`}
+      className="absolute z-50"
       style={{
-        left: item.position.x,
-        top: item.position.y,
+        left: `${position.x}px`,
+        top: `${position.y}px`,
         transform: 'translate(-50%, -50%)'
       }}
-      title={`${item.comment.substring(0, 20)}${item.comment.length > 20 ? '...' : ''} (Click to change status, right-click to delete)`}
-      onClick={() => onStatusChange(item.id)}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        onDelete(item.id);
-      }}
     >
-      <StatusIcon status={item.status} />
+      {/* Marker dot */}
+      <button
+        className={`${getCategoryColor()} w-6 h-6 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform relative`}
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label={`Feedback for ${feedback.elementPath}: ${feedback.comment}`}
+      >
+        <span className="text-white text-xs font-bold">{feedback.id.slice(0, 1)}</span>
+        
+        {/* Status indicator */}
+        <span 
+          className={`${getStatusColor()} absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white`}
+          aria-hidden="true"
+        ></span>
+      </button>
+      
+      {/* Popup Details */}
+      {isOpen && (
+        <div className="absolute top-8 left-0 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 p-4 border border-gray-200 dark:border-gray-700">
+          <div className="flex justify-between items-start mb-2">
+            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor()} text-white`}>
+              {feedback.category}
+            </span>
+            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()} text-white`}>
+              {feedback.status}
+            </span>
+          </div>
+          
+          <p className="text-sm text-gray-700 dark:text-gray-300 my-2 whitespace-pre-wrap">
+            {feedback.comment}
+          </p>
+          
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+            Created: {formatDate(feedback.createdAt)}
+            {feedback.updatedAt && (
+              <span className="ml-2">Updated: {formatDate(feedback.updatedAt)}</span>
+            )}
+          </div>
+          
+          {showDetails && (
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-3 p-1 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden">
+              <div title={feedback.elementPath} className="truncate">
+                Element: {feedback.elementPath}
+              </div>
+              <div>
+                Page: {feedback.page}
+              </div>
+            </div>
+          )}
+          
+          {onStatusChange && (
+            <div className="flex justify-between items-center mt-2">
+              <select
+                value={feedback.status}
+                onChange={handleStatusChange}
+                className="text-xs rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              >
+                {Object.values(FeedbackStatus).map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+              
+              {onDelete && (
+                <button
+                  onClick={handleDelete}
+                  className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

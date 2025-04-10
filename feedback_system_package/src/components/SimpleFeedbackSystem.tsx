@@ -1,550 +1,297 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { addFeedbackAsDebugItem } from '../data/debugData';
-import { addFeedbackAsRoadmapFeature } from '../data/roadmapData';
+import { FeedbackCategory, FeedbackStatus, FeedbackItem } from '../types/feedback';
+import { useFeedbackSystem } from '../hooks/useFeedbackSystem';
+import { getElementPath, findElementByPath, getElementPosition, highlightElement } from '../utils/elementFinder';
 import FeedbackMarker from './feedback/FeedbackMarker';
 
-// Feedback item types
-interface Position {
-  x: number;
-  y: number;
+interface SimpleFeedbackSystemProps {
+  position?: 'top-right' | 'bottom-right' | 'bottom-left' | 'top-left' | 'middle-right';
+  defaultCategory?: FeedbackCategory;
+  showStatuses?: boolean;
 }
 
-type FeedbackStatus = 'pending' | 'inProgress' | 'resolved';
-type FeedbackCategory = 'debug' | 'roadmap';
-
-interface FeedbackItem {
-  id: string;
-  position: Position;
-  elementPath: string;
-  comment: string;
-  status: FeedbackStatus;
-  createdAt: string;
-  category: FeedbackCategory;
-  page: string; // Store the page path where feedback was created
-}
-
-// Simple Feedback System Component
-const SimpleFeedbackSystem: React.FC = () => {
-  // Get current page location for page-specific feedback
+/**
+ * A simple feedback system that allows users to click on elements and leave feedback
+ */
+const SimpleFeedbackSystem: React.FC<SimpleFeedbackSystemProps> = ({
+  position = 'middle-right', // Default position
+  defaultCategory = FeedbackCategory.USABILITY,
+  showStatuses = true,
+}) => {
   const location = useLocation();
-  const currentPage = location.pathname;
-  
-  // State for the feedback system
-  const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
-  const [filteredItems, setFilteredItems] = useState<FeedbackItem[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<FeedbackCategory>('debug');
-  const [isActive, setIsActive] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [comment, setComment] = useState('');
   const [hoveredElement, setHoveredElement] = useState<HTMLElement | null>(null);
-  const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
-  const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
-  const [showCommentModal, setShowCommentModal] = useState(false);
-  const [currentComment, setCurrentComment] = useState('');
+  const [showFeedbackItems, setShowFeedbackItems] = useState(true);
   
-  // Reference to the widget element to avoid self-selection
-  const widgetRef = useRef<HTMLDivElement>(null);
+  const {
+    feedbackItems,
+    isActive,
+    selectedElement,
+    currentCategory,
+    setSelectedElement,
+    setCurrentCategory,
+    toggleFeedbackMode,
+    addFeedbackItem,
+    updateFeedbackStatus,
+    removeFeedbackItem,
+    getFeedbackItemsForPage
+  } = useFeedbackSystem();
   
-  // Load feedback items from localStorage on mount
+  // Initialize with default category
   useEffect(() => {
-    try {
-      const savedItems = localStorage.getItem('feedbackItems');
-      if (savedItems) {
-        setFeedbackItems(JSON.parse(savedItems));
-      }
-    } catch (error) {
-      console.error('Failed to load feedback items:', error);
-    }
-  }, []);
+    setCurrentCategory(defaultCategory);
+  }, [defaultCategory, setCurrentCategory]);
   
-  // Filter items for the current page or update the data structure if needed
+  // Get current page path for filtering feedback items
+  const currentPage = location.pathname;
+  const currentPageFeedbackItems = getFeedbackItemsForPage(currentPage);
+  
+  // Setup element hover listener when feedback mode is active
   useEffect(() => {
-    // Ensure all items have a page property (for backward compatibility)
-    const updatedItems = feedbackItems.map(item => {
-      if (!item.page) {
-        return { ...item, page: '/' };  // Default to homepage if no page info
-      }
-      return item;
-    });
-    
-    if (JSON.stringify(updatedItems) !== JSON.stringify(feedbackItems)) {
-      setFeedbackItems(updatedItems);
+    if (!isActive) {
+      setHoveredElement(null);
+      return;
     }
     
-    // Filter items to only show those for the current page
-    const pageItems = updatedItems.filter(item => item.page === currentPage);
-    setFilteredItems(pageItems);
-  }, [feedbackItems, currentPage]);
-  
-  // Save feedback items to localStorage when they change
-  useEffect(() => {
-    try {
-      localStorage.setItem('feedbackItems', JSON.stringify(feedbackItems));
-      // Dispatch event for any subscribers
-      const event = new CustomEvent('feedbackItemsUpdated', { detail: feedbackItems });
-      window.dispatchEvent(event);
-    } catch (error) {
-      console.error('Failed to save feedback items:', error);
-    }
-  }, [feedbackItems]);
-  
-  // Handle document interaction when feedback tool is active
-  useEffect(() => {
-    if (!isActive) return;
-    
-    // Store original element states
-    const originalStates = new Map<HTMLElement, {
-      outline: string,
-      outlineOffset: string,
-      pointerEvents: string
-    }>();
-    
-    // Save and disable buttons' normal behavior
-    const disableInteractiveElements = () => {
-      // Find all interactive elements
-      const interactiveElements = document.querySelectorAll('button, a, input, select, [role="button"]');
-      
-      interactiveElements.forEach(el => {
-        const htmlEl = el as HTMLElement;
-        
-        // Skip our own widget elements
-        if (widgetRef.current && widgetRef.current.contains(htmlEl)) return;
-        
-        // Store original state
-        originalStates.set(htmlEl, {
-          outline: htmlEl.style.outline,
-          outlineOffset: htmlEl.style.outlineOffset,
-          pointerEvents: htmlEl.style.pointerEvents
-        });
-        
-        // Disable normal interactive behavior to allow highlighting and selection
-        htmlEl.style.pointerEvents = 'none';
-      });
-    };
-    
-    // Call immediately to disable interactive elements
-    disableInteractiveElements();
-    
-    // Handle element highlighting with a shared function
-    const highlightElement = (element: HTMLElement) => {
-      // Skip if it's the same element we're already hovering
-      if (element === hoveredElement) return;
-      
-      // Skip if it's part of our own widget
-      if (widgetRef.current && widgetRef.current.contains(element)) return;
-      
-      // Clear highlight from the previous element if any
-      if (hoveredElement) {
-        // Restore original outline (or empty string)
-        const originalState = originalStates.get(hoveredElement);
-        hoveredElement.style.outline = originalState?.outline || '';
-        hoveredElement.style.outlineOffset = originalState?.outlineOffset || '';
-      }
-      
-      // Apply highlight to the current element
-      element.style.outline = '2px solid #3b82f6';
-      element.style.outlineOffset = '2px';
-      setHoveredElement(element);
-    };
-    
-    // Handle mouse movement for element highlighting - using capture phase
-    const handleMouseOver = (e: MouseEvent) => {
-      highlightElement(e.target as HTMLElement);
-    };
-    
-    // Handle mousemove for more comprehensive element detection
+    // Track mouse movement to highlight elements
     const handleMouseMove = (e: MouseEvent) => {
-      // Get all elements at the current pointer position
-      const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
+      if (selectedElement) return; // Don't track if already selected
       
-      // Skip if we're over our widget
-      if (widgetRef.current && elementsAtPoint.some(el => widgetRef.current?.contains(el))) return;
+      const element = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement;
       
-      // Get the topmost element
-      if (elementsAtPoint.length > 0) {
-        highlightElement(elementsAtPoint[0] as HTMLElement);
+      // Skip if hovering the feedback system itself
+      if (element?.closest('.feedback-system-container')) {
+        setHoveredElement(null);
+        return;
+      }
+      
+      setHoveredElement(element);
+      
+      // Add highlight to hovered element
+      if (element && element !== hoveredElement) {
+        // Remove previous highlight
+        if (hoveredElement) {
+          hoveredElement.style.outline = '';
+          hoveredElement.style.outlineOffset = '';
+        }
+        
+        // Add new highlight
+        element.style.outline = '2px dashed rgba(59, 130, 246, 0.5)';
+        element.style.outlineOffset = '2px';
       }
     };
     
-    // Handle click to select an element and place a marker
-    const handleClick = (e: MouseEvent) => {
-      // Skip if clicking on our own widget
-      if (widgetRef.current && widgetRef.current.contains(e.target as Node)) return;
+    // Handle clicks on elements to select them
+    const handleElementClick = (e: MouseEvent) => {
+      if (!isActive) return;
       
-      // Stop normal event behavior
+      // Prevent bubbling and default behavior
       e.preventDefault();
       e.stopPropagation();
       
-      // Get elements at click position to ensure we get the right one
-      const elementsAtClick = document.elementsFromPoint(e.clientX, e.clientY);
-      const clickedElement = elementsAtClick.length > 0 ? 
-                           (elementsAtClick[0] as HTMLElement) : 
-                           (e.target as HTMLElement);
+      const element = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement;
       
-      // Set the position and element for the feedback
-      setSelectedPosition({ x: e.pageX, y: e.pageY });
-      setSelectedElement(clickedElement);
-      setShowCommentModal(true);
+      // Skip if clicking the feedback system itself
+      if (element?.closest('.feedback-system-container')) return;
       
-      // Clear all highlights
-      document.body.querySelectorAll('*').forEach(el => {
-        const htmlEl = el as HTMLElement;
-        const originalState = originalStates.get(htmlEl) || { outline: '', outlineOffset: '' };
-        htmlEl.style.outline = originalState.outline;
-        htmlEl.style.outlineOffset = originalState.outlineOffset;
-      });
-      
-      // Exit targeting mode but keep modal open
-      setIsActive(false);
-      
-      // Restore pointer events on all elements
-      originalStates.forEach((state, element) => {
-        if (element) {
-          element.style.pointerEvents = state.pointerEvents;
-        }
-      });
+      // Select the clicked element
+      setSelectedElement(element);
+      setIsFormOpen(true);
     };
     
-    // Allow ESC to cancel
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsActive(false);
-        
-        // Restore all elements to their original state
-        originalStates.forEach((state, element) => {
-          if (element) {
-            element.style.outline = state.outline;
-            element.style.outlineOffset = state.outlineOffset;
-            element.style.pointerEvents = state.pointerEvents;
-          }
-        });
-      }
-    };
-    
-    // Add a highlight overlay message to make it clear we're in targeting mode
-    const overlay = document.createElement('div');
-    overlay.id = 'feedback-targeting-overlay';
-    overlay.style.position = 'fixed';
-    overlay.style.bottom = '16px';
-    overlay.style.left = '50%';
-    overlay.style.transform = 'translateX(-50%)';
-    overlay.style.background = 'rgba(0, 0, 0, 0.8)';
-    overlay.style.color = 'white';
-    overlay.style.padding = '8px 16px';
-    overlay.style.borderRadius = '4px';
-    overlay.style.zIndex = '9999';
-    overlay.style.fontWeight = 'bold';
-    overlay.style.fontSize = '14px';
-    overlay.textContent = 'Click on any element to leave feedback (ESC to cancel)';
-    document.body.appendChild(overlay);
-    
-    // Add all event listeners
-    document.addEventListener('mouseover', handleMouseOver, true);
-    document.addEventListener('mousemove', handleMouseMove, true);
-    document.addEventListener('click', handleClick, true);
-    document.addEventListener('keydown', handleKeyDown);
-    
-    // Change cursor to indicate clickable page
-    document.body.style.cursor = 'crosshair';
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('click', handleElementClick, { capture: true });
     
     return () => {
-      // Clean up event listeners
-      document.removeEventListener('mouseover', handleMouseOver, true);
-      document.removeEventListener('mousemove', handleMouseMove, true);
-      document.removeEventListener('click', handleClick, true);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('click', handleElementClick, { capture: true });
       
-      // Reset cursor
-      document.body.style.cursor = '';
-      
-      // Remove the overlay
-      const existingOverlay = document.getElementById('feedback-targeting-overlay');
-      if (existingOverlay) {
-        existingOverlay.remove();
+      // Clean up any lingering highlight
+      if (hoveredElement) {
+        hoveredElement.style.outline = '';
+        hoveredElement.style.outlineOffset = '';
       }
-      
-      // Restore all elements to their original state
-      originalStates.forEach((state, element) => {
-        if (element) {
-          element.style.outline = state.outline;
-          element.style.outlineOffset = state.outlineOffset;
-          element.style.pointerEvents = state.pointerEvents;
-        }
-      });
     };
-  }, [isActive, hoveredElement]);
+  }, [isActive, hoveredElement, selectedElement, setSelectedElement]);
   
-  // Generate a simple path for the element (captures the essentials but keeps it simple)
-  const getElementPath = (element: HTMLElement): string => {
-    if (!element) return '';
-    if (element === document.body) return 'body';
+  // Submit feedback
+  const handleSubmitFeedback = useCallback(() => {
+    if (!selectedElement || !comment.trim()) return;
     
-    let selector = element.tagName.toLowerCase();
+    const elementPath = getElementPath(selectedElement);
+    const elementPosition = getElementPosition(selectedElement);
     
-    // Add id if available
-    if (element.id) {
-      selector += `#${element.id}`;
-      return selector;
-    }
-    
-    // Add classes if available
-    if (element.className && typeof element.className === 'string') {
-      const classes = element.className.split(/\\s+/).filter(c => c);
-      if (classes.length) {
-        selector += `.${classes.join('.')}`;
-      }
-    }
-    
-    // Add basic path info
-    const parentElement = element.parentElement;
-    if (parentElement && parentElement !== document.body) {
-      return `${getElementPath(parentElement)} > ${selector}`;
-    }
-    
-    return selector;
-  };
-  
-  // Add a new feedback item
-  const addFeedbackItem = () => {
-    if (!selectedPosition || !selectedElement || !currentComment.trim()) return;
-    
-    const newItem: FeedbackItem = {
-      id: `feedback-${Date.now()}`,
-      position: selectedPosition,
-      elementPath: getElementPath(selectedElement),
-      comment: currentComment.trim(),
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-      category: selectedCategory,
-      page: currentPage // Store current page information
-    };
-    
-    // Add item to the global list
-    setFeedbackItems(prev => [...prev, newItem]);
-    
-    // Create a title from element path (simplify it for readability)
-    const elementTitle = getElementPath(selectedElement)
-      .split('>')
-      .pop()
-      ?.trim() || 'Element';
-      
-    const title = `Feedback on ${elementTitle}`;
-    const desc = currentComment.trim();
-    
-    // Add to appropriate admin panel based on category
-    if (selectedCategory === 'debug') {
-      // The category will be 'ui' or similar based on the element selected
-      // For simplicity, we'll use 'ui' for divs, spans, etc. and 'accessibility' for forms, etc.
-      let debugCategory = 'ui';
-      const tag = selectedElement.tagName.toLowerCase();
-      
-      // Determine a more specific category based on the element
-      if (['form', 'input', 'button', 'select', 'textarea'].includes(tag)) {
-        debugCategory = 'accessibility';
-      } else if (['table', 'tr', 'td', 'th'].includes(tag)) {
-        debugCategory = 'data';
-      } else if (['a', 'link', 'nav'].includes(tag)) {
-        debugCategory = 'integration';
-      }
-      
-      // Add to debug items
-      try {
-        console.log('Adding debug item:', title, desc, debugCategory);
-        const itemId = addFeedbackAsDebugItem(
-          title,
-          desc,
-          debugCategory as any,
-          'medium'
-        );
-        console.log('Added debug item with ID:', itemId);
-      } catch (error) {
-        console.error('Failed to add debug item:', error);
-      }
-    } else if (selectedCategory === 'roadmap') {
-      // Add to roadmap features
-      // Determine a reasonable category based on the element
-      let category: 'ui' | 'core' | 'reporting' | 'integration' | 'analytics' = 'ui';
-      const tag = selectedElement.tagName.toLowerCase();
-      
-      // Determine a more specific category based on the element
-      if (['table', 'canvas', 'svg'].includes(tag)) {
-        category = 'reporting';
-      } else if (['form', 'iframe'].includes(tag)) {
-        category = 'integration';
-      } else if (['script', 'head', 'meta'].includes(tag)) {
-        category = 'core';
-      }
-      
-      try {
-        console.log('Adding roadmap feature:', title, desc, category);
-        const featureId = addFeedbackAsRoadmapFeature(
-          title,
-          desc,
-          category,
-          3 // Medium priority
-        );
-        console.log('Added roadmap feature with ID:', featureId);
-      } catch (error) {
-        console.error('Failed to add roadmap feature:', error);
-      }
-    }
-    
-    // Also dispatch custom event for administrative use
-    const eventData = {
-      item: newItem,
-      category: selectedCategory,
-      elementPath: getElementPath(selectedElement)
-    };
-    
-    // Create and dispatch a custom event that the admin components can listen for
-    const event = new CustomEvent('feedbackItemCreated', { 
-      detail: eventData
+    const newFeedback = addFeedbackItem({
+      elementPath,
+      position: elementPosition,
+      comment,
+      category: currentCategory,
+      page: currentPage
     });
-    window.dispatchEvent(event);
     
-    // Reset UI state
-    setCurrentComment('');
-    setShowCommentModal(false);
+    // Clear form
+    setComment('');
+    setIsFormOpen(false);
     setSelectedElement(null);
-  };
+    
+    // Keep feedback mode active but allow user to continue using the application
+    toggleFeedbackMode();
+  }, [
+    selectedElement, 
+    comment, 
+    addFeedbackItem, 
+    currentCategory, 
+    currentPage, 
+    setSelectedElement, 
+    toggleFeedbackMode
+  ]);
   
-  // Update the status of a feedback item (cycles through statuses)
-  const toggleFeedbackStatus = (id: string) => {
-    setFeedbackItems(prevItems => 
-      prevItems.map(item => {
-        if (item.id === id) {
-          const nextStatus = {
-            pending: 'inProgress',
-            inProgress: 'resolved',
-            resolved: 'pending'
-          }[item.status] as 'pending' | 'inProgress' | 'resolved';
-          
-          const updatedItem = { ...item, status: nextStatus };
-          
-          // Dispatch event for status change
-          const event = new CustomEvent('feedbackUpdated', { detail: updatedItem });
-          window.dispatchEvent(event);
-          
-          return updatedItem;
-        }
-        return item;
-      })
-    );
-  };
+  // Cancel feedback
+  const handleCancelFeedback = useCallback(() => {
+    setComment('');
+    setIsFormOpen(false);
+    setSelectedElement(null);
+    toggleFeedbackMode();
+  }, [setSelectedElement, toggleFeedbackMode]);
   
-  // Delete a feedback item (right-click)
-  const deleteFeedbackItem = (id: string) => {
-    setFeedbackItems(prevItems => prevItems.filter(item => item.id !== id));
-  };
-  
-  // These helper functions are now in the FeedbackMarker component
-  
-  // Reset all feedback (for testing)
-  const resetAllFeedback = () => {
-    if (window.confirm('Are you sure you want to reset all feedback?')) {
-      setFeedbackItems([]);
-      localStorage.removeItem('feedbackItems');
+  // Determine position classes
+  const getPositionClasses = () => {
+    switch (position) {
+      case 'top-right':
+        return 'top-4 right-4';
+      case 'bottom-right':
+        return 'bottom-4 right-4';
+      case 'bottom-left':
+        return 'bottom-4 left-4';
+      case 'top-left':
+        return 'top-4 left-4';
+      case 'middle-right':
+        return 'top-1/2 -translate-y-1/2 right-4';
+      default:
+        return 'top-1/2 -translate-y-1/2 right-4';
     }
   };
   
   return (
-    <div ref={widgetRef}>
-      {/* Feedback Button */}
-      <div className="fixed right-4 top-1/2 -translate-y-1/2 z-50">
-        {/* Category Switch */}
-        <div className="mb-2 bg-white rounded-md shadow-sm border border-gray-200 p-1 flex text-xs">
-          <button
-            onClick={() => setSelectedCategory('debug')}
-            className={`px-3 py-1 rounded-md transition-colors ${
-              selectedCategory === 'debug' 
-                ? 'bg-blue-100 text-blue-700' 
-                : 'hover:bg-gray-100'
-            }`}
-          >
-            Debug
-          </button>
-          <button
-            onClick={() => setSelectedCategory('roadmap')}
-            className={`px-3 py-1 rounded-md transition-colors ${
-              selectedCategory === 'roadmap' 
-                ? 'bg-blue-100 text-blue-700' 
-                : 'hover:bg-gray-100'
-            }`}
-          >
-            Roadmap
-          </button>
-        </div>
-        
+    <>
+      {/* Floating action button */}
+      <div 
+        className={`fixed ${getPositionClasses()} z-50 feedback-system-container`}
+      >
         <button
-          onClick={() => setIsActive(!isActive)}
-          className={`rounded-full h-12 w-12 shadow-lg flex items-center justify-center transition-colors ${
-            isActive ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
-          }`}
-          title={isActive ? 'Cancel' : 'Click to add feedback'}
+          onClick={toggleFeedbackMode}
+          className={`${isActive ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} 
+            rounded-full w-12 h-12 flex items-center justify-center shadow-lg text-white transition-colors`}
+          aria-label={isActive ? 'Cancel feedback mode' : 'Provide feedback'}
         >
-          {isActive ? <X className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-6 w-6" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" 
+            />
+          </svg>
         </button>
         
-        {/* Reset button (only visible if feedback exists) */}
-        {feedbackItems.length > 0 && (
-          <button
-            onClick={resetAllFeedback}
-            className="mt-2 text-xs bg-white p-1 rounded border border-gray-200 hover:bg-gray-50 shadow-sm"
-            title="Reset all feedback markers"
+        {/* Show/hide feedback markers toggle */}
+        <button
+          onClick={() => setShowFeedbackItems(!showFeedbackItems)}
+          className={`mt-2 ${showFeedbackItems ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-500 hover:bg-gray-600'} 
+            rounded-full w-10 h-10 flex items-center justify-center shadow-lg text-white transition-colors`}
+          aria-label={showFeedbackItems ? 'Hide feedback markers' : 'Show feedback markers'}
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-5 w-5" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
           >
-            Reset All
-          </button>
-        )}
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d={showFeedbackItems 
+                ? "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" 
+                : "M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+              } 
+            />
+          </svg>
+        </button>
       </div>
       
-      {/* Feedback Markers - only show for current page */}
-      {filteredItems.map(item => (
-        <FeedbackMarker
-          key={item.id}
-          item={item}
-          onStatusChange={toggleFeedbackStatus}
-          onDelete={deleteFeedbackItem}
-        />
-      ))}
-      
-      {/* Comment Modal */}
-      {showCommentModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-4 w-80 max-w-[95vw] shadow-lg">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-medium">Add Feedback</h3>
-              <button 
-                onClick={() => {
-                  setShowCommentModal(false);
-                  setSelectedElement(null);
-                }}
-                className="text-gray-500 hover:text-gray-700"
+      {/* Feedback form */}
+      {isFormOpen && selectedElement && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 feedback-system-container">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+              Provide Feedback
+            </h2>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Category
+              </label>
+              <select
+                value={currentCategory}
+                onChange={(e) => setCurrentCategory(e.target.value as FeedbackCategory)}
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
-                <X className="h-4 w-4" />
-              </button>
+                {Object.values(FeedbackCategory).map((category) => (
+                  <option key={category} value={category}>
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                  </option>
+                ))}
+              </select>
             </div>
             
-            <div className="text-xs bg-gray-100 p-2 rounded mb-4 overflow-hidden">
-              <div className="font-medium mb-1">Element selected:</div>
-              <div className="truncate opacity-60">
-                {selectedElement ? getElementPath(selectedElement) : 'None'}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Comment
+              </label>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                rows={4}
+                placeholder="Describe the issue or suggestion..."
+              ></textarea>
+            </div>
+            
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-4 p-2 bg-gray-100 dark:bg-gray-700 rounded">
+              <div title={getElementPath(selectedElement)} className="truncate">
+                <span className="font-medium">Selected element:</span> {selectedElement.tagName.toLowerCase()}
+                {selectedElement.id && `#${selectedElement.id}`}
+                {selectedElement.className && typeof selectedElement.className === 'string' && 
+                  selectedElement.className.split(' ').map(c => c && `.${c}`).join('')}
               </div>
             </div>
             
-            <textarea
-              value={currentComment}
-              onChange={(e) => setCurrentComment(e.target.value)}
-              placeholder="Enter your feedback here..."
-              className="w-full border border-gray-300 rounded-md p-2 mb-4 h-24 text-sm"
-              autoFocus
-            />
-            
-            <div className="flex justify-end">
+            <div className="flex justify-end space-x-2">
               <button
-                onClick={addFeedbackItem}
-                disabled={!currentComment.trim()}
-                className={`px-4 py-2 rounded-md text-white ${
-                  currentComment.trim() ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'
+                type="button"
+                onClick={handleCancelFeedback}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitFeedback}
+                disabled={!comment.trim()}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${
+                  comment.trim()
+                    ? 'bg-blue-500 hover:bg-blue-600'
+                    : 'bg-blue-300 cursor-not-allowed'
                 }`}
               >
                 Submit
@@ -554,12 +301,17 @@ const SimpleFeedbackSystem: React.FC = () => {
         </div>
       )}
       
-      {isActive && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-md shadow-lg text-sm z-50 border border-gray-200">
-          Click anywhere on the page to add feedback
-        </div>
-      )}
-    </div>
+      {/* Display feedback markers */}
+      {showFeedbackItems && currentPageFeedbackItems.map((item) => (
+        <FeedbackMarker
+          key={item.id}
+          feedback={item}
+          onStatusChange={showStatuses ? updateFeedbackStatus : undefined}
+          onDelete={showStatuses ? removeFeedbackItem : undefined}
+          showDetails={showStatuses}
+        />
+      ))}
+    </>
   );
 };
 
