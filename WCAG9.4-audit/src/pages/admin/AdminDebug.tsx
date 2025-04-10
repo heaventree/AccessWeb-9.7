@@ -36,6 +36,7 @@ export function AdminDebug() {
     .filter(item => statusFilter === 'all' || item.status === statusFilter)
     .filter(item => categoryFilter === 'all' || item.category === categoryFilter)
     .filter(item => priorityFilter === 'all' || item.priority === priorityFilter)
+    .filter(item => sourceFilter === 'all' || item.source === sourceFilter || (sourceFilter === 'feedback' && item.source === 'feedback') || (sourceFilter !== 'feedback' && !item.source))
     .filter(item => {
       if (!searchQuery) return true;
       const query = searchQuery.toLowerCase();
@@ -168,13 +169,44 @@ export function AdminDebug() {
     return colors[status];
   };
 
+  // Function to get source label
+  const getSourceLabel = (source?: DebugItemSource): string => {
+    if (!source) return 'Manual';
+    const labels: Record<DebugItemSource, string> = {
+      'feedback': 'User Feedback',
+      'manual': 'Manual Entry',
+      'system': 'System Generated'
+    };
+    return labels[source];
+  };
+
+  // Function to get source color
+  const getSourceColor = (source?: DebugItemSource): string => {
+    if (!source) return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    const colors: Record<DebugItemSource, string> = {
+      'feedback': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
+      'manual': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+      'system': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+    };
+    return colors[source];
+  };
+
   const renderDebugCard = (item: DebugItem) => {
+    // Add special styling for feedback items
+    const isFeedback = item.source === 'feedback';
+    const cardBorderClass = isFeedback 
+      ? 'border-pink-300 dark:border-pink-800 shadow-sm shadow-pink-100 dark:shadow-pink-900/20' 
+      : 'border-gray-200 dark:border-gray-700';
+
     return (
-      <Card key={item.id} className="overflow-hidden border border-gray-200 dark:border-gray-700">
+      <Card key={item.id} className={`overflow-hidden border ${cardBorderClass}`}>
         <div className={`h-2 ${getStatusIndicatorColor(item.status)}`} />
         <CardContent className="p-5">
           <div className="flex justify-between items-start mb-3">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{item.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {isFeedback && <span className="inline-block w-2 h-2 rounded-full bg-pink-500 mr-2"></span>}
+              {item.title}
+            </h3>
             <span className={`text-xs font-semibold px-2 py-1 rounded-full ${getPriorityColor(item.priority)}`}>
               {getPriorityLabel(item.priority)}
             </span>
@@ -191,6 +223,10 @@ export function AdminDebug() {
             </span>
             <span className="text-xs font-medium px-2 py-1 rounded-md bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
               {item.dateIdentified}
+            </span>
+            {/* Add source badge */}
+            <span className={`text-xs font-medium px-2 py-1 rounded-md ${getSourceColor(item.source)}`}>
+              {getSourceLabel(item.source)}
             </span>
           </div>
           
@@ -306,7 +342,7 @@ export function AdminDebug() {
         </div>
 
         {/* Category Filters */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mb-4">
           <button 
             className={`px-3 py-1 rounded-md text-sm ${categoryFilter === 'all' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
             onClick={() => setCategoryFilter('all')}
@@ -322,6 +358,35 @@ export function AdminDebug() {
               {getCategoryLabel(category)} ({categoryCounts[category] || 0})
             </button>
           ))}
+        </div>
+        
+        {/* Source Filters */}
+        <div className="flex flex-wrap gap-2">
+          <h3 className="w-full text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Filter by Source:</h3>
+          <button 
+            className={`px-3 py-1 rounded-md text-sm ${sourceFilter === 'all' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+            onClick={() => setSourceFilter('all')}
+          >
+            All Sources
+          </button>
+          <button 
+            className={`px-3 py-1 rounded-md text-sm ${sourceFilter === 'feedback' ? 'bg-pink-500 text-white' : 'bg-pink-100 dark:bg-pink-900 text-pink-800 dark:text-pink-200'}`}
+            onClick={() => setSourceFilter('feedback')}
+          >
+            User Feedback
+          </button>
+          <button 
+            className={`px-3 py-1 rounded-md text-sm ${sourceFilter === 'manual' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+            onClick={() => setSourceFilter('manual')}
+          >
+            Manual Entries
+          </button>
+          <button 
+            className={`px-3 py-1 rounded-md text-sm ${sourceFilter === 'system' ? 'bg-primary-500 text-white' : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'}`}
+            onClick={() => setSourceFilter('system')}
+          >
+            System Generated
+          </button>
         </div>
       </div>
 

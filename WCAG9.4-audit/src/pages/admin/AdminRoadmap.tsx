@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { HeadingSection } from '../../components/ui/HeadingSection';
-import { roadmapFeatures, FeatureStatus, RoadmapFeature, getFeaturesByStatus, getFeaturesByCategory, getNextFeatures } from '../../data/roadmapData';
+import { roadmapFeatures, FeatureStatus, RoadmapFeature, RoadmapFeatureSource, getFeaturesByStatus, getFeaturesByCategory, getNextFeatures } from '../../data/roadmapData';
 
 export function AdminRoadmap() {
   const [statusFilter, setStatusFilter] = useState<FeatureStatus | 'all'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [sourceFilter, setSourceFilter] = useState<RoadmapFeatureSource | 'all'>('all');
   const [features, setFeatures] = useState<RoadmapFeature[]>(roadmapFeatures);
   
   // Listen for changes in roadmapFeatures (from feedback system)
@@ -32,6 +33,7 @@ export function AdminRoadmap() {
   const filteredItems = features
     .filter(item => statusFilter === 'all' || item.status === statusFilter)
     .filter(item => categoryFilter === 'all' || item.category === categoryFilter)
+    .filter(item => sourceFilter === 'all' || item.source === sourceFilter || (sourceFilter === 'feedback' && item.source === 'feedback') || (sourceFilter !== 'feedback' && !item.source))
     .sort((a, b) => a.priority - b.priority);
 
   // Get category counts
@@ -99,6 +101,28 @@ export function AdminRoadmap() {
   const formatStatus = (status: FeatureStatus): string => {
     if (status === 'in-progress') return 'In Progress';
     return status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
+  // Function to get source label
+  const getSourceLabel = (source?: RoadmapFeatureSource): string => {
+    if (!source) return 'Manual';
+    const labels: Record<RoadmapFeatureSource, string> = {
+      'feedback': 'User Feedback',
+      'manual': 'Manual Entry',
+      'system': 'System Generated'
+    };
+    return labels[source];
+  };
+
+  // Function to get source color
+  const getSourceColor = (source?: RoadmapFeatureSource): string => {
+    if (!source) return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    const colors: Record<RoadmapFeatureSource, string> = {
+      'feedback': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
+      'manual': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+      'system': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+    };
+    return colors[source];
   };
 
   return (
@@ -188,7 +212,7 @@ export function AdminRoadmap() {
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mb-4">
           <h3 className="w-full text-lg font-semibold text-gray-900 dark:text-white mb-2">Filter by Category</h3>
           <button 
             className={`px-4 py-2 rounded-md ${categoryFilter === 'all' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
@@ -206,34 +230,79 @@ export function AdminRoadmap() {
             </button>
           ))}
         </div>
+
+        {/* Source Filters */}
+        <div className="flex flex-wrap gap-2">
+          <h3 className="w-full text-lg font-semibold text-gray-900 dark:text-white mb-2">Filter by Source</h3>
+          <button 
+            className={`px-4 py-2 rounded-md ${sourceFilter === 'all' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+            onClick={() => setSourceFilter('all')}
+          >
+            All Sources
+          </button>
+          <button 
+            className={`px-4 py-2 rounded-md ${sourceFilter === 'feedback' ? 'bg-pink-500 text-white' : 'bg-pink-100 dark:bg-pink-900 text-pink-800 dark:text-pink-200'}`}
+            onClick={() => setSourceFilter('feedback')}
+          >
+            User Feedback
+          </button>
+          <button 
+            className={`px-4 py-2 rounded-md ${sourceFilter === 'manual' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+            onClick={() => setSourceFilter('manual')}
+          >
+            Manual Entries
+          </button>
+          <button 
+            className={`px-4 py-2 rounded-md ${sourceFilter === 'system' ? 'bg-primary-500 text-white' : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'}`}
+            onClick={() => setSourceFilter('system')}
+          >
+            System Generated
+          </button>
+        </div>
       </div>
 
       {/* Items Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredItems.map((item) => (
-          <Card key={item.id} className="overflow-hidden border border-gray-200 dark:border-gray-700">
-            <div className={`h-2 ${getStatusColor(item.status)}`} />
-            <CardContent className="p-5">
-              <div className="flex justify-between items-start mb-3">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{item.title}</h3>
-                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${getPriorityColor(item.priority)}`}>
-                  {getPriorityLabel(item.priority)}
-                </span>
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{item.description}</p>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500 dark:text-gray-400">
-                  {item.status === 'completed' && item.completedDate ? `Completed: ${item.completedDate}` : 
-                   item.estimatedCompletionDate ? `Target: ${item.estimatedCompletionDate}` : 
-                   `Category: ${getCategoryLabel(item.category)}`}
-                </span>
-                <span className={`px-2 py-1 rounded-md text-xs font-medium ${getStatusBadgeClass(item.status)}`}>
-                  {formatStatus(item.status)}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        {filteredItems.map((item) => {
+          // Add special styling for feedback items
+          const isFeedback = item.source === 'feedback';
+          const cardBorderClass = isFeedback 
+            ? 'border-pink-300 dark:border-pink-800 shadow-sm shadow-pink-100 dark:shadow-pink-900/20' 
+            : 'border-gray-200 dark:border-gray-700';
+            
+          return (
+            <Card key={item.id} className={`overflow-hidden border ${cardBorderClass}`}>
+              <div className={`h-2 ${getStatusColor(item.status)}`} />
+              <CardContent className="p-5">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {isFeedback && <span className="inline-block w-2 h-2 rounded-full bg-pink-500 mr-2"></span>}
+                    {item.title}
+                  </h3>
+                  <span className={`text-xs font-semibold px-2 py-1 rounded-full ${getPriorityColor(item.priority)}`}>
+                    {getPriorityLabel(item.priority)}
+                  </span>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{item.description}</p>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  <span className={`text-xs font-medium px-2 py-1 rounded-md ${getStatusBadgeClass(item.status)}`}>
+                    {formatStatus(item.status)}
+                  </span>
+                  <span className={`text-xs font-medium px-2 py-1 rounded-md ${getSourceColor(item.source)}`}>
+                    {getSourceLabel(item.source)}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  {item.status === 'completed' && item.completedDate 
+                    ? `Completed: ${item.completedDate}` 
+                    : item.estimatedCompletionDate 
+                    ? `Target: ${item.estimatedCompletionDate}` 
+                    : `Category: ${getCategoryLabel(item.category)}`}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {filteredItems.length === 0 && (
