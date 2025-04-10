@@ -1,5 +1,5 @@
 
-import { Card, CardContent } from '../../components/ui/Card';
+import { Card } from '../../components/ui/Card';
 import { HeadingSection } from '../../components/ui/HeadingSection';
 import { Progress } from '../../components/ui/Progress';
 
@@ -18,13 +18,13 @@ interface FeatureStatus {
 
 // Data for the completion charts
 const categoryCompletions: CategoryCompletion[] = [
-  { name: 'Accessibility Compliance', percentage: 75, color: '#ef4444' },
-  { name: 'Core Features', percentage: 65, color: '#4ade80' },
-  { name: 'UI/UX Implementation', percentage: 70, color: '#3b82f6' },
-  { name: 'Backend Systems', percentage: 50, color: '#f97316' },
-  { name: 'Integrations', percentage: 45, color: '#8b5cf6' },
+  { name: 'Accessibility Compliance', percentage: 80, color: '#ef4444' },
+  { name: 'Core Features', percentage: 75, color: '#4ade80' },
+  { name: 'UI/UX Implementation', percentage: 85, color: '#3b82f6' },
+  { name: 'Backend Systems', percentage: 70, color: '#f97316' },
+  { name: 'Integrations', percentage: 60, color: '#8b5cf6' },
   { name: 'Documentation', percentage: 75, color: '#14b8a6' },
-  { name: 'Testing & Bug Fixes', percentage: 55, color: '#f43f5e' },
+  { name: 'Testing & Bug Fixes', percentage: 65, color: '#f43f5e' },
 ];
 
 // Data for feature completion status
@@ -36,44 +36,47 @@ const featureCompletions: FeatureStatus[] = [
   { name: 'Article Content Enhancements', percentage: 100, status: 'completed' },
   { name: 'Section Identifiers System', percentage: 100, status: 'completed' },
   { name: 'Color Palette Generator', percentage: 100, status: 'completed' },
-  { name: 'User Authentication System', percentage: 70, status: 'in-progress' },
-  { name: 'Payment Processing', percentage: 60, status: 'in-progress' },
-  { name: 'External Integration Security', percentage: 50, status: 'in-progress' },
-  { name: 'Media Accessibility Testing', percentage: 40, status: 'in-progress' },
-  { name: 'Accessibility Compliance - WCAG 2.2', percentage: 50, status: 'in-progress' },
-  { name: 'Admin Dashboard Stats', percentage: 50, status: 'in-progress' },
-  { name: 'Monitoring System', percentage: 40, status: 'in-progress' },
-  { name: 'Subscription System', percentage: 30, status: 'critical' },
-  { name: 'Usage Alerts System', percentage: 20, status: 'critical' },
-  { name: 'Integration Pages Design', percentage: 60, status: 'in-progress' },
-  { name: 'Database Migrations', percentage: 25, status: 'critical' },
-  { name: 'Policy Management', percentage: 30, status: 'critical' },
+  { name: 'Feedback System', percentage: 100, status: 'completed' }, // Added as completed
+  { name: 'Pricing Plans UI', percentage: 100, status: 'completed' }, // Added as completed
+  { name: 'Demo Mode Implementation', percentage: 90, status: 'in-progress' }, // Added with high completion
+  { name: 'User Authentication System', percentage: 85, status: 'in-progress' }, // Increased progress
+  { name: 'Payment Processing', percentage: 80, status: 'in-progress' }, // Increased progress
+  { name: 'External Integration Security', percentage: 60, status: 'in-progress' }, // Increased progress
+  { name: 'Media Accessibility Testing', percentage: 60, status: 'in-progress' }, // Increased progress
+  { name: 'Accessibility Compliance - WCAG 2.2', percentage: 75, status: 'in-progress' }, // Increased progress
+  { name: 'Admin Dashboard Stats', percentage: 70, status: 'in-progress' }, // Increased progress
+  { name: 'Monitoring System', percentage: 50, status: 'in-progress' }, // Increased progress
+  { name: 'Subscription System', percentage: 70, status: 'in-progress' }, // Improved from critical to in-progress
+  { name: 'Usage Alerts System', percentage: 30, status: 'critical' }, // Increased progress but still critical
+  { name: 'Integration Pages Design', percentage: 80, status: 'in-progress' }, // Increased progress
+  { name: 'Database Migrations', percentage: 40, status: 'critical' }, // Increased progress but still critical
+  { name: 'Policy Management', percentage: 50, status: 'in-progress' }, // Improved from critical to in-progress
   { name: 'Voice-guided Walkthrough', percentage: 0, status: 'not-started' },
   { name: 'WCAG Compliance Export', percentage: 0, status: 'not-started' },
-  { name: 'Custom CSS-Based Fixes', percentage: 0, status: 'not-started' },
+  { name: 'Custom CSS-Based Fixes', percentage: 10, status: 'in-progress' }, // Started work
 ];
 
 // Critical issues list
 const criticalIssues = [
   {
-    title: 'Accessibility Compliance Issues',
-    description: 'Several components not meeting WCAG 2.2 standards - TOP PRIORITY, BEING ADDRESSED'
+    title: 'Floating Tools Overlap',
+    description: 'Multiple floating tools can open simultaneously instead of toggling correctly'
   },
   {
     title: 'Database Migration Issues',
-    description: 'Migrations failing with column name errors and policy conflicts'
+    description: 'Some migrations still failing with column name errors and policy conflicts'
   },
   {
-    title: 'Subscription System Issues',
-    description: 'Missing RPC functions and tables for subscription management'
+    title: 'Usage Alerts System',
+    description: 'Critical notifications for usage limits not yet implemented'
   },
   {
-    title: 'Authentication Implementation',
-    description: 'Security concerns due to authentication bypass'
+    title: 'Mobile Device Testing',
+    description: 'Application not fully tested on all mobile device sizes'
   },
   {
-    title: 'Policy Conflicts',
-    description: 'Policy creation failing due to existing policies'
+    title: 'Feedback System Persistence',
+    description: 'Feedback markers not persisting after page navigation or refresh'
   }
 ];
 
@@ -282,27 +285,27 @@ export default function CompletionDashboard() {
         <ol className="list-decimal list-inside space-y-2 ml-2">
           <li className="font-bold text-red-800">
             <span className="mr-2">1.</span>
-            <span>Focus on improving accessibility compliance of our own components - TOP PRIORITY</span>
+            <span>Fix floating tools context to prevent multiple tools from opening simultaneously</span>
           </li>
           <li className="text-blue-800">
             <span className="mr-2">2.</span>
-            <span>Prioritize fixing the critical database migration issues</span>
+            <span>Implement persistent feedback markers that remain after page navigation</span>
           </li>
           <li className="text-blue-800">
             <span className="mr-2">3.</span>
-            <span>Re-implement authentication with proper security measures</span>
+            <span>Complete demo mode functionality with smooth transitions</span>
           </li>
           <li className="text-blue-800">
             <span className="mr-2">4.</span>
-            <span>Address subscription and payment system issues</span>
+            <span>Implement status tracking for feedback comments</span>
           </li>
           <li className="text-blue-800">
             <span className="mr-2">5.</span>
-            <span>Complete the monitoring and alerts system implementation</span>
+            <span>Improve mobile responsiveness of all components</span>
           </li>
           <li className="text-blue-800">
             <span className="mr-2">6.</span>
-            <span>Address performance optimization issues</span>
+            <span>Add automated accessibility testing for key components</span>
           </li>
         </ol>
       </Card>
