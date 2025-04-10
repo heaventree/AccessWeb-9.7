@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { LandingPage } from './pages/LandingPage';
-import { PricingPage } from './pages/PricingPage';
+import PricingPage from './pages/PricingPage';
 import { SubscriptionDashboard } from './pages/SubscriptionDashboard';
 import { PaymentPage } from './pages/PaymentPage';
 import { IntegrationsPage } from './pages/integrations/IntegrationsPage';
@@ -63,7 +63,7 @@ import { WordPressIntPage } from './pages/WordPressIntPage';
 import { APIIntegrationPage } from './pages/integrations/APIIntegrationPage';
 import { ComplianceIntegrationPage } from './pages/integrations/ComplianceIntegrationPage';
 import { ShopifyIntegrationPage } from './pages/integrations/ShopifyIntegrationPage';
-import { BillingPage } from './pages/BillingPage';
+import BillingPage from './pages/BillingPage';
 import { EnterpriseIntegrationPage } from './pages/integrations/EnterpriseIntegrationPage';
 import { AnalyticsPage } from './pages/analytics/AnalyticsPage';
 import { CompliancePage } from './pages/compliance/CompliancePage';

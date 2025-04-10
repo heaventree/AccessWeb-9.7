@@ -1,231 +1,208 @@
-import axios from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
-// Create an Axios instance with common configuration
-export const api = axios.create({
-  // In a real production environment, you would set this to your API URL
-  baseURL: process.env.NODE_ENV === 'production' 
-    ? 'https://api.accessibilitychecker.app/api/v1'
-    : 'http://localhost:5000/api',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  }
-});
+// Base API configuration
+const API_URL = process.env.NODE_ENV === 'production'
+  ? 'https://api.accessibilitychecker.app/api/v1'
+  : 'http://localhost:5000/api';
 
-// Add a request interceptor to include auth token in every request
-api.interceptors.request.use(
-  (config) => {
+// Create API instance with authentication
+const createAuthenticatedApi = (): AxiosInstance => {
+  const api = axios.create({
+    baseURL: API_URL,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  // Request interceptor to add auth token
+  api.interceptors.request.use((config: AxiosRequestConfig) => {
     const token = localStorage.getItem('auth_token');
-    if (token) {
+    if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+  });
 
-// Add a response interceptor to handle common error scenarios
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    // Handle authentication errors
-    if (error.response && error.response.status === 401) {
-      // Clear invalid tokens
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
-      
-      // Redirect to login page if not already there
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
-      }
-    }
-    
-    return Promise.reject(error);
-  }
-);
+  return api;
+};
 
-// Typed helper functions for API endpoints
+// Authentication API
 export const authApi = {
-  login: async (email: string, password: string) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  // Register a new user
+  async register(userData: { email: string; password: string; name: string }) {
+    const response = await axios.post(`${API_URL}/auth/register`, userData);
+    return response.data;
   },
-  
-  register: async (userData: { email: string; password: string; name: string }) => {
-    try {
-      const response = await api.post('/auth/register', userData);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Login a user
+  async login(email: string, password: string) {
+    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+    return response.data;
   },
-  
-  verifyEmail: async (token: string) => {
-    try {
-      const response = await api.post('/auth/verify-email', { token });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Get current user information
+  async me() {
+    const api = createAuthenticatedApi();
+    const response = await api.get('/auth/me');
+    return response.data;
   },
-  
-  forgotPassword: async (email: string) => {
-    try {
-      const response = await api.post('/auth/forgot-password', { email });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Verify email address
+  async verifyEmail(token: string) {
+    const response = await axios.post(`${API_URL}/auth/verify-email`, { token });
+    return response.data;
   },
-  
-  resetPassword: async (token: string, newPassword: string) => {
-    try {
-      const response = await api.post('/auth/reset-password', { token, newPassword });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Request password reset
+  async forgotPassword(email: string) {
+    const response = await axios.post(`${API_URL}/auth/forgot-password`, { email });
+    return response.data;
   },
-  
-  refreshToken: async () => {
-    try {
-      const response = await api.post('/auth/refresh-token');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Reset password with token
+  async resetPassword(token: string, newPassword: string) {
+    const response = await axios.post(`${API_URL}/auth/reset-password`, {
+      token,
+      newPassword
+    });
+    return response.data;
   },
-  
-  logout: async () => {
-    try {
-      const response = await api.post('/auth/logout');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-  
-  me: async () => {
-    try {
-      const response = await api.get('/auth/me');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Logout
+  async logout() {
+    const api = createAuthenticatedApi();
+    const response = await api.post('/auth/logout');
+    return response.data;
   }
 };
 
+// User API
 export const userApi = {
-  updateProfile: async (userData: { name?: string; email?: string; }) => {
-    try {
-      const response = await api.put('/users/profile', userData);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  // Update user profile
+  async updateProfile(userData: { name?: string; email?: string }) {
+    const api = createAuthenticatedApi();
+    const response = await api.put('/users/profile', userData);
+    return response.data;
   },
-  
-  changePassword: async (data: { currentPassword: string; newPassword: string }) => {
-    try {
-      const response = await api.put('/users/password', data);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Change password
+  async changePassword(passwords: { currentPassword: string; newPassword: string }) {
+    const api = createAuthenticatedApi();
+    const response = await api.put('/users/password', passwords);
+    return response.data;
   },
-  
-  getSubscription: async () => {
-    try {
-      const response = await api.get('/users/subscription');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Delete account
+  async deleteAccount() {
+    const api = createAuthenticatedApi();
+    const response = await api.delete('/users/account');
+    return response.data;
   }
 };
 
-export const oauthApi = {
-  google: async (code: string) => {
-    try {
-      const response = await api.post('/auth/oauth/google', { code });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+// Payments API (Stripe)
+export const paymentsApi = {
+  // Get available subscription plans
+  async getPlans() {
+    const api = createAuthenticatedApi();
+    const response = await api.get('/payments/plans');
+    return response.data;
   },
-  
-  github: async (code: string) => {
-    try {
-      const response = await api.post('/auth/oauth/github', { code });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Create checkout session
+  async createCheckoutSession(planId: string, successUrl: string, cancelUrl: string) {
+    const api = createAuthenticatedApi();
+    const response = await api.post('/payments/create-checkout-session', {
+      planId,
+      successUrl,
+      cancelUrl
+    });
+    return response.data;
   },
-  
-  microsoft: async (code: string) => {
-    try {
-      const response = await api.post('/auth/oauth/microsoft', { code });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Create billing portal session
+  async createBillingPortalSession(returnUrl: string) {
+    const api = createAuthenticatedApi();
+    const response = await api.post('/payments/create-portal-session', { returnUrl });
+    return response.data;
+  },
+
+  // Get current subscription
+  async getCurrentSubscription() {
+    const api = createAuthenticatedApi();
+    const response = await api.get('/payments/subscription');
+    return response.data;
+  },
+
+  // Get invoices
+  async getInvoices() {
+    const api = createAuthenticatedApi();
+    const response = await api.get('/payments/invoices');
+    return response.data;
+  },
+
+  // Cancel subscription
+  async cancelSubscription() {
+    const api = createAuthenticatedApi();
+    const response = await api.post('/payments/cancel-subscription');
+    return response.data;
+  },
+
+  // Reactivate subscription
+  async reactivateSubscription() {
+    const api = createAuthenticatedApi();
+    const response = await api.post('/payments/reactivate-subscription');
+    return response.data;
+  },
+
+  // Check session status
+  async checkSessionStatus(sessionId: string) {
+    const api = createAuthenticatedApi();
+    const response = await api.get(`/payments/session-status/${sessionId}`);
+    return response.data;
   }
 };
 
-export const paymentApi = {
-  getPlans: async () => {
-    try {
-      const response = await api.get('/payments/plans');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+// Feedback API
+export const feedbackApi = {
+  // Get all feedback items
+  async getFeedbackItems() {
+    const api = createAuthenticatedApi();
+    const response = await api.get('/feedback');
+    return response.data;
   },
-  
-  subscribe: async (planId: string) => {
-    try {
-      const response = await api.post('/payments/subscribe', { planId });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Create feedback item
+  async createFeedbackItem(feedback: {
+    page: string;
+    elementPath: string;
+    position: { x: number; y: number };
+    comment: string;
+    category: string;
+  }) {
+    const api = createAuthenticatedApi();
+    const response = await api.post('/feedback', feedback);
+    return response.data;
   },
-  
-  createCheckoutSession: async (planId: string) => {
-    try {
-      const response = await api.post('/payments/create-checkout-session', { planId });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Update feedback item
+  async updateFeedbackItem(id: string, updates: {
+    comment?: string;
+    status?: string;
+    category?: string;
+  }) {
+    const api = createAuthenticatedApi();
+    const response = await api.put(`/feedback/${id}`, updates);
+    return response.data;
   },
-  
-  createPortalSession: async () => {
-    try {
-      const response = await api.post('/payments/create-portal-session');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-  
-  getInvoices: async () => {
-    try {
-      const response = await api.get('/payments/invoices');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+
+  // Delete feedback item
+  async deleteFeedbackItem(id: string) {
+    const api = createAuthenticatedApi();
+    const response = await api.delete(`/feedback/${id}`);
+    return response.data;
   }
 };
 
-export default api;
+// Export the API creator for custom endpoints
+export { createAuthenticatedApi };
