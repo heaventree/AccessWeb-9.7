@@ -39,6 +39,7 @@ import { AccessibilityControls } from './components/accessibility/AccessibilityC
 import { WCAGCheckerPage } from './pages/WCAGCheckerPage';
 import { WCAGStandardsTable } from './pages/WCAGStandardsTable';
 import WCAGColorPalette from './pages/tools/WCAGColorPalette';
+import ColorAccessibilitySimulatorPage from './pages/tools/ColorAccessibilitySimulator';
 import SimpleFeedbackSystem from './components/SimpleFeedbackSystem';
 import ImageAltScannerPage from './pages/tools/ImageAltScannerPage';
 import { BlogPage } from './pages/BlogPage';
@@ -84,6 +85,7 @@ function App() {
           <Route path="/checker" element={<><Navigation /><main id="main-content"><WCAGCheckerPage /></main><Footer /><BackToTop /></>} />
           <Route path="/tools/wcag-standards" element={<><Navigation /><main id="main-content"><WCAGStandardsTable /></main><Footer /><BackToTop /></>} />
           <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
+          <Route path="/tools/color-simulator" element={<><Navigation /><main id="main-content"><ColorAccessibilitySimulatorPage /></main><Footer /><BackToTop /></>} />
           <Route path="/tools/monitoring" element={<><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></>} />
           <Route path="/tools/realtime" element={<><Navigation /><main id="main-content"><RealTimeMonitorPage /></main><Footer /><BackToTop /></>} />
           <Route path="/tools/image-alt-scanner" element={<><Navigation /><main id="main-content"><ImageAltScannerPage /></main><Footer /><BackToTop /></>} />
