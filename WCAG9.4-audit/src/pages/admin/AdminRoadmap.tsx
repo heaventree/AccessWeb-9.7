@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { HeadingSection } from '../../components/ui/HeadingSection';
 import { roadmapFeatures, FeatureStatus, RoadmapFeature, getFeaturesByStatus, getFeaturesByCategory, getNextFeatures } from '../../data/roadmapData';
@@ -6,9 +6,30 @@ import { roadmapFeatures, FeatureStatus, RoadmapFeature, getFeaturesByStatus, ge
 export function AdminRoadmap() {
   const [statusFilter, setStatusFilter] = useState<FeatureStatus | 'all'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [features, setFeatures] = useState<RoadmapFeature[]>(roadmapFeatures);
+  
+  // Listen for changes in roadmapFeatures (from feedback system)
+  useEffect(() => {
+    // Set initial state
+    setFeatures(roadmapFeatures);
+    
+    // Event listener to update items when roadmap features change
+    const handleRoadmapUpdated = (event: CustomEvent) => {
+      console.log('Roadmap features updated event received:', event.detail);
+      setFeatures([...event.detail]);
+    };
+    
+    // Register event listener
+    window.addEventListener('roadmapFeaturesUpdated', handleRoadmapUpdated as EventListener);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('roadmapFeaturesUpdated', handleRoadmapUpdated as EventListener);
+    };
+  }, []);
   
   // Filter items based on selected filters
-  const filteredItems = roadmapFeatures
+  const filteredItems = features
     .filter(item => statusFilter === 'all' || item.status === statusFilter)
     .filter(item => categoryFilter === 'all' || item.category === categoryFilter)
     .sort((a, b) => a.priority - b.priority);
@@ -16,19 +37,23 @@ export function AdminRoadmap() {
   // Get category counts
   const categories = ['core', 'ui', 'reporting', 'integration', 'analytics'];
   const categoryCounts = categories.reduce((acc, category) => {
-    acc[category] = roadmapFeatures.filter(item => item.category === category).length;
+    acc[category] = features.filter(item => item.category === category).length;
     return acc;
   }, {} as Record<string, number>);
 
   // Get status counts
   const statuses: FeatureStatus[] = ['planned', 'in-progress', 'completed', 'deferred'];
   const statusCounts = statuses.reduce((acc, status) => {
-    acc[status] = roadmapFeatures.filter(item => item.status === status).length;
+    acc[status] = features.filter(item => item.status === status).length;
     return acc;
   }, {} as Record<string, number>);
 
   // Get the next features to implement
-  const nextFeatures = getNextFeatures(3);
+  // Instead of using the utility function, we'll calculate it directly from our state
+  const nextFeatures = features
+    .filter(item => item.status === 'planned')
+    .sort((a, b) => a.priority - b.priority)
+    .slice(0, 3);
 
   const getCategoryLabel = (category: string): string => {
     const labels: Record<string, string> = {
@@ -89,7 +114,7 @@ export function AdminRoadmap() {
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border-blue-200 dark:border-blue-800">
           <CardContent className="p-4">
             <h3 className="font-semibold text-blue-800 dark:text-blue-300">Total Features</h3>
-            <p className="text-3xl font-bold text-blue-900 dark:text-blue-200">{roadmapFeatures.length}</p>
+            <p className="text-3xl font-bold text-blue-900 dark:text-blue-200">{features.length}</p>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 border-green-200 dark:border-green-800">
@@ -150,7 +175,7 @@ export function AdminRoadmap() {
             className={`px-4 py-2 rounded-md ${statusFilter === 'all' ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
             onClick={() => setStatusFilter('all')}
           >
-            All Items ({roadmapFeatures.length})
+            All Items ({features.length})
           </button>
           {statuses.map(status => (
             <button 

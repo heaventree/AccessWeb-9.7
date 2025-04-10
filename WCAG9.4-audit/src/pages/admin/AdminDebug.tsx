@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { HeadingSection } from '../../components/ui/HeadingSection';
 import { debugItems, DebugItem, DebugItemCategory, DebugItemPriority, DebugItemStatus } from '../../data/debugData';
@@ -8,9 +8,30 @@ export function AdminDebug() {
   const [categoryFilter, setCategoryFilter] = useState<DebugItemCategory | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<DebugItemPriority | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [items, setItems] = useState<DebugItem[]>(debugItems);
+  
+  // Listen for changes in debugItems (from feedback system)
+  useEffect(() => {
+    // Set initial state
+    setItems(debugItems);
+    
+    // Event listener to update items when debug items change
+    const handleDebugItemsUpdated = (event: CustomEvent) => {
+      console.log('Debug items updated event received:', event.detail);
+      setItems([...event.detail]);
+    };
+    
+    // Register event listener
+    window.addEventListener('debugItemsUpdated', handleDebugItemsUpdated as EventListener);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('debugItemsUpdated', handleDebugItemsUpdated as EventListener);
+    };
+  }, []);
 
   // Filter items based on selected filters and search query
-  const filteredItems = debugItems
+  const filteredItems = items
     .filter(item => statusFilter === 'all' || item.status === statusFilter)
     .filter(item => categoryFilter === 'all' || item.category === categoryFilter)
     .filter(item => priorityFilter === 'all' || item.priority === priorityFilter)
@@ -33,21 +54,21 @@ export function AdminDebug() {
   // Get category counts
   const categories: DebugItemCategory[] = ['ui', 'core', 'api', 'integration', 'performance', 'security', 'monitoring', 'accessibility', 'data', 'subscription', 'alerts', 'policies'];
   const categoryCounts = categories.reduce((acc, category) => {
-    acc[category] = debugItems.filter(item => item.category === category).length;
+    acc[category] = items.filter(item => item.category === category).length;
     return acc;
   }, {} as Record<string, number>);
 
   // Get status counts
   const statuses: DebugItemStatus[] = ['identified', 'investigating', 'in-progress', 'testing', 'resolved', 'deferred'];
   const statusCounts = statuses.reduce((acc, status) => {
-    acc[status] = debugItems.filter(item => item.status === status).length;
+    acc[status] = items.filter(item => item.status === status).length;
     return acc;
   }, {} as Record<string, number>);
 
   // Get priority counts
   const priorities: DebugItemPriority[] = ['critical', 'high', 'medium', 'low', 'very-low'];
   const priorityCounts = priorities.reduce((acc, priority) => {
-    acc[priority] = debugItems.filter(item => item.priority === priority).length;
+    acc[priority] = items.filter(item => item.priority === priority).length;
     return acc;
   }, {} as Record<string, number>);
 
@@ -218,14 +239,14 @@ export function AdminDebug() {
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border-blue-200 dark:border-blue-800">
           <CardContent className="p-4">
             <h3 className="font-semibold text-blue-800 dark:text-blue-300">Total Issues</h3>
-            <p className="text-3xl font-bold text-blue-900 dark:text-blue-200">{debugItems.length}</p>
+            <p className="text-3xl font-bold text-blue-900 dark:text-blue-200">{items.length}</p>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 border-orange-200 dark:border-orange-800">
           <CardContent className="p-4">
             <h3 className="font-semibold text-orange-800 dark:text-orange-300">High Priority</h3>
             <p className="text-3xl font-bold text-orange-900 dark:text-orange-200">
-              {debugItems.filter(item => item.priority === 'critical' || item.priority === 'high').length}
+              {items.filter(item => item.priority === 'critical' || item.priority === 'high').length}
             </p>
           </CardContent>
         </Card>
