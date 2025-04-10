@@ -17,8 +17,10 @@ export function DemoModeToggle() {
     } else {
       enableDemoMode();
     }
-    // Refresh the page to ensure all components pick up the change
-    window.location.reload();
+    // Close the panel after toggling
+    if (isOpen) {
+      toggleTool(null);
+    }
   };
 
   // Toggle panel visibility

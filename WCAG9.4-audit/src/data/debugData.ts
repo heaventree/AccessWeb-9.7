@@ -88,6 +88,22 @@ export function addFeedbackAsDebugItem(
 }
 
 export const debugItems: DebugItem[] = [
+  {
+    id: 'debug-item-overlap-ui',
+    title: 'Floating tools overlap issue',
+    description: 'The floating tools (feedback button, demo mode toggle, etc.) are overlapping each other on the screen, making it difficult to use them.',
+    category: 'ui',
+    status: 'identified',
+    priority: 'medium',
+    dateIdentified: new Date().toISOString().split('T')[0],
+    source: 'manual',
+    todoItems: [
+      'Fix positioning of floating tools to prevent overlap',
+      'Implement better coordination between floating tools',
+      'Improve responsiveness of floating tools on different screen sizes'
+    ],
+    notes: 'This issue impacts the usability of the feedback and demo mode features. Need to redesign the positioning of these components to ensure they don\'t overlap.'
+  },
   // Dark Mode Implementation Issues
   {
     id: 'debug-001',
