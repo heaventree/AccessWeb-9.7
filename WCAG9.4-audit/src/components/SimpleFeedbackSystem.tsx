@@ -33,7 +33,7 @@ const SimpleFeedbackSystem: React.FC = () => {
   const currentPage = location.pathname;
   
   // Use the floating tools context
-  const { activeTool, toggleTool } = useFloatingTools();
+  const { activeTool, toggleTool, isFeedbackEnabled } = useFloatingTools();
   
   // State for the feedback system
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
@@ -453,6 +453,11 @@ const SimpleFeedbackSystem: React.FC = () => {
       localStorage.removeItem('feedbackItems');
     }
   };
+  
+  // Don't render anything if feedback is disabled
+  if (!isFeedbackEnabled) {
+    return null;
+  }
   
   return (
     <div ref={widgetRef}>
