@@ -58,6 +58,12 @@ export function Navigation() {
       description: 'Create accessible color combinations'
     },
     { 
+      name: 'Color Accessibility Simulator',
+      path: '/tools/color-simulator',
+      icon: Palette,
+      description: 'Test colors for accessibility and simulate color blindness'
+    },
+    { 
       name: 'WCAG Standards',
       path: '/tools/wcag-standards',
       icon: FileText,
