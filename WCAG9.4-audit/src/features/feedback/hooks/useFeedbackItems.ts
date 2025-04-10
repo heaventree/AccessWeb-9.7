@@ -1,7 +1,7 @@
 /**
  * Custom hook for managing feedback items
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FeedbackItem, FeedbackCategory } from '../types';
 import { 
   getAllFeedbackItems, 
@@ -41,10 +41,9 @@ export const useFeedbackItems = () => {
     };
   }, []);
   
-  // Update feedback items in local storage when they change
-  useEffect(() => {
-    saveFeedbackItems(feedbackItems);
-  }, [feedbackItems]);
+  // We don't need to save items on every change since we're already
+  // handling specific actions (add, toggle, remove) with direct service calls
+  // This prevents the circular update issue
   
   // Add a new feedback item
   const addFeedbackItem = (
