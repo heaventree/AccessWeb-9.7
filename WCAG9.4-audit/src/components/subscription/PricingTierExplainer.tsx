@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { Plan } from '../../hooks/useSubscription';
 
 interface PricingTierExplainerProps {
@@ -338,7 +338,7 @@ export function PricingTierExplainer({ plans, className = '' }: PricingTierExpla
                       })}
                     </tr>
                   ))}
-                </React.Fragment>
+                </Fragment>
               ))
             ) : (
               // Show only the active category

@@ -1,157 +1,140 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useState, useEffect, useCallback } from 'react';
+import { useDemoMode } from '../hooks/useDemoMode';
 
-interface DemoModeToggleProps {
-  className?: string;
-}
+export function DemoModeToggle() {
+  const { isDemoMode } = useDemoMode();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-export function DemoModeToggle({ className = '' }: DemoModeToggleProps) {
-  const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
-  const [isActivating, setIsActivating] = useState<boolean>(false);
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-
-  // Check local storage for demo mode status
-  useEffect(() => {
-    const demoModeStatus = localStorage.getItem('demo_mode') === 'true';
-    setIsDemoMode(demoModeStatus);
-  }, []);
-
-  // Handle demo mode toggle
-  const handleToggleDemo = () => {
+  // Handle toggle click
+  const handleToggle = () => {
     if (isDemoMode) {
-      // Turn off demo mode
-      localStorage.removeItem('demo_mode');
-      setIsDemoMode(false);
-      // Reload page to refresh all demo data
-      window.location.reload();
+      disableDemoMode();
     } else {
-      // Start demo mode activation process
-      activateDemoMode();
+      enableDemoMode();
     }
   };
 
-  // Activate demo mode with animation
-  const activateDemoMode = async () => {
-    setIsActivating(true);
-    
-    // Store demo mode state
-    localStorage.setItem('demo_mode', 'true');
-    
-    // Simulate API call or loading process
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Activate demo mode
-    setIsDemoMode(true);
-    setIsActivating(false);
-    
-    // Redirect to dashboard if not already there
-    if (window.location.pathname !== '/dashboard') {
-      navigate('/dashboard');
-    } else {
-      // Reload page to refresh all demo data
-      window.location.reload();
-    }
+  // Toggle panel visibility
+  const togglePanel = () => {
+    setIsAnimating(true);
+    setIsOpen(!isOpen);
   };
 
-  // If already authenticated, don't show the demo mode toggle
-  if (isAuthenticated) {
-    return null;
-  }
+  // Handle animation end
+  const handleAnimationEnd = () => {
+    setIsAnimating(false);
+  };
+
+  // Close panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (isOpen && !target.closest('.demo-mode-toggle')) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
-    <div className={`relative inline-block ${className}`}>
-      <div className="fixed bottom-16 right-4 z-30 md:bottom-4 md:right-4">
-        <button
-          onClick={handleToggleDemo}
-          disabled={isActivating}
-          className={`
-            relative flex items-center justify-center 
-            px-4 py-2 rounded-full shadow-lg 
-            transition-all duration-300 ease-in-out
-            ${isDemoMode 
-              ? 'bg-amber-500 hover:bg-amber-600 text-white' 
-              : 'bg-blue-600 hover:bg-blue-700 text-white'}
-            ${isActivating ? 'opacity-75 cursor-wait' : 'opacity-100 cursor-pointer'}
-          `}
+    <div className="fixed bottom-24 right-4 z-50 demo-mode-toggle flex flex-col items-end">
+      {/* Floating panel */}
+      {(isOpen || isAnimating) && (
+        <div 
+          className={`bg-white rounded-lg shadow-lg p-4 mb-2 w-64 transform transition-all duration-300 ${
+            isOpen 
+              ? 'translate-y-0 opacity-100' 
+              : 'translate-y-4 opacity-0 pointer-events-none'
+          }`}
+          onAnimationEnd={handleAnimationEnd}
         >
-          {isActivating ? (
-            <div className="flex items-center">
-              <svg 
-                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24"
-              >
-                <circle 
-                  className="opacity-25" 
-                  cx="12" 
-                  cy="12" 
-                  r="10" 
-                  stroke="currentColor" 
-                  strokeWidth="4"
-                ></circle>
-                <path 
-                  className="opacity-75" 
-                  fill="currentColor" 
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              <span>Activating Demo...</span>
-            </div>
-          ) : isDemoMode ? (
-            <div className="flex items-center">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 mr-1" 
-                viewBox="0 0 20 20" 
-                fill="currentColor"
-              >
-                <path 
-                  fillRule="evenodd" 
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" 
-                  clipRule="evenodd" 
-                />
-              </svg>
-              <span>Exit Demo Mode</span>
-            </div>
-          ) : (
-            <div className="flex items-center">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 mr-1" 
-                viewBox="0 0 20 20" 
-                fill="currentColor"
-              >
-                <path 
-                  fillRule="evenodd" 
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" 
-                  clipRule="evenodd" 
-                />
-              </svg>
-              <span>Try Demo Mode</span>
-            </div>
-          )}
-        </button>
-      </div>
-      
-      {/* Tooltip that appears when demo mode is active */}
-      {isDemoMode && (
-        <div className="fixed top-0 left-0 right-0 bg-amber-100 border-b border-amber-200 text-amber-800 text-center py-2 shadow-md z-50">
-          <div className="container mx-auto px-4">
-            <p className="text-sm font-medium">
-              <span className="font-bold">Demo Mode Active</span> - You're viewing sample data. 
-              <button 
-                onClick={handleToggleDemo}
-                className="ml-3 underline hover:text-amber-900"
-              >
-                Exit Demo
-              </button>
+          <div className="mb-3">
+            <h3 className="text-sm font-medium text-gray-900">Demo Mode</h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Toggle demo mode to explore features without authentication.
             </p>
           </div>
+          
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm text-gray-700">Status:</span>
+            <span 
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                isDemoMode 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-gray-100 text-gray-800'
+              }`}
+            >
+              {isDemoMode ? 'Enabled' : 'Disabled'}
+            </span>
+          </div>
+          
+          <label className="flex items-center cursor-pointer">
+            <div className="relative">
+              <input 
+                type="checkbox" 
+                className="sr-only" 
+                checked={isDemoMode}
+                onChange={handleToggle}
+              />
+              <div 
+                className={`block w-10 h-6 rounded-full transition-colors ${
+                  isDemoMode ? 'bg-blue-600' : 'bg-gray-300'
+                }`}
+              />
+              <div 
+                className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform transform ${
+                  isDemoMode ? 'translate-x-4' : ''
+                }`}
+              />
+            </div>
+            <div className="ml-3 text-sm font-medium text-gray-700">
+              {isDemoMode ? 'On' : 'Off'}
+            </div>
+          </label>
+          
+          {isDemoMode && (
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <h4 className="text-xs font-medium text-gray-900 mb-1">Active Demo Features:</h4>
+              <ul className="text-xs text-gray-600 space-y-1 pl-2">
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-1">•</span> Test subscriptions
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-1">•</span> Simulated payment processing
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-1">•</span> Sample reports & analytics
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       )}
+      
+      {/* Toggle button */}
+      <button
+        onClick={togglePanel}
+        className={`rounded-full p-2.5 shadow-lg flex items-center justify-center transition-colors ${
+          isDemoMode 
+            ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+            : 'bg-white hover:bg-gray-100 text-gray-700'
+        }`}
+        aria-label="Toggle demo mode"
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          className="h-5 w-5" 
+          viewBox="0 0 20 20" 
+          fill="currentColor"
+        >
+          <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+        </svg>
+      </button>
     </div>
   );
 }
