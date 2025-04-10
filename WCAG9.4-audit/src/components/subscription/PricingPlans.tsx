@@ -185,11 +185,17 @@ export function PricingPlans({ onSubscribe }: PricingPlansProps) {
               <p className="mt-2 text-sm text-gray-500">{plan.description}</p>
               <p className="mt-8">
                 <span className="text-4xl font-extrabold text-gray-900">
-                  ${billingInterval === 'monthly' ? plan.priceMonthly : plan.priceYearly}
+                  ${billingInterval === 'monthly' 
+                      ? plan.priceMonthly 
+                      : billingInterval === 'yearly'
+                        ? plan.priceYearly
+                        : plan.priceOnetime}
                 </span>
-                <span className="text-base font-medium text-gray-500">
-                  /{billingInterval === 'monthly' ? 'mo' : 'yr'}
-                </span>
+                {billingInterval !== 'onetime' && (
+                  <span className="text-base font-medium text-gray-500">
+                    /{billingInterval === 'monthly' ? 'mo' : 'yr'}
+                  </span>
+                )}
               </p>
               
               <button
