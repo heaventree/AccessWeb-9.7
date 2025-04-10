@@ -1,395 +1,141 @@
-/**
- * WCAG Compliance Platform Roadmap
- * 
- * This file maintains the complete feature roadmap for the WCAG compliance platform,
- * organized by priority and implementation status.
- */
+import { RoadmapFeature, FeatureStatus, RoadmapFeatureSource } from '../types/feedback';
+import { v4 as uuidv4 } from 'uuid';
 
-export type FeatureStatus = 'planned' | 'in-progress' | 'completed' | 'deferred';
-
-export type RoadmapFeatureSource = 'feedback' | 'manual' | 'system';
-
-export interface RoadmapFeature {
-  id: string;
-  title: string;
-  description: string;
-  status: FeatureStatus;
-  priority: number; // 1 (highest) to 5 (lowest)
-  category: 'core' | 'ui' | 'reporting' | 'integration' | 'analytics';
-  source?: RoadmapFeatureSource;
-  dependencies?: string[]; // IDs of features this depends on
-  estimatedCompletionDate?: string;
-  completedDate?: string;
-}
-
-// Function to add a new roadmap feature
-export function addRoadmapFeature(feature: RoadmapFeature) {
-  roadmapFeatures.push(feature);
-  
-  // Dispatch event
-  const event = new CustomEvent('roadmapFeaturesUpdated', { detail: roadmapFeatures });
-  window.dispatchEvent(event);
-  
-  return feature.id;
-}
-
-// Function to add user feedback as a roadmap feature
-export function addFeedbackAsRoadmapFeature(
-  title: string,
-  description: string,
-  category: RoadmapFeature['category'] = 'ui',
-  priority: number = 3
-) {
-  const newFeature: RoadmapFeature = {
-    id: `feature-feedback-${Date.now()}`,
-    title,
-    description,
-    status: 'planned',
-    priority,
-    category,
-    source: 'feedback'
-  };
-  
-  addRoadmapFeature(newFeature);
-  return newFeature.id;
-}
-
-export const roadmapFeatures: RoadmapFeature[] = [
-  // Core functionality - Already implemented
+// Default roadmap features
+const defaultRoadmapFeatures: RoadmapFeature[] = [
   {
-    id: 'url-scanner',
-    title: 'URL Scanner',
-    description: 'Scan a URL for WCAG compliance issues and display results',
-    status: 'completed',
+    id: '1',
+    title: 'Keyboard Navigation Enhancement',
+    description: 'Improve keyboard navigation throughout the application following WCAG 2.2 requirements.',
+    status: FeatureStatus.IN_PROGRESS,
+    category: 'accessibility',
     priority: 1,
-    category: 'core',
-    completedDate: '2025-03-24'
+    createdAt: new Date('2023-08-15').toISOString(),
+    updatedAt: new Date('2023-09-01').toISOString(),
+    estimatedCompletion: new Date('2023-10-15').toISOString(),
+    source: RoadmapFeatureSource.FEEDBACK,
+    feedbackIds: ['feedback-123', 'feedback-456']
   },
   {
-    id: 'accessible-ui',
-    title: 'Accessible UI Components',
-    description: 'Build accessible UI components using shadcn and tailwind',
-    status: 'completed',
-    priority: 1,
-    category: 'ui',
-    completedDate: '2025-03-24'
-  },
-  
-  // Next priority features - User Authentication System
-  {
-    id: 'user-authentication',
-    title: 'User Authentication System',
-    description: 'Complete user authentication system with signup, login, and account management',
-    status: 'planned',
-    priority: 1,
-    category: 'core',
-    dependencies: []
-  },
-  {
-    id: 'email-verification',
-    title: 'Email Verification System',
-    description: 'Email verification flow for new user signups with secure token handling',
-    status: 'planned',
-    priority: 1,
-    category: 'core',
-    dependencies: ['user-authentication']
-  },
-  {
-    id: 'password-recovery',
-    title: 'Password Recovery System',
-    description: 'Secure password reset and recovery workflow with email verification',
-    status: 'planned',
-    priority: 1,
-    category: 'core',
-    dependencies: ['user-authentication', 'email-verification']
-  },
-  {
-    id: 'oauth-integration',
-    title: 'OAuth Integration',
-    description: 'Support for third-party authentication via OAuth (Google, GitHub, etc.)',
-    status: 'planned',
+    id: '2',
+    title: 'High Contrast Mode',
+    description: 'Add high contrast mode for users with visual impairments.',
+    status: FeatureStatus.PLANNED,
+    category: 'accessibility',
     priority: 2,
-    category: 'integration',
-    dependencies: ['user-authentication']
+    createdAt: new Date('2023-08-20').toISOString(),
+    estimatedCompletion: new Date('2023-11-01').toISOString(),
+    dependencies: ['1'],
+    source: RoadmapFeatureSource.MANUAL
   },
   {
-    id: 'external-api-security',
-    title: 'External Integration Security',
-    description: 'Secure API communication for WordPress, Shopify, and custom site integrations',
-    status: 'planned',
-    priority: 2,
-    category: 'integration',
-    dependencies: ['user-authentication', 'api-integrations']
-  },
-  {
-    id: 'stripe-payments',
-    title: 'Stripe Payment Processing',
-    description: 'Integration with Stripe for secure payment processing and subscription management',
-    status: 'planned',
-    priority: 1,
-    category: 'core',
-    dependencies: ['user-authentication']
-  },
-  {
-    id: 'subscription-management',
-    title: 'Subscription Management System',
-    description: 'User interface for managing subscription plans, billing, and payment methods',
-    status: 'planned',
-    priority: 2,
-    category: 'ui',
-    dependencies: ['stripe-payments', 'user-dashboard']
-  },
-  
-  // Other priority features
-  {
-    id: 'compliance-badges',
-    title: 'WCAG Compliance Badges',
-    description: 'Generate embeddable compliance badges for sites that pass all critical tests',
-    status: 'in-progress',
-    priority: 2,
-    category: 'reporting',
-    dependencies: ['url-scanner']
-  },
-  {
-    id: 'user-dashboard',
-    title: 'User Dashboard',
-    description: 'Dashboard displaying scan history, issues, and analytics for users',
-    status: 'planned',
-    priority: 2,
-    category: 'ui',
-    dependencies: ['url-scanner']
-  },
-  {
-    id: 'admin-dashboard',
-    title: 'Admin Dashboard',
-    description: 'Administrative dashboard for managing users, subscriptions, and system settings',
-    status: 'planned',
-    priority: 2,
-    category: 'ui',
-    dependencies: ['user-dashboard']
-  },
-  {
-    id: 'ai-fixes',
-    title: 'AI-Generated CSS Fixes',
-    description: 'Use AI to generate CSS fixes for detected accessibility issues',
-    status: 'planned',
-    priority: 2,
-    category: 'core',
-    dependencies: ['url-scanner']
-  },
-  {
-    id: 'api-integrations',
-    title: 'API Integrations',
-    description: 'Implement API connections to push changes directly to client sites',
-    status: 'planned',
-    priority: 2,
-    category: 'integration',
-    dependencies: ['ai-fixes']
-  },
-  {
-    id: 'multi-region',
-    title: 'Multi-Region Compliance',
-    description: 'Support for multiple geographic accessibility standards (EU, UK, USA, Canada, Japan, Australia)',
-    status: 'planned',
-    priority: 2,
-    category: 'core',
-    dependencies: ['url-scanner']
-  },
-  
-  // Features from the task list
-  {
-    id: 'micro-animations',
-    title: 'Micro-animations for Highlighting Improvements',
-    description: 'Add subtle animations to highlight accessibility improvements and fixes',
-    status: 'planned',
+    id: '3',
+    title: 'Screen Reader Optimization',
+    description: 'Optimize application for screen readers with proper ARIA attributes and semantic HTML.',
+    status: FeatureStatus.PLANNED,
+    category: 'accessibility',
     priority: 3,
-    category: 'ui',
-    dependencies: ['ai-fixes']
-  },
-  {
-    id: 'color-blindness-sim',
-    title: 'Real-time Color Blindness Simulation Preview',
-    description: 'Provide real-time previews of how sites appear to users with different types of color blindness',
-    status: 'planned',
-    priority: 3,
-    category: 'ui',
-    dependencies: ['url-scanner']
-  },
-  {
-    id: 'emoji-rating',
-    title: 'Emoji-based Accessibility Difficulty Rating System',
-    description: 'Implement an intuitive emoji-based rating system for accessibility difficulty',
-    status: 'planned',
-    priority: 3,
-    category: 'ui',
-    dependencies: ['url-scanner']
-  },
-  {
-    id: 'pdf-generator',
-    title: 'One-click Accessibility Report PDF Generator',
-    description: 'Generate comprehensive PDF reports of accessibility scans with a single click',
-    status: 'planned',
-    priority: 3,
-    category: 'reporting',
-    dependencies: ['url-scanner']
-  },
-  {
-    id: 'learning-playground',
-    title: 'Interactive Accessibility Learning Playground',
-    description: 'Create an interactive learning environment with gamified challenges for accessibility education',
-    status: 'planned',
-    priority: 4,
-    category: 'ui',
-    dependencies: ['url-scanner']
-  },
-  {
-    id: 'bulk-scanning',
-    title: 'Bulk Site Scanning for Enterprise Clients',
-    description: 'Enable enterprise clients to scan multiple sites or pages in a single operation',
-    status: 'planned',
-    priority: 3,
-    category: 'core',
-    dependencies: ['url-scanner']
-  },
-  {
-    id: 'advanced-visualization',
-    title: 'Advanced Visualization of Accessibility Issues',
-    description: 'Develop sophisticated visualizations to better understand and communicate accessibility issues',
-    status: 'planned',
-    priority: 4,
-    category: 'ui',
-    dependencies: ['url-scanner']
-  },
-  {
-    id: 'cms-plugins',
-    title: 'WordPress and Shopify Plugins',
-    description: 'Create plugins for popular CMS platforms to integrate accessibility scanning and fixes',
-    status: 'planned',
-    priority: 3,
-    category: 'integration',
-    dependencies: ['ai-fixes', 'api-integrations']
-  },
-  {
-    id: 'white-label',
-    title: 'White-label Reporting Options',
-    description: 'Allow agencies and enterprises to white-label accessibility reports',
-    status: 'planned',
-    priority: 4,
-    category: 'reporting',
-    dependencies: ['pdf-generator']
-  },
-  {
-    id: 'team-collab',
-    title: 'Team Collaboration Features',
-    description: 'Enable teams to collaborate on fixing accessibility issues with comments and assignments',
-    status: 'planned',
-    priority: 4,
-    category: 'ui',
-    dependencies: ['user-dashboard']
-  },
-  {
-    id: 'scheduled-scanning',
-    title: 'Scheduled Automated Scanning',
-    description: 'Set up regular automated scans to monitor accessibility compliance over time',
-    status: 'planned',
-    priority: 3,
-    category: 'core',
-    dependencies: ['url-scanner']
-  },
-  {
-    id: 'badge-customization',
-    title: 'Advanced Customization of WCAG Badges',
-    description: 'Allow users to customize the appearance and content of compliance badges',
-    status: 'planned',
-    priority: 4,
-    category: 'ui',
-    dependencies: ['compliance-badges']
-  },
-  {
-    id: 'user-analytics',
-    title: 'Enhanced User Analytics Dashboard',
-    description: 'Provide detailed analytics on accessibility improvements and user behavior',
-    status: 'planned',
-    priority: 4,
-    category: 'analytics',
-    dependencies: ['user-dashboard']
-  },
-  {
-    id: 'postgres-integration',
-    title: 'PostgreSQL Database Integration',
-    description: 'Enhance database integration for better performance and data management',
-    status: 'planned',
-    priority: 3,
-    category: 'core',
-    dependencies: []
-  },
-  
-  // Add section identifier features we've implemented
-  {
-    id: 'section-identifiers',
-    title: 'Section Identifiers System',
-    description: 'Implement visual identifiers for page sections to help with accessibility testing and debugging',
-    status: 'completed',
-    priority: 2,
-    category: 'ui',
-    completedDate: '2025-04-01'
-  },
-  {
-    id: 'section-id-persistence',
-    title: 'Section Identifiers Persistence',
-    description: 'Ensure section identifiers maintain consistent IDs across page navigation',
-    status: 'completed',
-    priority: 2,
-    category: 'ui',
-    dependencies: ['section-identifiers'],
-    completedDate: '2025-04-01'
-  },
-  {
-    id: 'wcag-color-palette',
-    title: 'WCAG 2.2 Color Palette Generator',
-    description: 'Updated color palette generator supporting WCAG 2.2 standards with enhanced visual hierarchy',
-    status: 'completed',
-    priority: 2,
-    category: 'ui',
-    completedDate: '2025-04-01'
+    createdAt: new Date('2023-08-25').toISOString(),
+    estimatedCompletion: new Date('2023-12-01').toISOString(),
+    source: RoadmapFeatureSource.MANUAL
   }
 ];
 
-/**
- * Get features by status
- */
+// Local storage key
+const STORAGE_KEY = 'roadmapFeatures';
+
+// Load roadmap features from storage or use defaults
+export function getRoadmapFeatures(): RoadmapFeature[] {
+  try {
+    const storedFeatures = localStorage.getItem(STORAGE_KEY);
+    if (storedFeatures) {
+      return JSON.parse(storedFeatures);
+    }
+    return defaultRoadmapFeatures;
+  } catch (error) {
+    console.error('Error loading roadmap features:', error);
+    return defaultRoadmapFeatures;
+  }
+}
+
+// Save roadmap features to storage
+export function saveRoadmapFeatures(features: RoadmapFeature[]): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(features));
+}
+
+// Add a new roadmap feature
+export function addRoadmapFeature(feature: Omit<RoadmapFeature, 'id' | 'createdAt'>): RoadmapFeature {
+  const newFeature: RoadmapFeature = {
+    ...feature,
+    id: uuidv4(),
+    createdAt: new Date().toISOString()
+  };
+
+  const currentFeatures = getRoadmapFeatures();
+  saveRoadmapFeatures([...currentFeatures, newFeature]);
+  
+  return newFeature;
+}
+
+// Update an existing roadmap feature
+export function updateRoadmapFeature(id: string, updates: Partial<RoadmapFeature>): RoadmapFeature | null {
+  const features = getRoadmapFeatures();
+  const featureIndex = features.findIndex(feature => feature.id === id);
+  
+  if (featureIndex === -1) return null;
+  
+  const updatedFeature: RoadmapFeature = {
+    ...features[featureIndex],
+    ...updates,
+    updatedAt: new Date().toISOString()
+  };
+  
+  features[featureIndex] = updatedFeature;
+  saveRoadmapFeatures(features);
+  
+  return updatedFeature;
+}
+
+// Delete a roadmap feature
+export function deleteRoadmapFeature(id: string): boolean {
+  const features = getRoadmapFeatures();
+  const filteredFeatures = features.filter(feature => feature.id !== id);
+  
+  if (filteredFeatures.length === features.length) return false;
+  
+  saveRoadmapFeatures(filteredFeatures);
+  return true;
+}
+
+// Utility functions for filtering and analysis
 export function getFeaturesByStatus(status: FeatureStatus): RoadmapFeature[] {
-  return roadmapFeatures.filter(feature => feature.status === status)
-    .sort((a, b) => a.priority - b.priority);
+  return getRoadmapFeatures().filter(feature => feature.status === status);
 }
 
-/**
- * Get features by category
- */
-export function getFeaturesByCategory(category: RoadmapFeature['category']): RoadmapFeature[] {
-  return roadmapFeatures.filter(feature => feature.category === category)
-    .sort((a, b) => a.priority - b.priority);
+export function getFeaturesByCategory(category: string): RoadmapFeature[] {
+  return getRoadmapFeatures().filter(feature => feature.category === category);
 }
 
-/**
- * Get next features to implement based on priority, dependencies, and status
- */
-export function getNextFeatures(count: number = 3): RoadmapFeature[] {
-  // Get all planned features
-  const plannedFeatures = roadmapFeatures.filter(f => f.status === 'planned');
+export function getFeaturesBySource(source: RoadmapFeatureSource): RoadmapFeature[] {
+  return getRoadmapFeatures().filter(feature => feature.source === source);
+}
+
+export function getNextFeatures(limit: number = 5): RoadmapFeature[] {
+  return getRoadmapFeatures()
+    .filter(feature => feature.status === FeatureStatus.PLANNED)
+    .sort((a, b) => a.priority - b.priority)
+    .slice(0, limit);
+}
+
+export function getFeatureCategories(): string[] {
+  const features = getRoadmapFeatures();
+  const categories = new Set<string>();
   
-  // Check which ones have all dependencies satisfied
-  const completedFeatureIds = roadmapFeatures
-    .filter(f => f.status === 'completed')
-    .map(f => f.id);
-  
-  const implementableFeatures = plannedFeatures.filter(feature => {
-    if (!feature.dependencies || feature.dependencies.length === 0) return true;
-    return feature.dependencies.every(depId => completedFeatureIds.includes(depId));
+  features.forEach(feature => {
+    if (feature.category) {
+      categories.add(feature.category);
+    }
   });
   
-  // Sort by priority and return the requested number
-  return implementableFeatures
-    .sort((a, b) => a.priority - b.priority)
-    .slice(0, count);
+  return Array.from(categories);
 }

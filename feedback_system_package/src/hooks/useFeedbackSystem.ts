@@ -1,115 +1,131 @@
-import { useState, useEffect, useRef } from 'react';
-import { FeedbackItem, FeedbackCategory } from '../types/feedback';
+import { useState, useEffect, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { 
+  FeedbackCategory, 
+  FeedbackItem, 
+  FeedbackStatus, 
+  Position,
+  CreateFeedbackPayload
+} from '../types/feedback';
+import { findElementByPath } from '../utils/elementFinder';
 
-// Hook to manage feedback items with localStorage persistence
-export function useFeedbackSystem(currentPage: string) {
-  // State for the feedback system
+const STORAGE_KEY = 'feedbackItems';
+
+// Custom hook to manage feedback items
+export function useFeedbackSystem() {
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
-  const [filteredItems, setFilteredItems] = useState<FeedbackItem[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<FeedbackCategory>('debug');
-  
-  // Load feedback items from localStorage on mount
+  const [isActive, setIsActive] = useState(false);
+  const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
+  const [currentCategory, setCurrentCategory] = useState<FeedbackCategory>(FeedbackCategory.USABILITY);
+
+  // Load feedback items from storage on initial render
   useEffect(() => {
-    try {
-      const savedItems = localStorage.getItem('feedbackItems');
-      if (savedItems) {
-        setFeedbackItems(JSON.parse(savedItems));
+    const storedItems = localStorage.getItem(STORAGE_KEY);
+    if (storedItems) {
+      try {
+        setFeedbackItems(JSON.parse(storedItems));
+      } catch (error) {
+        console.error('Error parsing stored feedback items:', error);
       }
-    } catch (error) {
-      console.error('Failed to load feedback items:', error);
     }
   }, []);
-  
-  // Filter items for the current page or update the data structure if needed
+
+  // Save feedback items to storage whenever they change
   useEffect(() => {
-    // Ensure all items have a page property (for backward compatibility)
-    const updatedItems = feedbackItems.map(item => {
-      if (!item.page) {
-        return { ...item, page: '/' };  // Default to homepage if no page info
-      }
-      return item;
-    });
-    
-    if (JSON.stringify(updatedItems) !== JSON.stringify(feedbackItems)) {
-      setFeedbackItems(updatedItems);
-    }
-    
-    // Filter items to only show those for the current page
-    const pageItems = updatedItems.filter(item => item.page === currentPage);
-    setFilteredItems(pageItems);
-  }, [feedbackItems, currentPage]);
-  
-  // Save feedback items to localStorage when they change
-  useEffect(() => {
-    try {
-      localStorage.setItem('feedbackItems', JSON.stringify(feedbackItems));
-      // Dispatch event for any subscribers
-      const event = new CustomEvent('feedbackItemsUpdated', { detail: feedbackItems });
-      window.dispatchEvent(event);
-    } catch (error) {
-      console.error('Failed to save feedback items:', error);
-    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(feedbackItems));
   }, [feedbackItems]);
-  
-  // Add a new feedback item
-  const addFeedbackItem = (newItem: Omit<FeedbackItem, 'id' | 'createdAt' | 'status'>) => {
-    const completeItem: FeedbackItem = {
-      ...newItem,
-      id: `feedback-${Date.now()}`,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-      page: currentPage
+
+  // Update positions of feedback markers when page scrolls
+  useEffect(() => {
+    const updateMarkerPositions = () => {
+      setFeedbackItems(prevItems => 
+        prevItems.map(item => {
+          const element = findElementByPath(item.elementPath);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            return {
+              ...item,
+              position: {
+                x: rect.left + window.scrollX + (rect.width / 2),
+                y: rect.top + window.scrollY + (rect.height / 2)
+              }
+            };
+          }
+          return item;
+        })
+      );
     };
-    
-    setFeedbackItems(prev => [...prev, completeItem]);
-    return completeItem;
-  };
-  
-  // Update the status of a feedback item (cycles through statuses)
-  const toggleFeedbackStatus = (id: string) => {
-    setFeedbackItems(prevItems => 
-      prevItems.map(item => {
-        if (item.id === id) {
-          const nextStatus = {
-            pending: 'inProgress',
-            inProgress: 'resolved',
-            resolved: 'pending'
-          }[item.status] as 'pending' | 'inProgress' | 'resolved';
-          
-          const updatedItem = { ...item, status: nextStatus };
-          
-          // Dispatch event for status change
-          const event = new CustomEvent('feedbackUpdated', { detail: updatedItem });
-          window.dispatchEvent(event);
-          
-          return updatedItem;
-        }
-        return item;
-      })
-    );
-  };
-  
-  // Delete a feedback item
-  const deleteFeedbackItem = (id: string) => {
-    setFeedbackItems(prevItems => prevItems.filter(item => item.id !== id));
-  };
-  
-  // Reset all feedback
-  const resetAllFeedback = () => {
-    if (window.confirm('Are you sure you want to reset all feedback?')) {
-      setFeedbackItems([]);
-      localStorage.removeItem('feedbackItems');
+
+    window.addEventListener('scroll', updateMarkerPositions);
+    window.addEventListener('resize', updateMarkerPositions);
+
+    return () => {
+      window.removeEventListener('scroll', updateMarkerPositions);
+      window.removeEventListener('resize', updateMarkerPositions);
+    };
+  }, []);
+
+  // Toggle feedback mode
+  const toggleFeedbackMode = useCallback(() => {
+    setIsActive(prev => !prev);
+    if (selectedElement) {
+      setSelectedElement(null);
     }
-  };
+  }, [selectedElement]);
+
+  // Add new feedback item
+  const addFeedbackItem = useCallback((payload: CreateFeedbackPayload) => {
+    const newItem: FeedbackItem = {
+      id: uuidv4(),
+      elementPath: payload.elementPath,
+      position: payload.position,
+      comment: payload.comment,
+      category: payload.category,
+      status: FeedbackStatus.PENDING,
+      createdAt: new Date().toISOString(),
+      page: payload.page
+    };
+
+    setFeedbackItems(prev => [...prev, newItem]);
+    return newItem;
+  }, []);
+
+  // Update feedback item status
+  const updateFeedbackStatus = useCallback((id: string, status: FeedbackStatus) => {
+    setFeedbackItems(prevItems => 
+      prevItems.map(item => 
+        item.id === id 
+          ? { 
+              ...item, 
+              status,
+              updatedAt: new Date().toISOString()
+            } 
+          : item
+      )
+    );
+  }, []);
+
+  // Remove feedback item
+  const removeFeedbackItem = useCallback((id: string) => {
+    setFeedbackItems(prev => prev.filter(item => item.id !== id));
+  }, []);
+
+  // Get feedback items for the current page
+  const getFeedbackItemsForPage = useCallback((page: string) => {
+    return feedbackItems.filter(item => item.page === page);
+  }, [feedbackItems]);
 
   return {
     feedbackItems,
-    filteredItems,
-    selectedCategory,
-    setSelectedCategory,
+    isActive,
+    selectedElement,
+    currentCategory,
+    setSelectedElement,
+    setCurrentCategory,
+    toggleFeedbackMode,
     addFeedbackItem,
-    toggleFeedbackStatus,
-    deleteFeedbackItem,
-    resetAllFeedback
+    updateFeedbackStatus,
+    removeFeedbackItem,
+    getFeedbackItemsForPage
   };
 }

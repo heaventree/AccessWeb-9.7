@@ -1,309 +1,230 @@
+import React, { useState, useEffect } from 'react';
+import { HeadingSection, Card, CardContent, Progress } from '../../components/ui';
+import { 
+  DebugItemCategory, 
+  DebugItemStatus, 
+  FeatureStatus 
+} from '../../types/feedback';
+import { getDebugItems, getItemsByCategory } from '../../data/debugData';
+import { getRoadmapFeatures, getFeaturesByCategory } from '../../data/roadmapData';
 
-import { Card, HeadingSection, Progress } from '../../components/ui';
+// Category colors
+const categoryColors: Record<string, string> = {
+  accessibility: 'bg-blue-600 dark:bg-blue-500',
+  functionality: 'bg-green-600 dark:bg-green-500',
+  performance: 'bg-purple-600 dark:bg-purple-500',
+  security: 'bg-red-600 dark:bg-red-500',
+  visual: 'bg-orange-600 dark:bg-orange-500',
+  content: 'bg-teal-600 dark:bg-teal-500',
+  other: 'bg-gray-600 dark:bg-gray-500'
+};
 
-// Type definitions for our completion data
 interface CategoryCompletion {
-  name: string;
-  percentage: number;
-  color: string;
+  category: string;
+  bugsFixed: number;
+  totalBugs: number;
+  featuresCompleted: number;
+  totalFeatures: number;
+  overallPercentage: number;
 }
 
-interface FeatureStatus {
-  name: string;
-  percentage: number;
-  status: 'completed' | 'in-progress' | 'not-started' | 'critical';
-}
+// Helper to convert category names to friendly format
+const formatCategoryName = (category: string): string => {
+  return category.charAt(0).toUpperCase() + category.slice(1);
+};
 
-// Data for the completion charts
-const categoryCompletions: CategoryCompletion[] = [
-  { name: 'Accessibility Compliance', percentage: 75, color: '#ef4444' },
-  { name: 'Core Features', percentage: 65, color: '#4ade80' },
-  { name: 'UI/UX Implementation', percentage: 70, color: '#3b82f6' },
-  { name: 'Backend Systems', percentage: 50, color: '#f97316' },
-  { name: 'Integrations', percentage: 45, color: '#8b5cf6' },
-  { name: 'Documentation', percentage: 75, color: '#14b8a6' },
-  { name: 'Testing & Bug Fixes', percentage: 55, color: '#f43f5e' },
-];
+const CompletionDashboard: React.FC = () => {
+  const [categoryCompletions, setCategoryCompletions] = useState<CategoryCompletion[]>([]);
+  const [overallCompletion, setOverallCompletion] = useState(0);
 
-// Data for feature completion status
-const featureCompletions: FeatureStatus[] = [
-  { name: 'PDF Accessibility Testing', percentage: 100, status: 'completed' },
-  { name: 'CORS Issues Resolution', percentage: 100, status: 'completed' },
-  { name: 'Error Reporting & Logging', percentage: 100, status: 'completed' },
-  { name: 'Code Quality Improvements', percentage: 100, status: 'completed' },
-  { name: 'Article Content Enhancements', percentage: 100, status: 'completed' },
-  { name: 'Section Identifiers System', percentage: 100, status: 'completed' },
-  { name: 'Color Palette Generator', percentage: 100, status: 'completed' },
-  { name: 'User Authentication System', percentage: 70, status: 'in-progress' },
-  { name: 'Payment Processing', percentage: 60, status: 'in-progress' },
-  { name: 'External Integration Security', percentage: 50, status: 'in-progress' },
-  { name: 'Media Accessibility Testing', percentage: 40, status: 'in-progress' },
-  { name: 'Accessibility Compliance - WCAG 2.2', percentage: 50, status: 'in-progress' },
-  { name: 'Admin Dashboard Stats', percentage: 50, status: 'in-progress' },
-  { name: 'Monitoring System', percentage: 40, status: 'in-progress' },
-  { name: 'Subscription System', percentage: 30, status: 'critical' },
-  { name: 'Usage Alerts System', percentage: 20, status: 'critical' },
-  { name: 'Integration Pages Design', percentage: 60, status: 'in-progress' },
-  { name: 'Database Migrations', percentage: 25, status: 'critical' },
-  { name: 'Policy Management', percentage: 30, status: 'critical' },
-  { name: 'Voice-guided Walkthrough', percentage: 0, status: 'not-started' },
-  { name: 'WCAG Compliance Export', percentage: 0, status: 'not-started' },
-  { name: 'Custom CSS-Based Fixes', percentage: 0, status: 'not-started' },
-];
+  useEffect(() => {
+    calculateCompletions();
+  }, []);
 
-// Critical issues list
-const criticalIssues = [
-  {
-    title: 'Accessibility Compliance Issues',
-    description: 'Several components not meeting WCAG 2.2 standards - TOP PRIORITY, BEING ADDRESSED'
-  },
-  {
-    title: 'Database Migration Issues',
-    description: 'Migrations failing with column name errors and policy conflicts'
-  },
-  {
-    title: 'Subscription System Issues',
-    description: 'Missing RPC functions and tables for subscription management'
-  },
-  {
-    title: 'Authentication Implementation',
-    description: 'Security concerns due to authentication bypass'
-  },
-  {
-    title: 'Policy Conflicts',
-    description: 'Policy creation failing due to existing policies'
-  }
-];
+  const calculateCompletions = () => {
+    const debugItems = getDebugItems();
+    const roadmapFeatures = getRoadmapFeatures();
+    
+    // Get all unique categories
+    const categorySet = new Set<string>();
+    
+    debugItems.forEach(item => categorySet.add(item.category));
+    roadmapFeatures.forEach(feature => {
+      if (feature.category) categorySet.add(feature.category);
+    });
+    
+    // Calculate completion for each category
+    const completions: CategoryCompletion[] = Array.from(categorySet).map(category => {
+      const categoryBugs = debugItems.filter(item => item.category === category);
+      const categoryFeatures = roadmapFeatures.filter(feature => feature.category === category);
+      
+      const fixedBugs = categoryBugs.filter(
+        bug => bug.status === DebugItemStatus.RESOLVED
+      ).length;
+      
+      const completedFeatures = categoryFeatures.filter(
+        feature => feature.status === FeatureStatus.COMPLETED
+      ).length;
+      
+      const bugPercentage = categoryBugs.length > 0 
+        ? (fixedBugs / categoryBugs.length) * 100 
+        : 100;
+        
+      const featurePercentage = categoryFeatures.length > 0 
+        ? (completedFeatures / categoryFeatures.length) * 100 
+        : 100;
+      
+      // Calculate weighted average (bugs 40%, features 60%)
+      const overallPercentage = Math.round((bugPercentage * 0.4) + (featurePercentage * 0.6));
+      
+      return {
+        category,
+        bugsFixed: fixedBugs,
+        totalBugs: categoryBugs.length,
+        featuresCompleted: completedFeatures,
+        totalFeatures: categoryFeatures.length,
+        overallPercentage
+      };
+    });
+    
+    // Sort by completion percentage (descending)
+    completions.sort((a, b) => b.overallPercentage - a.overallPercentage);
+    setCategoryCompletions(completions);
+    
+    // Calculate overall completion
+    const totalBugs = debugItems.length;
+    const fixedBugs = debugItems.filter(
+      bug => bug.status === DebugItemStatus.RESOLVED
+    ).length;
+    
+    const totalFeatures = roadmapFeatures.length;
+    const completedFeatures = roadmapFeatures.filter(
+      feature => feature.status === FeatureStatus.COMPLETED
+    ).length;
+    
+    const bugsPercentage = totalBugs > 0 ? (fixedBugs / totalBugs) * 100 : 100;
+    const featuresPercentage = totalFeatures > 0 ? (completedFeatures / totalFeatures) * 100 : 100;
+    
+    // Weighted average
+    const overall = Math.round((bugsPercentage * 0.4) + (featuresPercentage * 0.6));
+    setOverallCompletion(overall);
+  };
 
-export default function CompletionDashboard() {
-  // Calculate overall project completion
-  const overallCompletion = Math.round(
-    categoryCompletions.reduce((sum, category) => sum + category.percentage, 0) / categoryCompletions.length
-  );
-  
-  // Count features by status
-  const completedCount = featureCompletions.filter(f => f.status === 'completed').length;
-  const inProgressCount = featureCompletions.filter(f => f.status === 'in-progress').length;
-  const criticalCount = featureCompletions.filter(f => f.status === 'critical').length;
-  // const notStartedCount = featureCompletions.filter(f => f.status === 'not-started').length;
-  
   return (
-    <div className="container mx-auto py-6 px-4">
+    <div className="container mx-auto px-4 py-8">
       <HeadingSection 
-        title="Project Completion Dashboard" 
-        description="Track the overall progress and status of WCAG 9.4 Audit Tool development." 
-        className="mb-8"
+        title="Completion Dashboard" 
+        description="Track the overall progress of your project across different categories." 
       />
       
-      {/* Overall Completion */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="col-span-1 flex flex-col items-center justify-center p-6">
-          <h3 className="text-lg font-medium mb-2">Overall Completion</h3>
-          <div className="relative flex items-center justify-center w-32 h-32">
-            <svg className="w-full h-full" viewBox="0 0 100 100" aria-hidden="true">
-              <circle 
-                className="text-gray-200" 
-                strokeWidth="10" 
-                stroke="currentColor" 
-                fill="transparent" 
-                r="40" 
-                cx="50" 
-                cy="50" 
-              />
-              <circle 
-                className="text-blue-600" 
-                strokeWidth="10" 
-                strokeDasharray={250.8} 
-                strokeDashoffset={250.8 - (overallCompletion / 100) * 250.8} 
-                strokeLinecap="round" 
-                stroke="currentColor" 
-                fill="transparent" 
-                r="40" 
-                cx="50" 
-                cy="50" 
-              />
-            </svg>
-            <span className="absolute text-3xl font-semibold">{overallCompletion}%</span>
+      {/* Overall progress */}
+      <Card className="mb-8">
+        <CardContent className="pt-6">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-xl font-bold">Overall Project Completion</h3>
+            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">{overallCompletion}%</span>
           </div>
-        </Card>
-        
-        <Card className="col-span-1 flex flex-col items-center justify-center p-6 bg-green-50">
-          <div className="flex items-center mb-2">
-            <div className="text-green-500 mr-2 text-xl" aria-hidden="true">✓</div>
-            <h3 className="text-lg font-medium" id="completed-features">Completed</h3>
-          </div>
-          <p className="text-4xl font-bold text-green-600" aria-labelledby="completed-features">{completedCount}</p>
-          <p className="text-sm text-gray-500 mt-2">Features</p>
-        </Card>
-        
-        <Card className="col-span-1 flex flex-col items-center justify-center p-6 bg-blue-50">
-          <div className="flex items-center mb-2">
-            <div className="text-blue-500 mr-2 text-xl" aria-hidden="true">⏱</div>
-            <h3 className="text-lg font-medium" id="in-progress-features">In Progress</h3>
-          </div>
-          <p className="text-4xl font-bold text-blue-600" aria-labelledby="in-progress-features">{inProgressCount}</p>
-          <p className="text-sm text-gray-500 mt-2">Features</p>
-        </Card>
-        
-        <Card className="col-span-1 flex flex-col items-center justify-center p-6 bg-red-50">
-          <div className="flex items-center mb-2">
-            <div className="text-red-500 mr-2 text-xl" aria-hidden="true">⚠</div>
-            <h3 className="text-lg font-medium" id="critical-features">Critical Issues</h3>
-          </div>
-          <p className="text-4xl font-bold text-red-600" aria-labelledby="critical-features">{criticalCount}</p>
-          <p className="text-sm text-gray-500 mt-2">Features</p>
-        </Card>
-      </div>
+          <Progress 
+            value={overallCompletion} 
+            max={100} 
+            className="h-8" 
+            barClassName="bg-gradient-to-r from-blue-500 to-purple-500" 
+          />
+        </CardContent>
+      </Card>
       
-      {/* Category Completion */}
-      <h2 className="text-xl font-semibold mb-4">Category Completion</h2>
+      {/* Category breakdown */}
+      <h3 className="text-xl font-bold mb-4">Category Breakdown</h3>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {categoryCompletions.map((category, index) => (
-          <Card key={index} className="p-4">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="font-medium">{category.name}</h3>
-              <span className="font-semibold">{category.percentage}%</span>
-            </div>
-            <Progress 
-              value={category.percentage} 
-              max={100} 
-              className="h-2 bg-gray-200 rounded-full overflow-hidden"
-              barClassName={`h-full rounded-full`}
-              style={{ backgroundColor: category.color }}
-            />
+        {categoryCompletions.map(category => (
+          <Card key={category.category}>
+            <CardContent className="pt-6">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-lg font-semibold">{formatCategoryName(category.category)}</h4>
+                <span className="text-xl font-semibold">{category.overallPercentage}%</span>
+              </div>
+              
+              <Progress 
+                value={category.overallPercentage} 
+                max={100} 
+                className="h-6 mb-4" 
+                barClassName={categoryColors[category.category] || 'bg-blue-600 dark:bg-blue-500'} 
+              />
+              
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Bugs Fixed</span>
+                    <span className="font-medium">
+                      {category.bugsFixed} / {category.totalBugs}
+                    </span>
+                  </div>
+                  <Progress 
+                    value={category.totalBugs > 0 ? (category.bugsFixed / category.totalBugs) * 100 : 100} 
+                    max={100} 
+                    className="h-2 mt-1" 
+                    barClassName="bg-red-500 dark:bg-red-400" 
+                  />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Features Completed</span>
+                    <span className="font-medium">
+                      {category.featuresCompleted} / {category.totalFeatures}
+                    </span>
+                  </div>
+                  <Progress 
+                    value={category.totalFeatures > 0 ? (category.featuresCompleted / category.totalFeatures) * 100 : 100} 
+                    max={100} 
+                    className="h-2 mt-1" 
+                    barClassName="bg-green-500 dark:bg-green-400" 
+                  />
+                </div>
+              </div>
+            </CardContent>
           </Card>
         ))}
       </div>
       
-      {/* Feature Status */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Feature Status</h2>
-          <Card className="p-4">
-            <div className="space-y-4">
-              {featureCompletions
-                .slice(0, Math.ceil(featureCompletions.length / 2))
-                .map((feature, index) => (
-                <div key={index} className="mb-2">
-                  <div className="flex justify-between items-center mb-1">
-                    <div className="flex items-center">
-                      {feature.status === 'completed' && <span className="text-green-500 mr-2">✓</span>}
-                      {feature.status === 'in-progress' && <span className="text-blue-500 mr-2">⏱</span>}
-                      {feature.status === 'critical' && <span className="text-red-500 mr-2">⚠</span>}
-                      {feature.status === 'not-started' && <span className="text-gray-500 mr-2">□</span>}
-                      <span className={
-                        feature.status === 'critical' ? 'text-red-700' :
-                        feature.status === 'completed' ? 'text-green-700' : ''
-                      }>
-                        {feature.name}
-                      </span>
-                    </div>
-                    <span className="font-semibold">{feature.percentage}%</span>
-                  </div>
-                  <Progress 
-                    value={feature.percentage} 
-                    max={100} 
-                    className="h-2 bg-gray-200 rounded-full overflow-hidden"
-                    barClassName={`h-full rounded-full ${
-                      feature.status === 'completed' ? 'bg-green-500' :
-                      feature.status === 'in-progress' ? 'bg-blue-500' :
-                      feature.status === 'critical' ? 'bg-red-500' : 'bg-gray-400'
-                    }`}
-                  />
-                </div>
-              ))}
+      {/* Key metrics */}
+      <Card>
+        <CardContent className="pt-6">
+          <h3 className="text-xl font-bold mb-4">Key Metrics</h3>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+              <div className="text-sm text-gray-600 dark:text-gray-400">Total Categories</div>
+              <div className="text-2xl font-bold">{categoryCompletions.length}</div>
             </div>
-          </Card>
-        </div>
-        
-        <div>
-          <h2 className="text-xl font-semibold mb-4">&nbsp;</h2>
-          <Card className="p-4">
-            <div className="space-y-4">
-              {featureCompletions
-                .slice(Math.ceil(featureCompletions.length / 2))
-                .map((feature, index) => (
-                <div key={index} className="mb-2">
-                  <div className="flex justify-between items-center mb-1">
-                    <div className="flex items-center">
-                      {feature.status === 'completed' && <span className="text-green-500 mr-2">✓</span>}
-                      {feature.status === 'in-progress' && <span className="text-blue-500 mr-2">⏱</span>}
-                      {feature.status === 'critical' && <span className="text-red-500 mr-2">⚠</span>}
-                      {feature.status === 'not-started' && <span className="text-gray-500 mr-2">□</span>}
-                      <span className={
-                        feature.status === 'critical' ? 'text-red-700' :
-                        feature.status === 'completed' ? 'text-green-700' : ''
-                      }>
-                        {feature.name}
-                      </span>
-                    </div>
-                    <span className="font-semibold">{feature.percentage}%</span>
-                  </div>
-                  <Progress 
-                    value={feature.percentage} 
-                    max={100} 
-                    className="h-2 bg-gray-200 rounded-full overflow-hidden"
-                    barClassName={`h-full rounded-full ${
-                      feature.status === 'completed' ? 'bg-green-500' :
-                      feature.status === 'in-progress' ? 'bg-blue-500' :
-                      feature.status === 'critical' ? 'bg-red-500' : 'bg-gray-400'
-                    }`}
-                  />
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-      </div>
-      
-      {/* Critical Issues */}
-      <h2 className="text-xl font-semibold mb-4" id="critical-issues">Critical Issues</h2>
-      <Card className="p-4 bg-red-50 mb-8 border-l-4 border-red-600" aria-labelledby="critical-issues">
-        <div className="space-y-4">
-          {criticalIssues.map((issue, index) => (
-            <div key={index} className="border-b border-red-100 pb-3 last:border-0 last:pb-0">
-              <div className="flex items-start">
-                <div className="text-red-500 mr-2 mt-1 flex-shrink-0" aria-hidden="true">⚠</div>
-                <div>
-                  <h3 className="font-medium text-red-700">{issue.title}</h3>
-                  <p className="text-sm text-gray-700">{issue.description}</p>
-                </div>
+            
+            <div className="bg-green-100 dark:bg-green-900 p-4 rounded-lg">
+              <div className="text-sm text-green-600 dark:text-green-400">Categories 100% Complete</div>
+              <div className="text-2xl font-bold">
+                {categoryCompletions.filter(c => c.overallPercentage === 100).length}
               </div>
             </div>
-          ))}
-        </div>
-      </Card>
-      
-      {/* Next Steps */}
-      <h2 className="text-xl font-semibold mb-4" id="recommendations">Recommendations</h2>
-      <Card className="p-4 bg-blue-50 border-l-4 border-blue-600" aria-labelledby="recommendations">
-        <ol className="list-decimal list-inside space-y-2 ml-2">
-          <li className="font-bold text-red-800">
-            <span className="mr-2">1.</span>
-            <span>Focus on improving accessibility compliance of our own components - TOP PRIORITY</span>
-          </li>
-          <li className="text-blue-800">
-            <span className="mr-2">2.</span>
-            <span>Prioritize fixing the critical database migration issues</span>
-          </li>
-          <li className="text-blue-800">
-            <span className="mr-2">3.</span>
-            <span>Re-implement authentication with proper security measures</span>
-          </li>
-          <li className="text-blue-800">
-            <span className="mr-2">4.</span>
-            <span>Address subscription and payment system issues</span>
-          </li>
-          <li className="text-blue-800">
-            <span className="mr-2">5.</span>
-            <span>Complete the monitoring and alerts system implementation</span>
-          </li>
-          <li className="text-blue-800">
-            <span className="mr-2">6.</span>
-            <span>Address performance optimization issues</span>
-          </li>
-        </ol>
+            
+            <div className="bg-yellow-100 dark:bg-yellow-900 p-4 rounded-lg">
+              <div className="text-sm text-yellow-600 dark:text-yellow-400">Categories In Progress</div>
+              <div className="text-2xl font-bold">
+                {categoryCompletions.filter(c => c.overallPercentage > 0 && c.overallPercentage < 100).length}
+              </div>
+            </div>
+            
+            <div className="bg-red-100 dark:bg-red-900 p-4 rounded-lg">
+              <div className="text-sm text-red-600 dark:text-red-400">Categories Not Started</div>
+              <div className="text-2xl font-bold">
+                {categoryCompletions.filter(c => c.overallPercentage === 0).length}
+              </div>
+            </div>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );
-}
+};
+
+export { CompletionDashboard };
+export default CompletionDashboard;

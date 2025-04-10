@@ -1,99 +1,63 @@
 /**
- * Utility functions for finding and interacting with DOM elements
+ * Utility functions for finding and tracking DOM elements
  */
 
-import { Position } from '../types/feedback';
-
 /**
- * Generate a simple path/selector for an element
- * This creates a selector that can be used to find the element again later
+ * Generates a CSS selector path for a given element
+ * @param element The DOM element to generate a path for
+ * @returns A CSS selector string that uniquely identifies the element
  */
 export function getElementPath(element: HTMLElement): string {
   if (!element) return '';
-  if (element === document.body) return 'body';
   
-  let selector = element.tagName.toLowerCase();
+  const path: string[] = [];
+  let currentElement: HTMLElement | null = element;
   
-  // Add id if available
-  if (element.id) {
-    selector += `#${element.id}`;
-    return selector;
-  }
-  
-  // Add classes if available
-  if (element.className && typeof element.className === 'string') {
-    const classes = element.className.split(/\\s+/).filter(c => c);
-    if (classes.length) {
-      selector += `.${classes.join('.')}`;
+  while (currentElement && currentElement !== document.body && currentElement !== document.documentElement) {
+    let selector = currentElement.tagName.toLowerCase();
+    
+    // Add id if available
+    if (currentElement.id) {
+      selector += `#${currentElement.id}`;
+      path.unshift(selector);
+      break; // ID should be unique, so we can stop here
     }
-  }
-  
-  // Add basic path info
-  const parentElement = element.parentElement;
-  if (parentElement && parentElement !== document.body) {
-    return `${getElementPath(parentElement)} > ${selector}`;
-  }
-  
-  return selector;
-}
-
-/**
- * Find an element by its path
- * Attempts to find the exact element, or the closest match if the exact one isn't found
- */
-export function findElementByPath(path: string, originalPosition: Position): HTMLElement | null {
-  try {
-    // Try to simplify the selector to improve chances of finding it
-    const simplifiedSelector = path
-      .split('>')
-      .pop()
-      ?.trim() || '';
-      
-    if (simplifiedSelector) {
-      // Try to find the element using the selector
-      const possibleElements = document.querySelectorAll(simplifiedSelector);
-      
-      if (possibleElements.length === 1) {
-        return possibleElements[0] as HTMLElement;
-      } else if (possibleElements.length > 1) {
-        // If multiple elements match, find the one closest to the original click position
-        const originalX = originalPosition.x;
-        const originalY = originalPosition.y;
-        
-        let closestElement = null;
-        let closestDistance = Infinity;
-        
-        possibleElements.forEach(el => {
-          const rect = el.getBoundingClientRect();
-          const centerX = rect.left + rect.width / 2 + window.scrollX;
-          const centerY = rect.top + rect.height / 2 + window.scrollY;
-          
-          const distance = Math.sqrt(
-            Math.pow(centerX - originalX, 2) + 
-            Math.pow(centerY - originalY, 2)
-          );
-          
-          if (distance < closestDistance) {
-            closestDistance = distance;
-            closestElement = el;
-          }
-        });
-        
-        if (closestElement) {
-          return closestElement as HTMLElement;
-        }
+    
+    // Add classes
+    if (currentElement.className && typeof currentElement.className === 'string') {
+      const classes = currentElement.className.trim().split(/\s+/).join('.');
+      if (classes) {
+        selector += `.${classes}`;
       }
     }
     
-    // Fallback: try the full path
-    try {
-      const element = document.querySelector(path) as HTMLElement;
-      if (element) return element;
-    } catch (error) {
-      // Selector might be invalid, ignore
+    // Add position among siblings for more specificity
+    const siblings = Array.from(currentElement.parentElement?.children || [])
+      .filter(sibling => sibling.tagName === currentElement?.tagName);
+    
+    if (siblings.length > 1) {
+      const index = siblings.indexOf(currentElement);
+      selector += `:nth-of-type(${index + 1})`;
     }
     
-    return null;
+    path.unshift(selector);
+    
+    currentElement = currentElement.parentElement;
+  }
+  
+  return path.join(' > ');
+}
+
+/**
+ * Finds an element in the DOM using a path
+ * @param path The CSS selector path to the element
+ * @returns The found element or null if not found
+ */
+export function findElementByPath(path: string): HTMLElement | null {
+  if (!path) return null;
+  try {
+    const element = document.querySelector(path) as HTMLElement;
+    return element;
   } catch (error) {
     console.error('Error finding element by path:', error);
     return null;
@@ -101,20 +65,97 @@ export function findElementByPath(path: string, originalPosition: Position): HTM
 }
 
 /**
- * Update the position of an element marker based on the target element
+ * Gets the absolute position of an element on the page
+ * @param element The DOM element to get position for
+ * @returns The x, y coordinates of the element
  */
-export function updateMarkerPosition(
-  markerElement: HTMLElement, 
-  targetElement: HTMLElement
-): void {
-  if (!markerElement || !targetElement) return;
+export function getElementPosition(element: HTMLElement): { x: number; y: number } {
+  if (!element) return { x: 0, y: 0 };
+  
+  const rect = element.getBoundingClientRect();
+  
+  return {
+    x: rect.left + window.scrollX + (rect.width / 2),
+    y: rect.top + window.scrollY + (rect.height / 2)
+  };
+}
+
+/**
+ * Determines if an element is visible
+ * @param element The DOM element to check visibility for
+ * @returns True if the element is visible, false otherwise
+ */
+export function isElementVisible(element: HTMLElement): boolean {
+  if (!element) return false;
+  
+  const style = window.getComputedStyle(element);
+  if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+    return false;
+  }
+  
+  const rect = element.getBoundingClientRect();
+  
+  // Check if element has size
+  if (rect.width === 0 || rect.height === 0) {
+    return false;
+  }
+  
+  // Check if element is within viewport
+  const isInViewport = 
+    rect.top < window.innerHeight &&
+    rect.left < window.innerWidth &&
+    rect.bottom > 0 &&
+    rect.right > 0;
+    
+  return isInViewport;
+}
+
+/**
+ * Adds a highlighting outline to an element
+ * @param element The DOM element to highlight
+ * @param color The highlight color (CSS color string)
+ */
+export function highlightElement(element: HTMLElement, color: string = 'rgba(255, 0, 0, 0.5)'): void {
+  if (!element) return;
+  
+  const originalOutline = element.style.outline;
+  const originalOutlineOffset = element.style.outlineOffset;
+  
+  element.style.outline = `2px solid ${color}`;
+  element.style.outlineOffset = '2px';
+  
+  // Return a cleanup function
+  setTimeout(() => {
+    element.style.outline = originalOutline;
+    element.style.outlineOffset = originalOutlineOffset;
+  }, 3000);
+}
+
+/**
+ * Creates an overlay element at the position of the target element
+ * @param targetElement The element to create an overlay for
+ * @param className Optional CSS class for styling
+ * @returns The created overlay element
+ */
+export function createElementOverlay(
+  targetElement: HTMLElement, 
+  className: string = 'element-overlay'
+): HTMLElement {
+  if (!targetElement) return document.createElement('div');
   
   const rect = targetElement.getBoundingClientRect();
-  const scrollX = window.scrollX;
-  const scrollY = window.scrollY;
+  const overlay = document.createElement('div');
   
-  // Position at the top-right corner of the element
-  markerElement.style.position = 'absolute';
-  markerElement.style.left = `${rect.right + scrollX}px`;
-  markerElement.style.top = `${rect.top + scrollY}px`;
+  overlay.className = className;
+  overlay.style.position = 'absolute';
+  overlay.style.left = `${rect.left + window.scrollX}px`;
+  overlay.style.top = `${rect.top + window.scrollY}px`;
+  overlay.style.width = `${rect.width}px`;
+  overlay.style.height = `${rect.height}px`;
+  overlay.style.pointerEvents = 'none';
+  overlay.style.zIndex = '9999';
+  
+  document.body.appendChild(overlay);
+  
+  return overlay;
 }
