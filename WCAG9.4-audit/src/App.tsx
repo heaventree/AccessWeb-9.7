@@ -77,6 +77,7 @@ import { AltTextGuide } from './pages/help/AltTextGuide';
 import { ErrorPage } from './components/ErrorPage';
 import AccessibilityTipsPage from './pages/help/AccessibilityTipsPage';
 import { AccessibilityTipsDemo } from './components/demo/AccessibilityTipsDemo';
+import { DemoModeToggle } from './components/DemoModeToggle';
 
 function App() {
   return (
@@ -172,6 +173,7 @@ function App() {
         <AccessibilityBadge />
         <AccessibilityControls />
         <SimpleFeedbackSystem />
+        <DemoModeToggle />
       </div>
     </ErrorBoundary>
   );
