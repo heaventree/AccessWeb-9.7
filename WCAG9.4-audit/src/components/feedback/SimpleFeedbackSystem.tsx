@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X, Target, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { MessageSquare, X, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 
 // Feedback item structure
 interface FeedbackItem {
@@ -35,6 +35,16 @@ const SimpleFeedbackSystem: React.FC = () => {
   // Save feedback items to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('feedbackItems', JSON.stringify(feedbackItems));
+  }, [feedbackItems]);
+  
+  // Dispatch custom event when feedback items change
+  useEffect(() => {
+    if (feedbackItems.length > 0) {
+      // Notify about the most recently added or changed item
+      const lastItem = feedbackItems[feedbackItems.length - 1];
+      const event = new CustomEvent('feedbackUpdated', { detail: lastItem });
+      window.dispatchEvent(event);
+    }
   }, [feedbackItems]);
   
   // Handle document interaction when feedback tool is active
@@ -161,7 +171,7 @@ const SimpleFeedbackSystem: React.FC = () => {
       category: selectedCategory
     };
     
-    setFeedbackItems([...feedbackItems, newItem]);
+    setFeedbackItems(prevItems => [...prevItems, newItem]);
     setCurrentComment('');
     setShowCommentModal(false);
     setSelectedElement(null);
@@ -169,8 +179,8 @@ const SimpleFeedbackSystem: React.FC = () => {
   
   // Update the status of a feedback item (cycles through statuses on click)
   const toggleFeedbackStatus = (id: string) => {
-    setFeedbackItems(
-      feedbackItems.map(item => {
+    setFeedbackItems(prevItems => 
+      prevItems.map(item => {
         if (item.id === id) {
           const nextStatus = {
             pending: 'inProgress',
@@ -178,7 +188,13 @@ const SimpleFeedbackSystem: React.FC = () => {
             resolved: 'pending'
           }[item.status] as 'pending' | 'inProgress' | 'resolved';
           
-          return { ...item, status: nextStatus };
+          const updatedItem = { ...item, status: nextStatus };
+          
+          // Dispatch event for status change
+          const event = new CustomEvent('feedbackUpdated', { detail: updatedItem });
+          window.dispatchEvent(event);
+          
+          return updatedItem;
         }
         return item;
       })
@@ -187,7 +203,7 @@ const SimpleFeedbackSystem: React.FC = () => {
   
   // Delete a feedback item (right-click)
   const deleteFeedbackItem = (id: string) => {
-    setFeedbackItems(feedbackItems.filter(item => item.id !== id));
+    setFeedbackItems(prevItems => prevItems.filter(item => item.id !== id));
   };
   
   // Get color for status

@@ -1,62 +1,73 @@
-import React, { useState } from 'react';
-import FeedbackWidget from './FeedbackWidget';
+import React, { useEffect } from 'react';
 import { addToRoadmap, addToDebugList } from '../../services/feedbackService';
+import SimpleFeedbackSystem from './SimpleFeedbackSystem';
 
-interface FeedbackContainerProps {
-  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
-}
+// Import the proper types from the data files
+import { FeatureStatus, RoadmapFeature } from '../../data/roadmapData';
+import { DebugItemStatus, DebugItemCategory, DebugItemPriority } from '../../data/debugData';
 
 /**
- * Container for feedback widgets with toggle between roadmap and debug feedback
+ * Container for the feedback system that syncs with backend storage
  */
-const FeedbackContainer: React.FC<FeedbackContainerProps> = ({ position = 'bottom-right' }) => {
-  const [activeTab, setActiveTab] = useState<'roadmap' | 'debug'>('debug');
-  
-  // Handle feedback submission
-  const handleFeedbackSubmitted = (feedback: any) => {
-    if (activeTab === 'roadmap') {
-      // Add to roadmap
-      addToRoadmap(feedback);
-    } else {
-      // Add to debug list
-      addToDebugList(feedback);
-    }
-  };
-  
+const FeedbackContainer: React.FC = () => {
+  // Listen for feedback items changes and sync with backend
+  useEffect(() => {
+    // Event listener for the SimpleFeedbackSystem custom event
+    const handleFeedbackUpdated = (event: CustomEvent) => {
+      const newItem = event.detail;
+      if (newItem) {
+        // Determine if it's roadmap or debug feedback
+        if (newItem.category === 'roadmap') {
+          // Convert status to proper FeatureStatus type
+          let featureStatus: FeatureStatus = 'planned';
+          if (newItem.status === 'resolved') featureStatus = 'completed';
+          else if (newItem.status === 'inProgress') featureStatus = 'in-progress';
+          
+          // Format for roadmap with the correct types
+          const roadmapItem: Omit<RoadmapFeature, 'id'> = {
+            title: newItem.comment,
+            description: `Element path: ${newItem.elementPath}`,
+            status: featureStatus,
+            priority: newItem.status === 'resolved' ? 3 : 
+                     newItem.status === 'inProgress' ? 2 : 1,
+            category: 'ui',
+            dependencies: []
+          };
+          addToRoadmap(roadmapItem);
+        } else {
+          // Convert status to proper DebugItemStatus type
+          let debugStatus: DebugItemStatus = 'identified';
+          if (newItem.status === 'resolved') debugStatus = 'testing'; // Fixed from 'resolved' to valid value 'testing'
+          else if (newItem.status === 'inProgress') debugStatus = 'in-progress';
+          
+          // Set priority correctly
+          const priorityValue: DebugItemPriority = 
+            newItem.status === 'resolved' ? 'low' : 
+            newItem.status === 'inProgress' ? 'high' : 'critical';
+          
+          // Format for debug with correct types
+          addToDebugList({
+            title: newItem.comment,
+            description: `Element path: ${newItem.elementPath}`,
+            category: 'ui' as DebugItemCategory,
+            status: debugStatus,
+            priority: priorityValue,
+            notes: `Coordinates: x=${newItem.position.x}, y=${newItem.position.y}`
+          });
+        }
+      }
+    };
+
+    // Add event listener for feedback updates
+    window.addEventListener('feedbackUpdated', handleFeedbackUpdated as EventListener);
+
+    return () => {
+      window.removeEventListener('feedbackUpdated', handleFeedbackUpdated as EventListener);
+    };
+  }, []);
+
   return (
-    <div className="fixed right-4 top-1/2 -translate-y-1/2 z-50 flex flex-col items-end gap-2">
-      {/* Tab switcher */}
-      <div className="bg-white rounded-md shadow-sm border border-gray-200 p-1 flex text-xs">
-        <button
-          onClick={() => setActiveTab('debug')}
-          className={`px-3 py-1 rounded-md transition-colors ${
-            activeTab === 'debug' 
-              ? 'bg-blue-100 text-blue-700' 
-              : 'hover:bg-gray-100'
-          }`}
-        >
-          Debug
-        </button>
-        <button
-          onClick={() => setActiveTab('roadmap')}
-          className={`px-3 py-1 rounded-md transition-colors ${
-            activeTab === 'roadmap' 
-              ? 'bg-blue-100 text-blue-700' 
-              : 'hover:bg-gray-100'
-          }`}
-        >
-          Roadmap
-        </button>
-      </div>
-      
-      {/* Active feedback widget */}
-      <FeedbackWidget 
-        addToRoadmap={activeTab === 'roadmap'}
-        onFeedbackSubmitted={handleFeedbackSubmitted}
-        position={position}
-        quickMode={true}
-      />
-    </div>
+    <SimpleFeedbackSystem />
   );
 };
 
