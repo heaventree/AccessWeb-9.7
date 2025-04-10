@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { stripeService } from '../services/stripe';
 import { DEVELOPMENT_MODE } from './useAuth';
 
@@ -278,7 +278,7 @@ export function useSubscription() {
   }, [fetchCurrentSubscription]);
 
   // Check if a session was successful (after Stripe redirect)
-  const checkSessionStatus = useCallback(async (sessionId: string) => {
+  const checkSessionStatus = useCallback(async (_sessionId: string) => {
     setLoading(true);
     setError(null);
     

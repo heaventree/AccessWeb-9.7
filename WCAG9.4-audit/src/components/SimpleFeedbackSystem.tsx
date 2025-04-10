@@ -457,7 +457,7 @@ const SimpleFeedbackSystem: React.FC = () => {
   return (
     <div ref={widgetRef}>
       {/* Feedback Button */}
-      <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+      <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-50">
         {/* Category Switch */}
         <div className="mb-2 bg-white rounded-md shadow-sm border border-gray-200 p-1 flex text-xs">
           <button
