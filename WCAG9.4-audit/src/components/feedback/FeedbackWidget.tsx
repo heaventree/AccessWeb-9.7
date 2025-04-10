@@ -224,7 +224,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
     <div ref={widgetRef} className={`fixed z-50 ${positionClasses[position]}`}>
       {isTargeting && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-4 max-w-md">
+          <div className="bg-white rounded-lg p-4 max-w-[95vw] w-auto mx-2 shadow-lg">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Select an element</h2>
               <button 
@@ -244,8 +244,8 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
       )}
       
       {isOpen && (
-        <div className="bg-white rounded-lg p-4 w-80 shadow-lg border border-gray-200">
-          <div className="flex justify-between items-center mb-4">
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-4 w-80 shadow-lg border border-gray-200 z-50 max-h-[80vh] overflow-y-auto max-w-[95vw] mx-auto my-2">
+          <div className="flex justify-between items-center mb-4 sticky top-0 bg-white pb-2 border-b border-gray-100">
             <h3 className="font-medium">Submit Feedback</h3>
             <button 
               onClick={() => setIsOpen(false)}
