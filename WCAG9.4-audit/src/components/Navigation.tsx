@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Gauge, Palette, FileText, Zap, Settings, Store, Globe, Activity, ActivitySquare, Book, HelpCircle, BarChart2, Bell, Shield, Building, LayoutDashboard, CreditCard, Users, User, Image } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { FeedbackToggle } from './FeedbackToggle';
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -412,6 +413,7 @@ export function Navigation() {
               <Settings className="w-5 h-5" />
             </Link>
             <ThemeToggle />
+            <FeedbackToggle />
             <Link
               to="/signup"
               className="ml-8 inline-flex items-center justify-center px-4 py-2 border-none rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
