@@ -516,7 +516,7 @@ const SimpleFeedbackSystem: React.FC = () => {
       {filteredItems.map(item => (
         <div
           key={item.id}
-          className={`fixed z-40 rounded-full w-6 h-6 flex items-center justify-center cursor-pointer shadow-md text-white hover:scale-110 transition-transform ${getStatusColor(item.status, item.category)}`}
+          className={`absolute z-40 rounded-full w-6 h-6 flex items-center justify-center cursor-pointer shadow-md text-white hover:scale-110 transition-transform ${getStatusColor(item.status, item.category)}`}
           style={{
             left: item.position.x,
             top: item.position.y,
