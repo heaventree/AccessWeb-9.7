@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useDemoMode } from '../hooks/useDemoMode';
 
 export function DemoModeToggle() {
-  const { isDemoMode } = useDemoMode();
+  const { isDemoMode, enableDemoMode, disableDemoMode } = useDemoMode();
   const [isOpen, setIsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 

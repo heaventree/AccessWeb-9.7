@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Subscription } from './useSubscription';
+import { Subscription, Invoice } from './useSubscription';
 
 // Local storage key for demo mode
 const DEMO_MODE_KEY = 'wcag_demo_mode_enabled';
@@ -63,37 +63,46 @@ export function useDemoMode() {
       id: 'demo-subscription-123',
       status: 'active',
       planId: 'professional',
+      planName: 'Professional',
       currentPeriodStart: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
       currentPeriodEnd: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
       cancelAtPeriodEnd: false,
-      isDemo: true,
-      invoices: [
-        {
-          id: 'demo-invoice-1',
-          amount: 99,
-          currency: 'usd',
-          status: 'paid',
-          date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-          pdfUrl: '#',
-          description: 'Professional Plan (Monthly)'
-        },
-        {
-          id: 'demo-invoice-2',
-          amount: 99,
-          currency: 'usd',
-          status: 'paid',
-          date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
-          pdfUrl: '#',
-          description: 'Professional Plan (Monthly)'
-        }
-      ]
+      paymentMethod: {
+        brand: 'visa',
+        last4: '4242'
+      }
     };
+  }, []);
+  
+  // Get demo invoices
+  const getDemoInvoices = useCallback((): Invoice[] => {
+    return [
+      {
+        id: 'demo-invoice-1',
+        number: 'INV-001',
+        amount: 99,
+        currency: 'usd',
+        status: 'paid',
+        date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+        pdfUrl: '#'
+      },
+      {
+        id: 'demo-invoice-2',
+        number: 'INV-002',
+        amount: 99,
+        currency: 'usd',
+        status: 'paid',
+        date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+        pdfUrl: '#'
+      }
+    ];
   }, []);
 
   return {
     isDemoMode,
     enableDemoMode,
     disableDemoMode,
-    getDemoSubscription
+    getDemoSubscription,
+    getDemoInvoices
   };
 }
