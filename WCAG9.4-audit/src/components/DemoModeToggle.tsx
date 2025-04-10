@@ -17,6 +17,8 @@ export function DemoModeToggle() {
     } else {
       enableDemoMode();
     }
+    // Refresh the page to ensure all components pick up the change
+    window.location.reload();
   };
 
   // Toggle panel visibility
