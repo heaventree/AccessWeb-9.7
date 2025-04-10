@@ -155,7 +155,6 @@ export function ColorAccessibilitySimulator() {
   // Handle screenshot of the preview
   const takeScreenshot = () => {
     if (previewRef.current) {
-      // Logic to capture the preview element as an image
       // Using html2canvas or similar library to capture as image
       alert('Screenshot functionality would be implemented here with html2canvas');
     }

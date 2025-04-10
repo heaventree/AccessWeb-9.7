@@ -1,4 +1,4 @@
-import React from 'react';
+
 import ColorAccessibilitySimulator from '../../components/ColorAccessibilitySimulator';
 
 export function ColorAccessibilitySimulatorPage() {
