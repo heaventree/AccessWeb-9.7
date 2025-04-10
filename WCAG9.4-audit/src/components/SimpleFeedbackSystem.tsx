@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { MessageSquare, X } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { addFeedbackAsDebugItem } from '../data/debugData';
 import { addFeedbackAsRoadmapFeature } from '../data/roadmapData';
+import FeedbackMarker from './feedback/FeedbackMarker';
 
 // Feedback item types
 interface Position {
@@ -436,23 +437,7 @@ const SimpleFeedbackSystem: React.FC = () => {
     setFeedbackItems(prevItems => prevItems.filter(item => item.id !== id));
   };
   
-  // Get color for status
-  const getStatusColor = (status: string, category: string) => {
-    if (status === 'pending') {
-      return category === 'roadmap' ? 'bg-blue-500' : 'bg-red-500';
-    } else if (status === 'inProgress') {
-      return category === 'roadmap' ? 'bg-indigo-500' : 'bg-orange-500';
-    } else {
-      return 'bg-green-500';
-    }
-  };
-  
-  // Render status icon
-  const StatusIcon = ({ status }: { status: string }) => {
-    if (status === 'pending') return <Clock className="h-3 w-3" />;
-    if (status === 'inProgress') return <AlertCircle className="h-3 w-3" />;
-    return <CheckCircle className="h-3 w-3" />;
-  };
+  // These helper functions are now in the FeedbackMarker component
   
   // Reset all feedback (for testing)
   const resetAllFeedback = () => {
@@ -514,23 +499,12 @@ const SimpleFeedbackSystem: React.FC = () => {
       
       {/* Feedback Markers - only show for current page */}
       {filteredItems.map(item => (
-        <div
+        <FeedbackMarker
           key={item.id}
-          className={`absolute z-40 rounded-full w-6 h-6 flex items-center justify-center cursor-pointer shadow-md text-white hover:scale-110 transition-transform ${getStatusColor(item.status, item.category)}`}
-          style={{
-            left: item.position.x,
-            top: item.position.y,
-            transform: 'translate(-50%, -50%)'
-          }}
-          title={`${item.comment.substring(0, 20)}${item.comment.length > 20 ? '...' : ''} (Click to change status, right-click to delete)`}
-          onClick={() => toggleFeedbackStatus(item.id)}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            deleteFeedbackItem(item.id);
-          }}
-        >
-          <StatusIcon status={item.status} />
-        </div>
+          item={item}
+          onStatusChange={toggleFeedbackStatus}
+          onDelete={deleteFeedbackItem}
+        />
       ))}
       
       {/* Comment Modal */}
