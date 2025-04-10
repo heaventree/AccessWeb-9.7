@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { addFeedbackAsDebugItem } from '../data/debugData';
 import { addFeedbackAsRoadmapFeature } from '../data/roadmapData';
 import FeedbackMarker from './feedback/FeedbackMarker';
+import { useFloatingTools } from '../contexts/FloatingToolsContext';
 
 // Feedback item types
 interface Position {
@@ -31,16 +32,21 @@ const SimpleFeedbackSystem: React.FC = () => {
   const location = useLocation();
   const currentPage = location.pathname;
   
+  // Use the floating tools context
+  const { activeTool, toggleTool } = useFloatingTools();
+  
   // State for the feedback system
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<FeedbackItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<FeedbackCategory>('debug');
-  const [isActive, setIsActive] = useState(false);
   const [hoveredElement, setHoveredElement] = useState<HTMLElement | null>(null);
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [currentComment, setCurrentComment] = useState('');
+  
+  // Compute isActive from the activeTool property
+  const isActive = activeTool === 'feedback';
   
   // Reference to the widget element to avoid self-selection
   const widgetRef = useRef<HTMLDivElement>(null);
