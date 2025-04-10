@@ -347,12 +347,18 @@ const SimpleFeedbackSystem: React.FC = () => {
       }
       
       // Add to debug items
-      addFeedbackAsDebugItem(
-        title,
-        desc,
-        debugCategory as any,
-        'medium'
-      );
+      try {
+        console.log('Adding debug item:', title, desc, debugCategory);
+        const itemId = addFeedbackAsDebugItem(
+          title,
+          desc,
+          debugCategory as any,
+          'medium'
+        );
+        console.log('Added debug item with ID:', itemId);
+      } catch (error) {
+        console.error('Failed to add debug item:', error);
+      }
     } else if (selectedCategory === 'roadmap') {
       // Add to roadmap features
       // Determine a reasonable category based on the element
@@ -368,12 +374,18 @@ const SimpleFeedbackSystem: React.FC = () => {
         category = 'core';
       }
       
-      addFeedbackAsRoadmapFeature(
-        title,
-        desc,
-        category,
-        3 // Medium priority
-      );
+      try {
+        console.log('Adding roadmap feature:', title, desc, category);
+        const featureId = addFeedbackAsRoadmapFeature(
+          title,
+          desc,
+          category,
+          3 // Medium priority
+        );
+        console.log('Added roadmap feature with ID:', featureId);
+      } catch (error) {
+        console.error('Failed to add roadmap feature:', error);
+      }
     }
     
     // Also dispatch custom event for administrative use

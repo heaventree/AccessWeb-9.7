@@ -42,6 +42,7 @@ import { WCAGCheckerPage } from './pages/WCAGCheckerPage';
 import { WCAGStandardsTable } from './pages/WCAGStandardsTable';
 import WCAGColorPalette from './pages/tools/WCAGColorPalette';
 import SimpleFeedbackSystem from './components/SimpleFeedbackSystem';
+import AddTestItems from './components/AddTestItems';
 import ImageAltScannerPage from './pages/tools/ImageAltScannerPage';
 import { WordPressDashboard } from './components/integrations/WordPressDashboard';
 import { CustomAPISetup } from './components/integrations/CustomAPISetup';
@@ -171,6 +172,7 @@ function App() {
         <AccessibilityBadge />
         <AccessibilityControls />
         <SimpleFeedbackSystem />
+        <AddTestItems />
       </div>
     </ErrorBoundary>
   );
