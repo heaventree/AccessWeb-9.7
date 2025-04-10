@@ -454,8 +454,12 @@ const SimpleFeedbackSystem: React.FC = () => {
     }
   };
   
+  // Log the state for debugging
+  console.log('Feedback enabled:', isFeedbackEnabled);
+
   // Don't render anything if feedback is disabled
   if (!isFeedbackEnabled) {
+    console.log('Feedback disabled - not rendering');
     return null;
   }
   

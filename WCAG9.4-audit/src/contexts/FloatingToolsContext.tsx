@@ -46,9 +46,11 @@ export function FloatingToolsProvider({ children }: { children: ReactNode }) {
   // Toggle feedback system visibility
   const toggleFeedbackSystem = () => {
     const newValue = !isFeedbackEnabled;
+    console.log('FloatingToolsContext: Toggling feedback system from', isFeedbackEnabled, 'to', newValue);
     setIsFeedbackEnabled(newValue);
     try {
       localStorage.setItem('feedbackEnabled', JSON.stringify(newValue));
+      console.log('FloatingToolsContext: Saved preference to localStorage');
     } catch (error) {
       console.error('Failed to save feedback preference:', error);
     }

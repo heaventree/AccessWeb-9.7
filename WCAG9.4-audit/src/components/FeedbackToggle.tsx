@@ -6,10 +6,18 @@ import { MessageSquare, EyeOff } from 'lucide-react';
  */
 export function FeedbackToggle() {
   const { isFeedbackEnabled, toggleFeedbackSystem } = useFloatingTools();
+  
+  console.log('FeedbackToggle rendering, enabled:', isFeedbackEnabled);
+  
+  const handleToggle = () => {
+    console.log('Toggle clicked, current status:', isFeedbackEnabled);
+    toggleFeedbackSystem();
+    console.log('After toggle, should be:', !isFeedbackEnabled);
+  };
 
   return (
     <button
-      onClick={toggleFeedbackSystem}
+      onClick={handleToggle}
       className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium transition-colors ${
         isFeedbackEnabled 
           ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
