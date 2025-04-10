@@ -19,6 +19,37 @@ export interface RoadmapFeature {
   completedDate?: string;
 }
 
+// Function to add a new roadmap feature
+export function addRoadmapFeature(feature: RoadmapFeature) {
+  roadmapFeatures.push(feature);
+  
+  // Dispatch event
+  const event = new CustomEvent('roadmapFeaturesUpdated', { detail: roadmapFeatures });
+  window.dispatchEvent(event);
+  
+  return feature.id;
+}
+
+// Function to add user feedback as a roadmap feature
+export function addFeedbackAsRoadmapFeature(
+  title: string,
+  description: string,
+  category: RoadmapFeature['category'] = 'ui',
+  priority: number = 3
+) {
+  const newFeature: RoadmapFeature = {
+    id: `feature-feedback-${Date.now()}`,
+    title,
+    description,
+    status: 'planned',
+    priority,
+    category
+  };
+  
+  addRoadmapFeature(newFeature);
+  return newFeature.id;
+}
+
 export const roadmapFeatures: RoadmapFeature[] = [
   // Core functionality - Already implemented
   {

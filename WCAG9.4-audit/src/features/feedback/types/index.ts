@@ -24,6 +24,7 @@ export interface FeedbackItem {
   status: FeedbackStatus;
   createdAt: string;
   category: FeedbackCategory;
+  page: string; // The page URL path where the feedback was created
   updatedAt?: string;
   assignedTo?: string;
 }
@@ -34,6 +35,7 @@ export interface CreateFeedbackPayload {
   position: Position;
   comment: string;
   category: FeedbackCategory;
+  page: string; // The page URL path where the feedback was created
 }
 
 // Feedback update payload

@@ -49,6 +49,40 @@ export interface DebugItem {
   notes?: string;
 }
 
+// This function will be used by the feedback system to add new items
+export function addDebugItem(item: DebugItem) {
+  debugItems.push(item);
+  
+  // Dispatch an event to notify other components
+  const event = new CustomEvent('debugItemsUpdated', { detail: debugItems });
+  window.dispatchEvent(event);
+  
+  return item.id;
+}
+
+// Function to add user feedback as a debug item
+export function addFeedbackAsDebugItem(
+  title: string, 
+  description: string, 
+  category: DebugItemCategory = 'ui',
+  priority: DebugItemPriority = 'medium'
+) {
+  const newItem: DebugItem = {
+    id: `debug-feedback-${Date.now()}`,
+    title,
+    description,
+    category,
+    status: 'identified',
+    priority,
+    dateIdentified: new Date().toISOString().split('T')[0],
+    todoItems: ['Review feedback', 'Determine appropriate action', 'Implement solution'],
+    notes: 'Added via user feedback system'
+  };
+  
+  addDebugItem(newItem);
+  return newItem.id;
+}
+
 export const debugItems: DebugItem[] = [
   // Dark Mode Implementation Issues
   {
