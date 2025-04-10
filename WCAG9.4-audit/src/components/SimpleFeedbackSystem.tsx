@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { addFeedbackAsDebugItem } from '../data/debugData';
+import { addFeedbackAsRoadmapFeature } from '../data/roadmapData';
 
 // Feedback item types
 interface Position {
@@ -319,7 +321,62 @@ const SimpleFeedbackSystem: React.FC = () => {
     // Add item to the global list
     setFeedbackItems(prev => [...prev, newItem]);
     
-    // Also update admin system and dispatch custom event for administrative use
+    // Create a title from element path (simplify it for readability)
+    const elementTitle = getElementPath(selectedElement)
+      .split('>')
+      .pop()
+      ?.trim() || 'Element';
+      
+    const title = `Feedback on ${elementTitle}`;
+    const desc = currentComment.trim();
+    
+    // Add to appropriate admin panel based on category
+    if (selectedCategory === 'debug') {
+      // The category will be 'ui' or similar based on the element selected
+      // For simplicity, we'll use 'ui' for divs, spans, etc. and 'accessibility' for forms, etc.
+      let debugCategory = 'ui';
+      const tag = selectedElement.tagName.toLowerCase();
+      
+      // Determine a more specific category based on the element
+      if (['form', 'input', 'button', 'select', 'textarea'].includes(tag)) {
+        debugCategory = 'accessibility';
+      } else if (['table', 'tr', 'td', 'th'].includes(tag)) {
+        debugCategory = 'data';
+      } else if (['a', 'link', 'nav'].includes(tag)) {
+        debugCategory = 'integration';
+      }
+      
+      // Add to debug items
+      addFeedbackAsDebugItem(
+        title,
+        desc,
+        debugCategory as any,
+        'medium'
+      );
+    } else if (selectedCategory === 'roadmap') {
+      // Add to roadmap features
+      // Determine a reasonable category based on the element
+      let category: 'ui' | 'core' | 'reporting' | 'integration' | 'analytics' = 'ui';
+      const tag = selectedElement.tagName.toLowerCase();
+      
+      // Determine a more specific category based on the element
+      if (['table', 'canvas', 'svg'].includes(tag)) {
+        category = 'reporting';
+      } else if (['form', 'iframe'].includes(tag)) {
+        category = 'integration';
+      } else if (['script', 'head', 'meta'].includes(tag)) {
+        category = 'core';
+      }
+      
+      addFeedbackAsRoadmapFeature(
+        title,
+        desc,
+        category,
+        3 // Medium priority
+      );
+    }
+    
+    // Also dispatch custom event for administrative use
     const eventData = {
       item: newItem,
       category: selectedCategory,
