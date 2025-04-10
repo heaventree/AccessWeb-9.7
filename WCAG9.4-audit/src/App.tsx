@@ -41,6 +41,7 @@ import { AccessibilityControls } from './components/accessibility/AccessibilityC
 import { WCAGCheckerPage } from './pages/WCAGCheckerPage';
 import { WCAGStandardsTable } from './pages/WCAGStandardsTable';
 import WCAGColorPalette from './pages/tools/WCAGColorPalette';
+import FeedbackContainer from './components/feedback/FeedbackContainer';
 import ImageAltScannerPage from './pages/tools/ImageAltScannerPage';
 import { WordPressDashboard } from './components/integrations/WordPressDashboard';
 import { CustomAPISetup } from './components/integrations/CustomAPISetup';
@@ -169,6 +170,7 @@ function App() {
         <SupportChat />
         <AccessibilityBadge />
         <AccessibilityControls />
+        <FeedbackContainer />
       </div>
     </ErrorBoundary>
   );
