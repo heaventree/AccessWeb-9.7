@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 // Feedback item types
 interface Position {
@@ -18,12 +19,18 @@ interface FeedbackItem {
   status: FeedbackStatus;
   createdAt: string;
   category: FeedbackCategory;
+  page: string; // Store the page path where feedback was created
 }
 
 // Simple Feedback System Component
 const SimpleFeedbackSystem: React.FC = () => {
+  // Get current page location for page-specific feedback
+  const location = useLocation();
+  const currentPage = location.pathname;
+  
   // State for the feedback system
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
+  const [filteredItems, setFilteredItems] = useState<FeedbackItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<FeedbackCategory>('debug');
   const [isActive, setIsActive] = useState(false);
   const [hoveredElement, setHoveredElement] = useState<HTMLElement | null>(null);
@@ -46,6 +53,25 @@ const SimpleFeedbackSystem: React.FC = () => {
       console.error('Failed to load feedback items:', error);
     }
   }, []);
+  
+  // Filter items for the current page or update the data structure if needed
+  useEffect(() => {
+    // Ensure all items have a page property (for backward compatibility)
+    const updatedItems = feedbackItems.map(item => {
+      if (!item.page) {
+        return { ...item, page: '/' };  // Default to homepage if no page info
+      }
+      return item;
+    });
+    
+    if (JSON.stringify(updatedItems) !== JSON.stringify(feedbackItems)) {
+      setFeedbackItems(updatedItems);
+    }
+    
+    // Filter items to only show those for the current page
+    const pageItems = updatedItems.filter(item => item.page === currentPage);
+    setFilteredItems(pageItems);
+  }, [feedbackItems, currentPage]);
   
   // Save feedback items to localStorage when they change
   useEffect(() => {
@@ -286,10 +312,27 @@ const SimpleFeedbackSystem: React.FC = () => {
       comment: currentComment.trim(),
       status: 'pending',
       createdAt: new Date().toISOString(),
-      category: selectedCategory
+      category: selectedCategory,
+      page: currentPage // Store current page information
     };
     
+    // Add item to the global list
     setFeedbackItems(prev => [...prev, newItem]);
+    
+    // Also update admin system and dispatch custom event for administrative use
+    const eventData = {
+      item: newItem,
+      category: selectedCategory,
+      elementPath: getElementPath(selectedElement)
+    };
+    
+    // Create and dispatch a custom event that the admin components can listen for
+    const event = new CustomEvent('feedbackItemCreated', { 
+      detail: eventData
+    });
+    window.dispatchEvent(event);
+    
+    // Reset UI state
     setCurrentComment('');
     setShowCommentModal(false);
     setSelectedElement(null);
@@ -400,8 +443,8 @@ const SimpleFeedbackSystem: React.FC = () => {
         )}
       </div>
       
-      {/* Feedback Markers */}
-      {feedbackItems.map(item => (
+      {/* Feedback Markers - only show for current page */}
+      {filteredItems.map(item => (
         <div
           key={item.id}
           className={`fixed z-40 rounded-full w-6 h-6 flex items-center justify-center cursor-pointer shadow-md text-white hover:scale-110 transition-transform ${getStatusColor(item.status, item.category)}`}
