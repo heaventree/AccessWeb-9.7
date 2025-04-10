@@ -51,21 +51,53 @@ const SimpleFeedbackSystem: React.FC = () => {
   useEffect(() => {
     if (!isActive) return;
     
-    // Handle mouse movement for element highlighting
-    const handleMouseOver = (e: MouseEvent) => {
-      // Skip if we're hovering over our own widget
-      if (widgetRef.current && widgetRef.current.contains(e.target as Node)) return;
+    // Store original element states to restore on cleanup
+    const originalStates = new Map<HTMLElement, {
+      outline: string,
+      outlineOffset: string,
+      pointerEvents: string
+    }>();
+    
+    // Save and disable buttons' normal behavior
+    const disableInteractiveElements = () => {
+      // Find all interactive elements
+      const interactiveElements = document.querySelectorAll('button, a, input, select, [role="button"]');
       
-      // Get the element under the cursor - using the deepest target
-      const element = e.target as HTMLElement;
-      
-      // Skip if it's the same element we were already hovering
+      interactiveElements.forEach(el => {
+        const htmlEl = el as HTMLElement;
+        
+        // Skip our own widget elements
+        if (widgetRef.current && widgetRef.current.contains(htmlEl)) return;
+        
+        // Store original state
+        originalStates.set(htmlEl, {
+          outline: htmlEl.style.outline,
+          outlineOffset: htmlEl.style.outlineOffset,
+          pointerEvents: htmlEl.style.pointerEvents
+        });
+        
+        // Disable normal interactive behavior to allow highlighting and selection
+        htmlEl.style.pointerEvents = 'none';
+      });
+    };
+    
+    // Call immediately to disable interactive elements
+    disableInteractiveElements();
+    
+    // Handle element highlighting with a shared function
+    const highlightElement = (element: HTMLElement) => {
+      // Skip if it's the same element we're already hovering
       if (element === hoveredElement) return;
+      
+      // Skip if it's part of our own widget
+      if (widgetRef.current && widgetRef.current.contains(element)) return;
       
       // Clear highlight from the previous element if any
       if (hoveredElement) {
-        hoveredElement.style.outline = '';
-        hoveredElement.style.outlineOffset = '';
+        // Restore original outline (or empty string)
+        const originalState = originalStates.get(hoveredElement);
+        hoveredElement.style.outline = originalState?.outline || '';
+        hoveredElement.style.outlineOffset = originalState?.outlineOffset || '';
       }
       
       // Apply highlight to the current element
@@ -74,63 +106,76 @@ const SimpleFeedbackSystem: React.FC = () => {
       setHoveredElement(element);
     };
     
-    // Handle mousemove to ensure we're capturing highlights for all elements
+    // Handle mouse movement for element highlighting - using capture phase
+    const handleMouseOver = (e: MouseEvent) => {
+      highlightElement(e.target as HTMLElement);
+    };
+    
+    // Handle mousemove for more comprehensive element detection
     const handleMouseMove = (e: MouseEvent) => {
-      // This helps capture elements that might not trigger mouseover
-      // like small icons or adjacent elements
+      // Get all elements at the current pointer position
       const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
       
-      // Skip our own widget elements
+      // Skip if we're over our widget
       if (widgetRef.current && elementsAtPoint.some(el => widgetRef.current?.contains(el))) return;
       
-      // Get the topmost element that isn't our widget
-      const topElement = elementsAtPoint[0] as HTMLElement;
-      
-      if (topElement && topElement !== hoveredElement) {
-        // Clear previous
-        if (hoveredElement) {
-          hoveredElement.style.outline = '';
-          hoveredElement.style.outlineOffset = '';
-        }
-        
-        // Highlight new element
-        topElement.style.outline = '2px solid #3b82f6';
-        topElement.style.outlineOffset = '2px';
-        setHoveredElement(topElement);
+      // Get the topmost element
+      if (elementsAtPoint.length > 0) {
+        highlightElement(elementsAtPoint[0] as HTMLElement);
       }
     };
     
-    // Handle click to select an element
+    // Handle click to select an element and place a marker
     const handleClick = (e: MouseEvent) => {
-      // Don't capture clicks on the feedback tool itself
+      // Skip if clicking on our own widget
       if (widgetRef.current && widgetRef.current.contains(e.target as Node)) return;
       
+      // Stop normal event behavior
       e.preventDefault();
       e.stopPropagation();
       
-      // Get click position and element
+      // Get elements at click position to ensure we get the right one
+      const elementsAtClick = document.elementsFromPoint(e.clientX, e.clientY);
+      const clickedElement = elementsAtClick.length > 0 ? 
+                           (elementsAtClick[0] as HTMLElement) : 
+                           (e.target as HTMLElement);
+      
+      // Set the position and element for the feedback
       setSelectedPosition({ x: e.pageX, y: e.pageY });
-      setSelectedElement(e.target as HTMLElement);
+      setSelectedElement(clickedElement);
       setShowCommentModal(true);
       
-      // Remove all highlights
+      // Clear all highlights
       document.body.querySelectorAll('*').forEach(el => {
-        (el as HTMLElement).style.outline = '';
-        (el as HTMLElement).style.outlineOffset = '';
+        const htmlEl = el as HTMLElement;
+        const originalState = originalStates.get(htmlEl) || { outline: '', outlineOffset: '' };
+        htmlEl.style.outline = originalState.outline;
+        htmlEl.style.outlineOffset = originalState.outlineOffset;
       });
       
-      // Exit targeting mode (but keep modal open for comment)
+      // Exit targeting mode but keep modal open
       setIsActive(false);
+      
+      // Restore pointer events on all elements
+      originalStates.forEach((state, element) => {
+        if (element) {
+          element.style.pointerEvents = state.pointerEvents;
+        }
+      });
     };
     
     // Allow ESC to cancel
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setIsActive(false);
-        // Remove highlights
-        document.body.querySelectorAll('*').forEach(el => {
-          (el as HTMLElement).style.outline = '';
-          (el as HTMLElement).style.outlineOffset = '';
+        
+        // Restore all elements to their original state
+        originalStates.forEach((state, element) => {
+          if (element) {
+            element.style.outline = state.outline;
+            element.style.outlineOffset = state.outlineOffset;
+            element.style.pointerEvents = state.pointerEvents;
+          }
         });
       }
     };
@@ -177,10 +222,13 @@ const SimpleFeedbackSystem: React.FC = () => {
         existingOverlay.remove();
       }
       
-      // Remove any lingering highlights
-      document.body.querySelectorAll('*').forEach(el => {
-        (el as HTMLElement).style.outline = '';
-        (el as HTMLElement).style.outlineOffset = '';
+      // Restore all elements to their original state
+      originalStates.forEach((state, element) => {
+        if (element) {
+          element.style.outline = state.outline;
+          element.style.outlineOffset = state.outlineOffset;
+          element.style.pointerEvents = state.pointerEvents;
+        }
       });
     };
   }, [isActive, hoveredElement]);
