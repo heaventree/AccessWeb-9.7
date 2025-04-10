@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useDemoMode } from '../hooks/useDemoMode';
+import { useFloatingTools } from '../contexts/FloatingToolsContext';
 
 export function DemoModeToggle() {
   const { isDemoMode, enableDemoMode, disableDemoMode } = useDemoMode();
-  const [isOpen, setIsOpen] = useState(false);
+  const { activeTool, toggleTool } = useFloatingTools();
   const [isAnimating, setIsAnimating] = useState(false);
+  
+  // Check if this tool is active
+  const isOpen = activeTool === 'demo';
 
   // Handle toggle click
   const handleToggle = () => {
@@ -18,28 +22,13 @@ export function DemoModeToggle() {
   // Toggle panel visibility
   const togglePanel = () => {
     setIsAnimating(true);
-    setIsOpen(!isOpen);
+    toggleTool('demo');
   };
 
   // Handle animation end
   const handleAnimationEnd = () => {
     setIsAnimating(false);
   };
-
-  // Close panel when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (isOpen && !target.closest('.demo-mode-toggle')) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
 
   return (
     <div className="fixed bottom-24 right-4 z-50 demo-mode-toggle flex flex-col items-end">

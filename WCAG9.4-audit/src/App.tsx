@@ -78,6 +78,7 @@ import { ErrorPage } from './components/ErrorPage';
 import AccessibilityTipsPage from './pages/help/AccessibilityTipsPage';
 import { AccessibilityTipsDemo } from './components/demo/AccessibilityTipsDemo';
 import { DemoModeToggle } from './components/DemoModeToggle';
+import { FloatingToolsProvider } from './contexts/FloatingToolsContext';
 
 function App() {
   return (
@@ -169,11 +170,13 @@ function App() {
             />
           } />
         </Routes>
-        <SupportChat />
-        <AccessibilityBadge />
-        <AccessibilityControls />
-        <SimpleFeedbackSystem />
-        <DemoModeToggle />
+        <FloatingToolsProvider>
+          <SupportChat />
+          <AccessibilityBadge />
+          <AccessibilityControls />
+          <SimpleFeedbackSystem />
+          <DemoModeToggle />
+        </FloatingToolsProvider>
       </div>
     </ErrorBoundary>
   );
