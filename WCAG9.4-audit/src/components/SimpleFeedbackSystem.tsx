@@ -105,6 +105,7 @@ const SimpleFeedbackSystem: React.FC = () => {
       pointerEvents: string
     }>();
     
+
     // Save and disable buttons' normal behavior
     const disableInteractiveElements = () => {
       // Find all interactive elements
@@ -201,7 +202,7 @@ const SimpleFeedbackSystem: React.FC = () => {
       });
       
       // Exit targeting mode but keep modal open
-      setIsActive(false);
+      toggleTool(null);
       
       // Restore pointer events on all elements
       originalStates.forEach((state, element) => {
@@ -214,7 +215,7 @@ const SimpleFeedbackSystem: React.FC = () => {
     // Allow ESC to cancel
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setIsActive(false);
+        toggleTool(null);
         
         // Restore all elements to their original state
         originalStates.forEach((state, element) => {
@@ -278,7 +279,7 @@ const SimpleFeedbackSystem: React.FC = () => {
         }
       });
     };
-  }, [isActive, hoveredElement]);
+  }, [isActive, hoveredElement, toggleTool]);
   
   // Generate a simple path for the element (captures the essentials but keeps it simple)
   const getElementPath = (element: HTMLElement): string => {
@@ -482,7 +483,7 @@ const SimpleFeedbackSystem: React.FC = () => {
         </div>
         
         <button
-          onClick={() => setIsActive(!isActive)}
+          onClick={() => toggleTool('feedback')}
           className={`rounded-full h-12 w-12 shadow-lg flex items-center justify-center transition-colors ${
             isActive ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
           }`}
