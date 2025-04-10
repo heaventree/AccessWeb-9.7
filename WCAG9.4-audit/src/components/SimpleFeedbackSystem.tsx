@@ -35,6 +35,11 @@ const SimpleFeedbackSystem: React.FC = () => {
   // Use the floating tools context
   const { activeTool, toggleTool, isFeedbackEnabled } = useFloatingTools();
   
+  // Debug: Log the isFeedbackEnabled value when it changes
+  useEffect(() => {
+    console.log('SimpleFeedbackSystem: isFeedbackEnabled changed to:', isFeedbackEnabled);
+  }, [isFeedbackEnabled]);
+  
   // State for the feedback system
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<FeedbackItem[]>([]);

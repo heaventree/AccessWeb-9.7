@@ -69,7 +69,7 @@ import { ErrorPage } from './components/ErrorPage';
 import AccessibilityTipsPage from './pages/help/AccessibilityTipsPage';
 import { AccessibilityTipsDemo } from './components/demo/AccessibilityTipsDemo';
 import { DemoModeToggle } from './components/DemoModeToggle';
-import { FloatingToolsProvider } from './contexts/FloatingToolsContext';
+// FloatingToolsProvider now used in AppProvider
 
 function App() {
   return (
@@ -162,13 +162,12 @@ function App() {
             />
           } />
         </Routes>
-        <FloatingToolsProvider>
-          <SupportChat />
-          <AccessibilityBadge />
-          <AccessibilityControls />
-          <SimpleFeedbackSystem />
-          <DemoModeToggle />
-        </FloatingToolsProvider>
+        {/* Components now use the FloatingToolsProvider from AppProvider */}
+        <SupportChat />
+        <AccessibilityBadge />
+        <AccessibilityControls />
+        <SimpleFeedbackSystem />
+        <DemoModeToggle />
       </div>
     </ErrorBoundary>
   );
