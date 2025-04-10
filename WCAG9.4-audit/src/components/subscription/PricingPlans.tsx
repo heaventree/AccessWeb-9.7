@@ -10,7 +10,7 @@ export function PricingPlans({ onSubscribe }: PricingPlansProps) {
   const { plans, loading, error, fetchPlans, createCheckoutSession } = useSubscription();
   const { isAuthenticated } = useAuth();
   
-  const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
+  const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly' | 'onetime'>('monthly');
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   
@@ -139,6 +139,17 @@ export function PricingPlans({ onSubscribe }: PricingPlansProps) {
             onClick={() => setBillingInterval('yearly')}
           >
             Yearly <span className="text-blue-500 font-medium">(Save 15%)</span>
+          </button>
+          <button
+            type="button"
+            className={`relative py-2 px-6 border-0 rounded-md text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:w-auto sm:px-8 ${
+              billingInterval === 'onetime'
+                ? 'bg-white border-gray-200 shadow-sm text-gray-900'
+                : 'bg-transparent text-gray-700'
+            }`}
+            onClick={() => setBillingInterval('onetime')}
+          >
+            One-time
           </button>
         </div>
       </div>

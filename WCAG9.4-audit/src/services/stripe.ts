@@ -128,6 +128,7 @@ class StripeService {
           description: 'For small websites and blogs',
           priceMonthly: 29,
           priceYearly: 290, // 10 months price for annual billing
+          priceOnetime: 199, // One-time payment option
           features: [
             'Single website scanning',
             'Basic WCAG 2.2 compliance reports',
@@ -143,6 +144,7 @@ class StripeService {
           description: 'For businesses and organizations',
           priceMonthly: 99,
           priceYearly: 990,
+          priceOnetime: 599, // One-time payment option
           features: [
             'Up to 5 websites',
             'Full WCAG 2.2 compliance reporting',
@@ -159,6 +161,7 @@ class StripeService {
           description: 'For large organizations with multiple sites',
           priceMonthly: 299,
           priceYearly: 2990,
+          priceOnetime: 1799, // One-time payment option
           features: [
             'Unlimited websites',
             'Custom compliance profiles',

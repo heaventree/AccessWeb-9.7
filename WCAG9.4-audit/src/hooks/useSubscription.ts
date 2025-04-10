@@ -8,6 +8,7 @@ export interface Plan {
   description: string;
   priceMonthly: number;
   priceYearly: number;
+  priceOnetime: number;
   features: string[];
   isPopular: boolean;
 }
