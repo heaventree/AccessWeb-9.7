@@ -53,21 +53,50 @@ const SimpleFeedbackSystem: React.FC = () => {
     
     // Handle mouse movement for element highlighting
     const handleMouseOver = (e: MouseEvent) => {
+      // Skip if we're hovering over our own widget
       if (widgetRef.current && widgetRef.current.contains(e.target as Node)) return;
       
-      // Highlight the element under cursor
+      // Get the element under the cursor - using the deepest target
       const element = e.target as HTMLElement;
-      if (element !== hoveredElement) {
-        // Remove highlight from previous element
+      
+      // Skip if it's the same element we were already hovering
+      if (element === hoveredElement) return;
+      
+      // Clear highlight from the previous element if any
+      if (hoveredElement) {
+        hoveredElement.style.outline = '';
+        hoveredElement.style.outlineOffset = '';
+      }
+      
+      // Apply highlight to the current element
+      element.style.outline = '2px solid #3b82f6';
+      element.style.outlineOffset = '2px';
+      setHoveredElement(element);
+    };
+    
+    // Handle mousemove to ensure we're capturing highlights for all elements
+    const handleMouseMove = (e: MouseEvent) => {
+      // This helps capture elements that might not trigger mouseover
+      // like small icons or adjacent elements
+      const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
+      
+      // Skip our own widget elements
+      if (widgetRef.current && elementsAtPoint.some(el => widgetRef.current?.contains(el))) return;
+      
+      // Get the topmost element that isn't our widget
+      const topElement = elementsAtPoint[0] as HTMLElement;
+      
+      if (topElement && topElement !== hoveredElement) {
+        // Clear previous
         if (hoveredElement) {
           hoveredElement.style.outline = '';
           hoveredElement.style.outlineOffset = '';
         }
         
-        // Add highlight to current element
-        element.style.outline = '2px solid #3b82f6';
-        element.style.outlineOffset = '2px';
-        setHoveredElement(element);
+        // Highlight new element
+        topElement.style.outline = '2px solid #3b82f6';
+        topElement.style.outlineOffset = '2px';
+        setHoveredElement(topElement);
       }
     };
     
@@ -84,7 +113,7 @@ const SimpleFeedbackSystem: React.FC = () => {
       setSelectedElement(e.target as HTMLElement);
       setShowCommentModal(true);
       
-      // Remove highlights
+      // Remove all highlights
       document.body.querySelectorAll('*').forEach(el => {
         (el as HTMLElement).style.outline = '';
         (el as HTMLElement).style.outlineOffset = '';
@@ -106,18 +135,47 @@ const SimpleFeedbackSystem: React.FC = () => {
       }
     };
     
-    document.addEventListener('mouseover', handleMouseOver);
+    // Add a highlight overlay message to make it clear we're in targeting mode
+    const overlay = document.createElement('div');
+    overlay.id = 'feedback-targeting-overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.bottom = '16px';
+    overlay.style.left = '50%';
+    overlay.style.transform = 'translateX(-50%)';
+    overlay.style.background = 'rgba(0, 0, 0, 0.8)';
+    overlay.style.color = 'white';
+    overlay.style.padding = '8px 16px';
+    overlay.style.borderRadius = '4px';
+    overlay.style.zIndex = '9999';
+    overlay.style.fontWeight = 'bold';
+    overlay.style.fontSize = '14px';
+    overlay.textContent = 'Click on any element to leave feedback (ESC to cancel)';
+    document.body.appendChild(overlay);
+    
+    // Add all event listeners
+    document.addEventListener('mouseover', handleMouseOver, true);
+    document.addEventListener('mousemove', handleMouseMove, true);
     document.addEventListener('click', handleClick, true);
     document.addEventListener('keydown', handleKeyDown);
     
-    // Cursor style to indicate clickable page
+    // Change cursor to indicate clickable page
     document.body.style.cursor = 'crosshair';
     
     return () => {
-      document.removeEventListener('mouseover', handleMouseOver);
+      // Clean up event listeners
+      document.removeEventListener('mouseover', handleMouseOver, true);
+      document.removeEventListener('mousemove', handleMouseMove, true);
       document.removeEventListener('click', handleClick, true);
       document.removeEventListener('keydown', handleKeyDown);
+      
+      // Reset cursor
       document.body.style.cursor = '';
+      
+      // Remove the overlay
+      const existingOverlay = document.getElementById('feedback-targeting-overlay');
+      if (existingOverlay) {
+        existingOverlay.remove();
+      }
       
       // Remove any lingering highlights
       document.body.querySelectorAll('*').forEach(el => {
