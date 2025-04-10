@@ -7,6 +7,8 @@
 
 export type FeatureStatus = 'planned' | 'in-progress' | 'completed' | 'deferred';
 
+export type RoadmapFeatureSource = 'feedback' | 'manual' | 'system';
+
 export interface RoadmapFeature {
   id: string;
   title: string;
@@ -14,6 +16,7 @@ export interface RoadmapFeature {
   status: FeatureStatus;
   priority: number; // 1 (highest) to 5 (lowest)
   category: 'core' | 'ui' | 'reporting' | 'integration' | 'analytics';
+  source?: RoadmapFeatureSource;
   dependencies?: string[]; // IDs of features this depends on
   estimatedCompletionDate?: string;
   completedDate?: string;
@@ -43,7 +46,8 @@ export function addFeedbackAsRoadmapFeature(
     description,
     status: 'planned',
     priority,
-    category
+    category,
+    source: 'feedback'
   };
   
   addRoadmapFeature(newFeature);

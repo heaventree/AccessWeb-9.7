@@ -35,6 +35,8 @@ export type DebugItemPriority =
   | 'low'       // Fix when possible, minor impact
   | 'very-low'; // Nice to have, minimal impact
 
+export type DebugItemSource = 'feedback' | 'manual' | 'system';
+
 export interface DebugItem {
   id: string;
   title: string;
@@ -43,6 +45,7 @@ export interface DebugItem {
   status: DebugItemStatus;
   priority: DebugItemPriority;
   dateIdentified: string;
+  source?: DebugItemSource;
   assignedTo?: string;
   relatedIssues?: string[];
   todoItems?: string[];
@@ -75,6 +78,7 @@ export function addFeedbackAsDebugItem(
     status: 'identified',
     priority,
     dateIdentified: new Date().toISOString().split('T')[0],
+    source: 'feedback',
     todoItems: ['Review feedback', 'Determine appropriate action', 'Implement solution'],
     notes: 'Added via user feedback system'
   };

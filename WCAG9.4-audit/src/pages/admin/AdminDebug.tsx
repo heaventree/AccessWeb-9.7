@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { HeadingSection } from '../../components/ui/HeadingSection';
-import { debugItems, DebugItem, DebugItemCategory, DebugItemPriority, DebugItemStatus } from '../../data/debugData';
+import { debugItems, DebugItem, DebugItemCategory, DebugItemPriority, DebugItemStatus, DebugItemSource } from '../../data/debugData';
 
 export function AdminDebug() {
   const [statusFilter, setStatusFilter] = useState<DebugItemStatus | 'all'>('all');
   const [categoryFilter, setCategoryFilter] = useState<DebugItemCategory | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<DebugItemPriority | 'all'>('all');
+  const [sourceFilter, setSourceFilter] = useState<DebugItemSource | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<DebugItem[]>(debugItems);
   
