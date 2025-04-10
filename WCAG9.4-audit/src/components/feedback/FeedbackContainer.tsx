@@ -24,7 +24,7 @@ const FeedbackContainer: React.FC<FeedbackContainerProps> = ({ position = 'botto
   };
   
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+    <div className="fixed right-4 top-1/2 -translate-y-1/2 z-50 flex flex-col items-end gap-2">
       {/* Tab switcher */}
       <div className="bg-white rounded-md shadow-sm border border-gray-200 p-1 flex text-xs">
         <button
@@ -54,6 +54,7 @@ const FeedbackContainer: React.FC<FeedbackContainerProps> = ({ position = 'botto
         addToRoadmap={activeTab === 'roadmap'}
         onFeedbackSubmitted={handleFeedbackSubmitted}
         position={position}
+        quickMode={true}
       />
     </div>
   );

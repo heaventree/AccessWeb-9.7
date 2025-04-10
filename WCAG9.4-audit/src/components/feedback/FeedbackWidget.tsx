@@ -6,12 +6,14 @@ interface FeedbackWidgetProps {
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
   onFeedbackSubmitted?: (feedback: any) => void;
   addToRoadmap?: boolean; // Whether to add to roadmap (true) or debug list (false)
+  quickMode?: boolean; // If true, clicking the button immediately activates targeting mode
 }
 
 export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
   position = 'bottom-right',
   onFeedbackSubmitted,
-  addToRoadmap = false
+  addToRoadmap = false,
+  quickMode = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isTargeting, setIsTargeting] = useState(false);
@@ -87,6 +89,16 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
         (el as HTMLElement).style.outline = '';
         (el as HTMLElement).style.outlineOffset = '';
       });
+      
+      // Open the feedback form immediately after selection
+      setIsOpen(true);
+      
+      // Pre-fill title with element type
+      const elementType = element.tagName.toLowerCase();
+      setFeedback(prev => ({
+        ...prev,
+        title: `Feedback for ${elementType} element`
+      }));
     };
     
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -331,9 +343,10 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
       
       {!isOpen && !isTargeting && (
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => quickMode ? startTargeting() : setIsOpen(true)}
           className="rounded-full h-12 w-12 bg-blue-600 text-white shadow-lg flex items-center justify-center hover:bg-blue-700"
-          aria-label="Open feedback form"
+          aria-label={quickMode ? "Click to select an element" : "Open feedback form"}
+          title={quickMode ? "Click to select an element for feedback" : "Open feedback form"}
         >
           <MessageSquare className="h-5 w-5" />
         </button>
