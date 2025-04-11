@@ -6,9 +6,12 @@ import {
   Layout,
   Link2,
   Heading1,
-  MousePointer2
+  MousePointer2,
+  Zap
 } from 'lucide-react';
 import type { AccessibilityIssue } from '../types';
+import { AIRecommendations } from './AIRecommendations';
+import { fixEngine } from '../lib/accessibility-fixes';
 
 interface StructureAnalysisPanelProps {
   issues: AccessibilityIssue[];
@@ -277,6 +280,55 @@ export function StructureAnalysisPanel({ issues }: StructureAnalysisPanelProps) 
                       </div>
                     </div>
                   )}
+                  
+                  {/* Auto-fix button for Pro users */}
+                  {issue.fixSuggestion && (
+                    <div className="mt-6 flex items-center space-x-4">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Apply auto-fix using the fix engine
+                          try {
+                            const sanitizeSelector = (selector: string) => {
+                              return selector
+                                .replace(/[^\w\s\-_.#[\]='"]/g, '')  // Remove potentially unsafe characters
+                                .trim() || 'body';  // Default to body if empty after sanitizing
+                            };
+                            
+                            fixEngine.applyFix({
+                              id: 'current-page',
+                              url: window.location.href,
+                              name: 'Current Page',
+                              platform: 'web',
+                              metadata: {}
+                            }, {
+                              id: issue.id,
+                              targetSelector: sanitizeSelector(issue.nodes[0] || 'body'),
+                              type: 'structure',
+                              structureFix: {
+                                elementType: issue.structureType || 'generic',
+                                suggestion: issue.structureDetails?.suggestedStructure || issue.fixSuggestion
+                              }
+                            });
+                            
+                            // Show success message or visual indication
+                            alert('Fix applied! Refresh to see changes.');
+                          } catch (error) {
+                            console.error('Error applying fix:', error);
+                            alert('Could not apply fix. See console for details.');
+                          }
+                        }}
+                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        <Zap className="w-4 h-4 mr-2" />
+                        Auto-Fix Issue
+                        <span className="ml-2 px-1.5 py-0.5 text-xs font-semibold bg-yellow-400 text-green-800 rounded">PRO</span>
+                      </button>
+                    </div>
+                  )}
+                  
+                  {/* AI Recommendations */}
+                  <AIRecommendations issue={issue} />
                 </div>
               )}
             </div>
