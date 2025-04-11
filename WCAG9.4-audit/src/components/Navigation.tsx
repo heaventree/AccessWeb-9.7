@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Settings, Globe, Book, HelpCircle, User } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { FeedbackToggle } from './FeedbackToggle';
-import { tools, integrations, resources, accountItems } from './NavigationData';
+import { toolItems, integrationItems, resourceItems, accountItems } from './NavigationData';
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -1,28 +1,21 @@
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { useUIEnhancement } from '../contexts/UIEnhancementContext';
 
+/**
+ * A wrapper component that renders either standard or enhanced UI elements
+ * based on the current UI mode from UIEnhancementContext
+ */
 interface UIEnhancementWrapperProps {
-  children: ReactNode;
-  enhancedVersion: ReactNode;
-  featureFlag: keyof ReturnType<typeof useUIEnhancement>['featureFlags'];
+  standardElement: ReactNode;
+  enhancedElement: ReactNode;
 }
 
-/**
- * UIEnhancementWrapper component conditionally renders either the original children
- * or an enhanced version based on the current UI mode and the specified feature flag.
- * 
- * This is useful for smaller UI elements that need to be enhanced without creating
- * full page alternatives.
- */
-export function UIEnhancementWrapper({
-  children,
-  enhancedVersion,
-  featureFlag
-}: UIEnhancementWrapperProps) {
-  const { uiMode, featureFlags } = useUIEnhancement();
+export function UIEnhancementWrapper({ standardElement, enhancedElement }: UIEnhancementWrapperProps) {
+  const { uiMode } = useUIEnhancement();
   
-  // Show enhanced version only if both UI mode is enhanced and the specific feature flag is enabled
-  const shouldShowEnhanced = uiMode === 'enhanced' && featureFlags[featureFlag];
-  
-  return shouldShowEnhanced ? <>{enhancedVersion}</> : <>{children}</>;
+  return (
+    <>
+      {uiMode === 'enhanced' ? enhancedElement : standardElement}
+    </>
+  );
 }

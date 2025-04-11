@@ -5,7 +5,7 @@ interface UIEnhancementButtonProps {
   className?: string;
 }
 
-export function UIEnhancementButton({ className = '' }: UIEnhancementButtonProps) {
+export function UIEnhancementButton({ className = 'fixed z-50 bottom-20 right-4' }: UIEnhancementButtonProps) {
   const { uiMode, setUIMode } = useUIEnhancement();
   
   const toggleUIMode = () => {

@@ -11,6 +11,8 @@ import { SkipLink } from './components/ui';
 import { AuthPage } from './pages/AuthPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { Navigation } from './components/Navigation';
+import { EnhancedNavigation } from './components/EnhancedNavigation';
+import { UIEnhancementWrapper } from './components/UIEnhancementWrapper';
 import { Footer } from './components/Footer';
 import { AdminLayout } from './layouts/AdminLayout';
 import { AccountLayout } from './layouts/AccountLayout';
@@ -82,7 +84,12 @@ function App() {
         <SkipLink targetId="main-content" />
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<><Navigation /><main id="main-content"><LandingPage /></main><Footer /><BackToTop /></>} />
+          <Route path="/" element={
+            <UIEnhancementWrapper
+              standardElement={<><Navigation /><main id="main-content"><LandingPage /></main><Footer /><BackToTop /></>}
+              enhancedElement={<><EnhancedNavigation /><main id="main-content"><LandingPage /></main><Footer /><BackToTop /></>}
+            />
+          } />
           <Route path="/pricing" element={<><Navigation /><main id="main-content"><PricingPage /></main><Footer /><BackToTop /></>} />
           <Route path="/wordpressint" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
           <Route path="/checker" element={<><Navigation /><main id="main-content"><WCAGCheckerPage /></main><Footer /><BackToTop /></>} />

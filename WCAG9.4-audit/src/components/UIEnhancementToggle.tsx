@@ -29,7 +29,7 @@ export function UIEnhancementToggle() {
     <>
       {/* Floating toggle button */}
       <button
-        className="fixed right-4 bottom-4 z-50 p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-colors"
+        className="fixed right-4 bottom-4 z-50 p-3 rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700 transition-colors animate-pulse"
         onClick={togglePanel}
         aria-label="Toggle UI Enhancement Panel"
         aria-expanded={panelOpen}
