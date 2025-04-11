@@ -3,7 +3,6 @@ import {
   ChevronDown,
   ChevronUp,
   Smartphone,
-  Laptop,
   Code,
   Layout,
   Type,
@@ -15,6 +14,95 @@ import type { AccessibilityIssue } from '../types';
 
 interface ResponsiveAnalysisPanelProps {
   issues: AccessibilityIssue[];
+}
+
+function getImpactColor(impact: string): string {
+  switch (impact) {
+    case 'critical':
+      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+    case 'serious':
+      return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+    case 'moderate':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+    case 'minor':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+  }
+}
+
+function getSubtleBackgroundColor(issue: AccessibilityIssue): string {
+  // Viewport and meta issues
+  if (issue.id.includes('viewport') || issue.structureDetails?.elementType === 'meta') {
+    return 'bg-purple-50 dark:bg-purple-900/10';
+  }
+  
+  // Touch target issues
+  if (issue.id.includes('touch-target') || 
+      issue.wcagCriteria.includes('2.5.5') || 
+      issue.wcagCriteria.includes('2.5.8') ||
+      issue.structureDetails?.elementType === 'touch-target') {
+    return 'bg-orange-50 dark:bg-orange-900/10';
+  }
+  
+  // Text and font size issues
+  if (issue.id.includes('font-size') || 
+      issue.id.includes('text') || 
+      issue.wcagCriteria.includes('1.4.4') ||
+      issue.structureDetails?.elementType === 'font-size' ||
+      issue.wcagCriteria.includes('1.4.12')) {
+    return 'bg-blue-50 dark:bg-blue-900/10';
+  }
+  
+  // Layout, orientation, and reflow issues
+  if (issue.id.includes('reflow') || 
+      issue.id.includes('orientation') || 
+      issue.wcagCriteria.includes('1.4.10') ||
+      issue.wcagCriteria.includes('1.3.4')) {
+    return 'bg-green-50 dark:bg-green-900/10';
+  }
+  
+  // Image issues
+  if (issue.id.includes('image') || issue.structureDetails?.elementType === 'image') {
+    return 'bg-amber-50 dark:bg-amber-900/10';
+  }
+  
+  // CSS and media query issues
+  if (issue.id.includes('media-queries') || issue.structureDetails?.elementType === 'css') {
+    return 'bg-red-50 dark:bg-red-900/10';
+  }
+  
+  return 'bg-gray-50 dark:bg-gray-800';
+}
+
+function getStatusLabel(issue: AccessibilityIssue): string {
+  switch (issue.impact) {
+    case 'critical':
+      return 'Critical';
+    case 'serious':
+      return 'Needs Attention';
+    case 'moderate':
+      return 'Review';
+    case 'minor':
+      return 'Consider';
+    default:
+      return 'Check';
+  }
+}
+
+function getStatusLabelStyle(issue: AccessibilityIssue): string {
+  switch (issue.impact) {
+    case 'critical':
+      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+    case 'serious':
+      return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+    case 'moderate':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+    case 'minor':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+  }
 }
 
 export function ResponsiveAnalysisPanel({ issues }: ResponsiveAnalysisPanelProps) {
@@ -157,21 +245,26 @@ export function ResponsiveAnalysisPanel({ issues }: ResponsiveAnalysisPanelProps
           {responsiveIssues.map(issue => (
             <div key={issue.id + responsiveIssues.indexOf(issue)} className="border rounded-lg overflow-hidden dark:border-gray-700">
               <div
-                className="bg-gray-50 dark:bg-gray-800 p-4 flex justify-between items-center cursor-pointer"
+                className={`p-4 flex justify-between items-center cursor-pointer ${getSubtleBackgroundColor(issue)}`}
                 onClick={() => toggleIssue(issue.id + responsiveIssues.indexOf(issue))}
               >
                 <div className="flex items-center">
                   {getIconForIssue(issue)}
-                  <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">
-                      {getIssueTitle(issue)}
-                    </h3>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-gray-900 dark:text-white">
+                        {getIssueTitle(issue)}
+                      </h3>
+                      <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusLabelStyle(issue)}`}>
+                        {getStatusLabel(issue)}
+                      </span>
+                    </div>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {issue.description}
                     </p>
                   </div>
                 </div>
-                <div className="text-gray-400">
+                <div className="text-gray-400 ml-4">
                   {expandedIssues.has(issue.id + responsiveIssues.indexOf(issue)) ? (
                     <ChevronUp className="h-5 w-5" />
                   ) : (
@@ -367,19 +460,4 @@ function getIssueTitle(issue: AccessibilityIssue): string {
   
   // Format any other IDs into a proper title
   return issue.id.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-}
-
-function getImpactColor(impact: string): string {
-  switch (impact) {
-    case 'critical':
-      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-    case 'serious':
-      return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-    case 'moderate':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-    case 'minor':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-    default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
-  }
 }

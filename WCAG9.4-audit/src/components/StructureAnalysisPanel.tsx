@@ -14,6 +14,71 @@ interface StructureAnalysisPanelProps {
   issues: AccessibilityIssue[];
 }
 
+function getImpactColor(impact: string): string {
+  switch (impact) {
+    case 'critical':
+      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+    case 'serious':
+      return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+    case 'moderate':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+    case 'minor':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+  }
+}
+
+function getSubtleBackgroundColor(issue: AccessibilityIssue): string {
+  if (issue.structureType === 'heading' || issue.id.includes('heading') || issue.id === 'multiple-h1') {
+    return 'bg-amber-50 dark:bg-amber-900/10';
+  }
+  
+  if (issue.structureType === 'semantic' || issue.structureType === 'landmark') {
+    return 'bg-indigo-50 dark:bg-indigo-900/10';
+  }
+  
+  if (issue.structureType === 'url' || issue.id === 'url-design') {
+    return 'bg-blue-50 dark:bg-blue-900/10';
+  }
+  
+  if (issue.structureType === 'navigation') {
+    return 'bg-purple-50 dark:bg-purple-900/10';
+  }
+  
+  return 'bg-gray-50 dark:bg-gray-800';
+}
+
+function getStatusLabel(issue: AccessibilityIssue): string {
+  switch (issue.impact) {
+    case 'critical':
+      return 'Critical';
+    case 'serious':
+      return 'Needs Attention';
+    case 'moderate':
+      return 'Review';
+    case 'minor':
+      return 'Consider';
+    default:
+      return 'Check';
+  }
+}
+
+function getStatusLabelStyle(issue: AccessibilityIssue): string {
+  switch (issue.impact) {
+    case 'critical':
+      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+    case 'serious':
+      return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+    case 'moderate':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+    case 'minor':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+  }
+}
+
 export function StructureAnalysisPanel({ issues }: StructureAnalysisPanelProps) {
   const [expandedIssues, setExpandedIssues] = useState<Set<string>>(new Set());
 
@@ -121,21 +186,26 @@ export function StructureAnalysisPanel({ issues }: StructureAnalysisPanelProps) 
           {structureIssues.map(issue => (
             <div key={issue.id + structureIssues.indexOf(issue)} className="border rounded-lg overflow-hidden dark:border-gray-700">
               <div 
-                className="bg-gray-50 dark:bg-gray-800 p-4 flex justify-between items-center cursor-pointer" 
+                className={`p-4 flex justify-between items-center cursor-pointer ${getSubtleBackgroundColor(issue)}`}
                 onClick={() => toggleIssue(issue.id + structureIssues.indexOf(issue))}
               >
                 <div className="flex items-center">
                   {getIconForIssue(issue)}
-                  <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">
-                      {getIssueTitle(issue)}
-                    </h3>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-gray-900 dark:text-white">
+                        {getIssueTitle(issue)}
+                      </h3>
+                      <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusLabelStyle(issue)}`}>
+                        {getStatusLabel(issue)}
+                      </span>
+                    </div>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {issue.description}
                     </p>
                   </div>
                 </div>
-                <div className="text-gray-400">
+                <div className="text-gray-400 ml-4">
                   {expandedIssues.has(issue.id + structureIssues.indexOf(issue)) ? (
                     <ChevronUp className="h-5 w-5" />
                   ) : (
@@ -285,19 +355,4 @@ function getIssueTitle(issue: AccessibilityIssue): string {
   }
   
   return issue.id.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-}
-
-function getImpactColor(impact: string): string {
-  switch (impact) {
-    case 'critical':
-      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-    case 'serious':
-      return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-    case 'moderate':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-    case 'minor':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-    default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
-  }
 }
