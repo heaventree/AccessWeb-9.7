@@ -7,6 +7,7 @@ import { RegionSelector } from '../components/RegionSelector';
 import { EmbedBadge } from '../components/EmbedBadge';
 import { StructureAnalysisPanel } from '../components/StructureAnalysisPanel';
 import { ResponsiveAnalysisPanel } from '../components/ResponsiveAnalysisPanel';
+import { MediaAnalysisPanel } from '../components/MediaAnalysisPanel';
 import { testAccessibility } from '../utils/accessibilityTester';
 import { analyzeResponsiveDesign } from '../utils/responsiveDesignAnalyzer';
 import type { TestResult } from '../types';
@@ -103,8 +104,8 @@ export function WCAGCheckerPage() {
         // Office document issues are prioritized next
         setActiveTab('issues');  
       } else if (hasMediaIssues) {
-        // Media issues are prioritized after document issues
-        setActiveTab('issues');
+        // Media issues have their own dedicated tab
+        setActiveTab('media');
       } else if (hasStructureIssues) {
         // Structure issues get their own dedicated tab
         setActiveTab('structure');
@@ -200,7 +201,27 @@ export function WCAGCheckerPage() {
     );
   };
   
+  const getMediaIssues = () => {
+    if (!results) return [];
+    return results.issues.filter(issue => 
+      issue.mediaType === 'audio' || 
+      issue.mediaType === 'video' || 
+      issue.mediaType === 'embedded' ||
+      issue.wcagCriteria.includes('1.2.1') || // Audio-only and Video-only (Prerecorded)
+      issue.wcagCriteria.includes('1.2.2') || // Captions (Prerecorded)
+      issue.wcagCriteria.includes('1.2.3') || // Audio Description or Media Alternative (Prerecorded)
+      issue.wcagCriteria.includes('1.2.4') || // Captions (Live)
+      issue.wcagCriteria.includes('1.2.5') || // Audio Description (Prerecorded)
+      issue.wcagCriteria.includes('1.2.6') || // Sign Language (Prerecorded)
+      issue.wcagCriteria.includes('1.2.7') || // Extended Audio Description (Prerecorded)
+      issue.wcagCriteria.includes('1.2.8') || // Media Alternative (Prerecorded)
+      issue.wcagCriteria.includes('1.2.9') || // Audio-only (Live)
+      issue.wcagCriteria.includes('1.4.2')    // Audio Control
+    );
+  };
+  
   const responsiveIssues = getResponsiveIssues();
+  const mediaIssues = getMediaIssues();
 
   return (
     <div className="page-container">
@@ -434,6 +455,15 @@ export function WCAGCheckerPage() {
                         Responsive ({responsiveIssues.length})
                       </button>
                     )}
+                    {mediaIssues.length > 0 && (
+                      <button
+                        onClick={() => setActiveTab('media')}
+                        className={getTabStyle('media')}
+                      >
+                        <Video className="w-4 h-4 inline-block mr-2" />
+                        Media ({mediaIssues.length})
+                      </button>
+                    )}
                     {results.warnings.length > 0 && (
                       <button
                         onClick={() => setActiveTab('warnings')}
@@ -518,6 +548,26 @@ export function WCAGCheckerPage() {
                           </ul>
                         </div>
                         <ResponsiveAnalysisPanel issues={responsiveIssues} />
+                      </div>
+                    )}
+                    {activeTab === 'media' && mediaIssues.length > 0 && (
+                      <div className="space-y-4">
+                        <div className="bg-purple-50 p-4 rounded-lg">
+                          <h3 className="text-lg font-semibold text-purple-900 mb-2">
+                            Media Accessibility Analysis
+                          </h3>
+                          <p className="text-purple-700">
+                            Evaluating audio and video accessibility according to WCAG standards:
+                          </p>
+                          <ul className="mt-2 space-y-1 text-purple-700">
+                            <li>• Captions for video content (WCAG 1.2.2)</li>
+                            <li>• Audio descriptions for visual content (WCAG 1.2.3, 1.2.5)</li>
+                            <li>• Transcripts for audio-only content (WCAG 1.2.1)</li>
+                            <li>• Accessible media controls (WCAG 2.1.1)</li>
+                            <li>• Avoiding autoplay with sound (WCAG 1.4.2)</li>
+                          </ul>
+                        </div>
+                        <MediaAnalysisPanel issues={mediaIssues} />
                       </div>
                     )}
                   </div>
