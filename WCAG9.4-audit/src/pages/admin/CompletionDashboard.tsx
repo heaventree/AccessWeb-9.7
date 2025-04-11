@@ -18,13 +18,13 @@ interface FeatureStatus {
 
 // Data for the completion charts
 const categoryCompletions: CategoryCompletion[] = [
-  { name: 'Accessibility Compliance', percentage: 80, color: '#ef4444' },
-  { name: 'Core Features', percentage: 75, color: '#4ade80' },
+  { name: 'Accessibility Compliance', percentage: 85, color: '#ef4444' }, // Increased with Media Accessibility
+  { name: 'Core Features', percentage: 78, color: '#4ade80' }, // Slight increase
   { name: 'UI/UX Implementation', percentage: 85, color: '#3b82f6' },
   { name: 'Backend Systems', percentage: 70, color: '#f97316' },
   { name: 'Integrations', percentage: 60, color: '#8b5cf6' },
-  { name: 'Documentation', percentage: 75, color: '#14b8a6' },
-  { name: 'Testing & Bug Fixes', percentage: 65, color: '#f43f5e' },
+  { name: 'Documentation', percentage: 78, color: '#14b8a6' }, // Slight increase
+  { name: 'Testing & Bug Fixes', percentage: 70, color: '#f43f5e' }, // Increased with bug fixes
 ];
 
 // Data for feature completion status
@@ -42,8 +42,8 @@ const featureCompletions: FeatureStatus[] = [
   { name: 'User Authentication System', percentage: 85, status: 'in-progress' }, // Increased progress
   { name: 'Payment Processing', percentage: 80, status: 'in-progress' }, // Increased progress
   { name: 'External Integration Security', percentage: 60, status: 'in-progress' }, // Increased progress
-  { name: 'Media Accessibility Testing', percentage: 60, status: 'in-progress' }, // Increased progress
-  { name: 'Accessibility Compliance - WCAG 2.2', percentage: 75, status: 'in-progress' }, // Increased progress
+  { name: 'Media Accessibility Testing', percentage: 100, status: 'completed' }, // Completed feature
+  { name: 'Accessibility Compliance - WCAG 2.2', percentage: 85, status: 'in-progress' }, // Increased progress
   { name: 'Admin Dashboard Stats', percentage: 70, status: 'in-progress' }, // Increased progress
   { name: 'Monitoring System', percentage: 50, status: 'in-progress' }, // Increased progress
   { name: 'Subscription System', percentage: 70, status: 'in-progress' }, // Improved from critical to in-progress

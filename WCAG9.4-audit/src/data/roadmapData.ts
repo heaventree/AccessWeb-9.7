@@ -352,6 +352,15 @@ export const roadmapFeatures: RoadmapFeature[] = [
     priority: 2,
     category: 'ui',
     completedDate: '2025-04-01'
+  },
+  {
+    id: 'media-accessibility',
+    title: 'Media Accessibility Testing',
+    description: 'Implement comprehensive testing for audio, video, and embedded media accessibility compliance',
+    status: 'completed',
+    priority: 2,
+    category: 'core',
+    completedDate: '2025-04-11'
   }
 ];
 
