@@ -4,14 +4,66 @@ import {
   ChevronDown, 
   Menu, 
   X, 
+  CheckCircle, 
+  Book, 
+  Palette,
+
+  Eye, 
+  Activity,
+  Zap,
+  Image,
+  BarChart,
+  Shield,
+  ShoppingBag,
+  Code,
+  Briefcase,
+  BookOpen,
+  Info,
+  Wrench,
+  Rss,
+  Database,
+  HelpCircle,
+  Home,
+  Bell,
+  Link as LinkIcon,
   CreditCard,
+  Settings,
+  Users,
   Sun,
   Moon,
   MessageSquare
 } from 'lucide-react';
 import { useUIEnhancement } from '../contexts/UIEnhancementContext';
 import { useTheme } from '../hooks/useTheme';
-import { toolItems, integrationItems, resourceItems, accountItems } from './NavigationData';
+
+// Icon mapping
+const iconMap: Record<string, React.ReactNode> = {
+  'check-circle': <CheckCircle className="w-5 h-5" />,
+  'book': <Book className="w-5 h-5" />,
+  'palette': <Palette className="w-5 h-5" />,
+  'eye': <Eye className="w-5 h-5" />,
+  'activity': <Activity className="w-5 h-5" />,
+  'zap': <Zap className="w-5 h-5" />,
+  'image': <Image className="w-5 h-5" />,
+  'bar-chart': <BarChart className="w-5 h-5" />,
+  'shield': <Shield className="w-5 h-5" />,
+  'shopping-bag': <ShoppingBag className="w-5 h-5" />,
+  'code': <Code className="w-5 h-5" />,
+  'briefcase': <Briefcase className="w-5 h-5" />,
+  'book-open': <BookOpen className="w-5 h-5" />,
+  'info': <Info className="w-5 h-5" />,
+  'tool': <Wrench className="w-5 h-5" />,
+  'rss': <Rss className="w-5 h-5" />,
+  'database': <Database className="w-5 h-5" />,
+  'help-circle': <HelpCircle className="w-5 h-5" />,
+  'home': <Home className="w-5 h-5" />,
+  'bell': <Bell className="w-5 h-5" />,
+  'link': <LinkIcon className="w-5 h-5" />,
+  'credit-card': <CreditCard className="w-5 h-5" />,
+  'settings': <Settings className="w-5 h-5" />,
+  'users': <Users className="w-5 h-5" />,
+  'message-square': <MessageSquare className="w-5 h-5" />,
+};
 
 export function EnhancedNavigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
