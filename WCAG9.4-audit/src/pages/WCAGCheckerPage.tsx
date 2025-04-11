@@ -5,6 +5,7 @@ import { ResultsSummary } from '../components/ResultsSummary';
 import { IssuesList } from '../components/IssuesList';
 import { RegionSelector } from '../components/RegionSelector';
 import { EmbedBadge } from '../components/EmbedBadge';
+import { StructureAnalysisPanel } from '../components/StructureAnalysisPanel';
 import { testAccessibility } from '../utils/accessibilityTester';
 import type { TestResult } from '../types';
 import { exportToPDF } from '../utils/pdfExport';
@@ -19,10 +20,11 @@ import {
   Palette,
   HelpCircle,
   Video,
-  Headphones
+  Headphones,
+  Layout
 } from 'lucide-react';
 
-type TabType = 'issues' | 'warnings' | 'passes' | 'contrast';
+type TabType = 'issues' | 'warnings' | 'passes' | 'contrast' | 'structure';
 
 // Pro pill styling
 const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold inline-flex items-center scale-[0.85] origin-left";
@@ -80,6 +82,17 @@ export function WCAGCheckerPage() {
         issue.id === 'color-contrast' || issue.wcagCriteria.includes('1.4.3')
       );
       
+      // Check for HTML structure and URL design issues
+      const hasStructureIssues = testResults.issues.some(issue => 
+        issue.structureType || 
+        issue.id.includes('heading') || 
+        issue.id.includes('landmark') || 
+        issue.id.includes('semantic') ||
+        issue.id.includes('url') ||
+        issue.id === 'page-has-heading-one' ||
+        issue.id === 'multiple-h1'
+      );
+      
       if (hasPDFIssues) {
         // PDF issues are prioritized in the display
         setActiveTab('issues');
@@ -89,6 +102,9 @@ export function WCAGCheckerPage() {
       } else if (hasMediaIssues) {
         // Media issues are prioritized after document issues
         setActiveTab('issues');
+      } else if (hasStructureIssues) {
+        // Structure issues get their own dedicated tab
+        setActiveTab('structure');
       } else if (hasContrastIssues) {
         setActiveTab('contrast');
       } else if (testResults.issues.length > 0) {
@@ -137,6 +153,8 @@ export function WCAGCheckerPage() {
           return `${baseStyle} border-amber-500 text-amber-700 bg-amber-50`;
         case 'passes':
           return `${baseStyle} border-emerald-500 text-emerald-700 bg-emerald-50`;
+        case 'structure':
+          return `${baseStyle} border-blue-500 text-blue-700 bg-blue-50`;
       }
     }
     return `${baseStyle} border-gray-300 text-gray-600 hover:bg-gray-50`;
@@ -144,6 +162,21 @@ export function WCAGCheckerPage() {
 
   const contrastIssues = getContrastIssues();
   const nonContrastIssues = getNonContrastIssues();
+  
+  const getStructureIssues = () => {
+    if (!results) return [];
+    return results.issues.filter(issue => 
+      issue.structureType || 
+      issue.id.includes('heading') || 
+      issue.id.includes('landmark') || 
+      issue.id.includes('semantic') ||
+      issue.id.includes('url') ||
+      issue.id === 'page-has-heading-one' ||
+      issue.id === 'multiple-h1'
+    );
+  };
+  
+  const structureIssues = getStructureIssues();
 
   return (
     <div className="page-container">
@@ -358,6 +391,15 @@ export function WCAGCheckerPage() {
                         Issues ({nonContrastIssues.length})
                       </button>
                     )}
+                    {structureIssues.length > 0 && (
+                      <button
+                        onClick={() => setActiveTab('structure')}
+                        className={getTabStyle('structure')}
+                      >
+                        <Layout className="w-4 h-4 inline-block mr-2" />
+                        Structure ({structureIssues.length})
+                      </button>
+                    )}
                     {results.warnings.length > 0 && (
                       <button
                         onClick={() => setActiveTab('warnings')}
@@ -404,6 +446,25 @@ export function WCAGCheckerPage() {
                     )}
                     {activeTab === 'passes' && results.passes.length > 0 && (
                       <IssuesList issues={results.passes} type="passes" />
+                    )}
+                    {activeTab === 'structure' && structureIssues.length > 0 && (
+                      <div className="space-y-4">
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                            HTML Structure & URL Analysis
+                          </h3>
+                          <p className="text-blue-700">
+                            Analyzing the structural organization of HTML and URLs for usability and accessibility:
+                          </p>
+                          <ul className="mt-2 space-y-1 text-blue-700">
+                            <li>• Proper heading hierarchy (H1, H2, H3, etc.)</li>
+                            <li>• Semantic HTML elements usage</li>
+                            <li>• Landmark regions and ARIA roles</li>
+                            <li>• URL design and readability</li>
+                          </ul>
+                        </div>
+                        <StructureAnalysisPanel issues={structureIssues} />
+                      </div>
                     )}
                   </div>
                 </div>

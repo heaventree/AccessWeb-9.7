@@ -7,7 +7,6 @@
  * more detailed structural analysis that impacts both accessibility and SEO.
  */
 
-import { parse, HTMLElement } from 'node-html-parser';
 import type { AccessibilityIssue } from '../types';
 
 interface StructureAnalysisOptions {
@@ -46,69 +45,79 @@ const defaultOptions: StructureAnalysisOptions = {
  * Analyzes HTML structure for accessibility and usability issues
  */
 export function analyzeHtmlStructure(
-  html: string, 
+  html: string,
   url: string,
   options: Partial<StructureAnalysisOptions> = {}
 ): AccessibilityIssue[] {
   const issues: AccessibilityIssue[] = [];
-  const mergedOptions = { ...defaultOptions, ...options };
-  
+
+  // Apply default options
+  const opts = { ...defaultOptions, ...options };
+
   try {
-    const root = parse(html);
-    
-    // Check for semantic HTML issues
-    if (mergedOptions.checkSemantic) {
-      issues.push(...checkSemanticHTML(root));
-    }
-    
-    // Check heading structure
+    // Parse HTML string to a DOM 
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const root = doc.body;
+
+    // Extract all headings
     const headings = extractHeadings(root);
-    
-    if (mergedOptions.checkMultipleH1) {
+
+    // Check for multiple H1 tags
+    if (opts.checkMultipleH1) {
       issues.push(...checkMultipleH1Tags(headings));
     }
-    
-    if (mergedOptions.checkHeadingHierarchy) {
+
+    // Check for proper heading hierarchy
+    if (opts.checkHeadingHierarchy) {
       issues.push(...checkHeadingHierarchy(headings));
     }
-    
-    if (mergedOptions.checkSkippedHeadings) {
+
+    // Check for skipped heading levels
+    if (opts.checkSkippedHeadings) {
       issues.push(...checkSkippedHeadingLevels(headings));
     }
-    
-    // Check for missing landmarks
-    if (mergedOptions.checkMissingLandmarks) {
+
+    // Check for semantic HTML elements
+    if (opts.checkSemantic) {
+      issues.push(...checkSemanticHTML(root));
+    }
+
+    // Check for missing landmark regions
+    if (opts.checkMissingLandmarks) {
       issues.push(...checkLandmarks(root));
     }
-    
-    // Add URL design analysis
+
+    // Analyze the URL design
     const urlAnalysis = analyzeURL(url);
     if (urlAnalysis.issues.length > 0) {
       issues.push({
         id: 'url-design',
         impact: 'moderate',
-        description: 'URL design could be improved for better user experience and SEO',
-        nodes: [`<url>${url}</url>`],
-        wcagCriteria: ['2.4.4', '2.4.5'],
-        autoFixable: false,
-        fixSuggestion: urlAnalysis.issues.join(' '),
+        description: 'URL design can be improved for better usability and SEO',
+        nodes: [`<a href="${url}">${url}</a>`],
+        wcagCriteria: ['2.4.4', '2.4.9'],
+        structureType: 'url',
+        structureDetails: {
+          urlIssues: urlAnalysis.issues,
+          readabilityScore: urlAnalysis.readability,
+          suggestedStructure: generateURLSuggestion(url, urlAnalysis)
+        }
       });
     }
-    
+
+    return issues;
   } catch (error) {
-    console.error('Error during HTML structure analysis:', error);
-    issues.push({
+    console.error('Error analyzing HTML structure:', error);
+    return [{
       id: 'structure-analysis-error',
       impact: 'moderate',
-      description: 'An error occurred during structure analysis. Some issues may not be reported.',
-      nodes: ['<div>Structure analysis failed</div>'],
+      description: 'An error occurred while analyzing the HTML structure.',
+      nodes: ['<div>Error analyzing HTML structure</div>'],
       wcagCriteria: ['1.3.1'],
-      autoFixable: false,
-      fixSuggestion: 'Please check the HTML structure manually for proper semantic elements and heading hierarchy.'
-    });
+      autoFixable: false
+    }];
   }
-  
-  return issues;
 }
 
 /**
@@ -116,33 +125,17 @@ export function analyzeHtmlStructure(
  */
 function extractHeadings(root: HTMLElement): HeadingInfo[] {
   const headings: HeadingInfo[] = [];
-  
-  for (let level = 1; level <= 6; level++) {
-    const elements = root.querySelectorAll(`h${level}`);
-    
-    elements.forEach(heading => {
-      headings.push({
-        level,
-        text: heading.text.trim(),
-        element: heading
-      });
+  const headingElements = root.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+  headingElements.forEach(heading => {
+    const level = parseInt(heading.tagName.substring(1), 10);
+    headings.push({
+      level,
+      text: heading.textContent?.trim() || '',
+      element: heading as HTMLElement
     });
-  }
-  
-  // Sort headings by their position in the document (if possible)
-  // Note: Exact position indexing would require the original HTML string
-  // which we don't have access to here. This is approximated based on DOM order.
-  headings.sort((a, b) => {
-    // This is a simplified approach - in a real implementation with the original HTML
-    // we would check the actual string position
-    const aHTML = a.element.toString();
-    const bHTML = b.element.toString();
-    
-    // We can compare based on element order in the document
-    // by using a simple string comparison of their HTML representation
-    return aHTML.localeCompare(bHTML);
   });
-  
+
   return headings;
 }
 
@@ -153,14 +146,24 @@ function checkMultipleH1Tags(headings: HeadingInfo[]): AccessibilityIssue[] {
   const h1Headings = headings.filter(h => h.level === 1);
   
   if (h1Headings.length > 1) {
+    const nodes = h1Headings.map(h => h.element.outerHTML);
     return [{
       id: 'multiple-h1',
-      impact: 'moderate',
-      description: `Multiple H1 headings found (${h1Headings.length}). There should be only one main H1 per page.`,
-      nodes: h1Headings.map(h => h.element.toString()),
+      impact: 'serious',
+      description: `Found ${h1Headings.length} H1 headings. For optimal accessibility and SEO, a page should generally have only one H1 heading that describes the main content.`,
+      nodes,
       wcagCriteria: ['1.3.1', '2.4.6'],
       autoFixable: false,
-      fixSuggestion: 'Keep only one H1 heading that describes the main purpose of the page. Convert additional H1s to H2s.'
+      fixSuggestion: 'Keep the most important H1 and change the others to H2 or other appropriate levels.',
+      structureType: 'heading',
+      structureDetails: {
+        multipleH1s: true,
+        suggestedStructure: `<!-- Keep only one primary H1 heading -->
+<h1>Main Page Title</h1>
+<!-- Change secondary headings to H2 -->
+<h2>Secondary Section</h2>
+<h2>Another Section</h2>`
+      }
     }];
   }
   
@@ -171,27 +174,61 @@ function checkMultipleH1Tags(headings: HeadingInfo[]): AccessibilityIssue[] {
  * Checks for proper heading hierarchy (H1 before H2, H2 before H3, etc.)
  */
 function checkHeadingHierarchy(headings: HeadingInfo[]): AccessibilityIssue[] {
+  if (headings.length === 0) return [];
+
   const issues: AccessibilityIssue[] = [];
-  let highestLevelSeen = 0;
-  
-  for (const heading of headings) {
+  let foundH1 = false;
+
+  // Check if the page has at least one H1
+  const hasH1 = headings.some(h => h.level === 1);
+  if (!hasH1) {
+    issues.push({
+      id: 'page-has-heading-one',
+      impact: 'moderate',
+      description: 'The page does not have a top-level H1 heading, which should be the main title of the page.',
+      nodes: ['<body>...</body>'],
+      wcagCriteria: ['1.3.1', '2.4.6'],
+      autoFixable: false,
+      fixSuggestion: 'Add an H1 heading that describes the main content of the page.',
+      structureType: 'heading',
+      structureDetails: {
+        suggestedStructure: `<h1>Main Page Title</h1>
+<h2>Section Title</h2>
+<!-- Other content -->`,
+        multipleH1s: false
+      }
+    });
+  }
+
+  // Check heading hierarchy
+  for (let i = 0; i < headings.length; i++) {
+    const heading = headings[i];
+    
     if (heading.level === 1) {
-      highestLevelSeen = 1;
-    } else if (heading.level > highestLevelSeen + 1) {
+      foundH1 = true;
+    } else if (heading.level > 1 && !foundH1) {
+      // Found an Hx (x > 1) before any H1
       issues.push({
-        id: 'heading-hierarchy',
+        id: 'heading-order',
         impact: 'moderate',
-        description: `Heading level ${heading.level} (${heading.text}) appears before any level ${heading.level - 1} heading.`,
-        nodes: [heading.element.toString()],
+        description: `Found an H${heading.level} heading before any H1 heading. The page should start with an H1 heading.`,
+        nodes: [heading.element.outerHTML],
         wcagCriteria: ['1.3.1', '2.4.6'],
         autoFixable: false,
-        fixSuggestion: `Use a logical heading hierarchy. H${heading.level} should be preceded by H${heading.level - 1} in the document structure.`
+        fixSuggestion: 'Reorganize headings to start with an H1 as the main title.',
+        structureType: 'heading',
+        structureDetails: {
+          expectedLevel: 1,
+          actualLevel: heading.level,
+          suggestedStructure: `<h1>Main Page Title</h1>
+<h2>${heading.text}</h2>
+<!-- Rest of content -->`
+        }
       });
-    } else {
-      highestLevelSeen = Math.max(highestLevelSeen, heading.level);
+      break; // Only report the first instance
     }
   }
-  
+
   return issues;
 }
 
@@ -200,22 +237,34 @@ function checkHeadingHierarchy(headings: HeadingInfo[]): AccessibilityIssue[] {
  */
 function checkSkippedHeadingLevels(headings: HeadingInfo[]): AccessibilityIssue[] {
   const issues: AccessibilityIssue[] = [];
-  let previousLevel = 0;
   
-  for (const heading of headings) {
-    if (previousLevel > 0 && heading.level > previousLevel && heading.level - previousLevel > 1) {
+  for (let i = 0; i < headings.length - 1; i++) {
+    const current = headings[i];
+    const next = headings[i + 1];
+    
+    if (next.level > current.level + 1) {
       issues.push({
         id: 'skipped-heading-level',
         impact: 'moderate',
-        description: `Heading level jumped from H${previousLevel} to H${heading.level}, skipping at least one level.`,
-        nodes: [heading.element.toString()],
-        wcagCriteria: ['1.3.1', '2.4.6'],
+        description: `Skipped heading level: H${current.level} followed by H${next.level}, skipping ${
+          Array.from({ length: next.level - current.level - 1 }, 
+            (_, idx) => `H${current.level + idx + 1}`).join(', ')
+        }.`,
+        nodes: [current.element.outerHTML, next.element.outerHTML],
+        wcagCriteria: ['1.3.1', '2.4.10'],
         autoFixable: false,
-        fixSuggestion: `Don't skip heading levels. Change this heading from H${heading.level} to H${previousLevel + 1} or add the missing heading levels before it.`
+        fixSuggestion: `Change the H${next.level} to H${current.level + 1} or add the missing heading levels.`,
+        structureType: 'heading',
+        structureDetails: {
+          expectedLevel: current.level + 1,
+          actualLevel: next.level,
+          suggestedStructure: `${current.element.outerHTML}
+<!-- Add missing level or change the next heading -->
+<h${current.level + 1}>${next.text}</h${current.level + 1}>
+<!-- Rest of content -->`
+        }
       });
     }
-    
-    previousLevel = heading.level;
   }
   
   return issues;
@@ -226,53 +275,70 @@ function checkSkippedHeadingLevels(headings: HeadingInfo[]): AccessibilityIssue[
  */
 function checkSemanticHTML(root: HTMLElement): AccessibilityIssue[] {
   const issues: AccessibilityIssue[] = [];
-  
-  // Check for missing main landmark
-  const mainElements = root.querySelectorAll('main');
-  if (mainElements.length === 0) {
-    const possibleMains = root.querySelectorAll('div[class*="main"], div[class*="content"], div[id*="main"], div[id*="content"]');
-    
-    if (possibleMains.length > 0) {
-      issues.push({
-        id: 'missing-main-landmark',
-        impact: 'moderate',
-        description: 'No <main> element found. Using semantic <main> helps screen readers identify the main content.',
-        nodes: possibleMains.map(el => el.toString().substring(0, 200) + '...'),
-        wcagCriteria: ['1.3.1', '2.4.1'],
-        autoFixable: true,
-        fixSuggestion: 'Replace non-semantic <div> containing main content with <main> element.'
-      });
-    }
-  }
-  
-  // Check for unsemantic divs that could be replaced with semantic elements
-  const divs = root.querySelectorAll('div[class*="nav"], div[id*="nav"]');
-  if (divs.length > 0) {
+
+  // Check for non-semantic navigation elements
+  const potentialNavigations = Array.from(root.querySelectorAll('div, ul')).filter(el => {
+    const children = el.querySelectorAll('a');
+    return children.length >= 3 && 
+           !el.closest('nav') && 
+           !el.closest('[role="navigation"]');
+  });
+
+  if (potentialNavigations.length > 0) {
     issues.push({
       id: 'unsemantic-navigation',
       impact: 'moderate',
-      description: 'Non-semantic <div> elements used for navigation instead of <nav>.',
-      nodes: divs.map(el => el.toString().substring(0, 200) + '...'),
-      wcagCriteria: ['1.3.1'],
+      description: 'Found potential navigation elements not using the semantic <nav> element.',
+      nodes: potentialNavigations.slice(0, 3).map(el => el.outerHTML),
+      wcagCriteria: ['1.3.1', '4.1.2'],
       autoFixable: true,
-      fixSuggestion: 'Replace <div> elements with semantic <nav> elements for navigation.'
+      fixSuggestion: 'Use <nav> elements for navigation regions.',
+      structureType: 'semantic',
+      structureDetails: {
+        unSemanticElement: potentialNavigations[0].tagName.toLowerCase(),
+        suggestedStructure: `<nav aria-label="Main navigation">
+  ${potentialNavigations[0].innerHTML}
+</nav>`
+      }
     });
   }
-  
-  // Check for lists that don't use <ul> or <ol>
-  const listPatterns = root.querySelectorAll('div > div > div.item, div[class*="list"] > div');
-  if (listPatterns.length > 5) {
+
+  // Check for non-semantic lists
+  const bulletDivs = Array.from(root.querySelectorAll('div')).filter(div => {
+    const text = div.textContent || '';
+    const childDivs = div.querySelectorAll('div');
+    return (
+      childDivs.length >= 3 && 
+      Array.from(childDivs).every(child => {
+        const childText = child.textContent || '';
+        return childText.startsWith('•') || 
+              childText.startsWith('-') || 
+              childText.startsWith('*');
+      })
+    );
+  });
+
+  if (bulletDivs.length > 0) {
     issues.push({
       id: 'unsemantic-list',
-      impact: 'minor',
-      description: 'Possible list items found not using proper <ul>/<ol> and <li> elements.',
-      nodes: [listPatterns[0].toString().substring(0, 200) + '...'],
+      impact: 'moderate',
+      description: 'Found bullet-point items not using semantic <ul>/<li> structure.',
+      nodes: bulletDivs.slice(0, 2).map(el => el.outerHTML),
       wcagCriteria: ['1.3.1'],
-      autoFixable: false,
-      fixSuggestion: 'Use proper list elements (<ul> or <ol> with <li> items) for content that represents a list.'
+      autoFixable: true,
+      fixSuggestion: 'Use <ul> and <li> elements for list content.',
+      structureType: 'semantic',
+      structureDetails: {
+        unSemanticElement: 'div',
+        suggestedStructure: `<ul>
+  <li>${bulletDivs[0].textContent?.replace(/^[•\\-\\*]\\s*/, '') || 'List item 1'}</li>
+  <li>List item 2</li>
+  <li>List item 3</li>
+</ul>`
+      }
     });
   }
-  
+
   return issues;
 }
 
@@ -282,40 +348,29 @@ function checkSemanticHTML(root: HTMLElement): AccessibilityIssue[] {
 function checkLandmarks(root: HTMLElement): AccessibilityIssue[] {
   const issues: AccessibilityIssue[] = [];
   
-  // Check for header
-  const headerElements = root.querySelectorAll('header');
-  if (headerElements.length === 0) {
-    const possibleHeaders = root.querySelectorAll('div[class*="header"], div[id*="header"]');
-    
-    if (possibleHeaders.length > 0) {
-      issues.push({
-        id: 'missing-header-landmark',
-        impact: 'minor',
-        description: 'No <header> element found. Using semantic <header> helps screen readers identify the header content.',
-        nodes: possibleHeaders.map(el => el.toString().substring(0, 200) + '...'),
-        wcagCriteria: ['1.3.1', '2.4.1'],
-        autoFixable: true,
-        fixSuggestion: 'Replace non-semantic <div> containing header content with <header> element.'
-      });
-    }
-  }
-  
-  // Check for footer
-  const footerElements = root.querySelectorAll('footer');
-  if (footerElements.length === 0) {
-    const possibleFooters = root.querySelectorAll('div[class*="footer"], div[id*="footer"]');
-    
-    if (possibleFooters.length > 0) {
-      issues.push({
-        id: 'missing-footer-landmark',
-        impact: 'minor',
-        description: 'No <footer> element found. Using semantic <footer> helps screen readers identify the footer content.',
-        nodes: possibleFooters.map(el => el.toString().substring(0, 200) + '...'),
-        wcagCriteria: ['1.3.1', '2.4.1'],
-        autoFixable: true,
-        fixSuggestion: 'Replace non-semantic <div> containing footer content with <footer> element.'
-      });
-    }
+  // Check for main landmark
+  const hasMain = root.querySelector('main, [role="main"]');
+  if (!hasMain) {
+    issues.push({
+      id: 'missing-main-landmark',
+      impact: 'moderate',
+      description: 'No <main> element or element with role="main" found. The main content should be contained in a <main> element.',
+      nodes: ['<body>...</body>'],
+      wcagCriteria: ['1.3.1', '2.4.1'],
+      autoFixable: false,
+      fixSuggestion: 'Wrap the main content in a <main> element.',
+      structureType: 'landmark',
+      structureDetails: {
+        missingLandmark: true,
+        suggestedStructure: `<body>
+  <header>...</header>
+  <main>
+    <!-- Main content here -->
+  </main>
+  <footer>...</footer>
+</body>`
+      }
+    });
   }
   
   return issues;
@@ -325,75 +380,75 @@ function checkLandmarks(root: HTMLElement): AccessibilityIssue[] {
  * Analyzes URL design for readability and usability
  */
 export function analyzeURL(url: string): URLAnalysisResult {
+  const issues: string[] = [];
+  let readability: 'good' | 'moderate' | 'poor' = 'good';
+  let length: 'good' | 'moderate' | 'poor' = 'good';
+  
   try {
-    const parsedUrl = new URL(url);
-    const pathname = parsedUrl.pathname;
-    const issues: string[] = [];
+    const parsedURL = new URL(url);
+    const path = parsedURL.pathname;
+    
+    // Check for URL parameters (query string)
+    const containsParameters = parsedURL.search.length > 0;
     
     // Check URL length
-    const urlLength = url.length;
-    let lengthRating: 'good' | 'moderate' | 'poor' = 'good';
-    
-    if (urlLength > 100) {
-      lengthRating = 'poor';
-      issues.push('URL is too long (over 100 characters).');
-    } else if (urlLength > 75) {
-      lengthRating = 'moderate';
-      issues.push('URL is moderately long (over 75 characters).');
+    if (url.length > 100) {
+      length = 'poor';
+      issues.push('URL is excessively long (over 100 characters)');
+    } else if (url.length > 75) {
+      length = 'moderate';
+      issues.push('URL is quite long (over 75 characters)');
     }
     
-    // Check URL readability
-    const segments = pathname.split('/').filter(Boolean);
-    let readabilityRating: 'good' | 'moderate' | 'poor' = 'good';
-    
-    // Check for uppercase letters (generally not recommended in URLs)
-    if (/[A-Z]/.test(pathname)) {
-      readabilityRating = 'poor';
-      issues.push('URL contains uppercase letters, which are not recommended for URLs.');
+    // Check path segment length and number
+    const segments = path.split('/').filter(s => s.length > 0);
+    if (segments.length > 5) {
+      issues.push('URL has too many path segments (more than 5)');
+      readability = 'poor';
     }
     
-    // Check for excessive use of numbers or special characters
-    if (/[0-9]{5,}/.test(pathname)) {
-      readabilityRating = readabilityRating === 'poor' ? 'poor' : 'moderate';
-      issues.push('URL contains long numeric sequences, which reduces readability.');
+    // Check for very long segments
+    const longSegments = segments.filter(s => s.length > 20);
+    if (longSegments.length > 0) {
+      issues.push('URL contains overly long path segments (over 20 characters)');
+      readability = readability === 'good' ? 'moderate' : 'poor';
     }
     
-    // Check segment length
-    for (const segment of segments) {
-      if (segment.length > 30) {
-        readabilityRating = readabilityRating === 'poor' ? 'poor' : 'moderate';
-        issues.push('URL contains very long path segments (over 30 characters).');
-        break;
-      }
-    }
-    
-    // Check for query parameters
-    const containsParameters = parsedUrl.search.length > 0;
-    if (containsParameters && parsedUrl.search.length > 50) {
-      issues.push('URL contains lengthy query parameters, which reduces clarity.');
-    }
-    
-    // Check for hyphens vs underscores
-    const usesHyphens = pathname.includes('-');
-    const usesUnderscores = pathname.includes('_');
+    // Check for underscores vs hyphens
+    const usesUnderscores = segments.some(s => s.includes('_'));
+    const usesHyphens = segments.some(s => s.includes('-'));
     
     if (usesUnderscores) {
-      issues.push('URL uses underscores instead of the preferred hyphens for word separation.');
+      issues.push('URL uses underscores instead of hyphens for word separation');
+      readability = readability === 'good' ? 'moderate' : readability;
     }
     
-    // Check for keywords (very basic implementation)
-    const usesKeywords = segments.some(segment => 
-      segment.length > 3 && 
-      !segment.match(/^(page|id|user|item|index|www|com|net|org)$/)
+    // Check for mixed case (inconsistent)
+    const hasMixedCase = segments.some(s => {
+      const hasUpper = /[A-Z]/.test(s);
+      const hasLower = /[a-z]/.test(s);
+      return hasUpper && hasLower;
+    });
+    
+    if (hasMixedCase) {
+      issues.push('URL uses mixed case, which can cause confusion');
+      readability = readability === 'good' ? 'moderate' : readability;
+    }
+    
+    // Check for keyword usage (simplistic check for common words)
+    const commonWords = ['about', 'contact', 'services', 'products', 'blog', 'news'];
+    const usesKeywords = segments.some(s => 
+      commonWords.some(word => s.toLowerCase().includes(word))
     );
     
-    if (!usesKeywords) {
-      issues.push('URL lacks descriptive keywords, which helps with both SEO and user comprehension.');
+    // Overall URL assessment
+    if (issues.length === 0) {
+      issues.push('URL design is good for accessibility and SEO');
     }
     
     return {
-      readability: readabilityRating,
-      length: lengthRating,
+      readability,
+      length,
       usesKeywords,
       usesHyphens,
       usesUnderscores,
@@ -409,7 +464,60 @@ export function analyzeURL(url: string): URLAnalysisResult {
       usesHyphens: false,
       usesUnderscores: false,
       containsParameters: false,
-      issues: ['Error analyzing URL. Please ensure it is properly formatted.']
+      issues: ['Invalid URL format']
     };
+  }
+}
+
+/**
+ * Generates a suggested improved URL based on analysis
+ */
+function generateURLSuggestion(url: string, analysis: URLAnalysisResult): string {
+  try {
+    const parsedURL = new URL(url);
+    let path = parsedURL.pathname;
+    let suggestion = '';
+    
+    // Replace underscores with hyphens
+    if (analysis.usesUnderscores) {
+      path = path.replace(/_/g, '-');
+    }
+    
+    // Convert to lowercase
+    path = path.toLowerCase();
+    
+    // Simplify long paths if needed
+    const segments = path.split('/').filter(s => s.length > 0);
+    const simplifiedSegments = segments.map(s => {
+      if (s.length > 20) {
+        // Truncate very long segments
+        return s.substring(0, 20) + '...';
+      }
+      return s;
+    });
+    
+    // Rebuild the URL
+    const newPath = '/' + simplifiedSegments.join('/');
+    suggestion = `${parsedURL.protocol}//${parsedURL.host}${newPath}`;
+    
+    // Explain changes
+    if (suggestion !== url) {
+      suggestion += '\n\nImprovements:\n';
+      
+      if (analysis.usesUnderscores) {
+        suggestion += '- Replaced underscores with hyphens for better SEO\n';
+      }
+      
+      if (path !== parsedURL.pathname) {
+        suggestion += '- Simplified URL structure\n';
+      }
+    } else {
+      suggestion = 'Original URL is well-structured.';
+    }
+    
+    return suggestion;
+  } catch (error) {
+    console.error('Error generating URL suggestion:', error);
+    return 'Could not generate URL suggestion due to an error.';
   }
 }
