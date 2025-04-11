@@ -89,26 +89,6 @@ export function addFeedbackAsDebugItem(
 
 export const debugItems: DebugItem[] = [
   {
-    id: 'debug-item-non-destructive-ui-enhancement',
-    title: 'Non-destructive UI enhancement for admin interfaces',
-    description: 'Admin interfaces need UI polish while ensuring no functionality breaks during the improvement process.',
-    category: 'ui',
-    status: 'identified',
-    priority: 'high',
-    dateIdentified: new Date().toISOString().split('T')[0],
-    source: 'manual',
-    assignedTo: 'UI Team',
-    todoItems: [
-      'Create component audit and enhancement inventory',
-      'Implement shadow DOM enhancement pattern for testing',
-      'Create component-first implementation approach',
-      'Add feature flags for toggling enhanced UI on/off',
-      'Test all functionality with both UI versions',
-      'Document UI component library for consistency'
-    ],
-    notes: 'Enhancement should maintain all functionality regardless of UI state. Focus on admin interfaces first while keeping the same HTML structure to avoid breaking behavior.'
-  },
-  {
     id: 'debug-item-documentation-organization',
     title: 'Documentation organization improvements needed',
     description: 'Current documentation structure has overlapping sections (/docs, /help/documentation). Need to consolidate all documentation into a clear, logical structure.',
