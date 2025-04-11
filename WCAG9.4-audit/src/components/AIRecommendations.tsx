@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Brain, Code, BookOpen, ExternalLink, Info, Zap } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -22,16 +22,35 @@ const loadingMessages = [
   "Generating recommendations...",
   "Checking best practices...",
   "Preparing code examples...",
-  "Finalizing suggestions..."
+  "Finalizing suggestions...",
+  "One moment, I'm just putting my thoughts together...",
+  "Thinking cap is on... Almost there!",
+  "Hold tight, I'm making sure this makes sense...",
+  "Just connecting the dots—won't be long!",
+  "Processing... Or as humans call it, thinking!",
+  "I see what you're asking—let me shape this properly!",
+  "One sec, I'm making sure this is as thorough as possible..."
 ];
 
 export function AIRecommendations({ issue }: AIRecommendationsProps) {
   const [recommendations, setRecommendations] = useState<AIRecommendation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loadingMessage] = useState(() => 
+  const [loadingMessage, setLoadingMessage] = useState(() => 
     loadingMessages[Math.floor(Math.random() * loadingMessages.length)]
   );
+  
+  // Dynamic loading message effect
+  useEffect(() => {
+    if (!loading) return;
+    
+    // Change message every 3-5 seconds to create a more dynamic loading experience
+    const interval = setInterval(() => {
+      setLoadingMessage(loadingMessages[Math.floor(Math.random() * loadingMessages.length)]);
+    }, 3000 + Math.random() * 2000);
+    
+    return () => clearInterval(interval);
+  }, [loading]);
 
   const generateRecommendations = async () => {
     setLoading(true);
