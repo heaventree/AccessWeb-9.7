@@ -58,6 +58,15 @@ export function HelpCenter() {
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Find answers to common questions and learn how to make your website accessible
             </p>
+            <div className="mt-8">
+              <Link
+                to="/help/documentation"
+                className="inline-flex items-center px-6 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+              >
+                <Book className="w-5 h-5 mr-2" />
+                Browse Feature Documentation
+              </Link>
+            </div>
           </div>
 
           {/* Search */}
