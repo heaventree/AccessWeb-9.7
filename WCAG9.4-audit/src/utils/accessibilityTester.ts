@@ -6,6 +6,7 @@ import { getWCAGInfo } from './wcagHelper';
 import { testPDFAccessibility } from './pdfAccessibilityTester';
 import { testMediaAccessibility } from './mediaAccessibilityTester';
 import { testDocumentAccessibility, checkDocumentLinks } from './documentFormatTester';
+import { analyzeHtmlStructure, analyzeURL } from './htmlStructureAnalyzer';
 import Color from 'color';
 
 // Configure axe-core rules based on selected region
@@ -415,6 +416,27 @@ export async function testAccessibility(
     const issues = axeResults.violations.map(convertAxeResultToIssue);
     const passes = axeResults.passes.map(convertAxeResultToIssue);
     const warnings = axeResults.incomplete.map(convertAxeResultToIssue);
+    
+    // Run enhanced HTML structure analysis
+    console.log('Running enhanced HTML structure analysis...');
+    try {
+      const structureIssues = analyzeHtmlStructure(html, url);
+      if (structureIssues.length > 0) {
+        console.log(`Found ${structureIssues.length} HTML structure issues`);
+        issues.push(...structureIssues);
+      }
+    } catch (structureError) {
+      console.error('Error during HTML structure analysis:', structureError);
+      warnings.push({
+        id: 'structure-analysis-error',
+        impact: 'moderate',
+        description: 'An error occurred during enhanced structure analysis.',
+        nodes: ['<div>Structure analysis could not be completed</div>'],
+        wcagCriteria: ['1.3.1'],
+        autoFixable: false,
+        fixSuggestion: 'Please review the HTML structure manually for proper semantic elements and heading hierarchy.'
+      });
+    }
 
     // Check for PDF links in the page
     if (options?.documentTesting?.enabled && options.documentTesting.pdfAccessibility) {

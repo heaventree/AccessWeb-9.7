@@ -131,6 +131,18 @@ export interface AccessibilityIssue {
     hasSignLanguage?: boolean;
     keyboardAccessible?: boolean;
   };
+  structureType?: 'heading' | 'landmark' | 'semantic' | 'url' | 'navigation';
+  structureDetails?: {
+    elementType?: string;
+    expectedLevel?: number;
+    actualLevel?: number;
+    multipleH1s?: boolean;
+    missingLandmark?: boolean;
+    unSemanticElement?: string;
+    urlIssues?: string[];
+    readabilityScore?: 'good' | 'moderate' | 'poor';
+    suggestedStructure?: string;
+  };
 }
 
 export interface LegislationCompliance {
@@ -162,6 +174,10 @@ export interface TestResult {
     mediaIssues?: number;
     audioIssues?: number;
     videoIssues?: number;
+    structureIssues?: number;
+    headingIssues?: number;
+    semanticIssues?: number;
+    urlIssues?: number;
   };
   legislationCompliance?: LegislationCompliance;
 }
