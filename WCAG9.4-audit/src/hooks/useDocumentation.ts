@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 
-export function useDocumentation(slug: string) {
+export function useDocumentation(slug: string, pathPrefix: string = '') {
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +61,7 @@ export function useDocumentation(slug: string) {
     if (slug) {
       fetchDocumentation();
     }
-  }, [slug]);
+  }, [slug, pathPrefix]);
 
   return {
     content,

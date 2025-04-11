@@ -62,7 +62,7 @@ import { SettingsPage } from './pages/settings/SettingsPage';
 import { TeamPage } from './pages/team/TeamPage';
 import { HelpCenter } from './pages/HelpCenter';
 import { HelpArticle } from './pages/HelpArticle';
-import { Documentation } from './pages/Documentation';
+import { Documentation } from './pages/docs/Documentation';
 import { KnowledgeBasePage } from './pages/KnowledgeBasePage';
 import { UiDemo } from './pages/UiDemo';
 import { AltTextGuide } from './pages/help/AltTextGuide';
@@ -113,21 +113,28 @@ function App() {
           <Route path="/integrations/api" element={<><Navigation /><main id="main-content"><APIIntegrationPage /></main><Footer /><BackToTop /></>} />
           <Route path="/integrations/compliance" element={<><Navigation /><main id="main-content"><ComplianceIntegrationPage /></main><Footer /><BackToTop /></>} />
           <Route path="/integrations/enterprise" element={<><Navigation /><main id="main-content"><EnterpriseIntegrationPage /></main><Footer /><BackToTop /></>} />
-          <Route path="/docs" element={<><Navigation /><main id="main-content"><DocumentationPage /></main><Footer /><BackToTop /></>} />
+          {/* Documentation Routes - All Feature Documentation */}
+          <Route path="/docs" element={<><Navigation /><main id="main-content"><Documentation /></main><Footer /><BackToTop /></>} />
+          <Route path="/docs/:slug" element={<><Navigation /><main id="main-content"><HelpArticle /></main><Footer /><BackToTop /></>} />
           <Route path="/docs/api" element={<><Navigation /><main id="main-content"><APIGuide /></main><Footer /><BackToTop /></>} />
           <Route path="/docs/wordpress" element={<><Navigation /><main id="main-content"><WordPressGuide /></main><Footer /><BackToTop /></>} />
           <Route path="/docs/shopify" element={<><Navigation /><main id="main-content"><ShopifyGuide /></main><Footer /><BackToTop /></>} />
-          <Route path="/knowledge-base" element={<><Navigation /><main id="main-content"><KnowledgeBasePage /></main><Footer /><BackToTop /></>} />
+          
+          {/* WCAG Resources - All WCAG Guidance & Best Practices */}
+          <Route path="/wcag-resources" element={<><Navigation /><main id="main-content"><WcagResourcesPage /></main><Footer /><BackToTop /></>} />
+          <Route path="/wcag-resources/alt-text-guide" element={<><Navigation /><main id="main-content"><AltTextGuide /></main><Footer /><BackToTop /></>} />
+          <Route path="/wcag-resources/accessibility-tips" element={<><Navigation /><main id="main-content"><AccessibilityTipsPage /></main><Footer /><BackToTop /></>} />
+          <Route path="/wcag-resources/accessibility-demo" element={<><Navigation /><main id="main-content"><AccessibilityTipsDemo /></main><Footer /><BackToTop /></>} />
+          <Route path="/wcag-resources/non-destructive-fixes" element={<><Navigation /><main id="main-content"><NonDestructiveFixPage /></main><Footer /><BackToTop /></>} />
+          
+          {/* Help Center - FAQ & General Support */}
+          <Route path="/help" element={<><Navigation /><main id="main-content"><HelpCenter /></main><Footer /><BackToTop /></>} />
+          <Route path="/help/:slug" element={<><Navigation /><main id="main-content"><HelpArticle /></main><Footer /><BackToTop /></>} />
+          
+          {/* Blog & Knowledge Base */}
           <Route path="/blog" element={<><Navigation /><main id="main-content"><BlogPage /></main><Footer /><BackToTop /></>} />
           <Route path="/blog/:slug" element={<><Navigation /><main id="main-content"><ArticlePage /></main><Footer /><BackToTop /></>} />
-          <Route path="/wcag-resources" element={<><Navigation /><main id="main-content"><WcagResourcesPage /></main><Footer /><BackToTop /></>} />
-          <Route path="/non-destructive-fixes" element={<><Navigation /><main id="main-content"><NonDestructiveFixPage /></main><Footer /><BackToTop /></>} />
-          <Route path="/help" element={<><Navigation /><main id="main-content"><HelpCenter /></main><Footer /><BackToTop /></>} />
-          <Route path="/help/alt-text-guide" element={<><Navigation /><main id="main-content"><AltTextGuide /></main><Footer /><BackToTop /></>} />
-          <Route path="/help/accessibility-tips" element={<><Navigation /><main id="main-content"><AccessibilityTipsPage /></main><Footer /><BackToTop /></>} />
-          <Route path="/help/accessibility-demo" element={<><Navigation /><main id="main-content"><AccessibilityTipsDemo /></main><Footer /><BackToTop /></>} />
-          <Route path="/help/documentation" element={<><Navigation /><main id="main-content"><Documentation /></main><Footer /><BackToTop /></>} />
-          <Route path="/help/:slug" element={<><Navigation /><main id="main-content"><HelpArticle /></main><Footer /><BackToTop /></>} />
+          <Route path="/knowledge-base" element={<><Navigation /><main id="main-content"><KnowledgeBasePage /></main><Footer /><BackToTop /></>} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/signup" element={<AuthPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
