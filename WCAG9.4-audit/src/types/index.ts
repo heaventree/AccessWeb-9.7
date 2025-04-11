@@ -106,6 +106,7 @@ export interface AccessibilityIssue {
   helpUrl?: string;
   nodes: string[];
   wcagCriteria: string[];
+  url?: string;
   autoFixable?: boolean;
   fixSuggestion?: string;
   codeExample?: string;

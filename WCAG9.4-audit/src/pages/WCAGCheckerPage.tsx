@@ -27,7 +27,7 @@ import {
   Smartphone
 } from 'lucide-react';
 
-type TabType = 'issues' | 'warnings' | 'passes' | 'contrast' | 'structure' | 'responsive';
+type TabType = 'issues' | 'warnings' | 'passes' | 'contrast' | 'structure' | 'responsive' | 'media';
 
 // Pro pill styling
 const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold inline-flex items-center scale-[0.85] origin-left";
@@ -160,6 +160,8 @@ export function WCAGCheckerPage() {
           return `${baseStyle} border-blue-500 text-blue-700 bg-blue-50`;
         case 'responsive':
           return `${baseStyle} border-teal-500 text-teal-700 bg-teal-50`;
+        case 'media':
+          return `${baseStyle} border-purple-500 text-purple-700 bg-purple-50`;
       }
     }
     return `${baseStyle} border-gray-300 text-gray-600 hover:bg-gray-50`;

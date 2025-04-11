@@ -6,10 +6,9 @@ import { AIRecommendations } from './AIRecommendations';
 
 interface MediaAnalysisPanelProps {
   issues: AccessibilityIssue[];
-  url: string;
 }
 
-export function MediaAnalysisPanel({ issues, url }: MediaAnalysisPanelProps) {
+export function MediaAnalysisPanel({ issues }: MediaAnalysisPanelProps) {
   const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
 
   const toggleIssue = (id: string) => {
