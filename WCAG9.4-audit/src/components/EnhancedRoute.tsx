@@ -1,44 +1,34 @@
-import React from 'react';
-import { UIEnhancementWrapper } from './UIEnhancementWrapper';
-import { Navigation } from './Navigation';
-import { Footer } from './Footer';
-import { BackToTop } from './BackToTop';
+import { ReactNode } from 'react';
+import { Route } from 'react-router-dom';
 import { useUIEnhancement } from '../contexts/UIEnhancementContext';
 
 interface EnhancedRouteProps {
-  children: React.ReactNode;
-  showNavigation?: boolean;
-  showFooter?: boolean;
+  path: string;
+  element: ReactNode;
+  enhancedElement: ReactNode;
+  featureFlag?: keyof ReturnType<typeof useUIEnhancement>['featureFlags'];
 }
 
 /**
- * EnhancedRoute Component
+ * EnhancedRoute component that conditionally renders either the original or enhanced
+ * version of a page/component based on the UI mode and feature flags.
  * 
- * This component provides a standardized layout with Navigation, Footer, and BackToTop
- * components, optionally enhanced by the UIEnhancementContext. It serves as a drop-in
- * replacement for the existing route elements in App.tsx without modifying their structure.
+ * This provides a clean way to toggle between UI versions without complex conditional rendering.
  */
-export function EnhancedRoute({ children, showNavigation = true, showFooter = true }: EnhancedRouteProps) {
-  const { uiMode, isEnhanced } = useUIEnhancement();
+export function EnhancedRoute({
+  path,
+  element,
+  enhancedElement,
+  featureFlag = 'enhancedNavigation'
+}: EnhancedRouteProps) {
+  const { uiMode, featureFlags, isEnhanced } = useUIEnhancement();
   
-  // If UI Enhancement is not active, render the original components
-  if (uiMode === 'current') {
-    return (
-      <>
-        {showNavigation && <Navigation />}
-        <main id="main-content">{children}</main>
-        {showFooter && <Footer />}
-        <BackToTop />
-      </>
-    );
-  }
+  // Determine which element to render based on UI mode and feature flags
+  const renderedElement = uiMode === 'enhanced' && featureFlags[featureFlag] 
+    ? enhancedElement 
+    : element;
   
-  // If UI Enhancement is active, use UIEnhancementWrapper to handle enhanced UI
   return (
-    <UIEnhancementWrapper showNavigation={showNavigation}>
-      <main id="main-content">{children}</main>
-      {showFooter && <Footer />}
-      <BackToTop />
-    </UIEnhancementWrapper>
+    <Route path={path} element={renderedElement} />
   );
 }

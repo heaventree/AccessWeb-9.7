@@ -1,180 +1,138 @@
 import { useState } from 'react';
+import { PanelRight, X } from 'lucide-react';
 import { useUIEnhancement } from '../contexts/UIEnhancementContext';
-import { XCircle, Settings } from 'lucide-react';
 
 export function UIEnhancementToggle() {
-  const { featureFlags, toggleFeatureFlag } = useUIEnhancement();
-  const [isOpen, setIsOpen] = useState(false);
+  const { uiMode, setUIMode, featureFlags, toggleFeatureFlag } = useUIEnhancement();
+  const [panelOpen, setPanelOpen] = useState(false);
   
-  const handleToggle = () => {
-    setIsOpen(!isOpen);
+  const togglePanel = () => {
+    setPanelOpen(!panelOpen);
   };
   
+  const toggleMode = () => {
+    setUIMode(uiMode === 'current' ? 'enhanced' : 'current');
+  };
+  
+  const featureOptions = [
+    { key: 'enhancedNavigation', label: 'Enhanced Navigation' },
+    { key: 'enhancedFooter', label: 'Enhanced Footer' },
+    { key: 'enhancedCards', label: 'Enhanced Cards' },
+    { key: 'enhancedTables', label: 'Enhanced Tables' },
+    { key: 'enhancedForms', label: 'Enhanced Forms' },
+    { key: 'enhancedButtons', label: 'Enhanced Buttons' },
+    { key: 'enhancedAnalytics', label: 'Enhanced Analytics' },
+    { key: 'enhancedDashboards', label: 'Enhanced Dashboards' },
+  ];
+  
   return (
-    <div className="fixed bottom-20 right-8 z-50">
-      {isOpen && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-2 border border-gray-200 dark:border-gray-700 w-72">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">UI Enhancement Options</h3>
-            <button
-              onClick={handleToggle}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-              aria-label="Close enhancement options"
+    <>
+      {/* Floating toggle button */}
+      <button
+        className="fixed right-4 bottom-4 z-50 p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-colors"
+        onClick={togglePanel}
+        aria-label="Toggle UI Enhancement Panel"
+        aria-expanded={panelOpen}
+        aria-controls="enhancement-panel"
+      >
+        <PanelRight className="w-5 h-5" />
+      </button>
+      
+      {/* Panel */}
+      {panelOpen && (
+        <div 
+          id="enhancement-panel"
+          className="fixed right-4 bottom-16 z-50 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+        >
+          {/* Panel header */}
+          <div className="flex items-center justify-between bg-blue-600 dark:bg-blue-700 text-white p-3">
+            <h2 className="text-sm font-medium">UI Enhancement Options</h2>
+            <button 
+              onClick={togglePanel}
+              className="text-white/80 hover:text-white"
+              aria-label="Close panel"
             >
-              <XCircle className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
           
-          <div className="space-y-3">
+          {/* Main toggle switch */}
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
-              <label htmlFor="toggle-navigation" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Enhanced Navigation
-              </label>
-              <div className="relative inline-block w-12 align-middle select-none">
-                <input
-                  type="checkbox"
-                  id="toggle-navigation"
-                  className="sr-only"
-                  checked={featureFlags.enhancedNavigation}
-                  onChange={() => toggleFeatureFlag('enhancedNavigation')}
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Enhanced UI Mode</span>
+              <button
+                onClick={toggleMode}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
+                  uiMode === 'enhanced' ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+                role="switch"
+                aria-checked={uiMode === 'enhanced'}
+              >
+                <span 
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    uiMode === 'enhanced' ? 'translate-x-6' : 'translate-x-1'
+                  }`} 
                 />
-                <div className={`block w-12 h-6 rounded-full ${featureFlags.enhancedNavigation ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-                <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${featureFlags.enhancedNavigation ? 'transform translate-x-6' : ''}`}></div>
+              </button>
+            </div>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              {uiMode === 'enhanced' 
+                ? 'Using enhanced UI with modern design patterns' 
+                : 'Using current UI with standard design'}
+            </p>
+          </div>
+          
+          {/* Feature toggles */}
+          {uiMode === 'enhanced' && (
+            <div className="p-4">
+              <h3 className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400 mb-3">Feature Toggles</h3>
+              <div className="space-y-3">
+                {featureOptions.map((feature) => {
+                  const isDisabled = (
+                    (feature.key === 'enhancedNavigation' || feature.key === 'enhancedFooter') && 
+                    uiMode === 'enhanced'
+                  );
+                  
+                  return (
+                    <div key={feature.key} className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{feature.label}</span>
+                        {isDisabled && (
+                          <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">(required)</span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => toggleFeatureFlag(feature.key as keyof typeof featureFlags)}
+                        disabled={isDisabled}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
+                          featureFlags[feature.key as keyof typeof featureFlags] 
+                            ? 'bg-blue-600' 
+                            : 'bg-gray-300 dark:bg-gray-600'
+                        } ${isDisabled ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        role="switch"
+                        aria-checked={featureFlags[feature.key as keyof typeof featureFlags]}
+                      >
+                        <span 
+                          className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                            featureFlags[feature.key as keyof typeof featureFlags] 
+                              ? 'translate-x-5' 
+                              : 'translate-x-1'
+                          }`} 
+                        />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-            
-            <div className="flex items-center justify-between">
-              <label htmlFor="toggle-footer" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Enhanced Footer
-              </label>
-              <div className="relative inline-block w-12 align-middle select-none">
-                <input
-                  type="checkbox"
-                  id="toggle-footer"
-                  className="sr-only"
-                  checked={featureFlags.enhancedFooter}
-                  onChange={() => toggleFeatureFlag('enhancedFooter')}
-                />
-                <div className={`block w-12 h-6 rounded-full ${featureFlags.enhancedFooter ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-                <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${featureFlags.enhancedFooter ? 'transform translate-x-6' : ''}`}></div>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <label htmlFor="toggle-cards" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Enhanced Cards
-              </label>
-              <div className="relative inline-block w-12 align-middle select-none">
-                <input
-                  type="checkbox"
-                  id="toggle-cards"
-                  className="sr-only"
-                  checked={featureFlags.enhancedCards}
-                  onChange={() => toggleFeatureFlag('enhancedCards')}
-                />
-                <div className={`block w-12 h-6 rounded-full ${featureFlags.enhancedCards ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-                <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${featureFlags.enhancedCards ? 'transform translate-x-6' : ''}`}></div>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <label htmlFor="toggle-tables" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Enhanced Tables
-              </label>
-              <div className="relative inline-block w-12 align-middle select-none">
-                <input
-                  type="checkbox"
-                  id="toggle-tables"
-                  className="sr-only"
-                  checked={featureFlags.enhancedTables}
-                  onChange={() => toggleFeatureFlag('enhancedTables')}
-                />
-                <div className={`block w-12 h-6 rounded-full ${featureFlags.enhancedTables ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-                <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${featureFlags.enhancedTables ? 'transform translate-x-6' : ''}`}></div>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <label htmlFor="toggle-forms" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Enhanced Forms
-              </label>
-              <div className="relative inline-block w-12 align-middle select-none">
-                <input
-                  type="checkbox"
-                  id="toggle-forms"
-                  className="sr-only"
-                  checked={featureFlags.enhancedForms}
-                  onChange={() => toggleFeatureFlag('enhancedForms')}
-                />
-                <div className={`block w-12 h-6 rounded-full ${featureFlags.enhancedForms ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-                <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${featureFlags.enhancedForms ? 'transform translate-x-6' : ''}`}></div>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <label htmlFor="toggle-buttons" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Enhanced Buttons
-              </label>
-              <div className="relative inline-block w-12 align-middle select-none">
-                <input
-                  type="checkbox"
-                  id="toggle-buttons"
-                  className="sr-only"
-                  checked={featureFlags.enhancedButtons}
-                  onChange={() => toggleFeatureFlag('enhancedButtons')}
-                />
-                <div className={`block w-12 h-6 rounded-full ${featureFlags.enhancedButtons ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-                <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${featureFlags.enhancedButtons ? 'transform translate-x-6' : ''}`}></div>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <label htmlFor="toggle-analytics" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Enhanced Analytics
-              </label>
-              <div className="relative inline-block w-12 align-middle select-none">
-                <input
-                  type="checkbox"
-                  id="toggle-analytics"
-                  className="sr-only"
-                  checked={featureFlags.enhancedAnalytics}
-                  onChange={() => toggleFeatureFlag('enhancedAnalytics')}
-                />
-                <div className={`block w-12 h-6 rounded-full ${featureFlags.enhancedAnalytics ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-                <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${featureFlags.enhancedAnalytics ? 'transform translate-x-6' : ''}`}></div>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <label htmlFor="toggle-dashboards" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Enhanced Dashboards
-              </label>
-              <div className="relative inline-block w-12 align-middle select-none">
-                <input
-                  type="checkbox"
-                  id="toggle-dashboards"
-                  className="sr-only"
-                  checked={featureFlags.enhancedDashboards}
-                  onChange={() => toggleFeatureFlag('enhancedDashboards')}
-                />
-                <div className={`block w-12 h-6 rounded-full ${featureFlags.enhancedDashboards ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-                <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${featureFlags.enhancedDashboards ? 'transform translate-x-6' : ''}`}></div>
-              </div>
-            </div>
+          )}
+          
+          {/* Footer */}
+          <div className="bg-gray-50 dark:bg-gray-900 p-3 text-xs text-center text-gray-500 dark:text-gray-400">
+            WCAG 9.4 - Non-destructive UI Enhancement
           </div>
         </div>
       )}
-      
-      <button
-        onClick={handleToggle}
-        className={`p-3 rounded-full shadow-lg ${
-          isOpen ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
-        }`}
-        aria-label={isOpen ? 'Close enhancement options' : 'Open enhancement options'}
-        title={isOpen ? 'Close enhancement options' : 'Open enhancement options'}
-      >
-        <Settings className="w-6 h-6" />
-      </button>
-    </div>
+    </>
   );
 }

@@ -16,174 +16,146 @@ export interface NavigationSection {
   items: NavItem[];
 }
 
+// Tool navigation items
 export const tools: NavItem[] = [
   {
-    id: 'wcag-checker',
-    label: 'WCAG Checker',
-    href: '/checker',
+    id: 'checker',
+    label: 'Accessibility Checker',
     icon: 'check-circle',
+    href: '/checker',
+    badge: {
+      text: 'Popular',
+      variant: 'primary',
+    },
   },
   {
-    id: 'wcag-standards',
-    label: 'WCAG Standards',
-    href: '/tools/wcag-standards',
-    icon: 'book',
-  },
-  {
-    id: 'color-palette',
-    label: 'Color Palette',
-    href: '/tools/colors',
+    id: 'color-contrast',
+    label: 'Color Contrast Checker',
     icon: 'palette',
+    href: '/tools/color-contrast',
   },
   {
-    id: 'color-simulator',
-    label: 'Color Simulator',
-    href: '/tools/color-simulator',
-    icon: 'eye',
-  },
-  {
-    id: 'monitoring',
-    label: 'Accessibility Monitoring',
-    href: '/tools/monitoring',
-    icon: 'activity',
-    badge: {
-      text: 'PRO',
-      variant: 'primary',
-    },
-  },
-  {
-    id: 'realtime',
-    label: 'Real-Time Monitor',
-    href: '/tools/realtime',
-    icon: 'zap',
-    badge: {
-      text: 'PRO',
-      variant: 'primary',
-    },
-  },
-  {
-    id: 'image-alt-scanner',
-    label: 'Image Alt Scanner',
-    href: '/tools/image-alt-scanner',
+    id: 'image-analyzer',
+    label: 'Image Accessibility Analyzer',
     icon: 'image',
+    href: '/tools/image-analyzer', 
   },
   {
-    id: 'analytics',
-    label: 'Analytics',
-    href: '/tools/analytics',
-    icon: 'bar-chart',
-    badge: {
-      text: 'PRO',
-      variant: 'primary',
-    },
+    id: 'form-tester',
+    label: 'Form Accessibility Tester',
+    icon: 'activity',
+    href: '/tools/form-tester',
   },
   {
-    id: 'compliance',
-    label: 'Compliance',
-    href: '/tools/compliance',
-    icon: 'shield',
-    badge: {
-      text: 'PRO',
-      variant: 'primary',
-    },
+    id: 'keyboard-navigator',
+    label: 'Keyboard Navigation Tester',
+    icon: 'zap',
+    href: '/tools/keyboard-navigator',
   },
 ];
 
+// Integration navigation items
 export const integrations: NavItem[] = [
   {
-    id: 'wordpress',
-    label: 'WordPress',
-    href: '/integrations/wordpress',
-    icon: 'wordpress',
+    id: 'cms',
+    label: 'CMS Plugins',
+    icon: 'database',
+    href: '/integrations/cms',
   },
   {
-    id: 'shopify',
-    label: 'Shopify',
-    href: '/integrations/shopify',
-    icon: 'shopping-bag',
+    id: 'development',
+    label: 'Development Tools',
+    icon: 'code',
+    href: '/integrations/development',
     badge: {
-      text: 'PRO',
+      text: 'New',
       variant: 'primary',
     },
+  },
+  {
+    id: 'reporting',
+    label: 'Reporting Tools',
+    icon: 'bar-chart',
+    href: '/integrations/reporting',
+  },
+  {
+    id: 'design',
+    label: 'Design Tool Integration',
+    icon: 'eye',
+    href: '/integrations/design',
   },
   {
     id: 'api',
-    label: 'API Integration',
+    label: 'API Access',
+    icon: 'link',
     href: '/integrations/api',
-    icon: 'code',
-    badge: {
-      text: 'PRO',
-      variant: 'primary',
-    },
-  },
-  {
-    id: 'compliance-integration',
-    label: 'Compliance Integration',
-    href: '/integrations/compliance',
-    icon: 'shield',
-    badge: {
-      text: 'PRO',
-      variant: 'primary',
-    },
-  },
-  {
-    id: 'enterprise',
-    label: 'Enterprise Integration',
-    href: '/integrations/enterprise',
-    icon: 'briefcase',
-    badge: {
-      text: 'ENTERPRISE',
-      variant: 'warning',
-    },
   },
 ];
 
+// Resource navigation items
 export const resources: NavItem[] = [
+  {
+    id: 'documentation',
+    label: 'Documentation',
+    icon: 'book-open',
+    href: '/docs',
+  },
   {
     id: 'wcag-resources',
     label: 'WCAG Resources',
+    icon: 'book',
     href: '/wcag-resources',
-    icon: 'book-open',
-  },
-  {
-    id: 'alt-text-guide',
-    label: 'Alt Text Guide',
-    href: '/wcag-resources/alt-text-guide',
-    icon: 'image',
-  },
-  {
-    id: 'accessibility-tips',
-    label: 'Accessibility Tips',
-    href: '/wcag-resources/accessibility-tips',
-    icon: 'info',
-  },
-  {
-    id: 'non-destructive-fixes',
-    label: 'Non-Destructive Fixes',
-    href: '/wcag-resources/non-destructive-fixes',
-    icon: 'tool',
   },
   {
     id: 'blog',
     label: 'Blog',
-    href: '/blog',
     icon: 'rss',
+    href: '/blog',
   },
   {
     id: 'knowledge-base',
     label: 'Knowledge Base',
+    icon: 'info',
     href: '/knowledge-base',
-    icon: 'database',
   },
   {
     id: 'help-center',
     label: 'Help Center',
-    href: '/help',
     icon: 'help-circle',
+    href: '/help',
   },
 ];
 
+// Combined sections for sidebar navigation
 export const navigationSections: NavigationSection[] = [
+  {
+    id: 'main',
+    title: 'Main',
+    items: [
+      {
+        id: 'dashboard',
+        label: 'Dashboard',
+        icon: 'home',
+        href: '/dashboard',
+      },
+      {
+        id: 'projects',
+        label: 'Projects',
+        icon: 'briefcase',
+        href: '/projects',
+      },
+      {
+        id: 'notifications',
+        label: 'Notifications',
+        icon: 'bell',
+        href: '/notifications',
+        badge: {
+          text: '3',
+          variant: 'primary',
+        },
+      },
+    ],
+  },
   {
     id: 'tools',
     title: 'Tools',
@@ -201,73 +173,24 @@ export const navigationSections: NavigationSection[] = [
   },
 ];
 
+// Account menu items
 export const accountItems: NavItem[] = [
   {
-    id: 'dashboard',
-    label: 'Dashboard',
-    href: '/my-account',
-    icon: 'home',
-  },
-  {
-    id: 'monitoring',
-    label: 'Monitoring',
-    href: '/my-account/monitoring',
-    icon: 'activity',
-  },
-  {
-    id: 'analytics',
-    label: 'Analytics',
-    href: '/my-account/analytics',
-    icon: 'bar-chart',
-  },
-  {
-    id: 'alerts',
-    label: 'Alerts',
-    href: '/my-account/alerts',
-    icon: 'bell',
-  },
-  {
-    id: 'connections',
-    label: 'Connections',
-    href: '/my-account/connections',
-    icon: 'link',
-    children: [
-      {
-        id: 'custom-api',
-        label: 'Custom API',
-        href: '/my-account/connections/custom-api',
-        icon: 'code',
-      },
-      {
-        id: 'shopify',
-        label: 'Shopify',
-        href: '/my-account/connections/shopify',
-        icon: 'shopping-bag',
-      },
-      {
-        id: 'wordpress',
-        label: 'WordPress',
-        href: '/my-account/connections/wordpress',
-        icon: 'wordpress',
-      },
-    ],
+    id: 'profile',
+    label: 'Profile',
+    icon: 'users',
+    href: '/profile',
   },
   {
     id: 'billing',
     label: 'Billing',
-    href: '/my-account/billing',
     icon: 'credit-card',
+    href: '/billing',
   },
   {
     id: 'settings',
     label: 'Settings',
-    href: '/my-account/settings',
     icon: 'settings',
-  },
-  {
-    id: 'team',
-    label: 'Team',
-    href: '/my-account/team',
-    icon: 'users',
+    href: '/settings',
   },
 ];

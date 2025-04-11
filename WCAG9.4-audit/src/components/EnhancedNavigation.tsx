@@ -18,7 +18,7 @@ import {
   Briefcase,
   BookOpen,
   Info,
-  Tool,
+  Wrench,
   Rss,
   Database,
   HelpCircle,
@@ -59,7 +59,7 @@ const iconMap: Record<string, React.ReactNode> = {
   'briefcase': <Briefcase className="w-5 h-5" />,
   'book-open': <BookOpen className="w-5 h-5" />,
   'info': <Info className="w-5 h-5" />,
-  'tool': <Settings className="w-5 h-5" />, // We'll use Settings instead of Tool as it doesn't exist
+  'tool': <Wrench className="w-5 h-5" />,
   'rss': <Rss className="w-5 h-5" />,
   'database': <Database className="w-5 h-5" />,
   'help-circle': <HelpCircle className="w-5 h-5" />,
