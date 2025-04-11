@@ -1,485 +1,388 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Save, RefreshCw, Activity, Code, Key, Info, Book, ArrowRight, ArrowLeft, X, CheckCircle, Globe, Zap, FileText, HelpCircle, Download } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Globe, RefreshCw, Save, AlertTriangle, CheckCircle, Shield } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { wordPressAPI } from '../../lib/integrations/wordpress';
 import type { WordPressSettings } from '../../types/integrations';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { wordPressAPI } from '../../lib/integrations/wordpress';
 
-export function WordPressSetup() {
-  const [settings, setSettings] = useState<WordPressSettings>({
+interface WordPressSetupProps {
+  settings?: WordPressSettings;
+  onSave?: (settings: WordPressSettings) => void;
+  onTestSuccess?: () => void;
+}
+
+/**
+ * WordPress Setup Component
+ * 
+ * Allows users to configure and test their WordPress site connection
+ */
+export function WordPressSetup({ settings: initialSettings, onSave, onTestSuccess }: WordPressSetupProps) {
+  const [settings, setSettings] = useState<WordPressSettings>(initialSettings || {
+    siteUrl: '',
     apiKey: '',
-    scanFrequency: 'weekly',
-    autoFix: true,
-    notifyAdmin: true,
-    excludedPaths: []
+    autofixEnabled: true,
+    monitoringEnabled: true,
+    monitoringInterval: 1440, // 24 hours in minutes
+    scanLevel: 'AA',
+    notifyOnIssue: true,
+    emailNotifications: []
   });
-  const [loading, setLoading] = useState(false);
-  const [generating, setGenerating] = useState(false);
-  const [newApiKey, setNewApiKey] = useState<string | null>(null);
-  const [showNewKey, setShowNewKey] = useState(false);
-  const [showExistingKey, setShowExistingKey] = useState(false);
-  const [showInstructionsModal, setShowInstructionsModal] = useState(false);
+  
+  const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{
+    success: boolean;
+    message: string;
+    tested: boolean;
+  }>({
+    success: false,
+    message: '',
+    tested: false
+  });
 
-  // Load existing settings
-  React.useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        setLoading(true);
-        const savedSettings = await wordPressAPI.getSettings();
-        if (savedSettings) {
-          setSettings(savedSettings);
-        }
-      } catch (error) {
-        console.error('Failed to load settings:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadSettings();
-  }, []);
-
-  const handleGenerateApiKey = async () => {
-    setGenerating(true);
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    
     try {
-      // Generate a cryptographically secure random API key
-      const buffer = new Uint8Array(32);
-      window.crypto.getRandomValues(buffer);
-      const key = Array.from(buffer)
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
+      // Validate the URL format
+      if (!isValidUrl(settings.siteUrl)) {
+        throw new Error('Please enter a valid WordPress site URL');
+      }
       
-      // Save the new API key in settings
-      const newSettings = { ...settings, apiKey: key };
-      const result = await wordPressAPI.saveSettings(newSettings);
+      // Validate the API key
+      if (!settings.apiKey || settings.apiKey.length < 32) {
+        throw new Error('Please enter a valid API key');
+      }
       
-      if (result.success) {
-        setSettings(newSettings);
-        setNewApiKey(key);
-        toast.success('API key generated successfully');
-      } else {
-        throw new Error(result.message);
+      // Check if the API key has been tested
+      if (!testResult.tested || !testResult.success) {
+        // Automatically test the connection before saving
+        const isValid = await wordPressAPI.validateAPIKey(settings.apiKey, settings.siteUrl);
+        
+        if (!isValid) {
+          throw new Error('Connection test failed. Please check your site URL and API key.');
+        }
+      }
+      
+      // Save settings through the API
+      const response = await wordPressAPI.saveSettings(settings);
+      
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to save settings');
+      }
+      
+      toast.success('WordPress settings saved successfully');
+      
+      // Call the parent callback if provided
+      if (onSave) {
+        onSave(settings);
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to generate API key');
+      const message = error instanceof Error ? error.message : 'Failed to save settings';
+      toast.error(message);
     } finally {
-      setGenerating(false);
+      setSaving(false);
     }
   };
 
-  const handleSaveSettings = async () => {
+  // Test WordPress connection
+  const testConnection = async () => {
+    setTesting(true);
+    setTestResult({ ...testResult, tested: true, message: 'Testing connection...' });
+    
     try {
-      setLoading(true);
-      const result = await wordPressAPI.saveSettings(settings);
-      if (result.success) {
-        toast.success('Settings saved successfully');
-      } else {
-        throw new Error(result.message);
+      // Validate URL format first
+      if (!isValidUrl(settings.siteUrl)) {
+        throw new Error('Please enter a valid WordPress site URL');
+      }
+      
+      // Validate API key format (basic validation)
+      if (!settings.apiKey || settings.apiKey.length < 32) {
+        throw new Error('Please enter a valid API key (at least 32 characters)');
+      }
+      
+      // Test connection with the API
+      const isValid = await wordPressAPI.validateAPIKey(settings.apiKey, settings.siteUrl);
+      
+      if (!isValid) {
+        throw new Error('Connection test failed. Please check your WordPress site URL and API key.');
+      }
+      
+      setTestResult({
+        success: true,
+        message: 'Connection successful! Your WordPress site is properly configured.',
+        tested: true
+      });
+      
+      toast.success('WordPress connection successful');
+      
+      // Call success callback if provided
+      if (onTestSuccess) {
+        onTestSuccess();
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to save settings');
+      const message = error instanceof Error ? error.message : 'Connection test failed';
+      setTestResult({
+        success: false,
+        message,
+        tested: true
+      });
+      toast.error(message);
     } finally {
-      setLoading(false);
+      setTesting(false);
     }
+  };
+
+  // Helper function to validate URL format
+  const isValidUrl = (url: string): boolean => {
+    try {
+      // Add protocol if missing
+      const urlWithProtocol = url.match(/^https?:\/\//i) ? url : `https://${url}`;
+      new URL(urlWithProtocol);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  // Handle email list changes
+  const handleEmailChange = (emails: string) => {
+    const emailList = emails
+      .split(',')
+      .map(email => email.trim())
+      .filter(email => email.length > 0);
+    
+    setSettings(prev => ({ ...prev, emailNotifications: emailList }));
   };
 
   return (
-    <div className="space-y-6">
-      {/* Return to Connections Link */}
-      <div className="mb-2">
-        <Link 
-          to="/my-account/connections" 
-          className="inline-flex items-center text-blue-600 hover:text-blue-800"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Return to My Connections
-        </Link>
-      </div>
-      {/* WordPress Plugin Documentation Link */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-        <div className="flex items-start">
-          <Book className="w-6 h-6 text-blue-600 mt-1" />
-          <div className="ml-3">
-            <h2 className="text-lg font-semibold text-blue-900">WordPress Plugin Setup</h2>
-            <p className="mt-1 text-blue-700">
-              Before connecting your WordPress site, you'll need to install our WordPress plugin. Follow our comprehensive documentation to get started.
-            </p>
-            <div className="flex mt-3 space-x-3">
-              <a
-                href="/downloads/wcag-accessibility-scanner.zip"
-                download
-                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-              >
-                <Download className="w-5 h-5 mr-2" />
-                Download Plugin
-              </a>
-              <button
-                onClick={() => setShowInstructionsModal(true)}
-                className="inline-flex items-center px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50"
-              >
-                <HelpCircle className="w-5 h-5 mr-2" />
-                Setup Instructions
-              </button>
-              <Link
-                to="/docs/wordpress"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                <Book className="w-5 h-5 mr-2" />
-                View Documentation
-              </Link>
-            </div>
-          </div>
+    <div className="bg-white rounded-lg shadow-sm">
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center">
+          <Globe className="w-6 h-6 text-blue-600" />
+          <h2 className="ml-3 text-lg font-medium text-gray-900">
+            WordPress Integration Setup
+          </h2>
         </div>
       </div>
 
-      {/* API Key Management */}
-      <div className="bg-white p-8">
-        {/* API Key Generation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-xl mb-8"
-        >
-          <div className="border-b border-gray-200 pb-5 mb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Key className="w-6 h-6 text-blue-600" />
-                <h2 className="ml-3 text-lg font-medium text-gray-900">
-                  WordPress API Key
-                </h2>
-              </div>
-              <span className="text-sm font-medium text-gray-500">
-                Connect your WordPress site
-              </span>
-            </div>
+      <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {/* WordPress Site URL */}
+        <div>
+          <label htmlFor="site-url" className="block text-sm font-medium text-gray-700">
+            WordPress Site URL
+          </label>
+          <div className="mt-1">
+            <input
+              type="text"
+              id="site-url"
+              value={settings.siteUrl}
+              onChange={(e) => setSettings(prev => ({ ...prev, siteUrl: e.target.value }))}
+              placeholder="example.com or https://example.com"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              required
+            />
           </div>
+          <p className="mt-2 text-sm text-gray-500">
+            Enter your WordPress site URL without trailing slashes.
+          </p>
+        </div>
 
-          <div className="mb-8">
-            <div className="flex items-start mb-4">
-              <div className="flex-shrink-0">
-                <Info className="h-5 w-5 text-blue-400" />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">What is a WordPress API key?</h3>
-                <div className="mt-2 text-sm text-blue-700">
-                  <p>
-                    A WordPress API key connects your WordPress site with our accessibility services. After generating an API key, you'll need to install our plugin and enter this key in your WordPress dashboard.
-                  </p>
-                </div>
-              </div>
-            </div>
+        {/* API Key */}
+        <div>
+          <label htmlFor="api-key" className="block text-sm font-medium text-gray-700">
+            API Key
+          </label>
+          <div className="mt-1 flex rounded-md shadow-sm">
+            <input
+              type="password"
+              id="api-key"
+              value={settings.apiKey}
+              onChange={(e) => setSettings(prev => ({ ...prev, apiKey: e.target.value }))}
+              className="flex-1 rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              placeholder="Enter your WordPress API key"
+              required
+            />
+            <button
+              type="button"
+              onClick={testConnection}
+              disabled={testing || !settings.siteUrl || !settings.apiKey}
+              className="relative -ml-px inline-flex items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            >
+              {testing ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                'Test Connection'
+              )}
+            </button>
           </div>
-
-          {settings.apiKey ? (
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Key className="w-6 h-6 text-blue-600" />
-                  <div className="ml-3">
-                    <h4 className="text-base font-medium text-gray-900">WordPress API Key</h4>
-                    <p className="text-sm text-gray-500 mt-1">Use this key in your WordPress plugin configuration</p>
-                  </div>
-                </div>
-                <div>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                    Active
-                  </span>
-                </div>
-              </div>
-              <div className="mt-4">
-                <div className="relative">
-                  <code className="block w-full text-sm font-mono bg-gray-50 px-4 py-3 rounded-lg pr-20">
-                    {showExistingKey ? settings.apiKey : `${settings.apiKey.slice(0, 8)}...${settings.apiKey.slice(-8)}`}
-                  </code>
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <button
-                      onClick={() => setShowExistingKey(!showExistingKey)}
-                      className="text-gray-600 hover:text-gray-700 text-sm font-medium transition-colors mr-4"
-                    >
-                      {showExistingKey ? 'Hide' : 'Show'}
-                    </button>
-                    <CopyToClipboard
-                      text={settings.apiKey}
-                      onCopy={() => toast.success('API key copied to clipboard')}
-                    >
-                      <button className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
-                        Copy
-                      </button>
-                    </CopyToClipboard>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={handleGenerateApiKey}
-                  className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
-                >
-                  <RefreshCw className="-ml-1 mr-2 h-5 w-5" />
-                  Regenerate Key
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
-              <Globe className="mx-auto h-12 w-12 text-blue-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No WordPress API Key</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Generate an API key to connect your WordPress site
-              </p>
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={handleGenerateApiKey}
-                  disabled={generating}
-                  className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
-                >
-                  {generating ? (
-                    <>
-                      <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Key className="-ml-1 mr-2 h-5 w-5" />
-                      Generate API Key
-                    </>
-                  )}
-                </button>
-              </div>
+          
+          {/* Connection test result message */}
+          {testResult.tested && (
+            <div className={`mt-2 text-sm flex items-center ${testResult.success ? 'text-green-600' : 'text-red-600'}`}>
+              {testResult.success ? (
+                <CheckCircle className="h-4 w-4 mr-1" />
+              ) : (
+                <AlertTriangle className="h-4 w-4 mr-1" />
+              )}
+              {testResult.message}
             </div>
           )}
+          
+          <p className="mt-2 text-sm text-gray-500">
+            Generate an API key in the AccessWeb plugin settings in your WordPress admin.
+          </p>
+        </div>
 
-          {/* Display newly generated key */}
-          {newApiKey && (
-            <div className="mt-8 bg-blue-50 rounded-xl p-6">
-              <div className="flex items-start">
-                <CheckCircle className="w-6 h-6 text-blue-600 mt-1" />
-                <div className="ml-3">
-                  <h3 className="text-lg font-semibold text-blue-900">API Key Generated Successfully</h3>
-                  <p className="mt-1 text-blue-700">
-                    Your new WordPress API key has been generated. Copy this key and use it in your WordPress plugin settings.
-                  </p>
-                  <div className="mt-4">
-                    <div className="relative">
-                      <code className="block w-full text-sm font-mono bg-white px-4 py-3 rounded-lg pr-20">
-                        {showNewKey ? newApiKey : `${newApiKey.slice(0, 8)}...${newApiKey.slice(-8)}`}
-                      </code>
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <button
-                          onClick={() => setShowNewKey(!showNewKey)}
-                          className="text-gray-600 hover:text-gray-700 text-sm font-medium transition-colors mr-4"
-                        >
-                          {showNewKey ? 'Hide' : 'Show'}
-                        </button>
-                        <CopyToClipboard
-                          text={newApiKey}
-                          onCopy={() => toast.success('API key copied to clipboard')}
-                        >
-                          <button className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
-                            Copy
-                          </button>
-                        </CopyToClipboard>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </motion.div>
+        {/* Scan Level */}
+        <div>
+          <label htmlFor="scan-level" className="block text-sm font-medium text-gray-700">
+            WCAG Compliance Level
+          </label>
+          <select
+            id="scan-level"
+            value={settings.scanLevel}
+            onChange={(e) => setSettings(prev => ({ ...prev, scanLevel: e.target.value as 'A' | 'AA' | 'AAA' }))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          >
+            <option value="A">WCAG A (Minimum Level)</option>
+            <option value="AA">WCAG AA (Standard Level - Recommended)</option>
+            <option value="AAA">WCAG AAA (Maximum Level)</option>
+          </select>
+          <p className="mt-2 text-sm text-gray-500">
+            Select the WCAG level to test against. AA is the most common standard.
+          </p>
+        </div>
 
-        {/* WordPress Configuration */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-xl"
-        >
-          <div className="border-b border-gray-200 pb-5 mb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Globe className="w-6 h-6 text-blue-600" />
-                <h2 className="ml-3 text-lg font-medium text-gray-900">
-                  WordPress Configuration
-                </h2>
-              </div>
-            </div>
+        {/* Monitoring Interval */}
+        <div>
+          <label htmlFor="monitoring-interval" className="block text-sm font-medium text-gray-700">
+            Monitoring Interval (Minutes)
+          </label>
+          <input
+            type="number"
+            id="monitoring-interval"
+            value={settings.monitoringInterval}
+            onChange={(e) => setSettings(prev => ({ 
+              ...prev, 
+              monitoringInterval: parseInt(e.target.value) || 1440 
+            }))}
+            min="60"
+            step="60"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          />
+          <p className="mt-2 text-sm text-gray-500">
+            How often should we check your site? (60 = hourly, 1440 = daily)
+          </p>
+        </div>
+
+        {/* Email Notifications */}
+        <div>
+          <label htmlFor="email-notifications" className="block text-sm font-medium text-gray-700">
+            Email Notifications
+          </label>
+          <div className="mt-1">
+            <textarea
+              id="email-notifications"
+              value={settings.emailNotifications?.join(', ') || ''}
+              onChange={(e) => handleEmailChange(e.target.value)}
+              rows={2}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              placeholder="email1@example.com, email2@example.com"
+            />
+          </div>
+          <p className="mt-2 text-sm text-gray-500">
+            Enter email addresses separated by commas to receive notifications.
+          </p>
+        </div>
+
+        {/* Feature Toggles */}
+        <div className="space-y-4">
+          <div className="flex items-center">
+            <input
+              id="autofix-enabled"
+              type="checkbox"
+              checked={settings.autofixEnabled}
+              onChange={(e) => setSettings(prev => ({ ...prev, autofixEnabled: e.target.checked }))}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor="autofix-enabled" className="ml-2 block text-sm text-gray-900">
+              Enable automatic fixing of accessibility issues
+            </label>
           </div>
 
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="scanFrequency" className="block text-sm font-medium text-gray-700">
-                  Scan Frequency
-                </label>
-                <select
-                  id="scanFrequency"
-                  value={settings.scanFrequency}
-                  onChange={(e) => setSettings({ ...settings, scanFrequency: e.target.value })}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                  style={{ maxWidth: '280px' }}
-                >
-                  <option value="realtime">Real-time</option>
-                  <option value="hourly">Hourly</option>
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-              </div>
-
-              <div className="flex flex-wrap items-center space-x-6">
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="autoFix"
-                      name="autoFix"
-                      type="checkbox"
-                      checked={settings.autoFix}
-                      onChange={(e) => setSettings({ ...settings, autoFix: e.target.checked })}
-                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="autoFix" className="font-medium text-gray-700">Auto-fix Issues</label>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="notifyAdmin"
-                      name="notifyAdmin"
-                      type="checkbox"
-                      checked={settings.notifyAdmin}
-                      onChange={(e) => setSettings({ ...settings, notifyAdmin: e.target.checked })}
-                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="notifyAdmin" className="font-medium text-gray-700">Notify Admin</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="excludedPaths" className="block text-sm font-medium text-gray-700">
-                Excluded Paths (one per line)
-              </label>
-              <div className="mt-1">
-                <textarea
-                  id="excludedPaths"
-                  rows={3}
-                  value={settings.excludedPaths.join('\n')}
-                  onChange={(e) => setSettings({ ...settings, excludedPaths: e.target.value.split('\n').filter(p => p.trim()) })}
-                  className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                  placeholder="/wp-admin/&#10;/wp-login.php&#10;/exclude-this-path"
-                />
-              </div>
-              <p className="mt-2 text-sm text-gray-500">
-                Enter paths that should be excluded from accessibility scanning
-              </p>
-            </div>
-
-            <div className="pt-6 flex justify-end">
-              <button
-                onClick={handleSaveSettings}
-                disabled={loading}
-                className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                {loading ? (
-                  <>
-                    <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="-ml-1 mr-2 h-5 w-5" />
-                    Save Settings
-                  </>
-                )}
-              </button>
-            </div>
+          <div className="flex items-center">
+            <input
+              id="monitoring-enabled"
+              type="checkbox"
+              checked={settings.monitoringEnabled}
+              onChange={(e) => setSettings(prev => ({ ...prev, monitoringEnabled: e.target.checked }))}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor="monitoring-enabled" className="ml-2 block text-sm text-gray-900">
+              Enable regular monitoring of your site
+            </label>
           </div>
-        </motion.div>
-      </div>
 
-      {/* Instructions Modal */}
-      {showInstructionsModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            {/* Background overlay */}
-            <div 
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
-              aria-hidden="true"
-              onClick={() => setShowInstructionsModal(false)}
-            ></div>
+          <div className="flex items-center">
+            <input
+              id="notify-on-issue"
+              type="checkbox"
+              checked={settings.notifyOnIssue}
+              onChange={(e) => setSettings(prev => ({ ...prev, notifyOnIssue: e.target.checked }))}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor="notify-on-issue" className="ml-2 block text-sm text-gray-900">
+              Send email notifications when new issues are detected
+            </label>
+          </div>
+        </div>
 
-            {/* Modal panel */}
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
-              <div className="absolute top-0 right-0 pt-4 pr-4">
-                <button
-                  type="button"
-                  className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  onClick={() => setShowInstructionsModal(false)}
-                >
-                  <span className="sr-only">Close</span>
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
-              <div className="sm:flex sm:items-start">
-                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                  <Book className="h-6 w-6 text-blue-600" />
-                </div>
-                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                    WordPress Integration Steps
-                  </h3>
-                  <div className="mt-4">
-                    <ol className="list-decimal list-inside space-y-3 text-gray-600">
-                      <li>Generate an API key (shown above)</li>
-                      <li>Install our WordPress plugin from the WordPress plugin directory</li>
-                      <li>Activate the plugin in your WordPress admin dashboard</li>
-                      <li>Navigate to Settings {`>`} Accessibility Scanner in your WordPress admin</li>
-                      <li>Enter your API key and configure scanning options</li>
-                      <li>Save settings and start your first scan</li>
-                    </ol>
-                    
-                    <div className="mt-6 bg-blue-50 p-4 rounded-md">
-                      <h4 className="font-medium text-blue-800">Plugin Installation Options</h4>
-                      <p className="mt-2 text-sm text-blue-700">
-                        You can install our plugin in one of two ways:
-                      </p>
-                      <ul className="mt-2 space-y-1 text-sm text-blue-700 list-disc list-inside">
-                        <li>Search for "WCAG Accessibility Scanner" in the WordPress plugin directory</li>
-                        <li>Download the plugin zip file from our website and upload it to your WordPress site</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() => setShowInstructionsModal(false)}
-                >
-                  Got it
-                </button>
-                <Link
-                  to="/docs/wordpress"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm"
-                >
-                  View Full Documentation
-                </Link>
+        {/* WordPress Plugin Notice */}
+        <div className="rounded-md bg-blue-50 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <Shield className="h-5 w-5 text-blue-400" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-blue-800">WordPress Plugin Required</h3>
+              <div className="mt-2 text-sm text-blue-700">
+                <p>
+                  This integration requires the AccessWeb WordPress Plugin to be installed on your site.
+                  <a 
+                    href="/docs/wordpress-plugin-installation" 
+                    className="font-medium text-blue-700 underline hover:text-blue-600 ml-1"
+                  >
+                    View installation instructions
+                  </a>
+                </p>
               </div>
             </div>
           </div>
         </div>
-      )}
+
+        {/* Submit Button */}
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={saving || !settings.siteUrl || !settings.apiKey}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          >
+            {saving ? (
+              <>
+                <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="-ml-1 mr-2 h-5 w-5" />
+                Save Settings
+              </>
+            )}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
