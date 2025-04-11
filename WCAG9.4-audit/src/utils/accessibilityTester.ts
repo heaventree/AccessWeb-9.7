@@ -4,7 +4,7 @@ import type { TestResult, AccessibilityIssue } from '../types';
 import { addLegislationRefs } from './legislationMapper';
 import { getWCAGInfo } from './wcagHelper';
 import { testPDFAccessibility } from './pdfAccessibilityTester';
-import { testMediaAccessibility } from './mediaAccessibilityTester';
+import { analyzeMediaAccessibility } from './mediaAccessibilityTester';
 import { testDocumentAccessibility, checkDocumentLinks } from './documentFormatTester';
 import { analyzeHtmlStructure, analyzeURL } from './htmlStructureAnalyzer';
 import { analyzeResponsiveDesign } from './responsiveDesignAnalyzer';
@@ -508,7 +508,8 @@ export async function testAccessibility(
     if (options?.mediaTesting?.enabled) {
       try {
         console.log('Running media accessibility tests...');
-        mediaIssues = await testMediaAccessibility(container);
+        // Use the container's innerHTML as the HTML to analyze
+        mediaIssues = await analyzeMediaAccessibility(container.innerHTML, url);
         
         // Add media issues to main issues array
         issues.push(...mediaIssues);
