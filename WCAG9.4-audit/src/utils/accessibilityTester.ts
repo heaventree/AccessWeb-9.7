@@ -7,6 +7,7 @@ import { testPDFAccessibility } from './pdfAccessibilityTester';
 import { testMediaAccessibility } from './mediaAccessibilityTester';
 import { testDocumentAccessibility, checkDocumentLinks } from './documentFormatTester';
 import { analyzeHtmlStructure, analyzeURL } from './htmlStructureAnalyzer';
+import { analyzeResponsiveDesign } from './responsiveDesignAnalyzer';
 import Color from 'color';
 
 // Configure axe-core rules based on selected region
@@ -435,6 +436,27 @@ export async function testAccessibility(
         wcagCriteria: ['1.3.1'],
         autoFixable: false,
         fixSuggestion: 'Please review the HTML structure manually for proper semantic elements and heading hierarchy.'
+      });
+    }
+    
+    // Run responsive design analysis
+    console.log('Running responsive design analysis...');
+    try {
+      const responsiveIssues = analyzeResponsiveDesign(container, html);
+      if (responsiveIssues.length > 0) {
+        console.log(`Found ${responsiveIssues.length} responsive design issues`);
+        issues.push(...responsiveIssues);
+      }
+    } catch (responsiveError) {
+      console.error('Error during responsive design analysis:', responsiveError);
+      warnings.push({
+        id: 'responsive-analysis-error',
+        impact: 'moderate',
+        description: 'An error occurred during responsive design analysis.',
+        nodes: ['<div>Responsive design analysis could not be completed</div>'],
+        wcagCriteria: ['1.4.10', '2.5.5', '1.3.4'],
+        autoFixable: false,
+        fixSuggestion: 'Please review your site on mobile devices and ensure proper responsive implementation.'
       });
     }
 

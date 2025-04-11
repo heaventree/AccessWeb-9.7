@@ -422,6 +422,15 @@ export function WCAGCheckerPage() {
                         Structure ({structureIssues.length})
                       </button>
                     )}
+                    {responsiveIssues.length > 0 && (
+                      <button
+                        onClick={() => setActiveTab('responsive')}
+                        className={getTabStyle('responsive')}
+                      >
+                        <Smartphone className="w-4 h-4 inline-block mr-2" />
+                        Responsive ({responsiveIssues.length})
+                      </button>
+                    )}
                     {results.warnings.length > 0 && (
                       <button
                         onClick={() => setActiveTab('warnings')}
@@ -486,6 +495,26 @@ export function WCAGCheckerPage() {
                           </ul>
                         </div>
                         <StructureAnalysisPanel issues={structureIssues} />
+                      </div>
+                    )}
+                    {activeTab === 'responsive' && responsiveIssues.length > 0 && (
+                      <div className="space-y-4">
+                        <div className="bg-teal-50 p-4 rounded-lg">
+                          <h3 className="text-lg font-semibold text-teal-900 mb-2">
+                            Mobile & Responsive Design Analysis
+                          </h3>
+                          <p className="text-teal-700">
+                            Evaluating mobile accessibility according to WCAG 2.1 and 2.2 standards:
+                          </p>
+                          <ul className="mt-2 space-y-1 text-teal-700">
+                            <li>• Viewport configuration</li>
+                            <li>• Touch target sizes (WCAG 2.5.5 AAA & 2.5.8 AA)</li>
+                            <li>• Content reflow at 320px (WCAG 1.4.10)</li>
+                            <li>• Orientation support (WCAG 1.3.4)</li>
+                            <li>• Text spacing adaptability (WCAG 1.4.12)</li>
+                          </ul>
+                        </div>
+                        <ResponsiveAnalysisPanel issues={responsiveIssues} />
                       </div>
                     )}
                   </div>
