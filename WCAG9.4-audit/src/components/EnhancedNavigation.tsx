@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import { useUIEnhancement } from '../contexts/UIEnhancementContext';
 import { useTheme } from '../hooks/useTheme';
-import { tools, integrations, resources } from './NavigationData';
+import { toolItems, integrationItems, resourceItems, accountItems } from './NavigationData';
 
 // Icon mapping
 const iconMap: Record<string, React.ReactNode> = {

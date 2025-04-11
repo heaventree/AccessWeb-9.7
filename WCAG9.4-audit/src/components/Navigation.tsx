@@ -124,7 +124,7 @@ export function Navigation() {
                     variants={dropdownVariants}
                     className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2"
                   >
-                    {tools.map(tool => (
+                    {toolItems.map(tool => (
                       <Link
                         key={tool.path}
                         to={tool.path}
@@ -164,7 +164,7 @@ export function Navigation() {
                     variants={dropdownVariants}
                     className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2"
                   >
-                    {integrations.map(integration => (
+                    {integrationItems.map(integration => (
                       <Link
                         key={integration.path}
                         to={integration.path}
@@ -204,7 +204,7 @@ export function Navigation() {
                     variants={dropdownVariants}
                     className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2"
                   >
-                    {resources.map(resource => (
+                    {resourceItems.map(resource => (
                       <Link
                         key={resource.path}
                         to={resource.path}
@@ -335,7 +335,7 @@ export function Navigation() {
                 >
                   Home
                 </Link>
-                {tools.map(tool => (
+                {toolItems.map(tool => (
                   <Link
                     key={tool.path}
                     to={tool.path}
@@ -348,7 +348,7 @@ export function Navigation() {
                     </div>
                   </Link>
                 ))}
-                {integrations.map(integration => (
+                {integrationItems.map(integration => (
                   <Link
                     key={integration.path}
                     to={integration.path}
@@ -361,7 +361,7 @@ export function Navigation() {
                     </div>
                   </Link>
                 ))}
-                {resources.map(resource => (
+                {resourceItems.map(resource => (
                   <Link
                     key={resource.path}
                     to={resource.path}
