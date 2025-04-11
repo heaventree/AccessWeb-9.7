@@ -49,10 +49,11 @@ const mockCategories: HelpCategory[] = [
     articles: [
       { id: '15', title: 'WCAG Checker Guide', slug: 'wcag-checker-complete-guide' },
       { id: '16', title: 'HTML Structure Analysis', slug: 'html-structure-analysis-guide' },
-      { id: '17', title: 'Responsive Design Tests', slug: 'responsive-design-analysis-guide' },
-      { id: '18', title: 'Media Accessibility Testing', slug: 'media-accessibility-testing-guide' },
-      { id: '19', title: 'Export Reports as PDF', slug: 'export-accessibility-reports-guide' },
-      { id: '20', title: 'Color Palette Generator', slug: 'color-palette-generator-guide' }
+      { id: '17', title: 'URL Design Analysis', slug: 'url-design-analysis-guide' },
+      { id: '18', title: 'Responsive Design Tests', slug: 'responsive-design-analysis-guide' },
+      { id: '19', title: 'Media Accessibility Testing', slug: 'media-accessibility-testing-guide' },
+      { id: '20', title: 'Export Reports as PDF', slug: 'export-accessibility-reports-guide' },
+      { id: '21', title: 'Color Palette Generator', slug: 'color-palette-generator-guide' }
     ]
   },
   {
@@ -61,10 +62,10 @@ const mockCategories: HelpCategory[] = [
     description: 'Guides for advanced accessibility features',
     icon: 'Code',
     articles: [
-      { id: '21', title: 'AI-Powered Recommendations', slug: 'ai-powered-accessibility-recommendations' },
-      { id: '22', title: 'Section Identifier System', slug: 'section-identifier-system-guide' },
-      { id: '23', title: 'Feedback System', slug: 'accessibility-feedback-system-guide' },
-      { id: '24', title: 'Pro Features Overview', slug: 'pro-features-overview-guide' }
+      { id: '22', title: 'AI Recommendations', slug: 'ai-recommendations-guide' },
+      { id: '23', title: 'Section Identifier System', slug: 'section-identifier-system-guide' },
+      { id: '24', title: 'Feedback System', slug: 'accessibility-feedback-system-guide' },
+      { id: '25', title: 'Pro Features Overview', slug: 'pro-features-overview-guide' }
     ]
   },
   {
@@ -73,10 +74,10 @@ const mockCategories: HelpCategory[] = [
     description: 'Creating accessible content for the web',
     icon: 'FileText',
     articles: [
-      { id: '25', title: 'Alt Text Guide', slug: 'alt-text-best-practices-guide' },
-      { id: '26', title: 'Captions and Transcripts', slug: 'captions-transcripts-accessibility-guide' },
-      { id: '27', title: 'Accessible PDFs', slug: 'accessible-pdf-document-guide' },
-      { id: '28', title: 'Accessible Videos', slug: 'accessible-video-content-guide' }
+      { id: '26', title: 'Alt Text Guide', slug: 'alt-text-best-practices-guide' },
+      { id: '27', title: 'Captions and Transcripts', slug: 'captions-transcripts-accessibility-guide' },
+      { id: '28', title: 'Accessible PDFs', slug: 'accessible-pdf-document-guide' },
+      { id: '29', title: 'Accessible Videos', slug: 'accessible-video-content-guide' }
     ]
   }
 ];

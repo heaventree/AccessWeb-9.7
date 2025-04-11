@@ -30,6 +30,12 @@ export function useDocumentation(slug: string) {
           case 'section-identifier-system-guide':
             documentationPath = '/src/data/documentation/sectionIdentifier.md';
             break;
+          case 'url-design-analysis-guide':
+            documentationPath = '/src/data/documentation/urlDesignAnalysis.md';
+            break;
+          case 'ai-recommendations-guide':
+            documentationPath = '/src/data/documentation/aiRecommendations.md';
+            break;
           default:
             throw new Error('Documentation not found');
         }

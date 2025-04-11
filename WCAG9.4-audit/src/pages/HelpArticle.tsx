@@ -141,6 +141,24 @@ export function HelpArticle() {
   }
   
   // Render regular article content
+  if (!article) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-[130px] pb-[130px]">
+        <div className="max-w-3xl mx-auto px-4">
+          <EmptyState
+            title="Article Not Found"
+            description="The article content could not be loaded."
+            icon={<Book className="h-6 w-6 text-gray-600" />}
+            action={{
+              label: "Back to Help Center",
+              onClick: () => window.location.href = '/help'
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <>
       <Navigation />
