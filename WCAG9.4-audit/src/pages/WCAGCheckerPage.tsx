@@ -376,10 +376,11 @@ export function WCAGCheckerPage() {
                 </div>
                 <button
                   onClick={handleExport}
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-md rounded-lg transition-all hover:shadow-lg"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Export Report
+                  <span className={proPillStyle + " ml-2"}>PRO</span>
                 </button>
               </div>
 
