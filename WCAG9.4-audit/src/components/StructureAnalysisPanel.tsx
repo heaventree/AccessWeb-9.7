@@ -6,7 +6,6 @@ import {
   Layout,
   Link2,
   Heading1,
-  Heading2,
   MousePointer2
 } from 'lucide-react';
 import type { AccessibilityIssue } from '../types';

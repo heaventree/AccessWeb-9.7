@@ -305,7 +305,6 @@ function checkSemanticHTML(root: HTMLElement): AccessibilityIssue[] {
 
   // Check for non-semantic lists
   const bulletDivs = Array.from(root.querySelectorAll('div')).filter(div => {
-    const text = div.textContent || '';
     const childDivs = div.querySelectorAll('div');
     return (
       childDivs.length >= 3 && 
