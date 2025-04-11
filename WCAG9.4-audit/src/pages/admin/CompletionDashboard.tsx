@@ -52,7 +52,7 @@ const featureCompletions: FeatureStatus[] = [
   { name: 'Database Migrations', percentage: 40, status: 'critical' }, // Increased progress but still critical
   { name: 'Policy Management', percentage: 50, status: 'in-progress' }, // Improved from critical to in-progress
   { name: 'Voice-guided Walkthrough', percentage: 0, status: 'not-started' },
-  { name: 'WCAG Compliance Export', percentage: 0, status: 'not-started' },
+  { name: 'WCAG Compliance Export', percentage: 100, status: 'completed' }, // Updated to completed
   { name: 'Custom CSS-Based Fixes', percentage: 10, status: 'in-progress' }, // Started work
 ];
 

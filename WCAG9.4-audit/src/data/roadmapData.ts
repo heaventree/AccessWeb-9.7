@@ -361,6 +361,15 @@ export const roadmapFeatures: RoadmapFeature[] = [
     priority: 2,
     category: 'core',
     completedDate: '2025-04-11'
+  },
+  {
+    id: 'pdf-generator',
+    title: 'WCAG Compliance Export',
+    description: 'Generate comprehensive export of accessibility scans as a PRO feature',
+    status: 'completed',
+    priority: 3,
+    category: 'reporting',
+    completedDate: '2025-04-11'
   }
 ];
 
