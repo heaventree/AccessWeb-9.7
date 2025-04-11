@@ -34,14 +34,7 @@ import {
 } from 'lucide-react';
 import { useUIEnhancement } from '../contexts/UIEnhancementContext';
 import { useTheme } from '../hooks/useTheme';
-import { 
-  NavItem, 
-  navigationSections, 
-  tools, 
-  integrations, 
-  resources,
-  accountItems
-} from './NavigationData';
+import { tools, integrations, resources } from './NavigationData';
 
 // Icon mapping
 const iconMap: Record<string, React.ReactNode> = {

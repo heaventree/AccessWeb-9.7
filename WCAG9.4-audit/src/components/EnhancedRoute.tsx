@@ -21,7 +21,7 @@ export function EnhancedRoute({
   enhancedElement,
   featureFlag = 'enhancedNavigation'
 }: EnhancedRouteProps) {
-  const { uiMode, featureFlags, isEnhanced } = useUIEnhancement();
+  const { uiMode, featureFlags } = useUIEnhancement();
   
   // Determine which element to render based on UI mode and feature flags
   const renderedElement = uiMode === 'enhanced' && featureFlags[featureFlag] 

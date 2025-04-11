@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 // UI Mode options - 'current' is the existing UI, 'enhanced' is the new UI
 type UIMode = 'current' | 'enhanced';

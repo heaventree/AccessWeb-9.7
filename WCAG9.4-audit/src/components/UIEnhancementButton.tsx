@@ -1,4 +1,4 @@
-import { LightbulbIcon, Settings } from 'lucide-react';
+import { LightbulbIcon } from 'lucide-react';
 import { useUIEnhancement } from '../contexts/UIEnhancementContext';
 
 interface UIEnhancementButtonProps {
