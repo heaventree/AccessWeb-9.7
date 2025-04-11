@@ -33,7 +33,7 @@ import { WordPressAPIPage } from './pages/connections/WordPressAPIPage';
 import { APIGuide } from './pages/docs/APIGuide';
 import { WordPressGuide } from './pages/docs/WordPressGuide';
 import { ShopifyGuide } from './pages/docs/ShopifyGuide';
-import { DocumentationPage } from './pages/docs/DocumentationPage';
+// Documentation component is imported separately
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AccessibilityControls } from './components/accessibility/AccessibilityControls';
 import { WCAGCheckerPage } from './pages/WCAGCheckerPage';

@@ -45,8 +45,8 @@ export function HelpArticle() {
             description={error || "The article you're looking for doesn't exist."}
             icon={<Book className="h-6 w-6 text-gray-600" />}
             action={{
-              label: "Back to Help Center",
-              onClick: () => window.location.href = '/help'
+              label: pathPrefix === '/docs' ? "Back to Documentation" : "Back to Help Center",
+              onClick: () => window.location.href = pathPrefix
             }}
           />
         </div>
@@ -153,8 +153,8 @@ export function HelpArticle() {
             description="The article content could not be loaded."
             icon={<Book className="h-6 w-6 text-gray-600" />}
             action={{
-              label: "Back to Help Center",
-              onClick: () => window.location.href = '/help'
+              label: pathPrefix === '/docs' ? "Back to Documentation" : "Back to Help Center",
+              onClick: () => window.location.href = pathPrefix
             }}
           />
         </div>
@@ -168,11 +168,11 @@ export function HelpArticle() {
       <div className="min-h-screen bg-gray-50 pt-[130px] pb-[130px]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
-            to="/help"
+            to={pathPrefix}
             className="inline-flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 bg-white rounded-lg shadow-sm border border-gray-200 mb-8 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Help Center
+            {pathPrefix === '/docs' ? 'Back to Documentation' : 'Back to Help Center'}
           </Link>
 
           <article className="bg-white rounded-xl shadow-sm overflow-hidden">

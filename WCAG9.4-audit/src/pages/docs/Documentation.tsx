@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Book, FileText, Code, Globe, X, HelpCircle } from 'lucide-react';
-import { Navigation } from '../../components/Navigation';
-import { Footer } from '../../components/Footer';
-import { BackToTop } from '../../components/BackToTop';
+// These are imported and used at the App.tsx level
 import { EmptyState } from '../../components/EmptyState';
 
 // Documentation guides
