@@ -4,30 +4,7 @@ import {
   ChevronDown, 
   Menu, 
   X, 
-  CheckCircle, 
-  Book, 
-  Palette, 
-  Eye, 
-  Activity,
-  Zap,
-  Image,
-  BarChart,
-  Shield,
-  ShoppingBag,
-  Code,
-  Briefcase,
-  BookOpen,
-  Info,
-  Wrench,
-  Rss,
-  Database,
-  HelpCircle,
-  Home,
-  Bell,
-  Link as LinkIcon,
   CreditCard,
-  Settings,
-  Users,
   Sun,
   Moon,
   MessageSquare
@@ -35,35 +12,6 @@ import {
 import { useUIEnhancement } from '../contexts/UIEnhancementContext';
 import { useTheme } from '../hooks/useTheme';
 import { toolItems, integrationItems, resourceItems, accountItems } from './NavigationData';
-
-// Icon mapping
-const iconMap: Record<string, React.ReactNode> = {
-  'check-circle': <CheckCircle className="w-5 h-5" />,
-  'book': <Book className="w-5 h-5" />,
-  'palette': <Palette className="w-5 h-5" />,
-  'eye': <Eye className="w-5 h-5" />,
-  'activity': <Activity className="w-5 h-5" />,
-  'zap': <Zap className="w-5 h-5" />,
-  'image': <Image className="w-5 h-5" />,
-  'bar-chart': <BarChart className="w-5 h-5" />,
-  'shield': <Shield className="w-5 h-5" />,
-  'shopping-bag': <ShoppingBag className="w-5 h-5" />,
-  'code': <Code className="w-5 h-5" />,
-  'briefcase': <Briefcase className="w-5 h-5" />,
-  'book-open': <BookOpen className="w-5 h-5" />,
-  'info': <Info className="w-5 h-5" />,
-  'tool': <Wrench className="w-5 h-5" />,
-  'rss': <Rss className="w-5 h-5" />,
-  'database': <Database className="w-5 h-5" />,
-  'help-circle': <HelpCircle className="w-5 h-5" />,
-  'home': <Home className="w-5 h-5" />,
-  'bell': <Bell className="w-5 h-5" />,
-  'link': <LinkIcon className="w-5 h-5" />,
-  'credit-card': <CreditCard className="w-5 h-5" />,
-  'settings': <Settings className="w-5 h-5" />,
-  'users': <Users className="w-5 h-5" />,
-  'message-square': <MessageSquare className="w-5 h-5" />,
-};
 
 export function EnhancedNavigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -73,11 +21,6 @@ export function EnhancedNavigation() {
   
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
-  };
-
-  const getIcon = (iconName?: string) => {
-    if (!iconName) return null;
-    return iconMap[iconName] || null;
   };
   
   return (
@@ -220,25 +163,26 @@ export function EnhancedNavigation() {
                   {resourceItems.map((resource) => (
                     <Link
                       key={resource.id}
-                      to={resource.href || '/'}
+                      to={resource.path || '/'}
                       className={`flex items-start p-2 rounded-md ${
-                        pathname === resource.href
+                        pathname === resource.path
                           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
                           : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                       }`}
                     >
                       <span className="flex-shrink-0 mr-3 mt-1 text-gray-500 dark:text-gray-400">
-                        {getIcon(resource.icon)}
+                        <resource.icon className="w-5 h-5" />
                       </span>
                       <div>
-                        <div className="font-medium">{resource.label}</div>
-                        {resource.badge && (
-                          <span className={`
-                            inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1
-                            ${resource.badge.variant === 'primary' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                            ${resource.badge.variant === 'warning' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                          `}>
-                            {resource.badge.text}
+                        <div className="font-medium">{resource.name}</div>
+                        {resource.isPro && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                            PRO
+                          </span>
+                        )}
+                        {resource.isNew && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                            NEW
                           </span>
                         )}
                       </div>
@@ -323,18 +267,18 @@ export function EnhancedNavigation() {
               {toolItems.map((tool) => (
                 <Link
                   key={tool.id}
-                  to={tool.href || '/'}
+                  to={tool.path || '/'}
                   className={`flex items-center py-2 px-2 rounded-md ${
-                    pathname === tool.href
+                    pathname === tool.path
                       ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
                       : 'text-gray-700 dark:text-gray-300'
                   }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <span className="mr-3 text-gray-500 dark:text-gray-400">
-                    {getIcon(tool.icon)}
+                    <tool.icon className="w-5 h-5" />
                   </span>
-                  {tool.label}
+                  {tool.name}
                 </Link>
               ))}
             </div>
@@ -344,18 +288,18 @@ export function EnhancedNavigation() {
               {integrationItems.map((integration) => (
                 <Link
                   key={integration.id}
-                  to={integration.href || '/'}
+                  to={integration.path || '/'}
                   className={`flex items-center py-2 px-2 rounded-md ${
-                    pathname === integration.href
+                    pathname === integration.path
                       ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
                       : 'text-gray-700 dark:text-gray-300'
                   }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <span className="mr-3 text-gray-500 dark:text-gray-400">
-                    {getIcon(integration.icon)}
+                    <integration.icon className="w-5 h-5" />
                   </span>
-                  {integration.label}
+                  {integration.name}
                 </Link>
               ))}
             </div>
@@ -365,18 +309,18 @@ export function EnhancedNavigation() {
               {resourceItems.map((resource) => (
                 <Link
                   key={resource.id}
-                  to={resource.href || '/'}
+                  to={resource.path || '/'}
                   className={`flex items-center py-2 px-2 rounded-md ${
-                    pathname === resource.href
+                    pathname === resource.path
                       ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
                       : 'text-gray-700 dark:text-gray-300'
                   }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <span className="mr-3 text-gray-500 dark:text-gray-400">
-                    {getIcon(resource.icon)}
+                    <resource.icon className="w-5 h-5" />
                   </span>
-                  {resource.label}
+                  {resource.name}
                 </Link>
               ))}
             </div>
@@ -405,7 +349,7 @@ export function EnhancedNavigation() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="mr-3 text-gray-500 dark:text-gray-400">
-                  {getIcon('message-square')}
+                  <MessageSquare className="w-5 h-5" />
                 </span>
                 Give Feedback
               </a>
