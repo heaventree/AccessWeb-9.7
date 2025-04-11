@@ -71,6 +71,7 @@ import AccessibilityTipsPage from './pages/help/AccessibilityTipsPage';
 import { AccessibilityTipsDemo } from './components/demo/AccessibilityTipsDemo';
 import { DemoModeToggle } from './components/DemoModeToggle';
 import { UIEnhancementButton } from './components/UIEnhancementButton';
+import { UIEnhancementToggle } from './components/UIEnhancementToggle';
 // FloatingToolsProvider now used in AppProvider
 
 function App() {
@@ -181,6 +182,7 @@ function App() {
         
         {/* UI Enhancement Button - safely toggles between current and enhanced UI */}
         <UIEnhancementButton />
+        <UIEnhancementToggle />
       </div>
     </ErrorBoundary>
   );

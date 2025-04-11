@@ -1,175 +1,284 @@
+// Types
+export interface Badge {
+  text: string;
+  variant: 'primary' | 'secondary' | 'warning' | 'success' | 'danger';
+}
+
 export interface NavItem {
   id: string;
+  href?: string;
   label: string;
   icon?: string;
-  href?: string;
-  children?: NavItem[];
-  badge?: {
-    text: string;
-    variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info';
-  };
+  description?: string;
+  badge?: Badge;
 }
 
-export interface NavigationSection {
-  id: string;
-  title: string;
-  items: NavItem[];
-}
-
-// Tool navigation items
+// Tools navigation data
 export const tools: NavItem[] = [
   {
-    id: 'checker',
-    label: 'Accessibility Checker',
-    icon: 'check-circle',
+    id: 'wcag-checker',
     href: '/checker',
+    label: 'WCAG Checker',
+    icon: 'shield',
+    description: 'Analyze and fix accessibility issues',
     badge: {
       text: 'Popular',
-      variant: 'primary',
-    },
+      variant: 'primary'
+    }
   },
   {
-    id: 'color-contrast',
-    label: 'Color Contrast Checker',
+    id: 'wcag-standards',
+    href: '/tools/wcag-standards',
+    label: 'WCAG Standards',
+    icon: 'book-open',
+    description: 'Browse accessibility guidelines'
+  },
+  {
+    id: 'colors',
+    href: '/tools/colors',
+    label: 'Color Palette',
     icon: 'palette',
-    href: '/tools/color-contrast',
+    description: 'Create accessible color schemes'
   },
   {
-    id: 'image-analyzer',
-    label: 'Image Accessibility Analyzer',
-    icon: 'image',
-    href: '/tools/image-analyzer', 
-  },
-  {
-    id: 'form-tester',
-    label: 'Form Accessibility Tester',
-    icon: 'activity',
-    href: '/tools/form-tester',
-  },
-  {
-    id: 'keyboard-navigator',
-    label: 'Keyboard Navigation Tester',
-    icon: 'zap',
-    href: '/tools/keyboard-navigator',
-  },
-];
-
-// Integration navigation items
-export const integrations: NavItem[] = [
-  {
-    id: 'cms',
-    label: 'CMS Plugins',
-    icon: 'database',
-    href: '/integrations/cms',
-  },
-  {
-    id: 'development',
-    label: 'Development Tools',
-    icon: 'code',
-    href: '/integrations/development',
+    id: 'color-simulator',
+    href: '/tools/color-simulator',
+    label: 'Color Simulator',
+    icon: 'eye',
+    description: 'Visualize color perception',
     badge: {
       text: 'New',
-      variant: 'primary',
-    },
+      variant: 'primary'
+    }
   },
   {
-    id: 'reporting',
-    label: 'Reporting Tools',
+    id: 'monitoring',
+    href: '/tools/monitoring',
+    label: 'Monitoring',
+    icon: 'activity',
+    description: 'Track accessibility over time'
+  },
+  {
+    id: 'realtime',
+    href: '/tools/realtime',
+    label: 'Real-time Monitor',
+    icon: 'zap',
+    description: 'Live accessibility monitoring',
+    badge: {
+      text: 'PRO',
+      variant: 'warning'
+    }
+  },
+  {
+    id: 'image-alt',
+    href: '/tools/image-alt-scanner',
+    label: 'Image Alt Scanner',
+    icon: 'image',
+    description: 'Check and fix image descriptions'
+  },
+  {
+    id: 'analytics',
+    href: '/tools/analytics',
+    label: 'Analytics',
     icon: 'bar-chart',
-    href: '/integrations/reporting',
-  },
-  {
-    id: 'design',
-    label: 'Design Tool Integration',
-    icon: 'eye',
-    href: '/integrations/design',
-  },
-  {
-    id: 'api',
-    label: 'API Access',
-    icon: 'link',
-    href: '/integrations/api',
+    description: 'Accessibility metrics and insights',
+    badge: {
+      text: 'PRO',
+      variant: 'warning'
+    }
   },
 ];
 
-// Resource navigation items
+// Integrations navigation data
+export const integrations: NavItem[] = [
+  {
+    id: 'wordpress',
+    href: '/integrations/wordpress',
+    label: 'WordPress',
+    icon: 'code',
+    description: 'Improve your WordPress site'
+  },
+  {
+    id: 'shopify',
+    href: '/integrations/shopify',
+    label: 'Shopify',
+    icon: 'shopping-bag',
+    description: 'Create accessible stores',
+    badge: {
+      text: 'PRO',
+      variant: 'warning'
+    }
+  },
+  {
+    id: 'api-integration',
+    href: '/integrations/api',
+    label: 'API',
+    icon: 'code',
+    description: 'Access our API endpoints'
+  },
+  {
+    id: 'compliance',
+    href: '/integrations/compliance',
+    label: 'Compliance',
+    icon: 'check-circle',
+    description: 'Automated compliance checks',
+    badge: {
+      text: 'PRO',
+      variant: 'warning'
+    }
+  },
+  {
+    id: 'enterprise',
+    href: '/integrations/enterprise',
+    label: 'Enterprise',
+    icon: 'briefcase',
+    description: 'Solutions for large businesses',
+    badge: {
+      text: 'Enterprise',
+      variant: 'primary'
+    }
+  },
+];
+
+// Resources navigation data
 export const resources: NavItem[] = [
   {
     id: 'documentation',
-    label: 'Documentation',
-    icon: 'book-open',
     href: '/docs',
+    label: 'Documentation',
+    icon: 'book',
+    description: 'How to use our tools'
   },
   {
     id: 'wcag-resources',
-    label: 'WCAG Resources',
-    icon: 'book',
     href: '/wcag-resources',
+    label: 'WCAG Resources',
+    icon: 'info',
+    description: 'Accessibility guidelines'
   },
   {
     id: 'blog',
+    href: '/blog',
     label: 'Blog',
     icon: 'rss',
-    href: '/blog',
+    description: 'News and articles'
   },
   {
     id: 'knowledge-base',
-    label: 'Knowledge Base',
-    icon: 'info',
     href: '/knowledge-base',
+    label: 'Knowledge Base',
+    icon: 'database',
+    description: 'Tutorials and guides'
   },
   {
     id: 'help-center',
+    href: '/help',
     label: 'Help Center',
     icon: 'help-circle',
-    href: '/help',
+    description: 'FAQs and support'
   },
 ];
 
-// Combined sections for sidebar navigation
-export const navigationSections: NavigationSection[] = [
+// Account navigation sections
+export const navigationSections = [
   {
-    id: 'main',
-    title: 'Main',
+    id: 'dashboard',
+    title: 'Dashboard',
     items: [
       {
-        id: 'dashboard',
-        label: 'Dashboard',
-        icon: 'home',
-        href: '/dashboard',
-      },
-      {
-        id: 'projects',
-        label: 'Projects',
-        icon: 'briefcase',
-        href: '/projects',
+        id: 'home',
+        href: '/my-account',
+        label: 'Home',
+        icon: 'home'
       },
       {
         id: 'notifications',
+        href: '/my-account/notifications',
         label: 'Notifications',
         icon: 'bell',
-        href: '/notifications',
         badge: {
           text: '3',
-          variant: 'primary',
-        },
+          variant: 'primary'
+        }
       },
-    ],
+    ]
   },
   {
     id: 'tools',
     title: 'Tools',
-    items: tools,
+    items: tools
   },
   {
-    id: 'integrations',
-    title: 'Integrations',
-    items: integrations,
+    id: 'connections',
+    title: 'Connections',
+    items: [
+      {
+        id: 'connections',
+        href: '/my-account/connections',
+        label: 'All Connections',
+        icon: 'link'
+      },
+      {
+        id: 'custom-api',
+        href: '/my-account/connections/custom-api',
+        label: 'Custom API',
+        icon: 'code'
+      },
+      {
+        id: 'shopify-connection',
+        href: '/my-account/connections/shopify',
+        label: 'Shopify',
+        icon: 'shopping-bag'
+      },
+      {
+        id: 'wordpress-connection',
+        href: '/my-account/connections/wordpress',
+        label: 'WordPress',
+        icon: 'code'
+      },
+    ]
   },
   {
-    id: 'resources',
-    title: 'Resources',
-    items: resources,
+    id: 'account',
+    title: 'Account',
+    items: [
+      {
+        id: 'billing',
+        href: '/my-account/billing',
+        label: 'Billing',
+        icon: 'credit-card'
+      },
+      {
+        id: 'settings',
+        href: '/my-account/settings',
+        label: 'Settings',
+        icon: 'settings'
+      },
+      {
+        id: 'team',
+        href: '/my-account/team',
+        label: 'Team',
+        icon: 'users'
+      },
+    ]
+  },
+  {
+    id: 'support',
+    title: 'Support',
+    items: [
+      {
+        id: 'help',
+        href: '/help',
+        label: 'Help Center',
+        icon: 'help-circle'
+      },
+      {
+        id: 'support-chat',
+        href: '#support-chat',
+        label: 'Chat with Support',
+        icon: 'message-square'
+      },
+    ]
   },
 ];
 
@@ -177,20 +286,26 @@ export const navigationSections: NavigationSection[] = [
 export const accountItems: NavItem[] = [
   {
     id: 'profile',
-    label: 'Profile',
-    icon: 'users',
-    href: '/profile',
+    href: '/my-account/settings',
+    label: 'My Profile',
+    icon: 'user'
   },
   {
     id: 'billing',
+    href: '/my-account/billing',
     label: 'Billing',
-    icon: 'credit-card',
-    href: '/billing',
+    icon: 'credit-card'
+  },
+  {
+    id: 'team',
+    href: '/my-account/team',
+    label: 'Team',
+    icon: 'users'
   },
   {
     id: 'settings',
+    href: '/my-account/settings',
     label: 'Settings',
-    icon: 'settings',
-    href: '/settings',
+    icon: 'settings'
   },
 ];
