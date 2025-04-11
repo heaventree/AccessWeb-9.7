@@ -325,6 +325,27 @@ export function EnhancedNavigation() {
               ))}
             </div>
             
+            <div className="pt-2 pb-4">
+              <h4 className="text-xs uppercase font-bold text-gray-500 dark:text-gray-400 mb-1 px-2">Account</h4>
+              {accountItems.map((item) => (
+                <Link
+                  key={item.id}
+                  to={item.path || '/'}
+                  className={`flex items-center py-2 px-2 rounded-md ${
+                    pathname === item.path
+                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                      : 'text-gray-700 dark:text-gray-300'
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span className="mr-3 text-gray-500 dark:text-gray-400">
+                    <item.icon className="w-5 h-5" />
+                  </span>
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+            
             <div className="border-t border-gray-200 dark:border-gray-800 py-4">
               <Link 
                 to="/pricing"
