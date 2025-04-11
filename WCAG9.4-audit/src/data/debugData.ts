@@ -89,6 +89,41 @@ export function addFeedbackAsDebugItem(
 
 export const debugItems: DebugItem[] = [
   {
+    id: 'debug-item-documentation-organization',
+    title: 'Documentation organization improvements needed',
+    description: 'Current documentation structure has overlapping sections (/docs, /help/documentation). Need to consolidate all documentation into a clear, logical structure.',
+    category: 'ui',
+    status: 'identified',
+    priority: 'medium',
+    dateIdentified: new Date().toISOString().split('T')[0],
+    source: 'manual',
+    todoItems: [
+      'Fix routes with overlapping documentation content',
+      'Create consistent navigation between documentation sections',
+      'Ensure proper organization between app docs and WCAG resources',
+      'Improve URL structure for better SEO and sharing'
+    ],
+    notes: 'Initial reorganization done but needs more work to fully resolve the confusion between different documentation sections'
+  },
+  {
+    id: 'debug-item-cms-expansion',
+    title: 'CMS functionality expansion',
+    description: 'Current CMS functionality is limited. Need to expand it to support management of all content including articles, blogs, technical documentation, and UI card content.',
+    category: 'core',
+    status: 'identified',
+    priority: 'high',
+    dateIdentified: new Date().toISOString().split('T')[0],
+    source: 'manual',
+    todoItems: [
+      'Design expanded CMS data structure',
+      'Create UI for managing different content types',
+      'Implement content versioning and publishing workflow',
+      'Add rich text editor with media support',
+      'Build tagging and categorization system'
+    ],
+    notes: 'This is a major feature that will greatly improve content management capabilities'
+  },
+  {
     id: 'debug-item-overlap-ui',
     title: 'Floating tools overlap issue',
     description: 'The floating tools (feedback button, demo mode toggle, etc.) are overlapping each other on the screen, making it difficult to use them.',
