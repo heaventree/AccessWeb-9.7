@@ -123,28 +123,29 @@ export function EnhancedNavigation() {
               </button>
               <div className="absolute left-0 top-full hidden group-hover:block bg-white dark:bg-gray-900 shadow-lg rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 w-64 z-50">
                 <div className="p-2">
-                  {tools.map((tool) => (
+                  {toolItems.map((tool) => (
                     <Link
                       key={tool.id}
-                      to={tool.href || '/'}
+                      to={tool.path || '/'}
                       className={`flex items-start p-2 rounded-md ${
-                        pathname === tool.href
+                        pathname === tool.path
                           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
                           : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                       }`}
                     >
                       <span className="flex-shrink-0 mr-3 mt-1 text-gray-500 dark:text-gray-400">
-                        {getIcon(tool.icon)}
+                        <tool.icon className="w-5 h-5" />
                       </span>
                       <div>
-                        <div className="font-medium">{tool.label}</div>
-                        {tool.badge && (
-                          <span className={`
-                            inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1
-                            ${tool.badge.variant === 'primary' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                            ${tool.badge.variant === 'warning' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                          `}>
-                            {tool.badge.text}
+                        <div className="font-medium">{tool.name}</div>
+                        {tool.isPro && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                            PRO
+                          </span>
+                        )}
+                        {tool.isNew && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                            NEW
                           </span>
                         )}
                       </div>
@@ -168,28 +169,29 @@ export function EnhancedNavigation() {
               </button>
               <div className="absolute left-0 top-full hidden group-hover:block bg-white dark:bg-gray-900 shadow-lg rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 w-64 z-50">
                 <div className="p-2">
-                  {integrations.map((integration) => (
+                  {integrationItems.map((integration) => (
                     <Link
                       key={integration.id}
-                      to={integration.href || '/'}
+                      to={integration.path || '/'}
                       className={`flex items-start p-2 rounded-md ${
-                        pathname === integration.href
+                        pathname === integration.path
                           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
                           : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                       }`}
                     >
                       <span className="flex-shrink-0 mr-3 mt-1 text-gray-500 dark:text-gray-400">
-                        {getIcon(integration.icon)}
+                        <integration.icon className="w-5 h-5" />
                       </span>
                       <div>
-                        <div className="font-medium">{integration.label}</div>
-                        {integration.badge && (
-                          <span className={`
-                            inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1
-                            ${integration.badge.variant === 'primary' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                            ${integration.badge.variant === 'warning' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                          `}>
-                            {integration.badge.text}
+                        <div className="font-medium">{integration.name}</div>
+                        {integration.isPro && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                            PRO
+                          </span>
+                        )}
+                        {integration.isNew && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                            NEW
                           </span>
                         )}
                       </div>
@@ -215,7 +217,7 @@ export function EnhancedNavigation() {
               </button>
               <div className="absolute left-0 top-full hidden group-hover:block bg-white dark:bg-gray-900 shadow-lg rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 w-64 z-50">
                 <div className="p-2">
-                  {resources.map((resource) => (
+                  {resourceItems.map((resource) => (
                     <Link
                       key={resource.id}
                       to={resource.href || '/'}
@@ -318,7 +320,7 @@ export function EnhancedNavigation() {
           <div className="px-4 py-3 space-y-1">
             <div className="pt-2 pb-4">
               <h4 className="text-xs uppercase font-bold text-gray-500 dark:text-gray-400 mb-1 px-2">Tools</h4>
-              {tools.map((tool) => (
+              {toolItems.map((tool) => (
                 <Link
                   key={tool.id}
                   to={tool.href || '/'}
@@ -339,7 +341,7 @@ export function EnhancedNavigation() {
             
             <div className="pt-2 pb-4">
               <h4 className="text-xs uppercase font-bold text-gray-500 dark:text-gray-400 mb-1 px-2">Integrations</h4>
-              {integrations.map((integration) => (
+              {integrationItems.map((integration) => (
                 <Link
                   key={integration.id}
                   to={integration.href || '/'}
@@ -360,7 +362,7 @@ export function EnhancedNavigation() {
             
             <div className="pt-2 pb-4">
               <h4 className="text-xs uppercase font-bold text-gray-500 dark:text-gray-400 mb-1 px-2">Resources</h4>
-              {resources.map((resource) => (
+              {resourceItems.map((resource) => (
                 <Link
                   key={resource.id}
                   to={resource.href || '/'}
