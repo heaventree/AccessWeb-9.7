@@ -1,5 +1,4 @@
 import { OpenAI } from 'openai';
-import { marked } from 'marked';
 import type { AccessibilityIssue } from '../types';
 import { getWCAGInfo } from './wcagHelper';
 
@@ -7,7 +6,11 @@ const API_KEY_ERROR = 'OpenAI API key not configured or invalid';
 const RATE_LIMIT_ERROR = 'Too many requests. Please try again later.';
 const TIMEOUT_ERROR = 'Request timed out. Please try again.';
 
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+// Use environment variable for the API key
+// If process.env is not available in Vite, fallback to import.meta.env
+const OPENAI_API_KEY = typeof process !== 'undefined' && process.env && process.env.OPENAI_API_KEY 
+  ? process.env.OPENAI_API_KEY 
+  : import.meta.env.VITE_OPENAI_API_KEY;
 
 interface AIRecommendation {
   explanation: string;
@@ -78,7 +81,12 @@ export async function getAIRecommendations(issue: AccessibilityIssue): Promise<A
 
     // Handle specific error types
     let errorMessage;
-    switch (error.code) {
+    
+    // Extract the OpenAI error code if available
+    const openaiError = error.error || error;
+    const errorCode = openaiError.code || '';
+    
+    switch (errorCode) {
       case 'insufficient_quota':
         errorMessage = 'API quota exceeded';
         break;
@@ -95,7 +103,16 @@ export async function getAIRecommendations(issue: AccessibilityIssue): Promise<A
         errorMessage = TIMEOUT_ERROR;
         break;
       default:
-        errorMessage = 'Unable to generate AI recommendations';
+        // Check for other common error patterns in the error object or message
+        if (error.status === 401 || (error.message && error.message.includes('API key'))) {
+          errorMessage = API_KEY_ERROR;
+        } else if (error.status === 429 || (error.message && error.message.includes('rate limit'))) {
+          errorMessage = RATE_LIMIT_ERROR;
+        } else if (error.status === 504 || (error.message && error.message.includes('timeout'))) {
+          errorMessage = TIMEOUT_ERROR;
+        } else {
+          errorMessage = 'Unable to generate AI recommendations';
+        }
     }
 
     console.error('AI Recommendations Error:', errorMessage);
@@ -120,9 +137,8 @@ function getFallbackRecommendation(issue: AccessibilityIssue): AIRecommendation 
 }
 
 function parseAIResponse(markdown: string): AIRecommendation {
-  const html = marked(markdown);
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
+  // We'll use a more direct approach to parse the response rather than using DOM
+  // This avoids issues with marked returning a Promise in some environments
 
   const sections = {
     explanation: '',
@@ -163,14 +179,15 @@ function parseAIResponse(markdown: string): AIRecommendation {
     if (currentSection && trimmedLine) {
       if (currentSection === 'additionalResources') {
         const urls = trimmedLine.match(/https?:\/\/[^\s)]+/g);
-        if (urls) {
-          sections.additionalResources.push(...urls);
+        if (urls && Array.isArray(urls)) {
+          sections.additionalResources = [...sections.additionalResources, ...urls];
         }
       } else if (currentSection === 'codeExample' && inCodeBlock) {
         sections.codeExample += trimmedLine + '\n';
-      } else {
-        sections[currentSection as keyof typeof sections] += 
-          (sections[currentSection as keyof typeof sections] ? '\n' : '') + trimmedLine;
+      } else if (currentSection === 'explanation') {
+        sections.explanation += (sections.explanation ? '\n' : '') + trimmedLine;
+      } else if (currentSection === 'suggestedFix') {
+        sections.suggestedFix += (sections.suggestedFix ? '\n' : '') + trimmedLine;
       }
     }
   });
