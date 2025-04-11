@@ -1,0 +1,443 @@
+/**
+ * UI Enhancement Styles
+ * 
+ * This file contains styles from the GoSaaS theme that we're 
+ * integrating in a non-destructive way. Original styling classes
+ * are preserved while new enhancement styles use the 'cs_' prefix
+ * to avoid conflicts.
+ */
+
+.cs_site_header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  transition: all 0.4s ease;
+}
+
+.cs_sticky_header.cs_sticky {
+  background-color: var(--cs-white, #fff); 
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.cs_dark .cs_sticky_header.cs_sticky {
+  background-color: var(--cs-black, #0f0f0f);
+}
+
+.cs_white_bg {
+  background-color: var(--cs-white, #fff);
+}
+
+.cs_dark .cs_white_bg {
+  background-color: var(--cs-black, #0f0f0f);
+}
+
+.cs_hero_1 {
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  overflow: hidden;
+  padding: 180px 0 290px;
+  z-index: 1;
+}
+
+.cs_hero_animation_1 {
+  position: relative;
+  z-index: 1;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item {
+  position: absolute;
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0.3;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_position_1 {
+  right: 6%;
+  top: 25%;
+  width: 290px;
+  height: 290px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.5);
+  animation: ripple_2 15s infinite;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_position_2 {
+  left: 7%;
+  top: 22%;
+  width: 390px;
+  height: 390px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.5);
+  animation: ripple_2 18s infinite;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_position_3 {
+  left: 12%;
+  bottom: 22%;
+  width: 200px;
+  height: 200px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.35);
+  animation: ripple_1 12s infinite;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_position_4 {
+  right: 15%;
+  bottom: 18%;
+  width: 250px;
+  height: 250px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.4);
+  animation: ripple_2 20s infinite;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_position_5 {
+  right: 22%;
+  top: 8%;
+  width: 90px;
+  height: 90px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.3);
+  animation: ripple_1 10s infinite;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_position_6 {
+  left: 25%;
+  top: 10%;
+  width: 70px;
+  height: 70px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.3);
+  animation: ripple_1 12s infinite;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_position_7 {
+  right: 25%;
+  bottom: 45%;
+  width: 70px;
+  height: 70px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.25);
+  animation: ripple_1 14s infinite;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_position_8 {
+  left: 25%;
+  bottom: 10%;
+  width: 80px;
+  height: 80px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.3);
+  animation: ripple_1 18s infinite;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_position_9 {
+  right: 30%;
+  bottom: 10%;
+  width: 60px;
+  height: 60px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.25);
+  animation: ripple_1 16s infinite;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_position_10 {
+  right: 50%;
+  top: 15%;
+  width: 90px;
+  height: 90px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.4);
+  animation: ripple_1 18s infinite;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_shape_1 {
+  width: 200px;
+  height: 200px;
+  right: 12%;
+  top: 25%;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.05);
+  animation: moveX 30s linear infinite alternate;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_shape_2 {
+  width: 250px;
+  height: 250px;
+  left: 12%;
+  top: 28%;
+  border-radius: 60px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.05);
+  transform: rotate(45deg);
+  animation: moveY 20s linear infinite alternate;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_shape_3 {
+  width: 180px;
+  height: 180px;
+  left: 6%;
+  bottom: 28%;
+  border-radius: 0;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.06);
+  animation: rotate 90s linear infinite;
+}
+
+.cs_hero_animation_1 .cs_hero_animation_1_item.cs_shape_4 {
+  width: 230px;
+  height: 230px;
+  right: 5%;
+  bottom: 20%;
+  border-radius: 40px;
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.04);
+  transform: rotate(35deg);
+  animation: moveX 20s linear infinite alternate-reverse;
+}
+
+/* For enhanced cards */
+.cs_card {
+  background-color: var(--cs-white, #fff);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s ease;
+  height: 100%;
+}
+
+.cs_dark .cs_card {
+  background-color: var(--cs-black-2, #1e1e1e);
+}
+
+.cs_card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.cs_iconbox_1 {
+  text-align: center;
+  position: relative;
+  padding: 40px 25px;
+  border-radius: 15px;
+  background-color: var(--cs-white, #fff);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: all 0.4s ease;
+  height: 100%;
+}
+
+.cs_dark .cs_iconbox_1 {
+  background-color: var(--cs-black-2, #1e1e1e);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.cs_iconbox_1:hover {
+  transform: translateY(-10px);
+}
+
+.cs_iconbox_icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 1;
+}
+
+.cs_iconbox_icon.cs_blue_bg {
+  background-color: rgba(var(--cs-accent-rgb, 0, 115, 255), 0.1);
+  color: var(--cs-accent, #0073ff);
+}
+
+.cs_iconbox_icon.cs_green_bg {
+  background-color: rgba(1, 181, 99, 0.1);
+  color: #01b563;
+}
+
+.cs_iconbox_icon.cs_purple_bg {
+  background-color: rgba(95, 47, 255, 0.1);
+  color: #5f2fff;
+}
+
+.cs_iconbox_icon.cs_orange_bg {
+  background-color: rgba(255, 74, 47, 0.1);
+  color: #ff4a2f;
+}
+
+/* Button Styles */
+.cs_btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 35px;
+  min-width: 142px;
+  border-radius: 30px;
+  font-weight: 500;
+  color: var(--cs-white, #fff);
+  background-color: var(--cs-accent, #0073ff);
+  position: relative;
+  overflow: hidden;
+  border: none;
+  outline: none;
+  transition: all 0.4s ease;
+  z-index: 1;
+}
+
+.cs_btn:hover {
+  background-color: var(--cs-accent-hover, #0054b3);
+  color: var(--cs-white, #fff);
+}
+
+.cs_btn.cs_btn_secondary {
+  color: var(--cs-primary, #141515);
+  background-color: var(--cs-white, #fff);
+  border: 1px solid rgba(1, 9, 34, 0.08);
+}
+
+.cs_dark .cs_btn.cs_btn_secondary {
+  color: var(--cs-white, #fff);
+  background-color: var(--cs-black-2, #1e1e1e);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.cs_btn.cs_btn_secondary:hover {
+  background-color: var(--cs-accent, #0073ff);
+  color: var(--cs-white, #fff);
+  border-color: transparent;
+}
+
+.cs_btn.cs_btn_lg {
+  padding: 15px 40px;
+  min-width: 152px;
+}
+
+.cs_btn.cs_btn_sm {
+  padding: 9px 25px;
+  min-width: 122px;
+}
+
+/* Animation keyframes */
+@keyframes ripple_1 {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(0.8);
+  }
+}
+
+@keyframes ripple_2 {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(0.8);
+  }
+}
+
+@keyframes moveX {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(30px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes moveY {
+  0% {
+    transform: translateY(0) rotate(45deg);
+  }
+  50% {
+    transform: translateY(20px) rotate(45deg);
+  }
+  100% {
+    transform: translateY(0) rotate(45deg);
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* CSS Variables for the theme */
+:root {
+  --cs-accent: #0073ff;
+  --cs-accent-rgb: 0, 115, 255;
+  --cs-accent-hover: #0054b3;
+  --cs-primary: #141515;
+  --cs-primary-rgb: 20, 21, 21;
+  --cs-primary-light: #555;
+  --cs-secondary: #7e7e7e;
+  --cs-white: #fff;
+  --cs-white-rgb: 255, 255, 255;
+  --cs-black: #0f0f0f;
+  --cs-black-rgb: 15, 15, 15;
+  --cs-black-2: #1e1e1e;
+  --cs-font-accent: 'Poppins', sans-serif;
+  --cs-font-primary: 'Inter', sans-serif;
+}
+
+/* Dark mode variables */
+.cs_dark {
+  --cs-primary: #fff;
+  --cs-primary-rgb: 255, 255, 255;
+  --cs-primary-light: #a9a9a9;
+  --cs-secondary: #9b9b9b;
+  --cs-white: #0f0f0f;
+  --cs-white-rgb: 15, 15, 15;
+  --cs-black: #fff;
+  --cs-black-rgb: 255, 255, 255;
+}
+
+/* Reusable utility classes */
+.cs_radius_15 {
+  border-radius: 15px;
+}
+
+.cs_radius_30 {
+  border-radius: 30px;
+}
+
+.cs_mb_30 {
+  margin-bottom: 30px;
+}
+
+.cs_mb_40 {
+  margin-bottom: 40px;
+}
+
+.cs_mb_50 {
+  margin-bottom: 50px;
+}
+
+.cs_mb_60 {
+  margin-bottom: 60px;
+}
+
+.cs_primary_color {
+  color: var(--cs-primary);
+}
+
+.cs_accent_color {
+  color: var(--cs-accent);
+}
+
+.cs_gradient_border {
+  border: double 2px transparent;
+  border-radius: 15px;
+  background-image: linear-gradient(white, white), radial-gradient(circle at top left, #0073ff, #01b563);
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+}
+
+.cs_dark .cs_gradient_border {
+  background-image: linear-gradient(var(--cs-black-2), var(--cs-black-2)), radial-gradient(circle at top left, #0073ff, #01b563);
+}
