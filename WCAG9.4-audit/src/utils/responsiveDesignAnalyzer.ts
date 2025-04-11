@@ -8,7 +8,6 @@
  */
 
 import type { AccessibilityIssue } from '../types';
-import { DEFAULT_DEVICES, Device, ScreenSize } from '../types/responsive-design';
 
 interface ResponsiveAnalysisOptions {
   checkMetaViewport: boolean;
@@ -38,7 +37,6 @@ const defaultOptions: ResponsiveAnalysisOptions = {
  */
 export function analyzeResponsiveDesign(
   html: string,
-  url: string,
   options: Partial<ResponsiveAnalysisOptions> = {}
 ): AccessibilityIssue[] {
   const issues: AccessibilityIssue[] = [];
@@ -189,9 +187,8 @@ function checkTouchTargets(doc: Document): AccessibilityIssue[] {
     const styles = window.getComputedStyle(el as Element);
     const width = parseInt(styles.width, 10);
     const height = parseInt(styles.height, 10);
-    const padding = parseInt(styles.padding, 10) || 0;
     
-    // Calculate effective sizes including padding
+    // Calculate effective sizes
     const effectiveWidth = width;
     const effectiveHeight = height;
     

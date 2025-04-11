@@ -442,7 +442,9 @@ export async function testAccessibility(
     // Run responsive design analysis
     console.log('Running responsive design analysis...');
     try {
-      const responsiveIssues = analyzeResponsiveDesign(container, html);
+      // Convert DOM Element to string to pass to analyzeResponsiveDesign
+      const htmlContent = container.innerHTML;
+      const responsiveIssues = analyzeResponsiveDesign(htmlContent, {});
       if (responsiveIssues.length > 0) {
         console.log(`Found ${responsiveIssues.length} responsive design issues`);
         issues.push(...responsiveIssues);
@@ -567,6 +569,19 @@ export async function testAccessibility(
       i.id === 'url-design'
     ).length;
     
+    // Count responsive-specific issues
+    const responsiveIssues = issues.filter(i => 
+      i.structureType === 'responsive' || 
+      i.id.includes('responsive') || 
+      i.id.includes('viewport') || 
+      i.id.includes('mobile') || 
+      i.wcagCriteria.includes('1.4.10') || // Reflow
+      i.wcagCriteria.includes('1.3.4') || // Orientation
+      i.wcagCriteria.includes('1.4.12') || // Text Spacing
+      i.wcagCriteria.includes('2.5.5') || // Target Size
+      i.wcagCriteria.includes('2.5.8')    // Target Size Enhanced
+    ).length;
+    
     const totalStructureIssues = headingIssues + semanticIssues + urlIssues;
 
     // Compile summary
@@ -583,7 +598,8 @@ export async function testAccessibility(
       structureIssues: totalStructureIssues > 0 ? totalStructureIssues : undefined,
       headingIssues: headingIssues > 0 ? headingIssues : undefined,
       semanticIssues: semanticIssues > 0 ? semanticIssues : undefined,
-      urlIssues: urlIssues > 0 ? urlIssues : undefined
+      urlIssues: urlIssues > 0 ? urlIssues : undefined,
+      responsiveIssues: responsiveIssues > 0 ? responsiveIssues : undefined
     };
 
     const testResults: TestResult = {
