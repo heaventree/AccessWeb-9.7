@@ -6,7 +6,9 @@ import { IssuesList } from '../components/IssuesList';
 import { RegionSelector } from '../components/RegionSelector';
 import { EmbedBadge } from '../components/EmbedBadge';
 import { StructureAnalysisPanel } from '../components/StructureAnalysisPanel';
+import { ResponsiveAnalysisPanel } from '../components/ResponsiveAnalysisPanel';
 import { testAccessibility } from '../utils/accessibilityTester';
+import { analyzeResponsiveDesign } from '../utils/responsiveDesignAnalyzer';
 import type { TestResult } from '../types';
 import { exportToPDF } from '../utils/pdfExport';
 import { 
@@ -21,10 +23,11 @@ import {
   HelpCircle,
   Video,
   Headphones,
-  Layout
+  Layout,
+  Smartphone
 } from 'lucide-react';
 
-type TabType = 'issues' | 'warnings' | 'passes' | 'contrast' | 'structure';
+type TabType = 'issues' | 'warnings' | 'passes' | 'contrast' | 'structure' | 'responsive';
 
 // Pro pill styling
 const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold inline-flex items-center scale-[0.85] origin-left";
@@ -155,6 +158,8 @@ export function WCAGCheckerPage() {
           return `${baseStyle} border-emerald-500 text-emerald-700 bg-emerald-50`;
         case 'structure':
           return `${baseStyle} border-blue-500 text-blue-700 bg-blue-50`;
+        case 'responsive':
+          return `${baseStyle} border-teal-500 text-teal-700 bg-teal-50`;
       }
     }
     return `${baseStyle} border-gray-300 text-gray-600 hover:bg-gray-50`;
@@ -177,6 +182,23 @@ export function WCAGCheckerPage() {
   };
   
   const structureIssues = getStructureIssues();
+  
+  const getResponsiveIssues = () => {
+    if (!results) return [];
+    return results.issues.filter(issue => 
+      issue.structureType === 'responsive' || 
+      issue.id.includes('responsive') ||
+      issue.id.includes('viewport') ||
+      issue.id.includes('mobile') ||
+      issue.wcagCriteria.includes('1.4.10') || // Reflow
+      issue.wcagCriteria.includes('1.3.4') || // Orientation
+      issue.wcagCriteria.includes('1.4.12') || // Text Spacing
+      issue.wcagCriteria.includes('2.5.5') || // Target Size (WCAG 2.1 AAA)
+      issue.wcagCriteria.includes('2.5.8')    // Target Size (Enhanced) (WCAG 2.2 AA)
+    );
+  };
+  
+  const responsiveIssues = getResponsiveIssues();
 
   return (
     <div className="page-container">

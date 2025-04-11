@@ -137,7 +137,7 @@ export interface AccessibilityIssue {
     hasSignLanguage?: boolean;
     keyboardAccessible?: boolean;
   };
-  structureType?: 'heading' | 'landmark' | 'semantic' | 'url' | 'navigation';
+  structureType?: 'heading' | 'landmark' | 'semantic' | 'url' | 'navigation' | 'responsive';
   structureDetails?: {
     elementType?: string;
     expectedLevel?: number;
