@@ -358,13 +358,20 @@ export function ResponsiveAnalysisPanel({ issues }: ResponsiveAnalysisPanelProps
                               id: 'current-page',
                               url: window.location.href,
                               name: 'Current Page',
-                              platform: 'web',
+                              platform: 'generic',
                               metadata: {}
                             }, {
                               id: issue.id,
                               targetSelector: sanitizeSelector(issue.nodes[0] || 'body'),
-                              type: 'responsive',
-                              responsiveFix: {
+                              cssProperties: [
+                                { name: 'outline', value: '2px solid #38b2ac' },
+                                { name: 'position', value: 'relative' }
+                              ],
+                              wcagCriteria: issue.wcagCriteria || ['1.4.10'],
+                              description: `Responsive fix for ${issue.id}: ${issue.description}`,
+                              createdAt: new Date().toISOString(),
+                              metadata: {
+                                fixType: 'responsive',
                                 deviceType: issue.id.includes('mobile') ? 'mobile' : 'all',
                                 property: issue.id.includes('touch-target') ? 'touchTarget' : 
                                           issue.id.includes('font-size') ? 'fontSize' : 

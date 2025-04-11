@@ -299,13 +299,20 @@ export function StructureAnalysisPanel({ issues }: StructureAnalysisPanelProps) 
                               id: 'current-page',
                               url: window.location.href,
                               name: 'Current Page',
-                              platform: 'web',
+                              platform: 'generic',
                               metadata: {}
                             }, {
                               id: issue.id,
                               targetSelector: sanitizeSelector(issue.nodes[0] || 'body'),
-                              type: 'structure',
-                              structureFix: {
+                              cssProperties: [
+                                { name: 'outline', value: '2px solid #4a90e2' },
+                                { name: 'position', value: 'relative' }
+                              ],
+                              wcagCriteria: issue.wcagCriteria || ['1.3.1'],
+                              description: `Structure fix for ${issue.id}: ${issue.description}`,
+                              createdAt: new Date().toISOString(),
+                              metadata: {
+                                fixType: 'structure',
                                 elementType: issue.structureType || 'generic',
                                 suggestion: issue.structureDetails?.suggestedStructure || issue.fixSuggestion
                               }
