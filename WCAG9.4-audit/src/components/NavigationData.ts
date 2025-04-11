@@ -1,171 +1,273 @@
-import { 
-  Gauge, 
-  Palette, 
-  FileText, 
-  Zap, 
-  Settings, 
-  Store, 
-  Globe, 
-  Activity, 
-  ActivitySquare, 
-  Book, 
-  HelpCircle, 
-  BarChart2, 
-  Bell, 
-  Shield, 
-  Building, 
-  LayoutDashboard, 
-  CreditCard, 
-  Users, 
-  Image
-} from 'lucide-react';
+export interface NavItem {
+  id: string;
+  label: string;
+  icon?: string;
+  href?: string;
+  children?: NavItem[];
+  badge?: {
+    text: string;
+    variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info';
+  };
+}
 
-/**
- * This file extracts navigation data from the original Navigation.tsx component
- * to make it available for both Navigation and EnhancedNavigation components.
- * This reduces duplication and ensures consistency when switching between UI versions.
- */
+export interface NavigationSection {
+  id: string;
+  title: string;
+  items: NavItem[];
+}
 
-export const tools = [
-  { 
-    name: 'WCAG Checker',
-    path: '/checker',
-    icon: Gauge,
-    description: 'Test your website against WCAG standards'
+export const tools: NavItem[] = [
+  {
+    id: 'wcag-checker',
+    label: 'WCAG Checker',
+    href: '/checker',
+    icon: 'check-circle',
   },
-  { 
-    name: 'Color Palette',
-    path: '/tools/colors',
-    icon: Palette,
-    description: 'Create accessible color combinations'
+  {
+    id: 'wcag-standards',
+    label: 'WCAG Standards',
+    href: '/tools/wcag-standards',
+    icon: 'book',
   },
-  { 
-    name: 'Color Accessibility Simulator',
-    path: '/tools/color-simulator',
-    icon: Palette,
-    description: 'Test colors for accessibility and simulate color blindness'
+  {
+    id: 'color-palette',
+    label: 'Color Palette',
+    href: '/tools/colors',
+    icon: 'palette',
   },
-  { 
-    name: 'WCAG Standards',
-    path: '/tools/wcag-standards',
-    icon: FileText,
-    description: 'Browse WCAG 2.1 standards and requirements'
+  {
+    id: 'color-simulator',
+    label: 'Color Simulator',
+    href: '/tools/color-simulator',
+    icon: 'eye',
   },
-  { 
-    name: 'Image Alt Scanner',
-    path: '/tools/image-alt-scanner',
-    icon: Image,
-    description: 'Find and fix image accessibility issues'
-  }
+  {
+    id: 'monitoring',
+    label: 'Accessibility Monitoring',
+    href: '/tools/monitoring',
+    icon: 'activity',
+    badge: {
+      text: 'PRO',
+      variant: 'primary',
+    },
+  },
+  {
+    id: 'realtime',
+    label: 'Real-Time Monitor',
+    href: '/tools/realtime',
+    icon: 'zap',
+    badge: {
+      text: 'PRO',
+      variant: 'primary',
+    },
+  },
+  {
+    id: 'image-alt-scanner',
+    label: 'Image Alt Scanner',
+    href: '/tools/image-alt-scanner',
+    icon: 'image',
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    href: '/tools/analytics',
+    icon: 'bar-chart',
+    badge: {
+      text: 'PRO',
+      variant: 'primary',
+    },
+  },
+  {
+    id: 'compliance',
+    label: 'Compliance',
+    href: '/tools/compliance',
+    icon: 'shield',
+    badge: {
+      text: 'PRO',
+      variant: 'primary',
+    },
+  },
 ];
 
-export const integrations = [
+export const integrations: NavItem[] = [
   {
-    name: 'Shopify',
-    path: '/integrations/shopify',
-    icon: Store,
-    description: 'Shopify theme accessibility'
+    id: 'wordpress',
+    label: 'WordPress',
+    href: '/integrations/wordpress',
+    icon: 'wordpress',
   },
   {
-    name: 'WordPress',
-    path: '/wordpressint',
-    icon: Globe,
-    description: 'WordPress site accessibility'
+    id: 'shopify',
+    label: 'Shopify',
+    href: '/integrations/shopify',
+    icon: 'shopping-bag',
+    badge: {
+      text: 'PRO',
+      variant: 'primary',
+    },
   },
   {
-    name: 'Custom API',
-    path: '/integrations/api',
-    icon: Activity,
-    description: 'API integration & webhooks'
+    id: 'api',
+    label: 'API Integration',
+    href: '/integrations/api',
+    icon: 'code',
+    badge: {
+      text: 'PRO',
+      variant: 'primary',
+    },
   },
   {
-    name: 'Compliance',
-    path: '/integrations/compliance',
-    icon: Shield,
-    description: 'Compliance monitoring & reporting'
+    id: 'compliance-integration',
+    label: 'Compliance Integration',
+    href: '/integrations/compliance',
+    icon: 'shield',
+    badge: {
+      text: 'PRO',
+      variant: 'primary',
+    },
   },
   {
-    name: 'Enterprise',
-    path: '/integrations/enterprise',
-    icon: Building,
-    description: 'Enterprise-grade solutions'
-  }
+    id: 'enterprise',
+    label: 'Enterprise Integration',
+    href: '/integrations/enterprise',
+    icon: 'briefcase',
+    badge: {
+      text: 'ENTERPRISE',
+      variant: 'warning',
+    },
+  },
 ];
 
-export const resources = [
+export const resources: NavItem[] = [
   {
-    name: 'Documentation',
-    path: '/docs',
-    icon: Book,
-    description: 'Technical guides and API docs'
+    id: 'wcag-resources',
+    label: 'WCAG Resources',
+    href: '/wcag-resources',
+    icon: 'book-open',
   },
   {
-    name: 'Help Center',
-    path: '/help',
-    icon: HelpCircle,
-    description: 'FAQs and troubleshooting'
+    id: 'alt-text-guide',
+    label: 'Alt Text Guide',
+    href: '/wcag-resources/alt-text-guide',
+    icon: 'image',
   },
   {
-    name: 'Non-Destructive Fixes',
-    path: '/non-destructive-fixes',
-    icon: Zap,
-    description: 'CSS-based accessibility fixes'
+    id: 'accessibility-tips',
+    label: 'Accessibility Tips',
+    href: '/wcag-resources/accessibility-tips',
+    icon: 'info',
   },
   {
-    name: 'Blog',
-    path: '/blog',
-    icon: FileText,
-    description: 'Articles and updates'
-  }
+    id: 'non-destructive-fixes',
+    label: 'Non-Destructive Fixes',
+    href: '/wcag-resources/non-destructive-fixes',
+    icon: 'tool',
+  },
+  {
+    id: 'blog',
+    label: 'Blog',
+    href: '/blog',
+    icon: 'rss',
+  },
+  {
+    id: 'knowledge-base',
+    label: 'Knowledge Base',
+    href: '/knowledge-base',
+    icon: 'database',
+  },
+  {
+    id: 'help-center',
+    label: 'Help Center',
+    href: '/help',
+    icon: 'help-circle',
+  },
 ];
 
-export const accountItems = [
+export const navigationSections: NavigationSection[] = [
   {
-    name: 'Account Dashboard',
-    path: '/my-account',
-    icon: LayoutDashboard,
-    description: 'View your account dashboard'
+    id: 'tools',
+    title: 'Tools',
+    items: tools,
   },
   {
-    name: 'Monitoring & Compliance',
-    path: '/my-account/monitoring',
-    icon: ActivitySquare,
-    description: 'Real-time monitoring & compliance'
+    id: 'integrations',
+    title: 'Integrations',
+    items: integrations,
   },
   {
-    name: 'Analytics',
-    path: '/my-account/analytics',
-    icon: BarChart2,
-    description: 'Accessibility analytics and insights'
+    id: 'resources',
+    title: 'Resources',
+    items: resources,
+  },
+];
+
+export const accountItems: NavItem[] = [
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    href: '/my-account',
+    icon: 'home',
   },
   {
-    name: 'Alerts',
-    path: '/my-account/alerts',
-    icon: Bell,
-    description: 'Configure accessibility alerts'
+    id: 'monitoring',
+    label: 'Monitoring',
+    href: '/my-account/monitoring',
+    icon: 'activity',
   },
   {
-    name: 'Connections',
-    path: '/my-account/connections',
-    icon: Globe,
-    description: 'Manage API and platform connections'
+    id: 'analytics',
+    label: 'Analytics',
+    href: '/my-account/analytics',
+    icon: 'bar-chart',
   },
   {
-    name: 'Settings',
-    path: '/my-account/settings',
-    icon: Settings,
-    description: 'Manage account settings'
+    id: 'alerts',
+    label: 'Alerts',
+    href: '/my-account/alerts',
+    icon: 'bell',
   },
   {
-    name: 'Billing',
-    path: '/my-account/billing',
-    icon: CreditCard,
-    description: 'Manage billing and subscriptions'
+    id: 'connections',
+    label: 'Connections',
+    href: '/my-account/connections',
+    icon: 'link',
+    children: [
+      {
+        id: 'custom-api',
+        label: 'Custom API',
+        href: '/my-account/connections/custom-api',
+        icon: 'code',
+      },
+      {
+        id: 'shopify',
+        label: 'Shopify',
+        href: '/my-account/connections/shopify',
+        icon: 'shopping-bag',
+      },
+      {
+        id: 'wordpress',
+        label: 'WordPress',
+        href: '/my-account/connections/wordpress',
+        icon: 'wordpress',
+      },
+    ],
   },
   {
-    name: 'Team',
-    path: '/my-account/team',
-    icon: Users,
-    description: 'Manage team members'
-  }
+    id: 'billing',
+    label: 'Billing',
+    href: '/my-account/billing',
+    icon: 'credit-card',
+  },
+  {
+    id: 'settings',
+    label: 'Settings',
+    href: '/my-account/settings',
+    icon: 'settings',
+  },
+  {
+    id: 'team',
+    label: 'Team',
+    href: '/my-account/team',
+    icon: 'users',
+  },
 ];

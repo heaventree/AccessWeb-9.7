@@ -1,91 +1,98 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
-// UI Enhancement modes
-export type UIMode = 'current' | 'enhanced';
+// Define the supported UI modes
+type UIMode = 'current' | 'enhanced';
 
-// Feature flags for specific components
-export interface FeatureFlags {
+// Define the feature flags for gradual enhancement
+interface FeatureFlags {
   enhancedNavigation: boolean;
   enhancedFooter: boolean;
-  enhancedLandingPage: boolean;
   enhancedCards: boolean;
-  enhancedButtons: boolean;
+  enhancedTables: boolean;
   enhancedForms: boolean;
-  darkModeEnhancement: boolean;
+  enhancedButtons: boolean;
+  enhancedAnalytics: boolean;
+  enhancedDashboards: boolean;
 }
 
 // Context interface
-interface UIEnhancementContextType {
+interface UIEnhancementContextProps {
   uiMode: UIMode;
   setUIMode: (mode: UIMode) => void;
   featureFlags: FeatureFlags;
   toggleFeatureFlag: (flag: keyof FeatureFlags) => void;
-  isEnhanced: (component: keyof FeatureFlags) => boolean;
+  isEnhanced: (feature: keyof FeatureFlags) => boolean;
 }
 
-// Default feature flags
-const defaultFeatureFlags: FeatureFlags = {
-  enhancedNavigation: false,
-  enhancedFooter: false,
-  enhancedLandingPage: false,
-  enhancedCards: false,
-  enhancedButtons: false,
-  enhancedForms: false,
-  darkModeEnhancement: false,
-};
-
-// Create context with default values
-const UIEnhancementContext = createContext<UIEnhancementContextType>({
+// Create the context with default values
+const UIEnhancementContext = createContext<UIEnhancementContextProps>({
   uiMode: 'current',
   setUIMode: () => {},
-  featureFlags: defaultFeatureFlags,
+  featureFlags: {
+    enhancedNavigation: false,
+    enhancedFooter: false,
+    enhancedCards: false,
+    enhancedTables: false,
+    enhancedForms: false,
+    enhancedButtons: false,
+    enhancedAnalytics: false,
+    enhancedDashboards: false,
+  },
   toggleFeatureFlag: () => {},
   isEnhanced: () => false,
 });
 
 // Provider component
 export function UIEnhancementProvider({ children }: { children: ReactNode }) {
-  // Initialize from localStorage if available
-  const [uiMode, setUIMode] = useState<UIMode>(() => {
-    const savedMode = localStorage.getItem('uiEnhancementMode');
-    return (savedMode as UIMode) || 'current';
-  });
-
-  const [featureFlags, setFeatureFlags] = useState<FeatureFlags>(() => {
-    const savedFlags = localStorage.getItem('uiEnhancementFlags');
-    return savedFlags ? JSON.parse(savedFlags) : defaultFeatureFlags;
-  });
-
-  // Save settings to localStorage when they change
-  useEffect(() => {
-    localStorage.setItem('uiEnhancementMode', uiMode);
-  }, [uiMode]);
-
-  useEffect(() => {
-    localStorage.setItem('uiEnhancementFlags', JSON.stringify(featureFlags));
-  }, [featureFlags]);
-
-  // Toggle individual feature flags
+  // Initialize UI mode from localStorage if available
+  const initialMode = (localStorage.getItem('uiMode') as UIMode) || 'current';
+  const [uiMode, setUIMode] = useState<UIMode>(initialMode);
+  
+  // Initialize feature flags from localStorage if available
+  const initialFeatureFlags: FeatureFlags = JSON.parse(
+    localStorage.getItem('featureFlags') || 
+    JSON.stringify({
+      enhancedNavigation: false,
+      enhancedFooter: false,
+      enhancedCards: false,
+      enhancedTables: false,
+      enhancedForms: false,
+      enhancedButtons: false,
+      enhancedAnalytics: false,
+      enhancedDashboards: false,
+    })
+  );
+  const [featureFlags, setFeatureFlags] = useState<FeatureFlags>(initialFeatureFlags);
+  
+  // Save UI mode to localStorage
+  const handleSetUIMode = (mode: UIMode) => {
+    localStorage.setItem('uiMode', mode);
+    setUIMode(mode);
+  };
+  
+  // Toggle a feature flag
   const toggleFeatureFlag = (flag: keyof FeatureFlags) => {
-    setFeatureFlags(prev => ({
-      ...prev,
-      [flag]: !prev[flag]
-    }));
+    const updatedFlags = {
+      ...featureFlags,
+      [flag]: !featureFlags[flag],
+    };
+    localStorage.setItem('featureFlags', JSON.stringify(updatedFlags));
+    setFeatureFlags(updatedFlags);
   };
-
-  // Helper to check if a component should use enhanced UI
-  const isEnhanced = (component: keyof FeatureFlags): boolean => {
-    return uiMode === 'enhanced' && featureFlags[component];
+  
+  // Check if a feature is enhanced
+  const isEnhanced = (feature: keyof FeatureFlags): boolean => {
+    return uiMode === 'enhanced' && featureFlags[feature];
   };
-
+  
   return (
-    <UIEnhancementContext.Provider 
+    <UIEnhancementContext.Provider
       value={{
         uiMode,
-        setUIMode,
+        setUIMode: handleSetUIMode,
         featureFlags,
         toggleFeatureFlag,
-        isEnhanced
+        isEnhanced,
       }}
     >
       {children}
@@ -93,7 +100,7 @@ export function UIEnhancementProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Hook for consuming the context
+// Custom hook for using the context
 export function useUIEnhancement() {
   const context = useContext(UIEnhancementContext);
   if (context === undefined) {
