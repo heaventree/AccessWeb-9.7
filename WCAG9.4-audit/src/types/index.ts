@@ -1,4 +1,10 @@
-import { EmailVerification, User } from './auth';
+import { User } from './auth';
+
+export interface EmailVerification {
+  email: string;
+  code: string;
+  expiresAt: string;
+}
 
 export interface WCAGInfo {
   description: string;
@@ -220,4 +226,4 @@ export interface LegislationMapping {
   };
 }
 
-export type { EmailVerification, User };
+// Direct imports are used instead of re-exporting

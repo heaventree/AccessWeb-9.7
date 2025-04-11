@@ -523,6 +523,29 @@ export async function testAccessibility(
     const videoIssues = mediaIssues.filter(i => i.mediaType === 'video').length;
     const embeddedMediaIssues = mediaIssues.filter(i => i.mediaType === 'embedded').length;
     const totalMediaIssues = audioIssues + videoIssues + embeddedMediaIssues;
+    
+    // Count structure-specific issues
+    const headingIssues = issues.filter(i => 
+      i.structureType === 'heading' || 
+      i.id === 'heading-order' || 
+      i.id === 'multiple-h1' || 
+      i.id === 'skipped-heading-level'
+    ).length;
+    
+    const semanticIssues = issues.filter(i => 
+      i.structureType === 'semantic' || 
+      i.structureType === 'landmark' || 
+      i.id === 'missing-main-landmark' || 
+      i.id === 'unsemantic-navigation' || 
+      i.id === 'unsemantic-list'
+    ).length;
+    
+    const urlIssues = issues.filter(i => 
+      i.structureType === 'url' || 
+      i.id === 'url-design'
+    ).length;
+    
+    const totalStructureIssues = headingIssues + semanticIssues + urlIssues;
 
     // Compile summary
     const summary = {
@@ -534,7 +557,11 @@ export async function testAccessibility(
       warnings: warnings.length,
       mediaIssues: totalMediaIssues > 0 ? totalMediaIssues : undefined,
       audioIssues: audioIssues > 0 ? audioIssues : undefined,
-      videoIssues: videoIssues > 0 ? videoIssues : undefined
+      videoIssues: videoIssues > 0 ? videoIssues : undefined,
+      structureIssues: totalStructureIssues > 0 ? totalStructureIssues : undefined,
+      headingIssues: headingIssues > 0 ? headingIssues : undefined,
+      semanticIssues: semanticIssues > 0 ? semanticIssues : undefined,
+      urlIssues: urlIssues > 0 ? urlIssues : undefined
     };
 
     const testResults: TestResult = {
