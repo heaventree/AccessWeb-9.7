@@ -127,7 +127,7 @@ export const wordPressAPI = {
             return {
               success: true,
               message: 'Settings saved and synced with WordPress',
-              data: { settings }
+              data: { scan: settings }
             };
           }
         } catch (syncError) {
@@ -138,7 +138,7 @@ export const wordPressAPI = {
       return {
         success: true,
         message: 'Settings saved successfully',
-        data: { settings }
+        data: { scan: settings }
       };
     } catch (error) {
       return {
