@@ -48,8 +48,6 @@ export interface WordPressPluginResponse extends ApiResponse {
     scan_id?: string;
     scan?: any;
     fixed?: boolean;
-    fixes_applied?: number;
-    backup_id?: string;
   };
 }
 

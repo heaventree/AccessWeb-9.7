@@ -54,8 +54,6 @@ import { WordPressIntPage } from './pages/WordPressIntPage';
 import { APIIntegrationPage } from './pages/integrations/APIIntegrationPage';
 import { ComplianceIntegrationPage } from './pages/integrations/ComplianceIntegrationPage';
 import { ShopifyIntegrationPage } from './pages/integrations/ShopifyIntegrationPage';
-import { WordPressIntegrationPage } from './pages/integrations/WordPressIntegrationPage';
-import { WordPressSetupPage } from './pages/integrations/WordPressSetupPage';
 import BillingPage from './pages/BillingPage';
 import { EnterpriseIntegrationPage } from './pages/integrations/EnterpriseIntegrationPage';
 import { AnalyticsPage } from './pages/analytics/AnalyticsPage';
@@ -109,8 +107,7 @@ function App() {
             <Route path="settings" element={<SettingsPage />} />
             <Route path="team" element={<TeamPage />} />
           </Route>
-          <Route path="/integrations/wordpress" element={<><Navigation /><main id="main-content"><WordPressIntegrationPage /></main><Footer /><BackToTop /></>} />
-          <Route path="/integrations/wordpress/setup" element={<><Navigation /><main id="main-content"><WordPressSetupPage /></main><Footer /><BackToTop /></>} />
+          <Route path="/integrations/wordpress" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
           <Route path="/tools/analytics" element={<><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></>} />
           <Route path="/tools/compliance" element={<><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></>} />
           <Route path="/integrations/api" element={<><Navigation /><main id="main-content"><APIIntegrationPage /></main><Footer /><BackToTop /></>} />
