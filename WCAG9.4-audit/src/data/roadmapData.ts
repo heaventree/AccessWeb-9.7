@@ -276,7 +276,7 @@ export const roadmapFeatures: RoadmapFeature[] = [
     status: 'planned',
     priority: 4,
     category: 'reporting',
-    dependencies: ['pdf-generator']
+    dependencies: ['wcag-compliance-export']
   },
   {
     id: 'team-collab',
@@ -363,7 +363,7 @@ export const roadmapFeatures: RoadmapFeature[] = [
     completedDate: '2025-04-11'
   },
   {
-    id: 'pdf-generator',
+    id: 'wcag-compliance-export',
     title: 'WCAG Compliance Export',
     description: 'Generate comprehensive export of accessibility scans as a PRO feature',
     status: 'completed',
