@@ -2,25 +2,143 @@ import type { WordPressSettings, WordPressPluginResponse, ScanResult } from '../
 import { storageService } from '../storage';
 
 export const wordPressAPI = {
-  // Authentication
-  async validateAPIKey(apiKey: string): Promise<boolean> {
+  // Helper function to get base URL
+  getBaseUrl(siteUrl: string): string {
+    // Ensure URL has proper format
+    let baseUrl = siteUrl;
+    if (!baseUrl.startsWith('http')) {
+      baseUrl = 'https://' + baseUrl;
+    }
+    // Remove trailing slash if present
+    if (baseUrl.endsWith('/')) {
+      baseUrl = baseUrl.slice(0, -1);
+    }
+    return baseUrl;
+  },
+
+  // Check if WordPress site has the plugin installed
+  async checkPluginInstalled(siteUrl: string): Promise<boolean> {
     try {
-      // Simulate API validation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return true;
+      // Check for plugin existence via WP REST API
+      const baseUrl = this.getBaseUrl(siteUrl);
+      const pluginCheckUrl = `${baseUrl}/wp-json/access-web/v1/status`;
+
+      const response = await fetch(pluginCheckUrl, {
+        method: 'GET'
+      });
+
+      // If we get a 200 response, plugin is installed
+      return response.ok;
     } catch (error) {
+      console.error('Plugin check error:', error);
       return false;
     }
   },
 
-  // Settings Management
+  // Get WordPress site info
+  async getSiteInfo(siteUrl: string, apiKey: string): Promise<any> {
+    try {
+      const baseUrl = this.getBaseUrl(siteUrl);
+      const url = `${baseUrl}/wp-json/access-web/v1/site-info`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'X-API-KEY': apiKey,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to get site info: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Get site info error:', error);
+      return null;
+    }
+  },
+
+  // Enhanced API Key Validation
+  async validateAPIKey(apiKey: string, siteUrl?: string): Promise<boolean> {
+    // If no siteUrl or apiKey provided, fallback to dev mode validation
+    if (!apiKey || !siteUrl) {
+      try {
+        // Simulate API validation for development
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    try {
+      // Build the WordPress REST API URL
+      const baseUrl = this.getBaseUrl(siteUrl);
+      const url = `${baseUrl}/wp-json/access-web/v1/validate`;
+
+      // Make the request with API key authentication
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'X-API-KEY': apiKey,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        console.error(`WordPress API responded with status ${response.status}`);
+        return false;
+      }
+      
+      const data = await response.json();
+      return data?.success === true && data?.data?.valid === true;
+    } catch (error) {
+      console.error('API key validation error:', error);
+      return false;
+    }
+  },
+
+  // Settings Management - keeps compatibility with existing code
   async saveSettings(settings: WordPressSettings): Promise<WordPressPluginResponse> {
     try {
+      // Save settings locally
       await storageService.setItem('wordpress_settings', settings);
+      
+      // If we have a site URL, try to sync settings with WordPress
+      if (settings.siteUrl && settings.apiKey) {
+        try {
+          const result = await this.apiRequest<any>(
+            'POST',
+            `${this.getBaseUrl(settings.siteUrl)}/wp-json/access-web/v1/settings`,
+            settings.apiKey,
+            {
+              autofixEnabled: settings.autofixEnabled,
+              monitoringEnabled: settings.monitoringEnabled,
+              monitoringInterval: settings.monitoringInterval,
+              scanLevel: settings.scanLevel,
+              notifyOnIssue: settings.notifyOnIssue,
+              emailNotifications: settings.emailNotifications
+            }
+          );
+          
+          if (result?.success) {
+            return {
+              success: true,
+              message: 'Settings saved and synced with WordPress',
+              data: { settings }
+            };
+          }
+        } catch (syncError) {
+          console.warn('Could not sync settings with WordPress, saved locally only', syncError);
+        }
+      }
+      
       return {
         success: true,
         message: 'Settings saved successfully',
-        data: settings
+        data: { settings }
       };
     } catch (error) {
       return {
@@ -30,21 +148,77 @@ export const wordPressAPI = {
     }
   },
 
-  async getSettings(apiKey: string): Promise<WordPressSettings | null> {
-    return storageService.getItem('wordpress_settings');
+  async getSettings(apiKey?: string): Promise<WordPressSettings | null> {
+    // Maintain backward compatibility - get from local storage first
+    const localSettings = await storageService.getItem<WordPressSettings>('wordpress_settings');
+    
+    // If we have settings and a siteUrl, try to fetch updated settings from WordPress
+    if (localSettings && localSettings.siteUrl && localSettings.apiKey) {
+      try {
+        const result = await this.apiRequest<any>(
+          'GET',
+          `${this.getBaseUrl(localSettings.siteUrl)}/wp-json/access-web/v1/settings`,
+          localSettings.apiKey
+        );
+        
+        if (result?.success && result?.data) {
+          // Merge remote settings with local settings
+          const mergedSettings: WordPressSettings = {
+            ...localSettings,
+            ...result.data
+          };
+          
+          // Update local storage with fresh data
+          await storageService.setItem('wordpress_settings', mergedSettings);
+          return mergedSettings;
+        }
+      } catch (error) {
+        console.warn('Could not fetch settings from WordPress, using local settings', error);
+      }
+    }
+    
+    return localSettings || null;
   },
 
-  // Scan Management
+  // Scan Management - maintains compatibility with existing implementations
   async startScan(apiKey: string, url: string): Promise<WordPressPluginResponse> {
     try {
-      // Simulate scan start
+      // Get settings to find site URL
+      const settings = await this.getSettings(apiKey);
+      
+      if (settings && settings.siteUrl) {
+        try {
+          // Attempt to start scan via WordPress API
+          const result = await this.apiRequest<any>(
+            'POST',
+            `${this.getBaseUrl(settings.siteUrl)}/wp-json/access-web/v1/scan`,
+            apiKey,
+            { target_url: url }
+          );
+          
+          if (result?.success && result?.data?.scan_id) {
+            // Store scan ID for tracking
+            await storageService.setItem('current_scan_id', result.data.scan_id);
+            
+            return {
+              success: true,
+              message: 'Scan started successfully via WordPress API',
+              data: { scan_id: result.data.scan_id }
+            };
+          }
+        } catch (apiError) {
+          console.warn('Could not start scan via WordPress API, falling back to simulation', apiError);
+        }
+      }
+      
+      // Fallback to simulation for development/testing
       const scanId = Date.now().toString();
       await storageService.setItem('current_scan_id', scanId);
       
       return {
         success: true,
-        message: 'Scan started successfully',
-        data: { scanId }
+        message: 'Scan started successfully (simulated)',
+        data: { scan_id: scanId }
       };
     } catch (error) {
       return {
@@ -55,19 +229,79 @@ export const wordPressAPI = {
   },
 
   async getScanResults(scanId: string): Promise<ScanResult | null> {
-    return storageService.getItem('scan_results');
+    // Get settings to find site URL and API key
+    const settings = await storageService.getItem<WordPressSettings>('wordpress_settings');
+    
+    if (settings && settings.siteUrl && settings.apiKey) {
+      try {
+        // Attempt to get scan results from WordPress API
+        const result = await this.apiRequest<any>(
+          'GET',
+          `${this.getBaseUrl(settings.siteUrl)}/wp-json/access-web/v1/scan/${scanId}`,
+          settings.apiKey
+        );
+        
+        if (result?.success && result?.data?.scan) {
+          // Map API response to ScanResult
+          const apiScan = result.data.scan;
+          const scanResult: ScanResult = {
+            id: scanId,
+            url: apiScan.url || '',
+            startTime: apiScan.start_time || new Date().toISOString(),
+            endTime: apiScan.end_time || '',
+            status: apiScan.status || 'pending',
+            progress: apiScan.progress || 0,
+            summary: apiScan.summary,
+            items: apiScan.items
+          };
+          
+          // Cache results
+          await storageService.setItem('scan_results', scanResult);
+          return scanResult;
+        }
+      } catch (apiError) {
+        console.warn('Could not fetch scan results from WordPress API, falling back to cached data', apiError);
+      }
+    }
+    
+    // Fallback to local storage for development/testing
+    return storageService.getItem<ScanResult>('scan_results');
   },
 
   // Auto-Fix Management
   async applyAutoFixes(scanId: string): Promise<WordPressPluginResponse> {
     try {
-      // Simulate applying fixes
+      // Get settings to find site URL and API key
+      const settings = await storageService.getItem<WordPressSettings>('wordpress_settings');
+      
+      if (settings && settings.siteUrl && settings.apiKey) {
+        try {
+          // Attempt to apply fixes via WordPress API
+          const result = await this.apiRequest<any>(
+            'POST',
+            `${this.getBaseUrl(settings.siteUrl)}/wp-json/access-web/v1/fix/${scanId}`,
+            settings.apiKey
+          );
+          
+          if (result?.success) {
+            return {
+              success: true,
+              message: result.message || 'Auto-fixes applied successfully via WordPress API',
+              data: { fixed: true }
+            };
+          }
+        } catch (apiError) {
+          console.warn('Could not apply fixes via WordPress API, falling back to simulation', apiError);
+        }
+      }
+      
+      // Fallback to simulation for development/testing
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       return {
         success: true,
-        message: 'Auto-fixes applied successfully',
-        data: { fixesApplied: 5 }
+        message: 'Auto-fixes applied successfully (simulated)',
+        data: { fixed: true }
       };
     } catch (error) {
       return {
@@ -77,7 +311,50 @@ export const wordPressAPI = {
     }
   },
 
-  // Monitoring Widget
+  // Enhanced error handling wrapper for API calls
+  async apiRequest<T>(
+    method: string,
+    endpoint: string,
+    apiKey: string,
+    body?: any
+  ): Promise<T | null> {
+    try {
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          'X-API-KEY': apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: body ? JSON.stringify(body) : undefined
+      });
+
+      if (!response.ok) {
+        // Log detailed error information
+        console.error(`WordPress API error: ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Error details:', errorText);
+
+        // Handle specific error statuses
+        switch (response.status) {
+          case 401:
+            throw new Error('Authentication failed. Please check your API key.');
+          case 404:
+            throw new Error('WordPress site not found or plugin not installed correctly.');
+          case 429:
+            throw new Error('Rate limit exceeded. Please try again later.');
+          default:
+            throw new Error(`API request failed with status ${response.status}`);
+        }
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error(`API request error (${method} ${endpoint}):`, error);
+      return null;
+    }
+  },
+
+  // Monitoring Widget - maintained for backward compatibility
   getMonitoringScript(apiKey: string): string {
     return `
       <script>
@@ -95,7 +372,7 @@ export const wordPressAPI = {
     `.trim();
   },
 
-  // Badge Management
+  // Badge Management - maintained for backward compatibility
   getBadgeScript(apiKey: string): string {
     return `
       <script>
