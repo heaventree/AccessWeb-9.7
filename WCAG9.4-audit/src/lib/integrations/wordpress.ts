@@ -1,6 +1,43 @@
 import type { WordPressSettings, WordPressPluginResponse, ScanResult } from '../../types/integrations';
 import { storageService } from '../storage';
 
+// Cache duration constants (in milliseconds)
+const CACHE_DURATIONS = {
+  SHORT: 5 * 60 * 1000,       // 5 minutes
+  MEDIUM: 30 * 60 * 1000,     // 30 minutes
+  LONG: 24 * 60 * 60 * 1000,  // 24 hours
+};
+
+// Cache management helpers
+const cacheManager = {
+  async get<T>(key: string): Promise<{ data: T; timestamp: number } | null> {
+    const cached = await storageService.getItem<{ data: T; timestamp: number }>(key);
+    return cached;
+  },
+  
+  async set<T>(key: string, data: T): Promise<void> {
+    await storageService.setItem(key, {
+      data,
+      timestamp: Date.now()
+    });
+  },
+  
+  async getWithExpiry<T>(key: string, maxAge: number): Promise<T | null> {
+    const cached = await this.get<T>(key);
+    if (!cached) return null;
+    
+    const isExpired = Date.now() - cached.timestamp > maxAge;
+    return isExpired ? null : cached.data;
+  },
+  
+  async invalidate(keyPrefix: string): Promise<void> {
+    // This is a simple implementation that would need to be expanded
+    // based on how the storage service works
+    console.log(`Invalidating cache with prefix: ${keyPrefix}`);
+    // In a real implementation, we would list all keys with the prefix and remove them
+  }
+};
+
 export const wordPressAPI = {
   // Helper function to get base URL
   getBaseUrl(siteUrl: string): string {
@@ -35,9 +72,20 @@ export const wordPressAPI = {
     }
   },
 
-  // Get WordPress site info
+  // Get WordPress site info with caching
   async getSiteInfo(siteUrl: string, apiKey: string): Promise<any> {
     try {
+      // Generate a cache key for this specific site
+      const cacheKey = `site_info_${siteUrl}`;
+      
+      // Try to get data from cache first
+      const cachedData = await cacheManager.getWithExpiry<any>(cacheKey, CACHE_DURATIONS.MEDIUM);
+      if (cachedData) {
+        console.log('Using cached site info');
+        return cachedData;
+      }
+      
+      // If not in cache or expired, fetch fresh data
       const baseUrl = this.getBaseUrl(siteUrl);
       const url = `${baseUrl}/wp-json/access-web/v1/site-info`;
 
@@ -53,7 +101,11 @@ export const wordPressAPI = {
         throw new Error(`Failed to get site info: ${response.statusText}`);
       }
 
-      return await response.json();
+      // Get the data and store in cache before returning
+      const data = await response.json();
+      await cacheManager.set(cacheKey, data);
+      
+      return data;
     } catch (error) {
       console.error('Get site info error:', error);
       return null;
@@ -149,7 +201,18 @@ export const wordPressAPI = {
   },
 
   async getSettings(apiKey?: string): Promise<WordPressSettings | null> {
-    // Maintain backward compatibility - get from local storage first
+    // Generate a cache key based on the API key if provided, otherwise use a generic one
+    const cacheKey = apiKey ? `wordpress_settings_${apiKey}` : 'wordpress_settings';
+    
+    // Try to get settings from cache first with short expiry time 
+    // (short expiry because settings may change frequently)
+    const cachedSettings = await cacheManager.getWithExpiry<WordPressSettings>(cacheKey, CACHE_DURATIONS.SHORT);
+    if (cachedSettings) {
+      console.log('Using cached WordPress settings');
+      return cachedSettings;
+    }
+    
+    // If not in cache, get from local storage as a fallback
     const localSettings = await storageService.getItem<WordPressSettings>('wordpress_settings');
     
     // If we have settings and a siteUrl, try to fetch updated settings from WordPress
@@ -168,13 +231,19 @@ export const wordPressAPI = {
             ...result.data
           };
           
-          // Update local storage with fresh data
+          // Update both cache and local storage with fresh data
+          await cacheManager.set(cacheKey, mergedSettings);
           await storageService.setItem('wordpress_settings', mergedSettings);
           return mergedSettings;
         }
       } catch (error) {
         console.warn('Could not fetch settings from WordPress, using local settings', error);
       }
+    }
+    
+    // If we got here but have local settings, cache them for next time
+    if (localSettings) {
+      await cacheManager.set(cacheKey, localSettings);
     }
     
     return localSettings || null;

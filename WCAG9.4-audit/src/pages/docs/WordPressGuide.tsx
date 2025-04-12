@@ -495,29 +495,54 @@ export function WordPressGuide() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/accessweb/v1/issues</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/access-web/v1/status</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">GET</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">Check if the AccessWeb plugin is installed and active</td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/access-web/v1/site-info</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">GET</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">Get information about the WordPress site</td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/access-web/v1/validate</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">GET</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">Validate API key authentication</td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/access-web/v1/issues</td>
                     <td className="px-6 py-4 text-sm text-gray-500">GET</td>
                     <td className="px-6 py-4 text-sm text-gray-500">Get a list of all accessibility issues</td>
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/accessweb/v1/issues/&#123;id&#125;</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/access-web/v1/issues/&#123;id&#125;</td>
                     <td className="px-6 py-4 text-sm text-gray-500">GET</td>
                     <td className="px-6 py-4 text-sm text-gray-500">Get details for a specific issue</td>
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/accessweb/v1/scan</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/access-web/v1/scan</td>
                     <td className="px-6 py-4 text-sm text-gray-500">POST</td>
                     <td className="px-6 py-4 text-sm text-gray-500">Trigger a new accessibility scan</td>
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/accessweb/v1/stats</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/access-web/v1/scan/&#123;id&#125;</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">GET</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">Get scan results for a specific scan ID</td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/access-web/v1/stats</td>
                     <td className="px-6 py-4 text-sm text-gray-500">GET</td>
                     <td className="px-6 py-4 text-sm text-gray-500">Get accessibility statistics</td>
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/accessweb/v1/fixes</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/access-web/v1/fix/&#123;scan_id&#125;</td>
                     <td className="px-6 py-4 text-sm text-gray-500">POST</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">Apply fixes to issues</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">Apply fixes to issues from a specific scan</td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">/wp-json/access-web/v1/settings</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">GET/POST</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">Get or update plugin settings</td>
                   </tr>
                 </tbody>
               </table>
@@ -535,16 +560,64 @@ export function WordPressGuide() {
               <h3>Example Usage</h3>
               <pre className="bg-gray-800 text-gray-100 rounded-lg p-4 text-sm">
                 {`// Get all accessibility issues
-fetch('/wp-json/accessweb/v1/issues', {
+fetch('/wp-json/access-web/v1/issues', {
   method: 'GET',
   headers: {
-    'X-WP-Nonce': wpApiSettings.nonce,
+    'X-API-KEY': 'your-api-key-here',
     'Content-Type': 'application/json'
   }
 })
 .then(response => response.json())
 .then(data => console.log(data))
 .catch(error => console.error('Error:', error));`}
+              </pre>
+              
+              <h3>Response Caching</h3>
+              <p>
+                The AccessWeb client implements intelligent response caching to improve performance and reduce API calls. The cache system uses three duration levels:
+              </p>
+              <ul>
+                <li><strong>Short-term cache</strong> (5 minutes): For frequently changing data like live scan results</li>
+                <li><strong>Medium-term cache</strong> (30 minutes): For semi-static data like issue reports</li>
+                <li><strong>Long-term cache</strong> (24 hours): For rarely changing data like site configuration</li>
+              </ul>
+              
+              <p>The client automatically manages cache invalidation when data is updated. Example implementation:</p>
+              
+              <pre className="bg-gray-800 text-gray-100 rounded-lg p-4 text-sm">
+                {`// Example of API client with caching
+const cacheManager = {
+  async getWithExpiry(key, maxAge) {
+    const cached = await storageService.getItem(key);
+    if (!cached) return null;
+    
+    const isExpired = Date.now() - cached.timestamp > maxAge;
+    return isExpired ? null : cached.data;
+  }
+};
+
+// Usage example
+async function getSiteInfo(siteUrl, apiKey) {
+  // Try to get from cache first
+  const cacheKey = \`site_info_\${siteUrl}\`;
+  const cachedData = await cacheManager.getWithExpiry(cacheKey, 30 * 60 * 1000);
+  
+  if (cachedData) {
+    console.log('Using cached site info');
+    return cachedData;
+  }
+  
+  // Fetch fresh data if not in cache
+  const response = await fetch(\`\${siteUrl}/wp-json/access-web/v1/site-info\`, {
+    headers: { 'X-API-KEY': apiKey }
+  });
+  
+  const data = await response.json();
+  
+  // Save to cache
+  await cacheManager.set(cacheKey, data);
+  return data;
+}`}
               </pre>
               
               <div className="bg-blue-50 border-l-4 border-blue-500 p-4 my-4">
