@@ -261,10 +261,39 @@ export const roadmapFeatures: RoadmapFeature[] = [
     dependencies: ['url-scanner']
   },
   {
+    id: 'wordpress-api-integration',
+    title: 'WordPress REST API Integration',
+    description: 'Implement real REST API communication with WordPress sites for scanning and reporting',
+    status: 'completed',
+    priority: 2,
+    category: 'integration',
+    completedDate: '2024-04-12'
+  },
+  {
+    id: 'wordpress-api-caching',
+    title: 'WordPress API Response Caching',
+    description: 'Implement intelligent tiered caching for WordPress API to optimize performance',
+    status: 'completed',
+    priority: 2,
+    category: 'integration',
+    dependencies: ['wordpress-api-integration'],
+    completedDate: '2024-04-12'
+  },
+  {
+    id: 'wordpress-plugin-detection',
+    title: 'WordPress Plugin Detection',
+    description: 'Add functionality to detect and verify AccessWeb plugin on WordPress sites',
+    status: 'completed',
+    priority: 2,
+    category: 'integration',
+    dependencies: ['wordpress-api-integration'],
+    completedDate: '2024-04-12'
+  },
+  {
     id: 'cms-plugins',
     title: 'WordPress and Shopify Plugins',
     description: 'Create plugins for popular CMS platforms to integrate accessibility scanning and fixes',
-    status: 'planned',
+    status: 'in-progress',
     priority: 3,
     category: 'integration',
     dependencies: ['ai-fixes', 'api-integrations']
