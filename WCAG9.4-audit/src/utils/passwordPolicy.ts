@@ -1,204 +1,270 @@
 /**
  * Password Policy Utility
  * 
- * Enforces secure password requirements based on NIST 800-63B recommendations
- * and implements zxcvbn for password strength estimation.
+ * Enforces strong password rules and secure password handling
+ * to protect user accounts from brute force and credential stuffing attacks.
  */
 
-// Password validation types
-interface PasswordValidationError {
+import { ErrorType, createError } from './errorHandler';
+import { MAX_FAILED_LOGIN_ATTEMPTS, LOCKOUT_TIME } from './environment';
+
+export class PasswordValidationError extends Error {
   code: string;
-  message: string;
-  details?: Record<string, any>;
+  details: Record<string, any>;
+  
+  constructor(code: string, message: string, details: Record<string, any> = {}) {
+    super(message);
+    this.name = 'PasswordValidationError';
+    this.code = code;
+    this.details = details;
+    
+    // Set prototype explicitly for instanceof to work
+    Object.setPrototypeOf(this, PasswordValidationError.prototype);
+  }
 }
 
-interface PasswordStrengthResult {
-  score: number; // 0-4, with 4 being strongest
-  feedback: {
-    warning: string;
-    suggestions: string[];
-  };
-  isStrong: boolean;
+/**
+ * Password policy configuration
+ */
+export interface PasswordPolicyConfig {
+  minLength: number;
+  maxLength: number;
+  requireUppercase: boolean;
+  requireLowercase: boolean;
+  requireNumbers: boolean;
+  requireSpecialChars: boolean;
+  disallowCommonPasswords: boolean;
+  passwordHistoryLimit: number;
 }
 
-// Common weak passwords list (abbreviated example)
-// In production, this should be much more comprehensive or use an external library
-const COMMON_PASSWORDS = [
-  'password', 'admin', '123456', 'qwerty', 'welcome', 
-  'letmein', 'monkey', 'football', 'dragon', 'baseball',
-  '111111', 'iloveyou', 'trustno1', 'sunshine', 'master',
-  'access', 'shadow', 'michael', 'superman', 'princess'
-];
-
-// Password policy configuration
-export const PASSWORD_POLICY = {
+/**
+ * Default password policy configuration
+ */
+export const DEFAULT_PASSWORD_POLICY: PasswordPolicyConfig = {
   minLength: 12,
   maxLength: 128,
   requireUppercase: true,
   requireLowercase: true,
   requireNumbers: true,
   requireSpecialChars: true,
-  preventCommonPasswords: true,
-  preventPersonalInfo: true,
-  minScore: 3, // Minimum zxcvbn score (0-4)
-  ageLimit: 90 // Password expiry in days
+  disallowCommonPasswords: true,
+  passwordHistoryLimit: 5
 };
 
 /**
- * Check if password contains common patterns
- * @param password Password to check
- * @returns True if password contains common patterns
+ * Validation rules for password checking
  */
-function containsCommonPatterns(password: string): boolean {
-  const patterns = [
-    /^12345/, // Sequential numbers
-    /^qwerty/i, // Sequential keyboard chars
-    /([a-zA-Z0-9])\\1{2,}/ // Repeated characters
-  ];
-  
-  return patterns.some(pattern => pattern.test(password));
-}
+const PASSWORD_VALIDATION_RULES = [
+  {
+    test: (password: string, config: PasswordPolicyConfig) => 
+      password.length >= config.minLength,
+    code: 'min_length',
+    message: (config: PasswordPolicyConfig) => 
+      `Password must be at least ${config.minLength} characters long`
+  },
+  {
+    test: (password: string, config: PasswordPolicyConfig) => 
+      password.length <= config.maxLength,
+    code: 'max_length',
+    message: (config: PasswordPolicyConfig) => 
+      `Password cannot exceed ${config.maxLength} characters`
+  },
+  {
+    test: (password: string, config: PasswordPolicyConfig) => 
+      !config.requireUppercase || /[A-Z]/.test(password),
+    code: 'require_uppercase',
+    message: () => 'Password must include at least one uppercase letter'
+  },
+  {
+    test: (password: string, config: PasswordPolicyConfig) => 
+      !config.requireLowercase || /[a-z]/.test(password),
+    code: 'require_lowercase',
+    message: () => 'Password must include at least one lowercase letter'
+  },
+  {
+    test: (password: string, config: PasswordPolicyConfig) => 
+      !config.requireNumbers || /[0-9]/.test(password),
+    code: 'require_numbers',
+    message: () => 'Password must include at least one number'
+  },
+  {
+    test: (password: string, config: PasswordPolicyConfig) => 
+      !config.requireSpecialChars || /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(password),
+    code: 'require_special_chars',
+    message: () => 'Password must include at least one special character'
+  }
+];
+
+// Top 20 most common passwords to check against
+const COMMON_PASSWORDS = [
+  '123456', 'password', '12345678', 'qwerty', '123456789',
+  '12345', '1234', '111111', '1234567', 'dragon',
+  '123123', 'baseball', 'abc123', 'football', 'monkey',
+  'letmein', '696969', 'shadow', 'master', '666666'
+];
 
 /**
- * Check if password is in common passwords list
- * @param password Password to check
- * @returns True if password is common
+ * Validate a password against the password policy
+ * @param password Password to validate
+ * @param config Password policy configuration
+ * @returns Array of validation failures or empty array if valid
  */
-function isCommonPassword(password: string): boolean {
-  const normalizedPassword = password.toLowerCase();
-  return COMMON_PASSWORDS.includes(normalizedPassword);
-}
+export function validatePassword(
+  password: string,
+  config: Partial<PasswordPolicyConfig> = {}
+): { isValid: boolean; failures: Array<{ code: string; message: string }> } {
+  // Merge with default config
+  const mergedConfig = { ...DEFAULT_PASSWORD_POLICY, ...config };
+  const failures: Array<{ code: string; message: string }> = [];
 
-/**
- * Basic password strength estimation
- * Note: In production, you should use zxcvbn or a similar library
- * @param password Password to check
- * @returns Password strength result
- */
-export function estimatePasswordStrength(password: string): PasswordStrengthResult {
-  // Score starts at 0 (weakest)
-  let score = 0;
-  const feedback = {
-    warning: '',
-    suggestions: []
-  };
-  
-  // Length check
-  if (password.length >= 12) score += 1;
-  if (password.length >= 16) score += 1;
-  
-  // Character variety
-  if (/[A-Z]/.test(password)) score += 0.5;
-  if (/[a-z]/.test(password)) score += 0.5;
-  if (/[0-9]/.test(password)) score += 0.5;
-  if (/[^A-Za-z0-9]/.test(password)) score += 0.5;
-  
-  // Check for common patterns and passwords
-  if (containsCommonPatterns(password)) {
-    score = Math.max(0, score - 2);
-    feedback.warning = 'Password contains common patterns';
-    feedback.suggestions.push('Avoid sequential characters or repeated patterns');
+  // Check each validation rule
+  PASSWORD_VALIDATION_RULES.forEach(rule => {
+    if (!rule.test(password, mergedConfig)) {
+      failures.push({
+        code: rule.code,
+        message: rule.message(mergedConfig)
+      });
+    }
+  });
+
+  // Check for common passwords
+  if (mergedConfig.disallowCommonPasswords && COMMON_PASSWORDS.includes(password.toLowerCase())) {
+    failures.push({
+      code: 'common_password',
+      message: 'Password is too common and easily guessable'
+    });
   }
-  
-  if (isCommonPassword(password)) {
-    score = 0; // Common passwords are automatically weak
-    feedback.warning = 'This is a commonly used password';
-    feedback.suggestions.push('Choose a unique password not found in common password lists');
-  }
-  
-  // Add suggestions based on score
-  if (score < 3) {
-    if (password.length < 16) {
-      feedback.suggestions.push('Use a longer password (16+ characters)');
-    }
-    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password)) {
-      feedback.suggestions.push('Mix uppercase and lowercase letters');
-    }
-    if (!/[0-9]/.test(password)) {
-      feedback.suggestions.push('Add some numbers');
-    }
-    if (!/[^A-Za-z0-9]/.test(password)) {
-      feedback.suggestions.push('Add special characters (!, @, #, etc.)');
-    }
-  }
-  
-  // Round score to nearest integer and clamp between 0-4
-  const finalScore = Math.min(4, Math.max(0, Math.round(score)));
   
   return {
-    score: finalScore,
-    feedback,
-    isStrong: finalScore >= PASSWORD_POLICY.minScore
+    isValid: failures.length === 0,
+    failures
   };
 }
 
 /**
- * Enforces password policy rules
- * @param password Password to validate
- * @throws PasswordValidationError if password doesn't meet requirements
+ * Check if a password is in the user's history
+ * @param newPassword New password to check
+ * @param passwordHistory Array of previous password hashes
+ * @returns True if password is in history
  */
-export function enforcePasswordPolicy(password: string): void {
-  const errors: string[] = [];
+export function isPasswordInHistory(
+  newPassword: string,
+  passwordHistory: string[]
+): boolean {
+  // In a real implementation, we would hash the new password and compare
+  // with stored hashes. This is a simplified version.
+  return passwordHistory.includes(newPassword);
+}
+
+/**
+ * Validate password with error throwing
+ * @param password Password to validate
+ * @param config Password policy configuration
+ * @throws Error if password is invalid
+ */
+export function enforcePasswordPolicy(
+  password: string,
+  config: Partial<PasswordPolicyConfig> = {}
+): void {
+  const { isValid, failures } = validatePassword(password, config);
   
-  // Check minimum length
-  if (password.length < PASSWORD_POLICY.minLength) {
-    errors.push(`Password must be at least ${PASSWORD_POLICY.minLength} characters long`);
+  if (!isValid) {
+    throw createError(
+      ErrorType.VALIDATION,
+      'invalid_password',
+      failures[0].message,
+      { failures }
+    );
+  }
+}
+
+/**
+ * Track and enforce account lockout after too many failed attempts
+ */
+export class AccountLockoutManager {
+  private static failedAttempts: Map<string, number> = new Map();
+  private static lockoutTimestamps: Map<string, number> = new Map();
+  
+  /**
+   * Record a failed login attempt
+   * @param username Username or identifier
+   * @returns Number of remaining attempts before lockout
+   */
+  static recordFailedAttempt(username: string): number {
+    // Check if account is already locked
+    if (this.isAccountLocked(username)) {
+      return 0;
+    }
+    
+    // Get current failed attempts
+    const currentAttempts = this.failedAttempts.get(username) || 0;
+    const newAttempts = currentAttempts + 1;
+    
+    // Update failed attempts
+    this.failedAttempts.set(username, newAttempts);
+    
+    // Set lockout timestamp if max attempts reached
+    if (newAttempts >= MAX_FAILED_LOGIN_ATTEMPTS) {
+      this.lockoutTimestamps.set(username, Date.now() + LOCKOUT_TIME);
+      return 0;
+    }
+    
+    return MAX_FAILED_LOGIN_ATTEMPTS - newAttempts;
   }
   
-  // Check maximum length
-  if (password.length > PASSWORD_POLICY.maxLength) {
-    errors.push(`Password cannot exceed ${PASSWORD_POLICY.maxLength} characters`);
+  /**
+   * Check if an account is currently locked out
+   * @param username Username or identifier
+   * @returns True if account is locked
+   */
+  static isAccountLocked(username: string): boolean {
+    const lockoutTime = this.lockoutTimestamps.get(username);
+    
+    if (!lockoutTime) {
+      return false;
+    }
+    
+    // Check if lockout has expired
+    if (Date.now() >= lockoutTime) {
+      // Reset lockout
+      this.resetLockout(username);
+      return false;
+    }
+    
+    return true;
   }
   
-  // Check character requirements
-  if (PASSWORD_POLICY.requireUppercase && !/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter');
+  /**
+   * Get time remaining on account lockout in seconds
+   * @param username Username or identifier
+   * @returns Seconds remaining or 0 if not locked
+   */
+  static getLockoutTimeRemaining(username: string): number {
+    const lockoutTime = this.lockoutTimestamps.get(username);
+    
+    if (!lockoutTime) {
+      return 0;
+    }
+    
+    const remaining = Math.max(0, Math.floor((lockoutTime - Date.now()) / 1000));
+    
+    return remaining;
   }
   
-  if (PASSWORD_POLICY.requireLowercase && !/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter');
-  }
-  
-  if (PASSWORD_POLICY.requireNumbers && !/[0-9]/.test(password)) {
-    errors.push('Password must contain at least one number');
-  }
-  
-  if (PASSWORD_POLICY.requireSpecialChars && !/[^A-Za-z0-9]/.test(password)) {
-    errors.push('Password must contain at least one special character');
-  }
-  
-  // Check for common passwords
-  if (PASSWORD_POLICY.preventCommonPasswords && isCommonPassword(password)) {
-    errors.push('Password is too common and easily guessable');
-  }
-  
-  // Check for common patterns
-  if (containsCommonPatterns(password)) {
-    errors.push('Password contains common patterns (sequential characters, repeated patterns)');
-  }
-  
-  // Estimate password strength
-  const strengthResult = estimatePasswordStrength(password);
-  if (!strengthResult.isStrong) {
-    errors.push('Password is not strong enough. ' + strengthResult.feedback.warning);
-    errors.push(...strengthResult.feedback.suggestions);
-  }
-  
-  // If any errors, throw validation error
-  if (errors.length > 0) {
-    throw {
-      code: 'password_policy_violation',
-      message: 'Password does not meet security requirements',
-      details: {
-        errors,
-        score: strengthResult.score
-      }
-    };
+  /**
+   * Reset lockout and failed attempts for an account
+   * @param username Username or identifier
+   */
+  static resetLockout(username: string): void {
+    this.failedAttempts.delete(username);
+    this.lockoutTimestamps.delete(username);
   }
 }
 
 export default {
-  PASSWORD_POLICY,
-  estimatePasswordStrength,
-  enforcePasswordPolicy
+  validatePassword,
+  enforcePasswordPolicy,
+  isPasswordInHistory,
+  AccountLockoutManager,
+  DEFAULT_PASSWORD_POLICY
 };
