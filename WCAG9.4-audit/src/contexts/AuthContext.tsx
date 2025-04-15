@@ -1,13 +1,19 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { generateToken, validateToken } from '../utils/auth';
-import { User, AuthError } from '../types/auth';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
+import { 
+  generateToken, 
+  validateToken, 
+  loginUser,
+  registerUser
+} from '../utils/auth';
+import { User, AuthError, LoginResponse, RegistrationData, RegistrationResponse } from '../types/auth';
 import { IS_DEVELOPMENT_MODE } from '../utils/environment';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<{ success: boolean; error?: AuthError }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: AuthError }>;
+  register: (data: RegistrationData) => Promise<{ success: boolean; error?: AuthError }>;
   logout: () => void;
   verifyEmail: (token: string) => Promise<boolean>;
   createPasswordResetToken: (email: string) => Promise<boolean>;
@@ -21,6 +27,7 @@ export const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   login: async () => ({ success: false }),
+  register: async () => ({ success: false }),
   logout: () => {},
   verifyEmail: async () => false,
   createPasswordResetToken: async () => false,
@@ -37,14 +44,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const isDevelopmentMode = IS_DEVELOPMENT_MODE;
 
+  // Secure token storage function
+  const storeAuthToken = useCallback((token: string) => {
+    try {
+      // For better security in production:
+      // - Use HttpOnly cookies via server-side auth
+      // - Or use more secure client storage methods
+      localStorage.setItem('token', token);
+    } catch (error) {
+      console.error('Error storing auth token:', error);
+    }
+  }, []);
+
+  // Secure token removal function
+  const removeAuthToken = useCallback(() => {
+    try {
+      localStorage.removeItem('token');
+    } catch (error) {
+      console.error('Error removing auth token:', error);
+    }
+  }, []);
+
   // Check for existing authentication on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // Get token from storage
         const token = localStorage.getItem('token');
+        
         if (token) {
+          // Validate the token (checks signature, expiration, etc.)
           const userData = validateToken(token);
+          
           if (userData) {
+            // If valid, set the user state
             setUser({
               id: userData.id,
               email: userData.email,
@@ -54,46 +87,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             });
           } else {
             // Token is invalid or expired, remove it
-            localStorage.removeItem('token');
+            removeAuthToken();
           }
         }
       } catch (error) {
         console.error('Authentication check failed:', error);
-        localStorage.removeItem('token');
+        removeAuthToken();
       } finally {
         setLoading(false);
       }
     };
 
     checkAuth();
-  }, []);
+  }, [removeAuthToken]);
 
   // Login function
   const login = async (email: string, password: string) => {
     try {
-      // Mock login for development
-      if (isDevelopmentMode) {
-        const mockUser: User = {
-          id: '123',
-          name: 'Demo User',
-          email: email,
-          role: 'user',
-          organization: 'Demo Org'
-        };
-        
-        const token = generateToken(mockUser);
-        localStorage.setItem('token', token);
-        setUser(mockUser);
-        
+      // Call the login API function from auth.ts
+      const response = await loginUser(email, password);
+      
+      if (response.success && response.token && response.user) {
+        // Store the token securely
+        storeAuthToken(response.token);
+        // Set the user state
+        setUser(response.user);
         return { success: true };
       }
       
-      // In production, this would call an API
-      // const response = await loginUser(email, password);
-      // localStorage.setItem('token', response.token);
-      // setUser(response.user);
-      
-      return { success: false, error: { code: 'auth/not-implemented', message: 'Login functionality not implemented yet.' } };
+      return { 
+        success: false, 
+        error: response.error || { 
+          code: 'auth/unknown-error', 
+          message: 'Login failed' 
+        } 
+      };
     } catch (error) {
       console.error('Login failed:', error);
       return { 
@@ -101,6 +129,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: { 
           code: 'auth/unknown-error', 
           message: 'An unexpected error occurred during login.' 
+        } 
+      };
+    }
+  };
+  
+  // Register function
+  const register = async (data: RegistrationData) => {
+    try {
+      // Call the register API function from auth.ts
+      const response = await registerUser(data);
+      
+      if (response.success && response.token && response.user) {
+        // Store the token securely
+        storeAuthToken(response.token);
+        // Set the user state
+        setUser(response.user);
+        return { success: true };
+      }
+      
+      return { 
+        success: false, 
+        error: response.error || { 
+          code: 'auth/unknown-error', 
+          message: 'Registration failed' 
+        } 
+      };
+    } catch (error) {
+      console.error('Registration failed:', error);
+      return { 
+        success: false, 
+        error: { 
+          code: 'auth/unknown-error', 
+          message: 'An unexpected error occurred during registration.' 
         } 
       };
     }
@@ -168,6 +229,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     loading,
     login,
+    register,
     logout,
     verifyEmail,
     createPasswordResetToken,
