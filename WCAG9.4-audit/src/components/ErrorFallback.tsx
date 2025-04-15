@@ -1,108 +1,82 @@
+import React from 'react';
+import { formatErrorForUser } from '../utils/errorHandler';
+
+interface ErrorFallbackProps {
+  error: Error;
+  resetError: () => void;
+}
+
 /**
  * Error Fallback Component
  * 
- * A dedicated fallback UI to display when errors occur.
- * This component is used by the ErrorBoundary when an error is caught.
- * 
- * Implements best practices for error display, including accessibility considerations.
+ * Provides a user-friendly error display with accessibility features
+ * and options to recover from the error.
  */
-
-import React from 'react';
-import { ErrorResponse } from '../utils/errorHandler';
-import { IS_DEVELOPMENT_MODE } from '../utils/environment';
-import { getUserFriendlyErrorMessage } from '../utils/errorHandler';
-
-interface ErrorFallbackProps {
-  error: Error | ErrorResponse;
-  resetError?: () => void;
-  title?: string;
-  showResetButton?: boolean;
-  showTechnicalDetails?: boolean;
-}
-
-const ErrorFallback: React.FC<ErrorFallbackProps> = ({
-  error,
-  resetError,
-  title = 'Something went wrong',
-  showResetButton = true,
-  showTechnicalDetails
-}) => {
-  // If the error has a type property, it's an ErrorResponse
-  const isErrorResponse = (err: any): err is ErrorResponse => {
-    return err && typeof err === 'object' && 'type' in err && 'code' in err;
-  };
+const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => {
+  // Format error for user display
+  const userFriendlyError = formatErrorForUser(error as any);
   
-  // Get the appropriate error message
-  const errorMessage = getUserFriendlyErrorMessage(error);
-  
-  // Determine if technical details should be shown
-  const displayTechnicalDetails = showTechnicalDetails !== undefined
-    ? showTechnicalDetails
-    : IS_DEVELOPMENT_MODE;
+  // Focus on the error container when it mounts
+  React.useEffect(() => {
+    const container = document.getElementById('error-container');
+    if (container) {
+      container.focus();
+    }
+  }, []);
   
   return (
     <div 
-      className="error-fallback"
+      id="error-container"
       role="alert"
-      aria-live="assertive"
-      data-testid="error-fallback"
+      tabIndex={-1}
+      className="p-6 mx-auto my-8 max-w-2xl bg-red-50 border border-red-200 rounded-lg shadow-sm"
+      aria-labelledby="error-title"
     >
-      <div className="error-fallback-container">
-        <h2 id="error-title" className="error-fallback-title">
-          {title}
-        </h2>
-        
-        <p className="error-fallback-message">
-          {errorMessage}
+      <h2 
+        id="error-title" 
+        className="text-xl font-semibold text-red-800 mb-2"
+      >
+        Something went wrong
+      </h2>
+      
+      <div className="mb-4 text-gray-700">
+        <p className="mb-2">
+          We're sorry, but we encountered an error while processing your request.
         </p>
-        
-        {displayTechnicalDetails && (
-          <details className="error-fallback-details">
-            <summary className="error-fallback-summary">
-              Technical details (for developers)
-            </summary>
-            
-            <div className="error-fallback-technical">
-              {isErrorResponse(error) ? (
-                <>
-                  <p><strong>Type:</strong> {error.type}</p>
-                  <p><strong>Code:</strong> {error.code}</p>
-                  <p><strong>Message:</strong> {error.message}</p>
-                  
-                  {error.details && (
-                    <>
-                      <p><strong>Details:</strong></p>
-                      <pre>{JSON.stringify(error.details, null, 2)}</pre>
-                    </>
-                  )}
-                  
-                  {error.stack && (
-                    <>
-                      <p><strong>Stack:</strong></p>
-                      <pre>{error.stack}</pre>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  <p><strong>Message:</strong> {error.message}</p>
-                  <p><strong>Stack:</strong></p>
-                  <pre>{error.stack}</pre>
-                </>
-              )}
-            </div>
-          </details>
+        <p className="mb-2">
+          Error details: {userFriendlyError.message}
+        </p>
+        {userFriendlyError.userMessage && (
+          <p className="mb-2 font-medium">
+            {userFriendlyError.userMessage}
+          </p>
         )}
+      </div>
+      
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
+          onClick={resetError}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          aria-label="Try again"
+        >
+          Try Again
+        </button>
         
-        {showResetButton && resetError && (
-          <button 
-            onClick={resetError}
-            className="error-fallback-button"
-            aria-describedby="error-title"
-          >
-            Try Again
-          </button>
-        )}
+        <button
+          onClick={() => window.location.href = '/'}
+          className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          aria-label="Return to home page"
+        >
+          Return to Home
+        </button>
+        
+        <a
+          href="mailto:support@wcag-checker.com?subject=Error Report"
+          className="px-4 py-2 text-center border border-gray-300 text-gray-700 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          aria-label="Contact support"
+        >
+          Contact Support
+        </a>
       </div>
     </div>
   );

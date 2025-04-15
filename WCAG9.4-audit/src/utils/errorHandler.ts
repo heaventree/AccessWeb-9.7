@@ -1,289 +1,279 @@
 /**
- * Error Handler Utility
+ * Error Handling Utility
  * 
- * Provides comprehensive error handling, logging, and sanitization for the application.
- * Implements best practices for error handling, including proper error categorization,
- * sanitization of sensitive data, and consistent error formatting.
+ * Provides utilities for creating, handling, and processing application errors
+ * with standardized error types, codes, and messages to improve error reporting,
+ * debugging, and user experience.
  */
 
-import { IS_DEVELOPMENT_MODE } from './environment';
-
-// Error types for consistent categorization
+// Standard error types for categorization
 export enum ErrorType {
-  // Authentication and authorization errors
-  AUTHENTICATION = 'authentication',
-  AUTHORIZATION = 'authorization',
+  // Data validation errors
+  VALIDATION = 'validation_error',
   
-  // Input validation errors
-  VALIDATION = 'validation',
+  // Authentication/authorization errors
+  AUTH = 'authentication_error',
   
-  // API and network errors
-  API = 'api',
-  NETWORK = 'network',
+  // API-related errors (requests, responses)
+  API = 'api_error',
   
-  // Data access and storage errors
-  DATABASE = 'database',
-  STORAGE = 'storage',
+  // Network-related errors
+  NETWORK = 'network_error',
   
-  // Security-related errors
-  SECURITY = 'security',
+  // Security-related errors (XSS, CSRF, etc.)
+  SECURITY = 'security_error',
   
-  // Application logic errors
-  BUSINESS_LOGIC = 'business_logic',
+  // Database-related errors
+  DATABASE = 'database_error',
   
-  // System and infrastructure errors
-  SYSTEM = 'system',
+  // General application errors
+  APPLICATION = 'application_error',
   
-  // Unknown or unexpected errors
-  UNKNOWN = 'unknown'
+  // Unknown/unexpected errors
+  UNKNOWN = 'unknown_error'
 }
 
-// Standard error response format
-export interface ErrorResponse {
+// Application error interface
+export interface AppError extends Error {
   type: ErrorType;
   code: string;
   message: string;
   details?: Record<string, any>;
-  stack?: string;
+  timestamp: string;
+  originalError?: any;
 }
 
 /**
- * Creates a standardized error object
+ * Create a standardized application error
+ * 
+ * @param type Error type for categorization
+ * @param code Specific error code
+ * @param message User-friendly error message
+ * @param details Additional error details
+ * @param originalError Original error if wrapping another error
+ * @returns Standardized AppError object
  */
-export const createError = (
+export function createError(
   type: ErrorType,
   code: string,
   message: string,
-  details?: Record<string, any>
-): ErrorResponse => {
-  return {
-    type,
-    code,
-    message,
-    details: sanitizeErrorDetails(details),
-    stack: IS_DEVELOPMENT_MODE ? new Error().stack : undefined
-  };
-};
-
-/**
- * Handles API errors and returns a standardized error response
- */
-export const handleApiError = (error: any): ErrorResponse => {
-  // Already formatted error
-  if (error && error.type && error.code && error.message) {
-    return error as ErrorResponse;
+  details?: Record<string, any>,
+  originalError?: any
+): AppError {
+  const error = new Error(message) as AppError;
+  error.type = type;
+  error.code = code;
+  error.message = message;
+  error.details = details;
+  error.timestamp = new Date().toISOString();
+  error.originalError = originalError;
+  
+  // Capture stack trace
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(error, createError);
   }
   
-  // Network errors (e.g. CORS, offline)
-  if (error instanceof TypeError && error.message.includes('Network request failed')) {
+  return error;
+}
+
+/**
+ * Process an API error response and convert to standardized AppError
+ * 
+ * @param error Error from API request
+ * @returns Standardized AppError
+ */
+export function handleAPIError(error: any): AppError {
+  // Check if it's an Axios error with a response
+  if (error.response) {
+    const { status, data } = error.response;
+    
+    // Handle based on status code
+    if (status === 400) {
+      return createError(
+        ErrorType.VALIDATION,
+        'invalid_request',
+        data.message || 'Invalid request parameters',
+        data.details || {},
+        error
+      );
+    }
+    
+    if (status === 401) {
+      return createError(
+        ErrorType.AUTH,
+        'unauthorized',
+        data.message || 'Authentication required',
+        data.details || {},
+        error
+      );
+    }
+    
+    if (status === 403) {
+      return createError(
+        ErrorType.AUTH,
+        'forbidden',
+        data.message || 'You do not have permission to access this resource',
+        data.details || {},
+        error
+      );
+    }
+    
+    if (status === 404) {
+      return createError(
+        ErrorType.API,
+        'not_found',
+        data.message || 'The requested resource was not found',
+        data.details || {},
+        error
+      );
+    }
+    
+    if (status === 429) {
+      return createError(
+        ErrorType.API,
+        'rate_limited',
+        data.message || 'Too many requests, please try again later',
+        { retryAfter: error.response.headers['retry-after'] },
+        error
+      );
+    }
+    
+    if (status >= 500) {
+      return createError(
+        ErrorType.API,
+        'server_error',
+        data.message || 'An unexpected server error occurred',
+        data.details || {},
+        error
+      );
+    }
+    
+    // Generic error for other status codes
+    return createError(
+      ErrorType.API,
+      `http_${status}`,
+      data.message || `Request failed with status code ${status}`,
+      data.details || {},
+      error
+    );
+  }
+  
+  // Handle network errors (no response from server)
+  if (error.request) {
     return createError(
       ErrorType.NETWORK,
       'network_error',
-      'Network request failed. Please check your connection.',
-      { originalError: error.message }
+      'Unable to connect to the server. Please check your internet connection.',
+      { request: error.request },
+      error
     );
   }
   
-  // Timeout errors
-  if (error.name === 'AbortError' || (error.code === 'request_timeout')) {
-    return createError(
-      ErrorType.NETWORK,
-      'request_timeout',
-      'The request timed out. Please try again.',
-      { originalError: error.message }
-    );
-  }
-  
-  // Authentication errors
-  if (error.message?.includes('unauthorized') || error.status === 401 || error.code === 401) {
-    return createError(
-      ErrorType.AUTHENTICATION,
-      'unauthorized',
-      'Authentication required. Please log in.',
-      { originalError: error.message }
-    );
-  }
-  
-  // Authorization errors
-  if (error.message?.includes('forbidden') || error.status === 403 || error.code === 403) {
-    return createError(
-      ErrorType.AUTHORIZATION,
-      'forbidden',
-      'You do not have permission to perform this action.',
-      { originalError: error.message }
-    );
-  }
-  
-  // Validation errors
-  if (error.message?.includes('validation') || error.status === 422 || error.code === 422) {
-    return createError(
-      ErrorType.VALIDATION,
-      'validation_error',
-      'The request data is invalid.',
-      { originalError: error.message, fields: error.details?.fields }
-    );
-  }
-  
-  // Not found errors
-  if (error.message?.includes('not found') || error.status === 404 || error.code === 404) {
-    return createError(
-      ErrorType.API,
-      'not_found',
-      'The requested resource was not found.',
-      { originalError: error.message }
-    );
-  }
-  
-  // Server errors
-  if (error.status >= 500 || error.code >= 500) {
-    return createError(
-      ErrorType.SYSTEM,
-      'server_error',
-      'An error occurred on the server. Please try again later.',
-      { originalError: error.message }
-    );
-  }
-  
-  // Default case - unknown error
+  // For everything else (setup errors, etc)
   return createError(
     ErrorType.UNKNOWN,
-    'unknown_error',
-    'An unexpected error occurred.',
-    { originalError: error.message || String(error) }
+    'request_failed',
+    error.message || 'An unexpected error occurred',
+    {},
+    error
   );
-};
+}
 
 /**
- * Logs errors with appropriate level and details
+ * Format error details for logging
+ * 
+ * @param error Error to format
+ * @returns Formatted error object for logging
  */
-export const logError = (error: ErrorResponse | any): void => {
-  const formattedError = error.type ? error : handleApiError(error);
-  
-  // Determine log level based on error type
-  switch (formattedError.type) {
-    case ErrorType.NETWORK:
-      if (navigator.onLine) {
-        console.warn(`Network Error: ${formattedError.message}`, formattedError);
-      } else {
-        // Offline errors are less severe
-        console.info(`Offline: ${formattedError.message}`);
-      }
-      break;
-      
+export function formatErrorForLogging(error: AppError): Record<string, any> {
+  return {
+    type: error.type,
+    code: error.code,
+    message: error.message,
+    details: error.details || {},
+    timestamp: error.timestamp,
+    stack: error.stack,
+    originalError: error.originalError ? {
+      message: error.originalError.message,
+      stack: error.originalError.stack
+    } : undefined
+  };
+}
+
+/**
+ * Format error for user display
+ * 
+ * @param error Error to format
+ * @returns User-friendly error object
+ */
+export function formatErrorForUser(error: AppError): Record<string, any> {
+  // Create a user-friendly error without sensitive details
+  return {
+    code: error.code,
+    message: error.message,
+    ...(error.details?.userMessage ? { userMessage: error.details.userMessage } : {}),
+    timestamp: error.timestamp
+  };
+}
+
+/**
+ * Get appropriate HTTP status code for an error
+ * 
+ * @param error Application error
+ * @returns HTTP status code
+ */
+export function getHttpStatusForError(error: AppError): number {
+  switch (error.type) {
     case ErrorType.VALIDATION:
-      console.warn(`Validation Error: ${formattedError.message}`, formattedError);
-      break;
-      
-    case ErrorType.AUTHENTICATION:
-    case ErrorType.AUTHORIZATION:
-      console.warn(`Auth Error: ${formattedError.message}`, formattedError);
-      break;
-      
-    case ErrorType.SYSTEM:
+      return 400;
+    case ErrorType.AUTH:
+      return error.code === 'unauthorized' ? 401 : 403;
+    case ErrorType.API:
+      if (error.code === 'not_found') return 404;
+      if (error.code === 'rate_limited') return 429;
+      return 500;
+    case ErrorType.SECURITY:
+      return 403;
     case ErrorType.DATABASE:
-      console.error(`Critical Error: ${formattedError.message}`, formattedError);
-      // In production, you might want to report these to a monitoring service
-      break;
-      
-    default:
-      console.error(`Error: ${formattedError.message}`, formattedError);
-  }
-  
-  // In development mode, also log the stack trace
-  if (IS_DEVELOPMENT_MODE && formattedError.stack) {
-    console.debug('Error Stack:', formattedError.stack);
-  }
-};
-
-/**
- * Sanitizes error details to remove sensitive information
- */
-export const sanitizeErrorDetails = (details?: Record<string, any>): Record<string, any> | undefined => {
-  if (!details) return undefined;
-  
-  const sanitized: Record<string, any> = {};
-  const sensitiveKeys = ['password', 'token', 'secret', 'key', 'auth', 'authorization', 'credential'];
-  
-  // Clone details and remove sensitive information
-  Object.entries(details).forEach(([key, value]) => {
-    const lowerKey = key.toLowerCase();
-    
-    // Check if the key contains any sensitive keywords
-    if (sensitiveKeys.some(sensitiveKey => lowerKey.includes(sensitiveKey))) {
-      sanitized[key] = '[REDACTED]';
-    } else if (typeof value === 'object' && value !== null) {
-      // Recursively sanitize nested objects
-      sanitized[key] = sanitizeErrorDetails(value as Record<string, any>);
-    } else {
-      sanitized[key] = value;
-    }
-  });
-  
-  return sanitized;
-};
-
-/**
- * Gets a user-friendly error message
- */
-export const getUserFriendlyErrorMessage = (error: ErrorResponse | any): string => {
-  const formattedError = error.type ? error : handleApiError(error);
-  
-  // Return a user-friendly message based on error type
-  switch (formattedError.type) {
+      return 500;
     case ErrorType.NETWORK:
-      return navigator.onLine
-        ? 'Unable to connect to the server. Please check your connection and try again.'
-        : 'You are currently offline. Please check your internet connection.';
-      
-    case ErrorType.AUTHENTICATION:
-      return 'Your session has expired. Please log in again.';
-      
-    case ErrorType.AUTHORIZATION:
-      return 'You do not have permission to perform this action.';
-      
-    case ErrorType.VALIDATION:
-      return 'Please check your input and try again.';
-      
-    case ErrorType.SYSTEM:
-      return 'Something went wrong on our end. We\'re working to fix it.';
-      
-    case ErrorType.DATABASE:
-    case ErrorType.STORAGE:
-      return 'Unable to access data at this time. Please try again later.';
-      
-    case ErrorType.BUSINESS_LOGIC:
-      return formattedError.message || 'Unable to complete the requested action.';
-      
+      return 503;
+    case ErrorType.APPLICATION:
+    case ErrorType.UNKNOWN:
     default:
-      return 'An unexpected error occurred. Please try again later.';
+      return 500;
   }
-};
+}
 
 /**
- * Determines if an error is retryable
+ * Log error with appropriate level and formatting
+ * 
+ * @param error Error to log
+ * @param level Log level (default: 'error')
  */
-export const isRetryableError = (error: ErrorResponse | any): boolean => {
-  const formattedError = error.type ? error : handleApiError(error);
+export function logError(error: AppError, level: 'info' | 'warn' | 'error' = 'error'): void {
+  const formattedError = formatErrorForLogging(error);
   
-  // Determine if the error is retryable based on its type
-  switch (formattedError.type) {
-    case ErrorType.NETWORK:
-      return true; // Network errors are generally retryable
-      
-    case ErrorType.SYSTEM:
-      return true; // Server errors are generally retryable
-      
-    case ErrorType.DATABASE:
-    case ErrorType.STORAGE:
-      return true; // Data access errors are generally retryable
-      
-    case ErrorType.AUTHENTICATION:
-    case ErrorType.AUTHORIZATION:
-    case ErrorType.VALIDATION:
-    case ErrorType.BUSINESS_LOGIC:
-      return false; // These errors require user action
-      
+  switch (level) {
+    case 'info':
+      console.info('[ERROR_INFO]', JSON.stringify(formattedError));
+      break;
+    case 'warn':
+      console.warn('[ERROR_WARNING]', JSON.stringify(formattedError));
+      break;
+    case 'error':
     default:
-      return false; // Unknown errors are not retryable by default
+      console.error('[ERROR]', JSON.stringify(formattedError));
   }
+}
+
+// Export all functions for use throughout the application
+export default {
+  ErrorType,
+  createError,
+  handleAPIError,
+  formatErrorForLogging,
+  formatErrorForUser,
+  getHttpStatusForError,
+  logError
 };

@@ -8,7 +8,7 @@
 import { authStorage } from '../utils/secureStorage';
 import { getApiUrl, IS_DEVELOPMENT_MODE } from '../utils/environment';
 import { corsConfig, validateCors } from '../config/cors';
-import { ErrorType, createError, handleApiError } from '../utils/errorHandler';
+import { ErrorType, createError, handleAPIError } from '../utils/errorHandler';
 
 export interface ApiRequestOptions extends RequestInit {
   useAuth?: boolean;
@@ -219,7 +219,7 @@ export class ApiService {
 
       // Handle all other unexpected errors
       console.error('API request failed:', error);
-      throw handleApiError(error);
+      throw handleAPIError(error);
     }
   }
 
