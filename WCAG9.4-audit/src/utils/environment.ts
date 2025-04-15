@@ -198,6 +198,11 @@ export const API_TIMEOUT: number = getEnvNumber('VITE_API_TIMEOUT', 30000);
  */
 export const API_BASE_URL: string = getEnvString('VITE_API_BASE_URL', 'http://localhost:3000/api');
 
+/**
+ * API version
+ */
+export const API_VERSION: string = getEnvString('VITE_API_VERSION', 'v1');
+
 export default {
   loadEnvVariables,
   getEnvString,
@@ -209,5 +214,6 @@ export default {
   isProduction,
   isTest,
   API_TIMEOUT,
-  API_BASE_URL
+  API_BASE_URL,
+  API_VERSION
 };
