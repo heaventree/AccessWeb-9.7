@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import jwt from 'jsonwebtoken';
 import { 
   User, 
   LoginResponse, 
@@ -8,31 +9,42 @@ import {
 } from '../types/auth';
 import { IS_DEVELOPMENT_MODE } from './environment';
 
-// Browser-friendly token utilities without relying on Node.js modules
+// JWT configuration
 const TOKEN_EXPIRY_HOURS = 24;
+// In production, this should be an environment variable loaded securely
+const JWT_SECRET = process.env.JWT_SECRET || 'wcag-audit-tool-secret-key-change-in-production';
+// Define algorithm for token signing
+const JWT_ALGORITHM = 'HS256';
 
 /**
- * Simplified token generation for browser environments
+ * Generate a secure JWT token for the user
  * @param user The user data to encode in the token
- * @returns A browser-compatible token string
+ * @returns A JWT token string
  */
 export const generateToken = (user: Partial<User>): string => {
   // Create a payload with user data and an expiration
   const payload = {
-    id: user.id,
+    sub: user.id, // Subject (user ID)
     email: user.email,
     role: user.role,
     name: user.name,
-    organization: user.organization,
-    exp: Date.now() + (TOKEN_EXPIRY_HOURS * 60 * 60 * 1000) // hours to milliseconds
+    organization: user.organization
   };
   
-  // Simple base64 encoding (not secure for production)
-  return btoa(JSON.stringify(payload));
+  const options = {
+    expiresIn: `${TOKEN_EXPIRY_HOURS}h`, // Token expiry time
+    algorithm: JWT_ALGORITHM as jwt.Algorithm, // Signing algorithm
+    issuer: 'wcag-audit-tool', // Token issuer
+    audience: 'wcag-audit-users', // Token audience
+    notBefore: 0 // Token valid immediately
+  };
+  
+  // Sign the token with our secret key
+  return jwt.sign(payload, JWT_SECRET, options);
 };
 
 /**
- * Validates a token and extracts the user data
+ * Validates a JWT token and extracts the user data
  * @param token The token to validate
  * @returns User data if valid, null if invalid
  */
@@ -40,23 +52,30 @@ export const validateToken = (
   token: string
 ): { id: string; email: string; role: UserRole; name?: string; organization?: string } | null => {
   try {
-    const decoded = JSON.parse(atob(token));
+    // Verify the token - this checks signature, expiry, etc.
+    const decoded = jwt.verify(token, JWT_SECRET, {
+      algorithms: [JWT_ALGORITHM as jwt.Algorithm],
+      issuer: 'wcag-audit-tool',
+      audience: 'wcag-audit-users'
+    }) as jwt.JwtPayload;
     
-    // Check expiration
-    if (decoded.exp && decoded.exp < Date.now()) {
-      console.log('Token expired');
-      return null;
-    }
-    
+    // If verification passes, return the user data
     return {
-      id: decoded.id,
-      email: decoded.email,
+      id: decoded.sub as string, // Subject contains user ID
+      email: decoded.email as string,
       role: decoded.role as UserRole,
-      name: decoded.name || '',
-      organization: decoded.organization || ''
+      name: decoded.name as string || '',
+      organization: decoded.organization as string || ''
     };
   } catch (error) {
-    console.error('Token validation error:', error);
+    // Log the specific error for debugging
+    if (error instanceof jwt.TokenExpiredError) {
+      console.log('Token expired');
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      console.log('Invalid token');
+    } else {
+      console.error('Token validation error:', error);
+    }
     return null;
   }
 };
