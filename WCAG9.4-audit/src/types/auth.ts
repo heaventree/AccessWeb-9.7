@@ -62,7 +62,7 @@ export interface AuthError {
  */
 export interface LoginResponse {
   success: boolean;
-  token?: string;
+  token?: string | Promise<string>;
   user?: User;
   error?: AuthError;
 }
@@ -82,7 +82,7 @@ export interface RegistrationData {
  */
 export interface RegistrationResponse {
   success: boolean;
-  token?: string;
+  token?: string | Promise<string>;
   user?: User;
   error?: AuthError;
 }

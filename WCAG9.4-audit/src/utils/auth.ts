@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import jwt from 'jsonwebtoken';
+import * as jose from 'jose';
 import { 
   User, 
   LoginResponse, 
@@ -12,17 +12,17 @@ import { IS_DEVELOPMENT_MODE } from './environment';
 // JWT configuration
 const TOKEN_EXPIRY_HOURS = 24;
 // In production, this should be an environment variable loaded securely
-const JWT_SECRET = process.env.JWT_SECRET || 'wcag-audit-tool-secret-key-change-in-production';
-// Define algorithm for token signing
-const JWT_ALGORITHM = 'HS256';
+const JWT_SECRET = 'wcag-audit-tool-secret-key-change-in-production';
+// Secret key in Uint8Array format for jose
+const SECRET_KEY = new TextEncoder().encode(JWT_SECRET);
 
 /**
- * Generate a secure JWT token for the user
+ * Generate a secure JWT token for the user using jose (browser-compatible)
  * @param user The user data to encode in the token
  * @returns A JWT token string
  */
-export const generateToken = (user: Partial<User>): string => {
-  // Create a payload with user data and an expiration
+export const generateToken = async (user: Partial<User>): Promise<string> => {
+  // Create a payload with user data and claims
   const payload = {
     sub: user.id, // Subject (user ID)
     email: user.email,
@@ -31,16 +31,19 @@ export const generateToken = (user: Partial<User>): string => {
     organization: user.organization
   };
   
-  const options = {
-    expiresIn: `${TOKEN_EXPIRY_HOURS}h`, // Token expiry time
-    algorithm: JWT_ALGORITHM as jwt.Algorithm, // Signing algorithm
-    issuer: 'wcag-audit-tool', // Token issuer
-    audience: 'wcag-audit-users', // Token audience
-    notBefore: 0 // Token valid immediately
-  };
+  // Set expiration to current time + TOKEN_EXPIRY_HOURS
+  const expirationTime = new Date();
+  expirationTime.setHours(expirationTime.getHours() + TOKEN_EXPIRY_HOURS);
   
-  // Sign the token with our secret key
-  return jwt.sign(payload, JWT_SECRET, options);
+  // Create and sign JWT token
+  return await new jose.SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setIssuer('wcag-audit-tool')
+    .setAudience('wcag-audit-users')
+    .setExpirationTime(expirationTime)
+    .setNotBefore(new Date()) // Valid from now
+    .sign(SECRET_KEY);
 };
 
 /**
@@ -48,30 +51,29 @@ export const generateToken = (user: Partial<User>): string => {
  * @param token The token to validate
  * @returns User data if valid, null if invalid
  */
-export const validateToken = (
+export const validateToken = async (
   token: string
-): { id: string; email: string; role: UserRole; name?: string; organization?: string } | null => {
+): Promise<{ id: string; email: string; role: UserRole; name?: string; organization?: string } | null> => {
   try {
     // Verify the token - this checks signature, expiry, etc.
-    const decoded = jwt.verify(token, JWT_SECRET, {
-      algorithms: [JWT_ALGORITHM as jwt.Algorithm],
+    const { payload } = await jose.jwtVerify(token, SECRET_KEY, {
       issuer: 'wcag-audit-tool',
       audience: 'wcag-audit-users'
-    }) as jwt.JwtPayload;
+    });
     
     // If verification passes, return the user data
     return {
-      id: decoded.sub as string, // Subject contains user ID
-      email: decoded.email as string,
-      role: decoded.role as UserRole,
-      name: decoded.name as string || '',
-      organization: decoded.organization as string || ''
+      id: payload.sub as string,  // Subject contains user ID
+      email: payload.email as string,
+      role: payload.role as UserRole,
+      name: payload.name as string || '',
+      organization: payload.organization as string || ''
     };
   } catch (error) {
-    // Log the specific error for debugging
-    if (error instanceof jwt.TokenExpiredError) {
+    // Log the error for debugging
+    if (error instanceof jose.errors.JWTExpired) {
       console.log('Token expired');
-    } else if (error instanceof jwt.JsonWebTokenError) {
+    } else if (error instanceof jose.errors.JOSEError) {
       console.log('Invalid token');
     } else {
       console.error('Token validation error:', error);
@@ -106,7 +108,7 @@ export const loginUser = async (
         organization: 'WCAG Compliance Team'
       };
       
-      const token = generateToken(mockUser);
+      const token = await generateToken(mockUser);
       
       return {
         success: true,
@@ -157,7 +159,7 @@ export const registerUser = async (
         organization: data.organization
       };
       
-      const token = generateToken(newUser);
+      const token = await generateToken(newUser);
       
       return {
         success: true,

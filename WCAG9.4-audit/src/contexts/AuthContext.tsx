@@ -74,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         if (token) {
           // Validate the token (checks signature, expiration, etc.)
-          const userData = validateToken(token);
+          const userData = await validateToken(token);
           
           if (userData) {
             // If valid, set the user state
@@ -108,8 +108,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await loginUser(email, password);
       
       if (response.success && response.token && response.user) {
+        // Resolve the token if it's a promise
+        const resolvedToken = response.token instanceof Promise 
+          ? await response.token 
+          : response.token;
+          
         // Store the token securely
-        storeAuthToken(response.token);
+        storeAuthToken(resolvedToken);
         // Set the user state
         setUser(response.user);
         return { success: true };
@@ -141,8 +146,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await registerUser(data);
       
       if (response.success && response.token && response.user) {
+        // Resolve the token if it's a promise
+        const resolvedToken = response.token instanceof Promise 
+          ? await response.token 
+          : response.token;
+          
         // Store the token securely
-        storeAuthToken(response.token);
+        storeAuthToken(resolvedToken);
         // Set the user state
         setUser(response.user);
         return { success: true };
