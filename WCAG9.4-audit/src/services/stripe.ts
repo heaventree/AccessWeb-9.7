@@ -1,233 +1,174 @@
-import { paymentsApi } from './api';
-import { DEVELOPMENT_MODE } from '../hooks/useAuth';
+/**
+ * Stripe Service
+ * 
+ * Provides secure payment processing functionality using Stripe API.
+ * All implementation details of the Stripe API are abstracted here.
+ */
 
-// Stripe API client
+import paymentsApi, { Plan, CheckoutSession, BillingPortalSession, Subscription, Invoice, SessionStatus } from './paymentsApi';
+import { ErrorType, createError, logError } from '../utils/errorHandler';
+
+/**
+ * Secure Stripe payment service
+ */
 class StripeService {
-  // Get available subscription plans
-  async getPlans() {
+  /**
+   * Get available plans
+   */
+  async getPlans(): Promise<Plan[]> {
     try {
-      if (DEVELOPMENT_MODE) {
-        return this.mockGetPlans();
-      }
       return await paymentsApi.getPlans();
     } catch (error) {
-      console.error('Error fetching plans:', error);
-      throw error;
+      logError(error);
+      throw createError(
+        ErrorType.API,
+        'plans_fetch_error',
+        'Failed to fetch subscription plans',
+        { originalError: error }
+      );
     }
   }
-  
-  // Create a checkout session for a specific plan
-  async createCheckoutSession(planId: string, successUrl: string, cancelUrl: string) {
+
+  /**
+   * Create a checkout session
+   */
+  async createCheckoutSession(
+    planId: string,
+    successUrl: string,
+    cancelUrl: string
+  ): Promise<CheckoutSession> {
     try {
-      if (DEVELOPMENT_MODE) {
-        return this.mockCreateCheckoutSession();
-      }
       return await paymentsApi.createCheckoutSession(planId, successUrl, cancelUrl);
     } catch (error) {
-      console.error('Error creating checkout session:', error);
-      throw error;
+      logError(error);
+      throw createError(
+        ErrorType.API,
+        'checkout_creation_error',
+        'Failed to create checkout session',
+        { originalError: error, planId }
+      );
     }
   }
-  
-  // Create a billing portal session for managing subscriptions
-  async createBillingPortalSession(returnUrl: string) {
+
+  /**
+   * Create a billing portal session
+   */
+  async createBillingPortalSession(returnUrl: string): Promise<BillingPortalSession> {
     try {
-      if (DEVELOPMENT_MODE) {
-        return {
-          url: returnUrl
-        };
-      }
       return await paymentsApi.createBillingPortalSession(returnUrl);
     } catch (error) {
-      console.error('Error creating billing portal session:', error);
-      throw error;
+      logError(error);
+      throw createError(
+        ErrorType.API,
+        'billing_portal_error',
+        'Failed to create billing portal session',
+        { originalError: error }
+      );
     }
   }
-  
-  // Get subscription details for the current user
-  async getCurrentSubscription() {
+
+  /**
+   * Get current subscription
+   */
+  async getCurrentSubscription(): Promise<Subscription | null> {
     try {
-      if (DEVELOPMENT_MODE) {
-        return this.mockCurrentSubscription();
-      }
       return await paymentsApi.getCurrentSubscription();
     } catch (error) {
-      console.error('Error fetching subscription:', error);
-      throw error;
+      logError(error);
+      throw createError(
+        ErrorType.API,
+        'subscription_fetch_error',
+        'Failed to fetch subscription details',
+        { originalError: error }
+      );
     }
   }
-  
-  // Get invoice history for the current user
-  async getInvoices() {
+
+  /**
+   * Get invoices
+   */
+  async getInvoices(): Promise<Invoice[]> {
     try {
-      if (DEVELOPMENT_MODE) {
-        return this.mockInvoices();
-      }
       return await paymentsApi.getInvoices();
     } catch (error) {
-      console.error('Error fetching invoices:', error);
-      throw error;
+      logError(error);
+      throw createError(
+        ErrorType.API,
+        'invoices_fetch_error',
+        'Failed to fetch invoices',
+        { originalError: error }
+      );
     }
   }
-  
-  // Cancel the current subscription
-  async cancelSubscription() {
+
+  /**
+   * Cancel subscription
+   */
+  async cancelSubscription(): Promise<Subscription> {
     try {
-      if (DEVELOPMENT_MODE) {
-        return {
-          success: true,
-          message: 'Subscription canceled in development mode'
-        };
-      }
       return await paymentsApi.cancelSubscription();
     } catch (error) {
-      console.error('Error cancelling subscription:', error);
-      throw error;
+      logError(error);
+      throw createError(
+        ErrorType.API,
+        'subscription_cancel_error',
+        'Failed to cancel subscription',
+        { originalError: error }
+      );
     }
   }
-  
-  // Reactivate a canceled subscription
-  async reactivateSubscription() {
+
+  /**
+   * Reactivate subscription
+   */
+  async reactivateSubscription(): Promise<Subscription> {
     try {
-      if (DEVELOPMENT_MODE) {
-        return {
-          success: true,
-          message: 'Subscription reactivated in development mode'
-        };
-      }
       return await paymentsApi.reactivateSubscription();
     } catch (error) {
-      console.error('Error reactivating subscription:', error);
-      throw error;
+      logError(error);
+      throw createError(
+        ErrorType.API,
+        'subscription_reactivate_error',
+        'Failed to reactivate subscription',
+        { originalError: error }
+      );
     }
   }
-  
-  // Check session status after checkout
-  async checkSessionStatus(sessionId: string) {
+
+  /**
+   * Check session status
+   */
+  async checkSessionStatus(sessionId: string): Promise<SessionStatus> {
     try {
-      if (DEVELOPMENT_MODE) {
-        return {
-          success: true,
-          subscription: this.mockCurrentSubscription().subscription
-        };
-      }
       return await paymentsApi.checkSessionStatus(sessionId);
     } catch (error) {
-      console.error('Error checking session status:', error);
-      throw error;
+      logError(error);
+      throw createError(
+        ErrorType.API,
+        'session_status_error',
+        'Failed to check session status',
+        { originalError: error, sessionId }
+      );
     }
   }
-  
-  // Mock methods for development mode
-  mockGetPlans() {
-    return {
-      plans: [
-        {
-          id: 'basic',
-          name: 'Basic',
-          description: 'For small websites and blogs',
-          priceMonthly: 29,
-          priceYearly: 290, // 10 months price for annual billing
-          priceOnetime: 199, // One-time payment option
-          features: [
-            'Single website scanning',
-            'Basic WCAG 2.2 compliance reports',
-            'Automated issue detection',
-            'Email notifications',
-            'Monthly scan limit: 5',
-          ],
-          isPopular: false
-        },
-        {
-          id: 'professional',
-          name: 'Professional',
-          description: 'For businesses and organizations',
-          priceMonthly: 99,
-          priceYearly: 990,
-          priceOnetime: 599, // One-time payment option
-          features: [
-            'Up to 5 websites',
-            'Full WCAG 2.2 compliance reporting',
-            'Real-time monitoring',
-            'API access',
-            'Priority email support',
-            'Monthly scan limit: 20',
-          ],
-          isPopular: true
-        },
-        {
-          id: 'enterprise',
-          name: 'Enterprise',
-          description: 'For large organizations with multiple sites',
-          priceMonthly: 299,
-          priceYearly: 2990,
-          priceOnetime: 1799, // One-time payment option
-          features: [
-            'Unlimited websites',
-            'Custom compliance profiles',
-            'Advanced reporting',
-            'Dedicated account manager',
-            'Unlimited API access',
-            'Phone support',
-            'Unlimited scans',
-            'Custom integrations',
-          ],
-          isPopular: false
-        }
-      ]
-    };
+
+  /**
+   * Format price for display
+   */
+  formatPrice(price: number, currency = 'USD'): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 2
+    }).format(price / 100); // Stripe uses cents
   }
-  
-  mockCreateCheckoutSession() {
-    // In development mode, we'll simulate a successful checkout
-    return {
-      sessionId: 'mock_cs_test_' + Math.random().toString(36).substring(2, 15),
-      sessionUrl: 'http://localhost:3000/mock-checkout-success'
-    };
-  }
-  
-  mockCurrentSubscription() {
-    return {
-      subscription: {
-        id: 'sub_mock123',
-        status: 'active',
-        planId: 'professional',
-        planName: 'Professional',
-        currentPeriodStart: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-        currentPeriodEnd: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
-        cancelAtPeriodEnd: false,
-        paymentMethod: {
-          brand: 'visa',
-          last4: '4242'
-        }
-      }
-    };
-  }
-  
-  mockInvoices() {
-    return {
-      invoices: [
-        {
-          id: 'inv_mock001',
-          number: 'INV-001',
-          amount: 99,
-          currency: 'usd',
-          status: 'paid',
-          date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-          pdfUrl: '#'
-        },
-        {
-          id: 'inv_mock002',
-          number: 'INV-002',
-          amount: 99,
-          currency: 'usd',
-          status: 'paid',
-          date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
-          pdfUrl: '#'
-        }
-      ]
-    };
+
+  /**
+   * Get interval display text
+   */
+  getIntervalDisplay(interval: 'month' | 'year'): string {
+    return interval === 'month' ? 'monthly' : 'yearly';
   }
 }
 
-export const stripeService = new StripeService();
+export default new StripeService();

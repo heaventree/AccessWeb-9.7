@@ -343,3 +343,4 @@ export default api;
 
 // Re-export specialized API services
 export { default as authApi } from './authApi';
+export { default as paymentsApi } from './paymentsApi';

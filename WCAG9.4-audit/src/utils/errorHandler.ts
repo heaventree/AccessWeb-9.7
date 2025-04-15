@@ -25,6 +25,9 @@ export enum ErrorType {
   DATABASE = 'database',
   STORAGE = 'storage',
   
+  // Security-related errors
+  SECURITY = 'security',
+  
   // Application logic errors
   BUSINESS_LOGIC = 'business_logic',
   
