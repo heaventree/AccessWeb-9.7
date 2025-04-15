@@ -6,6 +6,7 @@ import { ThemeProvider } from './ThemeProvider';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '../contexts/AuthContext';
 import { FloatingToolsProvider } from '../contexts/FloatingToolsContext';
+import SecurityProvider from './SecurityProvider';
 
 // Create a mock HelmetProvider for now since it's causing compatibility issues
 const MockHelmetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -82,14 +83,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       <ThemeProvider>
-        <AuthProvider>
-          <FloatingToolsProvider>
-            <MockHelmetProvider>
-              <Toaster position="top-center" />
-              {children}
-            </MockHelmetProvider>
-          </FloatingToolsProvider>
-        </AuthProvider>
+        <SecurityProvider>
+          <AuthProvider>
+            <FloatingToolsProvider>
+              <MockHelmetProvider>
+                <Toaster position="top-center" />
+                {children}
+              </MockHelmetProvider>
+            </FloatingToolsProvider>
+          </AuthProvider>
+        </SecurityProvider>
       </ThemeProvider>
     </PersistQueryClientProvider>
   );

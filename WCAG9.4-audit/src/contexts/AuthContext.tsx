@@ -7,6 +7,7 @@ import {
 import { User, AuthError, LoginResponse, RegistrationData, RegistrationResponse } from '../types/auth';
 import { IS_DEVELOPMENT_MODE } from '../utils/environment';
 import { authStorage } from '../utils/secureStorage';
+import { validateData, createLoginSchema, createRegistrationSchema } from '../utils/validation';
 
 interface AuthContextType {
   isAuthenticated: boolean;

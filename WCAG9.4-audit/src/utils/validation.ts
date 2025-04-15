@@ -1,165 +1,146 @@
 /**
- * Validation Utility
+ * Data Validation Utility
  * 
- * Provides validation functions using Zod for type checking and validation
- * with proper error handling and reporting.
+ * Provides utilities for validating data using Zod schemas with
+ * standardized error handling and formatting.
  */
 
 import { z } from 'zod';
 import { ErrorType, createError } from './errorHandler';
 
 /**
- * Validates data against a Zod schema
+ * Validate data against a Zod schema
  * 
  * @param schema Zod schema to validate against
  * @param data Data to validate
- * @returns Validated data with proper typing
- * @throws Error if validation fails
+ * @param errorMessage Custom error message
+ * @returns Validated data
  */
-export function validateData<T extends z.ZodType>(
-  schema: T,
-  data: unknown
-): z.infer<T> {
+export function validateData<T>(
+  schema: z.ZodType<T>,
+  data: unknown,
+  errorMessage: string = 'Invalid data format'
+): T {
   try {
     return schema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      // Format validation errors in a user-friendly and secure way
-      const formattedErrors = error.errors.map(err => ({
-        path: err.path.join('.'),
-        message: err.message
-      }));
-      
       throw createError(
         ErrorType.VALIDATION,
-        'validation_error',
-        'Data validation failed',
-        { validationErrors: formattedErrors }
+        'data_validation_failed',
+        errorMessage,
+        {
+          validationErrors: error.errors.map(err => ({
+            path: err.path.join('.'),
+            message: err.message
+          }))
+        },
+        error
       );
     }
     
-    // Re-throw any other errors
-    throw error;
+    throw createError(
+      ErrorType.VALIDATION,
+      'data_validation_error',
+      errorMessage,
+      {},
+      error
+    );
   }
 }
 
 /**
- * Safely attempts to validate data without throwing an error
+ * Safely validate data against a Zod schema
+ * Returns null instead of throwing errors
  * 
  * @param schema Zod schema to validate against
  * @param data Data to validate
- * @returns Object with validation result
+ * @returns Validated data or null if invalid
  */
-export function safeValidate<T extends z.ZodType>(
-  schema: T,
+export function safeValidateData<T>(
+  schema: z.ZodType<T>,
   data: unknown
-): { 
-  success: boolean; 
-  data?: z.infer<T>; 
-  error?: { 
-    code: string; 
-    message: string; 
-    details: unknown 
-  } 
-} {
+): T | null {
   try {
-    const validatedData = schema.parse(data);
-    return { success: true, data: validatedData };
+    return schema.parse(data);
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const formattedErrors = error.errors.map(err => ({
-        path: err.path.join('.'),
-        message: err.message
-      }));
-      
-      return {
-        success: false,
-        error: {
-          code: 'validation_error',
-          message: 'Data validation failed',
-          details: { validationErrors: formattedErrors }
-        }
-      };
-    }
-    
-    // Handle any other errors
-    return {
-      success: false,
-      error: {
-        code: 'unknown_validation_error',
-        message: 'An unexpected error occurred during validation',
-        details: { originalError: String(error) }
-      }
-    };
+    return null;
   }
 }
 
 /**
- * Common validation schemas
+ * Format Zod validation errors into user-friendly messages
+ * 
+ * @param error Zod error
+ * @returns User-friendly error messages
  */
-export const commonSchemas = {
-  // Authentication
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+export function formatZodError(error: z.ZodError): string[] {
+  return error.errors.map(err => {
+    const path = err.path.join('.');
+    return path ? `${path}: ${err.message}` : err.message;
+  });
+}
+
+// Common validation schemas
+export const schemas = {
+  // User schemas
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(12, 'Password must be at least 12 characters long'),
+  name: z.string().min(2, 'Name must be at least 2 characters long'),
+  id: z.string().uuid('Invalid ID format'),
   
-  // IDs and tokens
-  uuid: z.string().uuid('Invalid ID format'),
-  token: z.string().min(10, 'Invalid token'),
-  
-  // Common data types
-  positiveNumber: z.number().positive('Value must be positive'),
-  nonEmptyString: z.string().min(1, 'This field cannot be empty'),
-  url: z.string().url('Please enter a valid URL'),
-  
-  // Date validation
-  isoDate: z.string().refine(
-    (value) => !isNaN(Date.parse(value)),
+  // Common schemas
+  url: z.string().url('Invalid URL'),
+  date: z.string().refine(
+    (val) => !isNaN(Date.parse(val)),
     { message: 'Invalid date format' }
   ),
+  phoneNumber: z.string().regex(
+    /^\+?[1-9]\d{1,14}$/,
+    'Invalid phone number format. Please use international format.'
+  ),
   
-  // Object with data and metadata
-  dataWithMetadata: <T extends z.ZodTypeAny>(dataSchema: T) => 
-    z.object({
-      data: dataSchema,
-      metadata: z.record(z.string()).optional()
-    })
+  // Security-related schemas
+  csrfToken: z.string().min(32, 'Invalid CSRF token'),
+  jwt: z.string().regex(
+    /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*$/,
+    'Invalid JWT format'
+  )
 };
 
-/**
- * Sanitizes data based on allowed schema fields
- * Removes any fields not defined in the schema
- * 
- * @param schema Schema defining allowed fields
- * @param data Data to sanitize
- * @returns Sanitized data with only allowed fields
- */
-export function sanitizeData<T extends z.ZodType>(
-  schema: T,
-  data: Record<string, unknown>
-): Record<string, unknown> {
-  // Get schema shape (only works with object schemas)
-  if (!(schema instanceof z.ZodObject)) {
-    throw createError(
-      ErrorType.VALIDATION,
-      'invalid_schema',
-      'Schema must be a ZodObject for sanitization'
-    );
-  }
-  
-  const shape = schema.shape;
-  const allowedKeys = Object.keys(shape);
-  
-  // Filter data to only include allowed keys
-  const sanitized = Object.fromEntries(
-    Object.entries(data).filter(([key]) => allowedKeys.includes(key))
-  );
-  
-  return sanitized;
+// Common schema builders
+export function createUserSchema() {
+  return z.object({
+    id: schemas.id,
+    name: schemas.name,
+    email: schemas.email,
+    role: z.enum(['user', 'admin']),
+    organization: z.string().min(1, 'Organization name is required')
+  });
+}
+
+export function createLoginSchema() {
+  return z.object({
+    email: schemas.email,
+    password: schemas.password
+  });
+}
+
+export function createRegistrationSchema() {
+  return z.object({
+    name: schemas.name,
+    email: schemas.email,
+    password: schemas.password,
+    organization: z.string().min(1, 'Organization name is required')
+  });
 }
 
 export default {
   validateData,
-  safeValidate,
-  commonSchemas,
-  sanitizeData
+  safeValidateData,
+  formatZodError,
+  schemas,
+  createUserSchema,
+  createLoginSchema,
+  createRegistrationSchema
 };
