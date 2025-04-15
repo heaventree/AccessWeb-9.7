@@ -10,6 +10,7 @@ import { initCSP, updateCSPNonce, validateCSP } from '../utils/contentSecurity';
 import { setupRateLimiting } from '../utils/rateLimiting';
 import { initCsrfProtection, generateCsrfToken, validateCsrfToken } from '../utils/csrfProtection';
 import { configureSanitizerDefaults } from '../utils/sanitization';
+import { setupSecureStorage } from '../utils/secureStorage';
 import { loadEnvVariables } from '../utils/environment';
 
 // Security provider props
@@ -42,6 +43,9 @@ export function SecurityProvider({ children }: SecurityProviderProps): JSX.Eleme
     
     // Setup rate limiting
     setupRateLimiting();
+    
+    // Initialize secure storage
+    setupSecureStorage();
     
     // Update CSP nonce on each render for enhanced security
     updateCSPNonce();
