@@ -7,14 +7,42 @@ import {
   RegistrationResponse, 
   UserRole 
 } from '../types/auth';
-import { IS_DEVELOPMENT_MODE } from './environment';
+import { IS_DEVELOPMENT_MODE, requireEnvVariable } from './environment';
 
 // JWT configuration
 const TOKEN_EXPIRY_HOURS = 24;
-// In production, this should be an environment variable loaded securely
-const JWT_SECRET = 'wcag-audit-tool-secret-key-change-in-production';
+
+// Load JWT secret from environment variables
+const JWT_SECRET = requireEnvVariable('JWT_SECRET', 'dev-only-wcag-audit-tool-secret-key-for-testing');
+
 // Secret key in Uint8Array format for jose
 const SECRET_KEY = new TextEncoder().encode(JWT_SECRET);
+
+// For key rotation, store current and previous keys
+interface JWTKey {
+  id: string;
+  key: Uint8Array;
+  createdAt: Date;
+}
+
+// Initialize JWT keys array with current key
+const JWT_KEYS: JWTKey[] = [
+  {
+    id: 'current',
+    key: SECRET_KEY,
+    createdAt: new Date()
+  }
+];
+
+// If previous key exists, add it for verification of existing tokens
+const PREVIOUS_JWT_SECRET = process.env.PREVIOUS_JWT_SECRET;
+if (PREVIOUS_JWT_SECRET) {
+  JWT_KEYS.push({
+    id: 'previous',
+    key: new TextEncoder().encode(PREVIOUS_JWT_SECRET),
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 days ago
+  });
+}
 
 /**
  * Generate a secure JWT token for the user using jose (browser-compatible)
@@ -55,13 +83,54 @@ export const validateToken = async (
   token: string
 ): Promise<{ id: string; email: string; role: UserRole; name?: string; organization?: string } | null> => {
   try {
-    // Verify the token - this checks signature, expiry, etc.
-    const { payload } = await jose.jwtVerify(token, SECRET_KEY, {
-      issuer: 'wcag-audit-tool',
-      audience: 'wcag-audit-users'
-    });
+    // Add token format validation before verification
+    if (!token || typeof token !== 'string' || !token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/)) {
+      console.warn('Invalid token format');
+      return null;
+    }
     
-    // If verification passes, return the user data
+    // Try each key until one works or all fail
+    let payload: any = null;
+    let keyId: string = '';
+    
+    for (const jwKey of JWT_KEYS) {
+      try {
+        const result = await jose.jwtVerify(token, jwKey.key, {
+          issuer: 'wcag-audit-tool',
+          audience: 'wcag-audit-users',
+          clockTolerance: 30 // 30 seconds tolerance for clock skew
+        });
+        
+        payload = result.payload;
+        keyId = jwKey.id;
+        break;
+      } catch (e) {
+        // Try next key
+        continue;
+      }
+    }
+    
+    if (!payload) {
+      console.log('Token validation failed with all keys');
+      return null;
+    }
+    
+    // Add additional validation checks
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (!payload.exp || payload.exp < currentTime) {
+      console.warn('Token expired');
+      return null;
+    }
+    
+    if (!payload.sub || typeof payload.sub !== 'string') {
+      console.warn('Token missing subject (user ID)');
+      return null;
+    }
+    
+    // If token was signed with previous key, we should generate a new token
+    // with the current key (implemented in the auth context)
+    
+    // Return user data
     return {
       id: payload.sub as string,  // Subject contains user ID
       email: payload.email as string,
