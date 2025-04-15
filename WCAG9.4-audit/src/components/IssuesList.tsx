@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState } from 'react';
 import { 
   ChevronDown, 
   ChevronUp, 
@@ -32,9 +32,6 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
   const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
   const [selectedIssue, setSelectedIssue] = useState<AccessibilityIssue | null>(null);
   const [modalView, setModalView] = useState<ModalView>(null);
-  
-  // Reference to the modal trigger button for focus management
-  const modalTriggerRef = useRef<HTMLButtonElement>(null);
   
   // For live region announcements
   const [ariaLiveText, setAriaLiveText] = useState<string>('');
