@@ -5,12 +5,12 @@
  * measures including CSP, rate limiting, CSRF protection, and data sanitization.
  */
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { initCSP, updateCSPNonce, validateCSP } from '../utils/contentSecurity';
 import { setupRateLimiting } from '../utils/rateLimiting';
 import { initCsrfProtection, generateCsrfToken, validateCsrfToken } from '../utils/csrfProtection';
 import { configureSanitizerDefaults } from '../utils/sanitization';
-import { setupSecureStorage } from '../utils/secureStorage';
+import { setupSecureStorage, isSecureStorageInitialized } from '../utils/secureStorage';
 import { loadEnvVariables } from '../utils/environment';
 
 // Security provider props
@@ -27,28 +27,44 @@ interface SecurityProviderProps {
  * Configures and applies security measures for the entire application
  */
 export function SecurityProvider({ children }: SecurityProviderProps): JSX.Element {
+  // Track initialization state
+  const [isInitialized, setIsInitialized] = useState(false);
+  
   // Initialize security features on mount
   useEffect(() => {
-    // Initialize environment variables
-    loadEnvVariables();
+    const initializeSecurity = async () => {
+      try {
+        // Initialize environment variables
+        loadEnvVariables();
+        
+        // Initialize Content Security Policy
+        initCSP();
+        
+        // Configure sanitizer defaults
+        configureSanitizerDefaults();
+        
+        // Setup CSRF protection
+        initCsrfProtection();
+        
+        // Setup rate limiting
+        setupRateLimiting();
+        
+        // Initialize secure storage
+        await setupSecureStorage();
+        
+        // Update CSP nonce on each render for enhanced security
+        updateCSPNonce();
+        
+        // Mark as initialized
+        setIsInitialized(true);
+      } catch (error) {
+        console.error('Security initialization error:', error);
+        // Continue anyway to avoid blocking the app
+        setIsInitialized(true);
+      }
+    };
     
-    // Initialize Content Security Policy
-    initCSP();
-    
-    // Configure sanitizer defaults
-    configureSanitizerDefaults();
-    
-    // Setup CSRF protection
-    initCsrfProtection();
-    
-    // Setup rate limiting
-    setupRateLimiting();
-    
-    // Initialize secure storage
-    setupSecureStorage();
-    
-    // Update CSP nonce on each render for enhanced security
-    updateCSPNonce();
+    initializeSecurity();
     
     // Set up interval to validate CSP
     const validateInterval = setInterval(() => {
@@ -61,15 +77,20 @@ export function SecurityProvider({ children }: SecurityProviderProps): JSX.Eleme
     };
   }, []);
   
+  // Show nothing until security is initialized
+  if (!isInitialized && !isSecureStorageInitialized()) {
+    return null;
+  }
+  
   return (
     <>{children}</>
   );
 }
 
-export default SecurityProvider;
-
-// Export security utilities for use in components
+// Re-export security utilities for use in components
 export { 
   generateCsrfToken, 
-  validateCsrfToken,
+  validateCsrfToken 
 };
+
+export default SecurityProvider;

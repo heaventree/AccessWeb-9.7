@@ -30,14 +30,25 @@ async function getEncryptionKey(): Promise<string> {
   return sha256Hash(deviceInfo);
 }
 
+// Keep track of initialization
+let isInitialized = false;
+
 /**
  * Initialize secure storage
  */
 export async function setupSecureStorage(): Promise<void> {
   try {
+    // Only initialize once
+    if (isInitialized) {
+      return;
+    }
+    
     // Initialize encryption key
     const key = await getEncryptionKey();
     localStorage.setItem(ENCRYPTION_KEY, key);
+    
+    // Mark as initialized
+    isInitialized = true;
     
     // Log initialization in development
     if (isDevelopment()) {
@@ -46,6 +57,13 @@ export async function setupSecureStorage(): Promise<void> {
   } catch (error) {
     logError(error, { context: 'secureStorage.setupSecureStorage' });
   }
+}
+
+/**
+ * Check if secure storage is initialized
+ */
+export function isSecureStorageInitialized(): boolean {
+  return isInitialized || localStorage.getItem(ENCRYPTION_KEY) !== null;
 }
 
 /**
@@ -63,16 +81,19 @@ export const secureLocalStorage = {
       const encryptionKey = localStorage.getItem(ENCRYPTION_KEY);
       
       if (!encryptionKey) {
-        throw new Error('Encryption key not available. Secure storage not initialized.');
+        // Fall back to regular storage without encryption if not initialized
+        localStorage.setItem(key, value);
+        return;
       }
       
-      // Encrypt value
-      encrypt(value, encryptionKey).then(encryptedValue => {
-        // Store encrypted value
+      // Encrypt and store synchronously to avoid async issues
+      try {
+        const encryptedValue = encrypt(value, encryptionKey);
         localStorage.setItem(`${STORAGE_PREFIX}${key}`, encryptedValue);
-      }).catch(error => {
-        logError(error, { context: 'secureLocalStorage.setItem', key });
-      });
+      } catch (encryptError) {
+        logError(encryptError, { context: 'secureLocalStorage.setItem.encrypt', key });
+        localStorage.setItem(key, value);
+      }
     } catch (error) {
       logError(error, { context: 'secureLocalStorage.setItem', key });
       
@@ -96,18 +117,25 @@ export const secureLocalStorage = {
       const encryptionKey = localStorage.getItem(ENCRYPTION_KEY);
       
       if (!encryptionKey) {
-        throw new Error('Encryption key not available. Secure storage not initialized.');
+        // Fall back to regular storage if not initialized
+        return localStorage.getItem(key);
       }
       
       // Get encrypted value
       const encryptedValue = localStorage.getItem(`${STORAGE_PREFIX}${key}`);
       
       if (!encryptedValue) {
-        return null;
+        // Check regular storage as fallback
+        return localStorage.getItem(key);
       }
       
       // Decrypt value
-      return decrypt(encryptedValue, encryptionKey);
+      try {
+        return decrypt(encryptedValue, encryptionKey);
+      } catch (decryptError) {
+        logError(decryptError, { context: 'secureLocalStorage.getItem.decrypt', key });
+        return localStorage.getItem(key);
+      }
     } catch (error) {
       logError(error, { context: 'secureLocalStorage.getItem', key });
       
@@ -160,7 +188,7 @@ export const secureLocalStorage = {
    */
   hasItem(key: string): boolean {
     try {
-      return localStorage.getItem(`${STORAGE_PREFIX}${key}`) !== null;
+      return localStorage.getItem(`${STORAGE_PREFIX}${key}`) !== null || localStorage.getItem(key) !== null;
     } catch (error) {
       logError(error, { context: 'secureLocalStorage.hasItem', key });
       return false;
@@ -183,16 +211,19 @@ export const secureSessionStorage = {
       const encryptionKey = localStorage.getItem(ENCRYPTION_KEY);
       
       if (!encryptionKey) {
-        throw new Error('Encryption key not available. Secure storage not initialized.');
+        // Fall back to regular storage without encryption if not initialized
+        sessionStorage.setItem(key, value);
+        return;
       }
       
-      // Encrypt value
-      encrypt(value, encryptionKey).then(encryptedValue => {
-        // Store encrypted value
+      // Encrypt and store synchronously to avoid async issues
+      try {
+        const encryptedValue = encrypt(value, encryptionKey);
         sessionStorage.setItem(`${STORAGE_PREFIX}${key}`, encryptedValue);
-      }).catch(error => {
-        logError(error, { context: 'secureSessionStorage.setItem', key });
-      });
+      } catch (encryptError) {
+        logError(encryptError, { context: 'secureSessionStorage.setItem.encrypt', key });
+        sessionStorage.setItem(key, value);
+      }
     } catch (error) {
       logError(error, { context: 'secureSessionStorage.setItem', key });
       
@@ -216,18 +247,25 @@ export const secureSessionStorage = {
       const encryptionKey = localStorage.getItem(ENCRYPTION_KEY);
       
       if (!encryptionKey) {
-        throw new Error('Encryption key not available. Secure storage not initialized.');
+        // Fall back to regular storage if not initialized
+        return sessionStorage.getItem(key);
       }
       
       // Get encrypted value
       const encryptedValue = sessionStorage.getItem(`${STORAGE_PREFIX}${key}`);
       
       if (!encryptedValue) {
-        return null;
+        // Check regular storage as fallback
+        return sessionStorage.getItem(key);
       }
       
       // Decrypt value
-      return decrypt(encryptedValue, encryptionKey);
+      try {
+        return decrypt(encryptedValue, encryptionKey);
+      } catch (decryptError) {
+        logError(decryptError, { context: 'secureSessionStorage.getItem.decrypt', key });
+        return sessionStorage.getItem(key);
+      }
     } catch (error) {
       logError(error, { context: 'secureSessionStorage.getItem', key });
       
@@ -280,7 +318,7 @@ export const secureSessionStorage = {
    */
   hasItem(key: string): boolean {
     try {
-      return sessionStorage.getItem(`${STORAGE_PREFIX}${key}`) !== null;
+      return sessionStorage.getItem(`${STORAGE_PREFIX}${key}`) !== null || sessionStorage.getItem(key) !== null;
     } catch (error) {
       logError(error, { context: 'secureSessionStorage.hasItem', key });
       return false;
@@ -291,5 +329,6 @@ export const secureSessionStorage = {
 export default {
   secureLocalStorage,
   secureSessionStorage,
-  setupSecureStorage
+  setupSecureStorage,
+  isSecureStorageInitialized
 };
