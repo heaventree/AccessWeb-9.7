@@ -1,8 +1,8 @@
-# AI Agent Guidelines for Payymo Project
+# AI Agent Guidelines for WCAG Accessibility Audit Tool
 
 __Core Principle:__ This document, along with related files (PLANNING.md, TASK.md/project.index.json), forms the essential "operating system" for AI agent collaboration. Its primary purpose is to maintain agent focus, ensure task alignment, prevent deviation or destructive errors, and provide clear recovery paths if an agent does go off track due to context limitations. __Strict adherence to these processes is mandatory for successful AI-assisted development.__
 
-This document provides specific guidelines for AI agents working on the Payymo project, focusing on task management, non-destructive updates, and project organization.
+This document provides specific guidelines for AI agents working on the WCAG Accessibility Audit Tool, focusing on task management, non-destructive updates, project organization, and most importantly, maintaining accessibility standards throughout all development work.
 
 ## Core Principles
 
@@ -139,70 +139,86 @@ If an agent deviates, deletes work, or modifies code incorrectly:
 
 ## Project-Specific Guidelines
 
-For the Payymo project specifically:
+For the WCAG Accessibility Audit Tool specifically:
 
-1. **Financial Data Handling**:
-   - Treat all transaction data as sensitive information
-   - Follow security best practices for financial applications
-   - Validate all monetary calculations thoroughly
+1. **Accessibility Standards Compliance**:
+   - All components must be WCAG 2.2 AA+ compliant
+   - Component testing must include keyboard navigation verification
+   - Color contrast must meet minimum ratios (4.5:1 for normal text, 3:1 for large text)
+   - Focus states must be clearly visible and keyboard navigable
 
 2. **API Integrations**:
-   - Use service classes for external API interactions
-   - Follow OAuth best practices for authentication
-   - Implement proper error handling for API failures
+   - Use service classes for external API interactions (WordPress, document scanners)
+   - Implement proper error handling with accessible error messages
+   - Ensure API requests/responses include appropriate loading states
+   - Maintain security best practices for authentication and data handling
 
-3. **Multi-Tenant Architecture**:
-   - Maintain strict data isolation between tenants
-   - Always filter queries by tenant ID
-   - Never expose data from one tenant to another
+3. **Content and Documentation**:
+   - Ensure all articles maintain consistent formatting standards
+   - Follow structured semantics (proper heading levels, lists, tables)
+   - Include alt text for all informational images and diagrams
+   - Use clear, plain language where possible for maximum readability
 
-4. **Dashboard Development**:
-   - Follow the NobleUI design patterns
-   - Ensure performance optimization for data-heavy views
-   - Implement responsive design for all UI components
+4. **User Interface Development**:
+   - Follow Tailwind CSS coding standards and utility-first approach
+   - Ensure all UI components use proper ARIA attributes
+   - Maintain accessible focus order and tab index
+   - Implement responsive design for all screen sizes
+   - Use semantic HTML elements whenever possible
+
+5. **Testing and Validation**:
+   - Verify keyboard accessibility of all interactive elements
+   - Test screen reader compatibility of complex interfaces
+   - Validate color contrast ratios on all text and interface elements
+   - Ensure all media includes appropriate alternative content
 
 ## Prompt Templates
 
-When working with the Payymo project, use these prompt templates for consistent results:
+When working with the WCAG Accessibility Audit Tool, use these prompt templates for consistent results:
 
 ### Task Implementation Prompt
 
 ```
-Role: Payymo Developer
-Task: PM-XXX
+Role: WCAG Accessibility Developer
+Task: WCAG-XXX
 Objective: [Brief description of the task]
 Context: [Reference to relevant files, documentation, or issues]
 Requirements:
 - [Specific requirement 1]
 - [Specific requirement 2]
+Accessibility Considerations:
+- [Relevant WCAG guidelines]
+- [Specific accessibility requirements]
 Expected Output: [Description of the expected result]
 ```
 
 ### Issue Resolution Prompt
 
 ```
-Role: Payymo Troubleshooter
+Role: Accessibility Troubleshooter
 Issue: ISSUE-XXX
 Description: [Brief description of the issue]
 Error Context: [Error messages, logs, or symptoms]
 Affected Files: [List of relevant files]
+Accessibility Impact: [How this issue impacts accessibility]
 Previous Attempts: [Any previous attempts to fix]
-Required: Propose a solution that is minimally invasive and focused on the specific issue.
+Required: Propose a solution that is minimally invasive and maintains compliance with WCAG 2.2 standards.
 ```
 
 ### Code Review Prompt
 
 ```
-Role: Payymo Code Reviewer
+Role: WCAG Compliance Reviewer
 Files to Review: [List of changed files]
 Implementation Details: [Brief description of the changes]
 Checklist:
 - Does the code follow project standards?
-- Is error handling implemented properly?
-- Are there any potential performance issues?
+- Is error handling implemented properly with accessible messages?
+- Are there any accessibility compliance issues?
+- Are all interactive elements keyboard accessible?
 - Is the code sufficiently documented?
-- Does the code maintain multi-tenant isolation?
-- Are there any security concerns?
+- Are proper ARIA attributes used?
+- Does the implementation meet WCAG 2.2 AA+ standards?
 ```
 
 ## Advanced Agent Protocols

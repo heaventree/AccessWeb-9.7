@@ -1,6 +1,6 @@
-# Payymo Project Documentation Master Index
+# WCAG Accessibility Audit Tool - Documentation Master Index
 
-This document serves as the central navigation point for all Payymo project documentation, organized by category for easy reference.
+This document serves as the central navigation point for all WCAG Accessibility Audit Tool documentation, organized by category for easy reference.
 
 ## Project Management
 
@@ -11,72 +11,69 @@ This document serves as the central navigation point for all Payymo project docu
 - [ISSUES.md](./ISSUES.md) - Known issues, bugs, and their resolution status
 - [CHANGELOG.md](./CHANGELOG.md) - History of changes to the project
 - [AI_AGENT_GUIDELINES.md](./AI_AGENT_GUIDELINES.md) - Guidelines for AI agents working on the project
-- [STRUCTURE.md](./STRUCTURE.md) - Documentation structure and organization
 - [CONSOLIDATION_PLAN.md](./CONSOLIDATION_PLAN.md) - Plan for consolidating documentation
 - [project.index.json](./project.index.json) - Machine-readable project structure
 
 ## Technical Documentation
 
-### Architecture
+### Architecture & System Design
 
-- [technical/architecture/MULTI_TENANT_ARCHITECTURE.md](./technical/architecture/MULTI_TENANT_ARCHITECTURE.md) - Multi-tenant architecture design
+- [technical/architecture/system_architecture.md](./technical/architecture/system_architecture.md) - Overall system architecture
+- [technical/architecture/frontend_architecture.md](./technical/architecture/frontend_architecture.md) - React + TypeScript frontend design
+- [technical/architecture/component_structure.md](./technical/architecture/component_structure.md) - Component organization and hierarchy
 
 ### Development Guidelines
 
-- [technical/master_development_guide.md](./technical/master_development_guide.md) - Comprehensive development guidelines
-- [technical/super_prompt_template.md](./technical/super_prompt_template.md) - Templates for AI-assisted development
+- [technical/guides/development_workflow.md](./technical/guides/development_workflow.md) - Development process and standards
+- [technical/guides/accessibility_standards.md](./technical/guides/accessibility_standards.md) - WCAG compliance implementation guide
+- [technical/guides/ui_component_system.md](./technical/guides/ui_component_system.md) - UI component design patterns
 
 ### Best Practices
 
-- [technical/best_practices/ERROR_HANDLING.md](./technical/best_practices/ERROR_HANDLING.md) - Error handling and debugging standards
-- [technical/best_practices/API_INTEGRATION_GUIDELINES.md](./technical/best_practices/API_INTEGRATION_GUIDELINES.md) - API integration best practices
+- [technical/best_practices/error_handling.md](./technical/best_practices/error_handling.md) - Error handling and debugging standards
+- [technical/best_practices/accessibility_testing.md](./technical/best_practices/accessibility_testing.md) - Testing for accessibility compliance
+- [technical/best_practices/code_quality.md](./technical/best_practices/code_quality.md) - Code quality and review standards
 
 ### Security
 
-- [technical/security/SECURITY_GUIDELINES.md](./technical/security/SECURITY_GUIDELINES.md) - Security standards and best practices
+- [technical/security/security_guidelines.md](./technical/security/security_guidelines.md) - Security standards and best practices
+- [technical/security/data_protection.md](./technical/security/data_protection.md) - User data protection measures
 
 ### API Documentation
 
-- [technical/api_reference.md](./technical/api_reference.md) - API documentation
-- [technical/api_troubleshooting_guide.md](./technical/api_troubleshooting_guide.md) - Troubleshooting API issues
+- [technical/apis/api_reference.md](./technical/apis/api_reference.md) - API documentation
+- [technical/apis/api_troubleshooting.md](./technical/apis/api_troubleshooting.md) - Troubleshooting API issues
 
-### Integration Documentation
+### Integrations
 
-- [technical/gocardless_webhooks.md](./technical/gocardless_webhooks.md) - GoCardless webhook implementation
-- [technical/testing_with_gocardless_cli.md](./technical/testing_with_gocardless_cli.md) - Using GoCardless CLI for testing
+- [technical/integrations/wordpress_integration.md](./technical/integrations/wordpress_integration.md) - WordPress integration implementation
+- [technical/integrations/document_scanners.md](./technical/integrations/document_scanners.md) - PDF and document scanning integration
 
-### User Documentation
+### Feature Specifications
 
-- [technical/usage_guide.md](./technical/usage_guide.md) - User guide for the application
-- [technical/troubleshooting.md](./technical/troubleshooting.md) - User-facing troubleshooting guide
+- [technical/specifications/animated_walkthrough.md](./technical/specifications/animated_walkthrough.md) - WCAG animated walkthrough feature
+- [technical/specifications/content_organization.md](./technical/specifications/content_organization.md) - Content organization system
 
-### System Documentation
+## Project Updates
 
-- [technical/safety_and_backup_systems.md](./technical/safety_and_backup_systems.md) - Backup and recovery procedures
-- [technical/environment_setup.md](./technical/environment_setup.md) - Environment variables and setup guide
+### Milestone Reports
 
-### Test Data
+- [updates/milestones/wordpress_integration_completion.md](./updates/milestones/wordpress_integration_completion.md) - WordPress integration milestone
+- [updates/milestones/wcag94_completion_report.md](./updates/milestones/wcag94_completion_report.md) - WCAG 9.4 completion status
 
-- [technical/test-transactions.json](./technical/test-transactions.json) - Sample transaction data for testing
-- [technical/test-webhook.json](./technical/test-webhook.json) - Sample webhook data for testing
+### Handover Documentation
 
-## Updated Guidelines (April 10, 2025)
-
-- [AA - FINAL MD APRIL 10/MASTER INDEX (Updated).md](../AA%20-%20FINAL%20MD%20APRIL%2010/MASTER%20INDEX%20(Updated).md) - Updated master index
-- [AA - FINAL MD APRIL 10/15 Project Management & Documentation (Final Enhancements).md](../AA%20-%20FINAL%20MD%20APRIL%2010/15%20Project%20Management%20%26%20Documentation%20(Final%20Enhancements).md) - Enhanced project management guidelines
-- [AA - FINAL MD APRIL 10/AI Agent Guidelines (Updated).md](../AA%20-%20FINAL%20MD%20APRIL%2010/AI%20Agent%20Guidelines%20(Updated).md) - Updated AI agent guidelines
-- [AA - FINAL MD APRIL 10/CORE CODING STANDARDS (User Revision).md](../AA%20-%20FINAL%20MD%20APRIL%2010/CORE%20CODING%20STANDARDS%20(User%20Revision).md) - Updated coding standards
+- [updates/handovers/feedback_implementation.md](./updates/handovers/feedback_implementation.md) - Feedback system implementation guide
+- [updates/handovers/section_identifiers.md](./updates/handovers/section_identifiers.md) - Section identifiers implementation guide
 
 ## Structure of Documentation
 
 The documentation is organized in a hierarchical structure:
 
-1. **Project Management** - Files in the `project_management` directory for tracking tasks, issues, and project progress
-2. **Development Guidelines** - Technical standards and practices for developers
-3. **Integration Documentation** - Details on external API integrations
-4. **User Documentation** - Guides for end users of the application
-5. **System Documentation** - Information on system operations and maintenance
-6. **Updated Guidelines** - Latest revisions to project standards (April 10, 2025)
+1. **Project Management** - Core files in the root `project_management` directory for tracking tasks, issues, and project progress
+2. **Technical Documentation** - Technical specifications and development guidelines in the `technical` directory
+3. **Project Updates** - Milestone reports and handover documentation in the `updates` directory
+4. **Archives** - Historical documentation preserved in the `archive` directory
 
 ## Documentation Conventions
 
@@ -88,7 +85,7 @@ All documentation follows these conventions:
 4. **Links** - Use relative paths for internal links to other documentation files
 5. **Tables** - Use Markdown tables for structured data
 6. **Code Blocks** - Use triple backticks with language specifier for code examples
-7. **Task IDs** - Prefix with PM- for project management tasks
+7. **Task IDs** - Prefix with WCAG- for project management tasks
 8. **Issue IDs** - Prefix with ISSUE- for bug tracking
 
 ## How to Update Documentation
@@ -100,3 +97,13 @@ When adding or updating documentation:
 3. Update this master index if adding new files
 4. Verify all links are working
 5. Follow the formatting and naming conventions
+
+## Accessibility Standards
+
+As an accessibility tool, our documentation adheres to these standards:
+
+1. **Alt Text** - All images include descriptive alt text
+2. **Heading Structure** - Proper heading hierarchy for screen reader navigation
+3. **Link Text** - Descriptive link text instead of "click here" or URLs
+4. **Color Contrast** - References to color are accompanied by visual indicators
+5. **Tables** - Tables include proper headers and row/column relationships
