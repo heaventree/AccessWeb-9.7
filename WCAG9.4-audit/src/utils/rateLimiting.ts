@@ -1,214 +1,208 @@
 /**
  * Rate Limiting Utility
  * 
- * Provides client-side rate limiting to prevent brute force attacks and API abuse.
- * Implements token bucket algorithm for flexible rate limiting.
+ * Provides client-side rate limiting to prevent abuse and API flooding.
+ * Tracks request rates and applies throttling when necessary.
  */
 
-import { authStorage } from './secureStorage';
 import { ErrorType, createError } from './errorHandler';
 
-export interface RateLimitConfig {
-  maxTokens: number;        // Maximum number of tokens in the bucket
-  refillRate: number;       // Rate at which tokens are refilled (tokens per second)
-  refillInterval: number;   // Interval in ms at which tokens are added back
-  storageKey: string;       // Key used to store rate limit info in secure storage
+interface RateLimitEntry {
+  count: number;
+  resetAt: number;
+  blocked: boolean;
+  lastRequest: number;
 }
 
-export interface RateLimitInfo {
-  tokens: number;           // Current number of tokens in the bucket
-  lastRefill: number;       // Timestamp of the last token refill
+interface RateLimitOptions {
+  // Maximum requests per time window
+  maxRequests: number;
+  
+  // Time window in milliseconds
+  windowMs: number;
+  
+  // Minimum time between requests in milliseconds
+  minInterval?: number;
+  
+  // How long to block if rate limit is exceeded (ms)
+  blockDuration?: number;
+}
+
+// Default limits (can be overridden on a per-endpoint basis)
+const DEFAULT_LIMITS: RateLimitOptions = {
+  maxRequests: 60, // 60 requests
+  windowMs: 60 * 1000, // per minute
+  minInterval: 50, // minimum 50ms between requests
+  blockDuration: 30 * 1000 // block for 30 seconds if exceeded
+};
+
+// Store for rate limit tracking (endpoint -> rate limit data)
+const rateLimitStore = new Map<string, RateLimitEntry>();
+
+// Custom rate limits for specific endpoints
+const endpointLimits = new Map<string, RateLimitOptions>([
+  // More restrictive limits for authentication endpoints
+  ['POST:auth/login', { maxRequests: 5, windowMs: 60 * 1000, minInterval: 1000, blockDuration: 2 * 60 * 1000 }],
+  ['POST:auth/register', { maxRequests: 3, windowMs: 60 * 1000, minInterval: 1000, blockDuration: 5 * 60 * 1000 }],
+  ['POST:auth/reset-password', { maxRequests: 3, windowMs: 60 * 1000, minInterval: 1000, blockDuration: 5 * 60 * 1000 }],
+  
+  // More restrictive for sensitive operations
+  ['*:user/*', { maxRequests: 30, windowMs: 60 * 1000, minInterval: 100, blockDuration: 60 * 1000 }],
+  ['*:payment/*', { maxRequests: 10, windowMs: 60 * 1000, minInterval: 500, blockDuration: 60 * 1000 }],
+  
+  // Default for API endpoints
+  ['*:api/*', { maxRequests: 60, windowMs: 60 * 1000, minInterval: 50, blockDuration: 30 * 1000 }]
+]);
+
+/**
+ * Find the most specific rate limit for an endpoint
+ * @param endpoint API endpoint
+ * @returns Rate limit options
+ */
+function getLimitsForEndpoint(endpoint: string): RateLimitOptions {
+  // Find most specific match
+  let bestMatch: string | null = null;
+  let maxMatchScore = 0;
+  
+  // Method:path format
+  const [method, path] = endpoint.split(':');
+  
+  for (const [pattern, _] of endpointLimits) {
+    const [patternMethod, patternPath] = pattern.split(':');
+    
+    // Skip if method doesn't match and isn't wildcard
+    if (patternMethod !== '*' && patternMethod !== method) {
+      continue;
+    }
+    
+    // Calculate how specific the match is
+    // More segments and non-wildcards = more specific
+    const pathSegments = patternPath.split('/');
+    const endpointSegments = path.split('/');
+    
+    // Skip if pattern has more segments than the endpoint
+    if (pathSegments.length > endpointSegments.length) {
+      continue;
+    }
+    
+    // Check if pattern matches
+    let matches = true;
+    let matchScore = 0;
+    
+    for (let i = 0; i < pathSegments.length; i++) {
+      const patternSeg = pathSegments[i];
+      const endpointSeg = endpointSegments[i];
+      
+      if (patternSeg === '*' || patternSeg === endpointSeg) {
+        matchScore += patternSeg === '*' ? 1 : 2;
+      } else {
+        matches = false;
+        break;
+      }
+    }
+    
+    // If wildcard method, reduce score
+    matchScore += patternMethod === '*' ? 0 : 5;
+    
+    if (matches && matchScore > maxMatchScore) {
+      maxMatchScore = matchScore;
+      bestMatch = pattern;
+    }
+  }
+  
+  return bestMatch ? endpointLimits.get(bestMatch)! : DEFAULT_LIMITS;
 }
 
 /**
- * Rate limiter using token bucket algorithm
+ * Check if a request exceeds rate limits
+ * @param endpoint API endpoint
+ * @throws If rate limit is exceeded
  */
-export class RateLimiter {
-  private config: RateLimitConfig;
+export function rateLimitCheck(endpoint: string): void {
+  const now = Date.now();
   
-  constructor(config: RateLimitConfig) {
-    this.config = {
-      maxTokens: config.maxTokens || 60,
-      refillRate: config.refillRate || 1,
-      refillInterval: config.refillInterval || 1000,
-      storageKey: config.storageKey || 'rate_limit',
+  // Get rate limit options for this endpoint
+  const limits = getLimitsForEndpoint(endpoint);
+  
+  // Get or create rate limit entry
+  let entry = rateLimitStore.get(endpoint);
+  if (!entry) {
+    entry = {
+      count: 0,
+      resetAt: now + limits.windowMs,
+      blocked: false,
+      lastRequest: 0
     };
-    
-    // Initialize rate limit info if not exists
-    this.initRateLimitInfo();
+    rateLimitStore.set(endpoint, entry);
   }
   
-  /**
-   * Initialize rate limit info in storage
-   */
-  private initRateLimitInfo(): void {
-    const storedInfo = authStorage.getItem(this.config.storageKey);
-    
-    if (!storedInfo) {
-      const initialInfo: RateLimitInfo = {
-        tokens: this.config.maxTokens,
-        lastRefill: Date.now(),
-      };
-      
-      authStorage.setItem(this.config.storageKey, JSON.stringify(initialInfo));
-    }
-  }
-  
-  /**
-   * Get current rate limit info
-   */
-  private getRateLimitInfo(): RateLimitInfo {
-    const storedInfo = authStorage.getItem(this.config.storageKey);
-    
-    if (!storedInfo) {
-      // Should never happen since we initialize in constructor, but handle just in case
-      return {
-        tokens: this.config.maxTokens,
-        lastRefill: Date.now(),
-      };
-    }
-    
-    try {
-      return JSON.parse(storedInfo);
-    } catch (error) {
-      // If JSON parsing fails, initialize with defaults
-      const initialInfo: RateLimitInfo = {
-        tokens: this.config.maxTokens,
-        lastRefill: Date.now(),
-      };
-      
-      authStorage.setItem(this.config.storageKey, JSON.stringify(initialInfo));
-      return initialInfo;
-    }
-  }
-  
-  /**
-   * Update rate limit info in storage
-   */
-  private updateRateLimitInfo(info: RateLimitInfo): void {
-    authStorage.setItem(this.config.storageKey, JSON.stringify(info));
-  }
-  
-  /**
-   * Calculate token refill based on elapsed time
-   */
-  private refillTokens(info: RateLimitInfo): RateLimitInfo {
-    const now = Date.now();
-    const elapsed = now - info.lastRefill;
-    
-    if (elapsed < this.config.refillInterval) {
-      // Not enough time has passed to refill tokens
-      return info;
-    }
-    
-    // Calculate how many tokens to add back
-    const intervalsElapsed = Math.floor(elapsed / this.config.refillInterval);
-    const tokensToAdd = intervalsElapsed * this.config.refillRate;
-    
-    // Update tokens count, but don't exceed max
-    const newTokens = Math.min(info.tokens + tokensToAdd, this.config.maxTokens);
-    
-    // Update last refill time based on used intervals
-    const newLastRefill = info.lastRefill + (intervalsElapsed * this.config.refillInterval);
-    
-    return {
-      tokens: newTokens,
-      lastRefill: newLastRefill,
-    };
-  }
-  
-  /**
-   * Consume a token if available, throw error if rate limited
-   * @param cost Number of tokens to consume (default: 1)
-   * @throws Error if rate limited
-   */
-  public consumeToken(cost: number = 1): void {
-    let info = this.getRateLimitInfo();
-    
-    // Refill tokens based on elapsed time
-    info = this.refillTokens(info);
-    
-    // Check if enough tokens are available
-    if (info.tokens < cost) {
-      // Not enough tokens, rate limited
-      const retryAfterMs = this.calculateRetryAfter(info, cost);
+  // Check if currently blocked
+  if (entry.blocked) {
+    if (now < entry.resetAt) {
       throw createError(
-        ErrorType.SECURITY,
-        'rate_limit_exceeded',
-        'Rate limit exceeded. Please try again later.',
-        { 
-          retryAfterMs, 
-          retryAfterSec: Math.ceil(retryAfterMs / 1000) 
-        }
+        ErrorType.RATE_LIMIT,
+        'rate_limit_blocked',
+        `Too many requests. Please try again in ${Math.ceil((entry.resetAt - now) / 1000)} seconds.`,
+        { endpoint, retryAfter: Math.ceil((entry.resetAt - now) / 1000) }
       );
     }
     
-    // Consume tokens
-    info.tokens -= cost;
+    // Unblock if block period has passed
+    entry.blocked = false;
+    entry.count = 0;
+    entry.resetAt = now + limits.windowMs;
+  }
+  
+  // Check if window has expired and reset if needed
+  if (now > entry.resetAt) {
+    entry.count = 0;
+    entry.resetAt = now + limits.windowMs;
+  }
+  
+  // Check minimum interval between requests
+  if (limits.minInterval && entry.lastRequest > 0) {
+    const timeSinceLast = now - entry.lastRequest;
+    if (timeSinceLast < limits.minInterval) {
+      throw createError(
+        ErrorType.RATE_LIMIT,
+        'rate_limit_interval',
+        `Request rate too high. Please slow down.`,
+        { endpoint, retryAfter: Math.ceil((limits.minInterval - timeSinceLast) / 1000) }
+      );
+    }
+  }
+  
+  // Increment count and check against limit
+  entry.count++;
+  entry.lastRequest = now;
+  
+  if (entry.count > limits.maxRequests) {
+    // Set blocked state
+    entry.blocked = true;
+    entry.resetAt = now + (limits.blockDuration || DEFAULT_LIMITS.blockDuration!);
     
-    // Update storage
-    this.updateRateLimitInfo(info);
-  }
-  
-  /**
-   * Calculate when rate limit will be reset
-   * @returns Time in ms until retry is possible
-   */
-  public calculateRetryAfter(info: RateLimitInfo, cost: number): number {
-    const tokensNeeded = cost - info.tokens;
-    const intervalsNeeded = Math.ceil(tokensNeeded / this.config.refillRate);
-    return intervalsNeeded * this.config.refillInterval;
-  }
-  
-  /**
-   * Get remaining tokens
-   * @returns Number of tokens remaining
-   */
-  public getRemainingTokens(): number {
-    let info = this.getRateLimitInfo();
-    info = this.refillTokens(info);
-    this.updateRateLimitInfo(info);
-    return info.tokens;
-  }
-  
-  /**
-   * Reset rate limiter to initial state
-   */
-  public reset(): void {
-    const initialInfo: RateLimitInfo = {
-      tokens: this.config.maxTokens,
-      lastRefill: Date.now(),
-    };
-    
-    this.updateRateLimitInfo(initialInfo);
+    throw createError(
+      ErrorType.RATE_LIMIT,
+      'rate_limit_exceeded',
+      `Rate limit exceeded for ${endpoint}. Please try again later.`,
+      { endpoint, retryAfter: Math.ceil((limits.blockDuration || DEFAULT_LIMITS.blockDuration!) / 1000) }
+    );
   }
 }
 
-// Common rate limiter configurations
-export const rateLimiters = {
-  // For regular API requests (60 requests per minute)
-  api: new RateLimiter({
-    maxTokens: 60,
-    refillRate: 1,
-    refillInterval: 1000,
-    storageKey: 'rate_limit_api'
-  }),
-  
-  // For authentication attempts (5 attempts per minute)
-  auth: new RateLimiter({
-    maxTokens: 5,
-    refillRate: 1,
-    refillInterval: 12000, // 1 token per 12 seconds
-    storageKey: 'rate_limit_auth'
-  }),
-  
-  // For sensitive operations (10 operations per minute)
-  sensitive: new RateLimiter({
-    maxTokens: 10,
-    refillRate: 1,
-    refillInterval: 6000, // 1 token per 6 seconds
-    storageKey: 'rate_limit_sensitive'
-  })
-};
+/**
+ * Reset rate limiting for testing or emergency situations
+ * @param endpoint Optional specific endpoint to reset, otherwise resets all
+ */
+export function resetRateLimits(endpoint?: string): void {
+  if (endpoint) {
+    rateLimitStore.delete(endpoint);
+  } else {
+    rateLimitStore.clear();
+  }
+}
 
-export default rateLimiters;
+export default {
+  rateLimitCheck,
+  resetRateLimits
+};

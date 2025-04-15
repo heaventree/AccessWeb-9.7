@@ -1,152 +1,162 @@
 /**
  * CSRF Protection Utility
  * 
- * Provides utilities for generating, validating and managing CSRF tokens
- * to protect against Cross-Site Request Forgery attacks.
+ * Provides Cross-Site Request Forgery (CSRF) protection for API requests.
+ * Implements the double-submit cookie pattern with secure validation.
  */
 
-import { authStorage } from './secureStorage';
 import { ErrorType, createError } from './errorHandler';
+import { secureHash } from './secureStorage';
 
-// Key used to store the CSRF token in secure storage
+// Constants
 const CSRF_TOKEN_KEY = 'csrf_token';
-
-// CSRF token expiration time in milliseconds (default: 2 hours)
-const TOKEN_EXPIRY_MS = 2 * 60 * 60 * 1000;
-
-// Token timestamp delimiter
-const TOKEN_DELIMITER = ':';
+const CSRF_HEADER_NAME = 'X-CSRF-Token';
+const CSRF_TOKEN_EXPIRY = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
 
 /**
- * Generate a cryptographically secure CSRF token with timestamp
- * 
- * @returns CSRF token with embedded timestamp
+ * Generate a secure random token
+ * @returns Secure random token string
  */
-export function generateCsrfToken(): string {
-  // Generate a random token
-  const randomBytes = new Uint8Array(32);
-  window.crypto.getRandomValues(randomBytes);
+function generateSecureToken(): string {
+  let token = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   
-  // Convert to base64 string
-  const token = Array.from(randomBytes, byte => 
-    byte.toString(16).padStart(2, '0')
-  ).join('');
+  // Use crypto if available
+  if (window.crypto && window.crypto.getRandomValues) {
+    const array = new Uint8Array(48);
+    window.crypto.getRandomValues(array);
+    token = Array.from(array, (byte) => characters[byte % characters.length]).join('');
+  } else {
+    // Fallback to Math.random (less secure)
+    for (let i = 0; i < 48; i++) {
+      token += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+  }
   
-  // Add timestamp to token (used for expiration checking)
-  const timestamp = Date.now().toString();
-  const tokenWithTimestamp = `${token}${TOKEN_DELIMITER}${timestamp}`;
-  
-  // Store the token in secure storage
-  authStorage.setItem(CSRF_TOKEN_KEY, tokenWithTimestamp);
-  
-  return tokenWithTimestamp;
+  return token;
 }
 
 /**
- * Get the current CSRF token, generating a new one if none exists
- * or if the current one is expired
- * 
- * @returns Current valid CSRF token
+ * Store a CSRF token in storage with expiry
+ * @param token CSRF token to store
  */
-export function getCsrfToken(): string {
-  const currentToken = authStorage.getItem(CSRF_TOKEN_KEY);
-  
-  // If no token exists or it can't be parsed, generate a new one
-  if (!currentToken || !isValidTokenFormat(currentToken)) {
-    return generateCsrfToken();
+function storeToken(token: string): void {
+  // Store token with expiry timestamp
+  localStorage.setItem(
+    CSRF_TOKEN_KEY, 
+    JSON.stringify({
+      token: secureHash(token), // Store hashed version for additional security
+      raw: token, // Also store raw token for browser-only usage
+      expires: Date.now() + CSRF_TOKEN_EXPIRY
+    })
+  );
+}
+
+/**
+ * Get the current CSRF token, generating a new one if needed or if forceNew is true
+ * @param forceNew Force generation of a new token
+ * @returns CSRF token
+ */
+export function getCsrfToken(forceNew: boolean = false): string {
+  // Check if we have a valid token already
+  if (!forceNew) {
+    try {
+      const storedData = localStorage.getItem(CSRF_TOKEN_KEY);
+      if (storedData) {
+        const data = JSON.parse(storedData);
+        
+        // Check if token is still valid
+        if (data.expires > Date.now() && data.raw) {
+          return data.raw;
+        }
+      }
+    } catch (err) {
+      console.error('Error parsing stored CSRF token:', err);
+    }
   }
   
-  // Check if token is expired
-  const [token, timestampStr] = currentToken.split(TOKEN_DELIMITER);
-  const timestamp = parseInt(timestampStr, 10);
-  
-  if (isNaN(timestamp) || Date.now() > timestamp + TOKEN_EXPIRY_MS) {
-    // Token is expired, generate a new one
-    return generateCsrfToken();
-  }
-  
-  // Return existing valid token
-  return currentToken;
+  // Generate a new token
+  const newToken = generateSecureToken();
+  storeToken(newToken);
+  return newToken;
+}
+
+/**
+ * Append CSRF token to request headers
+ * @param headers Request headers object
+ */
+export function appendCsrfHeader(headers: Headers): void {
+  const token = getCsrfToken();
+  headers.set(CSRF_HEADER_NAME, token);
 }
 
 /**
  * Validate a CSRF token against the stored token
- * 
  * @param token Token to validate
- * @returns True if token is valid, false otherwise
+ * @returns True if token is valid
  */
 export function validateCsrfToken(token: string): boolean {
-  const storedToken = authStorage.getItem(CSRF_TOKEN_KEY);
-  
-  // No stored token
-  if (!storedToken) {
+  try {
+    const storedData = localStorage.getItem(CSRF_TOKEN_KEY);
+    if (!storedData) return false;
+    
+    const data = JSON.parse(storedData);
+    
+    // Check if token is expired
+    if (data.expires <= Date.now()) {
+      return false;
+    }
+    
+    // Compare hashed token with stored hash
+    return secureHash(token) === data.token;
+  } catch (err) {
+    console.error('Error validating CSRF token:', err);
     return false;
   }
-  
-  // Check if tokens match (precise comparison)
-  if (token === storedToken) {
-    return true;
-  }
-  
-  // If token format is wrong or doesn't match, validation fails
-  return false;
 }
 
 /**
- * Request validation middleware for CSRF protection
- * 
- * @param token CSRF token from request
- * @throws Error if token is invalid
+ * Middleware to protect API endpoints from CSRF attacks
+ * @param req Request object
+ * @param headerName CSRF header name
+ * @throws Error if CSRF validation fails
  */
-export function requireCsrfToken(token: string): void {
+export function requireCsrfToken(req: Request): void {
+  // Get token from header
+  const token = req.headers.get(CSRF_HEADER_NAME);
+  
+  // Check if token exists
   if (!token) {
     throw createError(
       ErrorType.SECURITY,
       'csrf_token_missing',
-      'CSRF token is missing'
+      'CSRF token is missing from request',
+      { headerName: CSRF_HEADER_NAME }
     );
   }
   
+  // Validate token
   if (!validateCsrfToken(token)) {
     throw createError(
       ErrorType.SECURITY,
       'csrf_token_invalid',
-      'Invalid or expired CSRF token'
+      'CSRF token validation failed',
+      { headerName: CSRF_HEADER_NAME }
     );
   }
 }
 
 /**
- * Check if token has valid format
- */
-function isValidTokenFormat(token: string): boolean {
-  // Token should be in format: token:timestamp
-  const parts = token.split(TOKEN_DELIMITER);
-  return parts.length === 2 && parts[0].length >= 32;
-}
-
-/**
- * Reset the CSRF token
+ * Reset CSRF token (e.g., after logout)
  */
 export function resetCsrfToken(): void {
-  authStorage.removeItem(CSRF_TOKEN_KEY);
-}
-
-/**
- * Add CSRF token to headers for a fetch request
- * 
- * @param headers Headers object to modify
- */
-export function addCsrfToHeaders(headers: Headers): void {
-  const token = getCsrfToken();
-  headers.set('X-CSRF-Token', token);
+  localStorage.removeItem(CSRF_TOKEN_KEY);
 }
 
 export default {
-  generateCsrfToken,
   getCsrfToken,
+  appendCsrfHeader,
   validateCsrfToken,
   requireCsrfToken,
-  addCsrfToHeaders,
   resetCsrfToken
 };

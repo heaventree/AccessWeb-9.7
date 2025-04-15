@@ -1,93 +1,109 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+/**
+ * Error Boundary Component
+ * 
+ * Catches JavaScript errors in child component tree and displays fallback UI.
+ * Includes accessibility support and error reporting capabilities.
+ */
+
+import { Component, ErrorInfo, ReactNode } from 'react';
+import { logError } from '../utils/errorHandler';
 import ErrorFallback from './ErrorFallback';
-import { logError, ErrorType, createError } from '../utils/errorHandler';
 
 interface ErrorBoundaryProps {
+  component?: string;
+  fallback?: ReactNode;
   children: ReactNode;
-  fallback?: ReactNode | ((error: Error, resetError: () => void) => ReactNode);
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
-  component?: string; // For tracking which component had the error
 }
 
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
+  errorInfo: ErrorInfo | null;
 }
 
 /**
- * Error Boundary Component
- * 
- * Catches JavaScript errors anywhere in its child component tree,
- * logs those errors, and displays a fallback UI instead of crashing.
- * 
- * This implements best practices for accessibility and error recovery.
+ * ErrorBoundary catches JavaScript errors anywhere in the child component tree,
+ * logs those errors, and displays a fallback UI instead of crashing the whole app.
  */
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
-      error: null
+      error: null,
+      errorInfo: null
     };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    // Update state so the next render will show the fallback UI
-    return { hasError: true, error };
+    // Update state so the next render will show the fallback UI.
+    return {
+      hasError: true,
+      error,
+      errorInfo: null
+    };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Create standardized error
-    const appError = createError(
-      ErrorType.APPLICATION,
-      'component_error',
-      `Error in component: ${this.props.component || 'unknown'}`,
-      { 
-        componentStack: errorInfo.componentStack,
-        component: this.props.component
-      },
-      error
-    );
+    // Log the error to our error reporting service
+    const component = this.props.component || 'unknown';
     
-    // Log the error with our standardized format
-    logError(appError);
+    // Update state with error details
+    this.setState({
+      errorInfo
+    });
     
-    // Call custom error handler if provided
+    // Log the error
+    logError(error, {
+      component,
+      react: true,
+      errorInfo: {
+        componentStack: errorInfo.componentStack
+      }
+    });
+    
+    // Call the optional onError handler
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
   }
 
-  resetError = (): void => {
+  /**
+   * Reset the error state to allow retry
+   */
+  handleRetry = (): void => {
     this.setState({
       hasError: false,
-      error: null
+      error: null,
+      errorInfo: null
     });
   };
 
   render(): ReactNode {
-    if (this.state.hasError && this.state.error) {
-      // If a custom fallback is provided, use it
-      if (this.props.fallback) {
-        if (typeof this.props.fallback === 'function') {
-          return this.props.fallback(this.state.error, this.resetError);
-        }
-        return this.props.fallback;
+    const { hasError, error, errorInfo } = this.state;
+    const { children, fallback, component } = this.props;
+
+    if (hasError) {
+      // Custom fallback provided as a prop
+      if (fallback) {
+        return fallback;
       }
       
-      // Otherwise use the default ErrorFallback component
+      // Default error fallback component with accessibility support
       return (
-        <ErrorFallback 
-          error={this.state.error} 
-          resetError={this.resetError} 
+        <ErrorFallback
+          error={error}
+          errorInfo={errorInfo}
+          componentName={component}
+          onRetry={this.handleRetry}
         />
       );
     }
 
     // When there's no error, render children normally
-    return this.props.children;
+    return children;
   }
 }
 
-export { ErrorBoundary };
 export default ErrorBoundary;

@@ -1,208 +1,163 @@
 /**
- * Content Security Policy (CSP) Utility
+ * Content Security Policy Utility
  * 
- * Provides utilities for working with Content Security Policy, including
- * generating nonces, validating sources, and creating CSP headers.
+ * Implements a robust Content Security Policy (CSP) to protect against
+ * XSS attacks and other code injection vulnerabilities.
  */
 
-import { createError, ErrorType } from './errorHandler';
+// CSP nonce storage
+let currentNonce: string | null = null;
 
 /**
- * Define directive type for Content Security Policy
- */
-export type CspDirective = 
-  | 'default-src' 
-  | 'script-src' 
-  | 'style-src'
-  | 'img-src'
-  | 'font-src'
-  | 'connect-src'
-  | 'frame-src'
-  | 'object-src'
-  | 'base-uri'
-  | 'form-action'
-  | 'frame-ancestors'
-  | 'upgrade-insecure-requests';
-
-/**
- * Default CSP directives
- */
-export const defaultCspDirectives: Record<CspDirective, string[]> = {
-  'default-src': ["'self'"],
-  'script-src': ["'self'", "'strict-dynamic'"],
-  'style-src': ["'self'", "'unsafe-inline'"],
-  'img-src': ["'self'", 'data:', 'https:'],
-  'font-src': ["'self'", 'https:'],
-  'connect-src': ["'self'", 'https:'],
-  'frame-src': ["'none'"],
-  'object-src': ["'none'"],
-  'base-uri': ["'self'"],
-  'form-action': ["'self'"],
-  'frame-ancestors': ["'none'"],
-  'upgrade-insecure-requests': []
-};
-
-/**
- * Generate a cryptographically secure nonce for CSP
+ * Generate a random nonce (number used once) for CSP
+ * @returns Random nonce string
  */
 export function generateNonce(): string {
-  const array = new Uint8Array(16);
-  window.crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-}
-
-/**
- * Validate if a source is allowed by Content Security Policy
- */
-export function validateSource(
-  source: string,
-  directive: CspDirective
-): boolean {
-  // Get allowed sources for the directive
-  const allowedSources = defaultCspDirectives[directive] || [];
+  // Generate a random string with crypto API if available
+  let nonce = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   
-  // Check if the source is specifically allowed
-  if (allowedSources.includes(source)) {
-    return true;
-  }
-  
-  // Check against wildcard patterns (domain*)
-  for (const allowedSource of allowedSources) {
-    if (allowedSource.endsWith('*') && 
-        source.startsWith(allowedSource.slice(0, -1))) {
-      return true;
+  if (window.crypto && window.crypto.getRandomValues) {
+    const array = new Uint8Array(16);
+    window.crypto.getRandomValues(array);
+    nonce = Array.from(array, (byte) => characters[byte % characters.length]).join('');
+  } else {
+    // Fallback (less secure) for older browsers
+    for (let i = 0; i < 16; i++) {
+      nonce += characters.charAt(Math.floor(Math.random() * characters.length));
     }
   }
   
-  // Check if 'self' is allowed and source is same origin
-  if (allowedSources.includes("'self'")) {
-    try {
-      const sourceUrl = new URL(source, window.location.origin);
-      if (sourceUrl.origin === window.location.origin) {
-        return true;
+  // Store for later use
+  currentNonce = nonce;
+  return nonce;
+}
+
+/**
+ * Get the current CSP nonce
+ * @returns Current nonce or null if not set
+ */
+export function getCurrentNonce(): string | null {
+  return currentNonce;
+}
+
+/**
+ * Build a Content Security Policy string
+ * @param config CSP configuration options
+ * @param nonce Optional nonce for script-src
+ * @returns CSP string
+ */
+export function buildCspString(config?: Partial<ContentSecurityPolicyConfig>, nonce?: string): string {
+  // Default CSP directives
+  const defaultConfig: ContentSecurityPolicyConfig = {
+    'default-src': ["'self'"],
+    'script-src': ["'self'", "'strict-dynamic'", `'nonce-${nonce || currentNonce || ''}'`],
+    'style-src': ["'self'", "'unsafe-inline'"],
+    'img-src': ["'self'", 'data:', 'https:'],
+    'font-src': ["'self'", 'https://fonts.gstatic.com'],
+    'connect-src': ["'self'", 'https://api.example.com'],
+    'frame-src': ["'none'"],
+    'object-src': ["'none'"],
+    'base-uri': ["'self'"],
+    'form-action': ["'self'"],
+    'frame-ancestors': ["'none'"],
+    'upgrade-insecure-requests': true,
+    'block-all-mixed-content': true
+  };
+  
+  // Merge with provided config
+  const mergedConfig: ContentSecurityPolicyConfig = { ...defaultConfig };
+  
+  if (config) {
+    Object.entries(config).forEach(([key, value]) => {
+      if (value === null) {
+        // Remove this directive
+        delete (mergedConfig as any)[key];
+      } else {
+        // Update directive
+        (mergedConfig as any)[key] = value;
       }
-    } catch (error) {
-      // Invalid URL, not allowed
-      return false;
-    }
+    });
   }
   
-  return false;
-}
-
-/**
- * Safely load a script with CSP nonce
- */
-export function loadScriptWithNonce(
-  url: string,
-  nonce: string,
-  async = true,
-  defer = true
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    // Validate source
-    if (!validateSource(url, 'script-src')) {
-      reject(
-        createError(
-          ErrorType.SECURITY,
-          'csp_violation',
-          'Script source violates Content Security Policy',
-          { source: url }
-        )
-      );
+  // Build CSP string
+  const directives: string[] = [];
+  
+  Object.entries(mergedConfig).forEach(([key, value]) => {
+    // Handle boolean directives
+    if (typeof value === 'boolean') {
+      if (value) directives.push(key);
       return;
     }
     
-    const script = document.createElement('script');
-    script.src = url;
-    script.nonce = nonce;
-    script.async = async;
-    script.defer = defer;
-    
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error(`Failed to load script: ${url}`));
-    
-    document.head.appendChild(script);
-  });
-}
-
-/**
- * Generate a CSP header value from directives
- */
-export function generateCspHeaderValue(
-  directives = defaultCspDirectives,
-  nonce?: string
-): string {
-  let headerValue = '';
-  
-  Object.entries(directives).forEach(([directive, sources]) => {
-    if (sources.length || directive === 'upgrade-insecure-requests') {
-      headerValue += directive;
-      
-      // Add sources if any (except for upgrade-insecure-requests)
-      if (sources.length) {
-        headerValue += ' ' + sources.join(' ');
-        
-        // Add nonce for script-src and style-src if provided
-        if (nonce && (directive === 'script-src' || directive === 'style-src')) {
-          headerValue += ` 'nonce-${nonce}'`;
-        }
-      }
-      
-      headerValue += '; ';
+    // Handle array directives
+    if (Array.isArray(value) && value.length > 0) {
+      directives.push(`${key} ${value.join(' ')}`);
     }
   });
   
-  return headerValue.trim();
+  return directives.join('; ');
 }
 
 /**
- * Create a Content Security Policy meta tag
+ * Install CSP meta tag in document head
+ * @param config CSP configuration
+ * @param nonce Optional nonce
  */
-export function createCspMetaTag(
-  directives = defaultCspDirectives,
-  nonce?: string
-): HTMLMetaElement {
-  const meta = document.createElement('meta');
-  meta.httpEquiv = 'Content-Security-Policy';
-  meta.content = generateCspHeaderValue(directives, nonce);
-  return meta;
-}
-
-/**
- * Install a Content Security Policy in the document
- */
-export function installCsp(
-  directives = defaultCspDirectives,
-  nonce?: string
-): void {
+export function installCsp(config?: Partial<ContentSecurityPolicyConfig>, nonce?: string): void {
   // Generate nonce if not provided
-  const cspNonce = nonce || generateNonce();
+  const nonceValue = nonce || generateNonce();
+  
+  // Build CSP string
+  const cspString = buildCspString(config, nonceValue);
   
   // Create meta tag
-  const metaTag = createCspMetaTag(directives, cspNonce);
+  const meta = document.createElement('meta');
+  meta.httpEquiv = 'Content-Security-Policy';
+  meta.content = cspString;
   
-  // Add to document head
-  document.head.appendChild(metaTag);
+  // Insert into document head
+  const firstChild = document.head.firstChild;
+  document.head.insertBefore(meta, firstChild);
   
-  // Mark nonce on window for later use
-  (window as any).__CSP_NONCE__ = cspNonce;
+  // Store nonce for later use
+  currentNonce = nonceValue;
 }
 
 /**
- * Get the current CSP nonce if available
+ * Create CSP header object for fetch requests
+ * @param config CSP configuration
+ * @param nonce Optional nonce
+ * @returns Headers object with CSP
  */
-export function getCurrentNonce(): string | null {
-  return (window as any).__CSP_NONCE__ || null;
+export function createCspHeaders(config?: Partial<ContentSecurityPolicyConfig>, nonce?: string): Record<string, string> {
+  return {
+    'Content-Security-Policy': buildCspString(config, nonce || currentNonce || undefined)
+  };
+}
+
+// Type definition for CSP configuration
+interface ContentSecurityPolicyConfig {
+  'default-src': string[];
+  'script-src': string[];
+  'style-src': string[];
+  'img-src': string[];
+  'font-src': string[];
+  'connect-src': string[];
+  'frame-src': string[];
+  'object-src': string[];
+  'base-uri': string[];
+  'form-action': string[];
+  'frame-ancestors': string[];
+  'upgrade-insecure-requests': boolean;
+  'block-all-mixed-content': boolean;
+  [key: string]: string[] | boolean | undefined;
 }
 
 export default {
-  defaultCspDirectives,
   generateNonce,
-  validateSource,
-  loadScriptWithNonce,
-  generateCspHeaderValue,
-  createCspMetaTag,
+  getCurrentNonce,
+  buildCspString,
   installCsp,
-  getCurrentNonce
+  createCspHeaders
 };

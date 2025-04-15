@@ -1,210 +1,150 @@
 /**
  * Data Sanitization Utility
  * 
- * Provides utilities for sanitizing user inputs and outputs to prevent
- * cross-site scripting (XSS) attacks and other injection vulnerabilities.
+ * Provides functions for sanitizing input data to prevent XSS attacks
+ * and other injection vulnerabilities.
  */
 
 import DOMPurify from 'dompurify';
-import { createError, ErrorType } from './errorHandler';
+
+// Configure DOMPurify with strict settings
+const SANITIZE_CONFIG = {
+  ALLOWED_TAGS: [
+    'a', 'b', 'br', 'code', 'div', 'em', 'h1', 'h2', 'h3', 'h4',
+    'h5', 'h6', 'hr', 'i', 'img', 'li', 'ol', 'p', 'pre', 'span', 
+    'strong', 'table', 'tbody', 'td', 'th', 'thead', 'tr', 'ul'
+  ],
+  ALLOWED_ATTR: [
+    'alt', 'class', 'href', 'id', 'src', 'style', 'target', 'title',
+    'aria-label', 'aria-hidden', 'role', 'tabindex'
+  ],
+  ALLOW_DATA_ATTR: false, // Disable data attributes
+  USE_PROFILES: { html: true }, // Use HTML profile
+  FORBID_TAGS: ['script', 'style', 'iframe', 'form', 'input', 'textarea', 'select'],
+  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onmouseout']
+};
+
+// More restrictive config for user-generated content
+const USER_CONTENT_CONFIG = {
+  ALLOWED_TAGS: ['b', 'br', 'em', 'i', 'p', 'strong'],
+  ALLOWED_ATTR: ['class'],
+  ALLOW_DATA_ATTR: false,
+  USE_PROFILES: { html: true },
+  FORBID_TAGS: ['script', 'style', 'iframe', 'form', 'input', 'textarea', 'select'],
+  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onmouseout']
+};
 
 /**
  * Sanitize HTML content to prevent XSS attacks
  * 
  * @param html HTML content to sanitize
- * @param options DOMPurify configuration options
+ * @param isUserContent If true, applies more restrictive sanitization for user-generated content
  * @returns Sanitized HTML
  */
-export function sanitizeHtml(
-  html: string,
-  options: DOMPurify.Config = {}
-): string {
-  // Combine provided options with secure defaults
-  const sanitizeOptions: DOMPurify.Config = {
-    ALLOWED_TAGS: [
-      'a', 'b', 'br', 'code', 'div', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'i', 'li', 'ol', 'p', 'pre', 'span', 'strong', 'table', 'tbody', 'td',
-      'th', 'thead', 'tr', 'ul'
-    ],
-    ALLOWED_ATTR: [
-      'href', 'title', 'class', 'id', 'style', 'target', 'rel'
-    ],
-    ADD_ATTR: ['target'],
-    FORBID_CONTENTS: ['script', 'style', 'iframe', 'form', 'input', 'object', 'embed'],
-    FORBID_TAGS: ['script', 'style', 'iframe', 'form', 'input', 'object', 'embed'],
-    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onmouseout', 'onmousedown', 'onmouseup'],
-    ALLOW_DATA_ATTR: false,
-    USE_PROFILES: { html: true },
-    RETURN_DOM: false,
-    RETURN_DOM_FRAGMENT: false,
-    RETURN_DOM_IMPORT: false,
-    RETURN_TRUSTED_TYPE: false,
-    ...options
-  };
-  
-  try {
-    // Sanitize the HTML content and ensure it returns a string
-    const result = DOMPurify.sanitize(html, sanitizeOptions);
-    return typeof result === 'string' ? result : '';
-  } catch (error) {
-    throw createError(
-      ErrorType.SECURITY,
-      'sanitization_error',
-      'Failed to sanitize HTML content',
-      { error: String(error) }
-    );
-  }
+export function sanitizeHtml(html: string, isUserContent: boolean = false): string {
+  const config = isUserContent ? USER_CONTENT_CONFIG : SANITIZE_CONFIG;
+  return DOMPurify.sanitize(html, config);
 }
 
 /**
- * Sanitize a URL to prevent javascript: and data: URLs
+ * Sanitize text content by escaping HTML entities
+ * Use for plain text that should not contain any HTML
+ * 
+ * @param text Text to sanitize
+ * @returns Text with HTML entities escaped
+ */
+export function sanitizeText(text: string): string {
+  const el = document.createElement('div');
+  el.textContent = text;
+  return el.innerHTML;
+}
+
+/**
+ * Sanitize a URL to prevent javascript: protocol attacks
  * 
  * @param url URL to sanitize
- * @returns Sanitized URL or # if the URL is invalid
+ * @returns Sanitized URL
  */
 export function sanitizeUrl(url: string): string {
-  if (!url) return '#';
+  if (!url) return '';
   
-  const sanitized = url.trim().toLowerCase();
-  
-  // Check for dangerous protocols
-  if (
-    sanitized.startsWith('javascript:') ||
-    sanitized.startsWith('data:') ||
-    sanitized.startsWith('vbscript:') ||
-    sanitized.startsWith('file:')
-  ) {
-    return '#';
-  }
-  
-  // Only allow http, https and relative URLs
-  if (
-    sanitized.startsWith('http://') ||
-    sanitized.startsWith('https://') ||
-    sanitized.startsWith('/') ||
-    sanitized.startsWith('#') ||
-    sanitized.startsWith('mailto:') ||
-    sanitized.startsWith('tel:')
-  ) {
+  // Try to parse the URL
+  try {
+    const parsed = new URL(url);
+    
+    // Block javascript: protocol
+    if (
+      parsed.protocol === 'javascript:' || 
+      parsed.protocol === 'data:' ||
+      parsed.protocol === 'vbscript:'
+    ) {
+      return '#';
+    }
+    
+    return parsed.toString();
+  } catch (err) {
+    // If URL is invalid, return as is if it doesn't contain suspicious protocols
+    if (
+      /^javascript:/i.test(url) || 
+      /^data:/i.test(url) ||
+      /^vbscript:/i.test(url)
+    ) {
+      return '#';
+    }
+    
     return url;
   }
-  
-  // Any other URLs are prefixed with http:// to prevent relative URLs with dangerous protocols
-  return sanitized.includes(':') ? '#' : `http://${url}`;
 }
 
 /**
- * Escape HTML special characters to prevent XSS
+ * Removes unsafe properties from an object recursively
  * 
- * @param text Text to escape
- * @returns Escaped text
+ * @param obj Object to sanitize
+ * @returns Sanitized object
  */
-export function escapeHtml(text: string): string {
-  if (!text) return '';
-  
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-/**
- * Sanitize file name to prevent path traversal attacks
- * 
- * @param fileName File name to sanitize
- * @returns Sanitized file name
- */
-export function sanitizeFileName(fileName: string): string {
-  if (!fileName) return '';
-  
-  // Remove path traversal sequences and control characters
-  let sanitized = fileName
-    .replace(/\.\.\//g, '')
-    .replace(/\\/g, '')
-    .replace(/\//g, '')
-    .replace(/[\x00-\x1f\x80-\x9f]/g, '');
-  
-  // Limit length
-  if (sanitized.length > 255) {
-    sanitized = sanitized.substring(0, 255);
+export function sanitizeObject<T>(obj: T): T {
+  if (!obj || typeof obj !== 'object') {
+    return obj;
   }
   
-  return sanitized;
-}
-
-/**
- * Sanitize a JSON object by recursively checking and sanitizing string values
- * 
- * @param data Data object to sanitize
- * @returns Sanitized data object
- */
-export function sanitizeObject<T extends Record<string, any>>(data: T): T {
-  if (!data || typeof data !== 'object') {
-    return data;
-  }
+  const result = { ...obj } as any;
   
-  const sanitized: Record<string, any> = {};
-  
-  Object.entries(data).forEach(([key, value]) => {
+  // Process each property
+  for (const key in result) {
+    const value = result[key];
+    
     if (typeof value === 'string') {
-      // Sanitize string values
-      sanitized[key] = escapeHtml(value);
-    } else if (Array.isArray(value)) {
-      // Recursively sanitize arrays
-      sanitized[key] = value.map(item => 
-        typeof item === 'object' ? sanitizeObject(item) : 
-        typeof item === 'string' ? escapeHtml(item) : item
-      );
+      // Sanitize strings depending on property name
+      if (key.includes('html') || key.includes('content')) {
+        result[key] = sanitizeHtml(value, true);
+      } else if (key.includes('url') || key.includes('link') || key.includes('href') || key.includes('src')) {
+        result[key] = sanitizeUrl(value);
+      } else {
+        result[key] = sanitizeText(value);
+      }
     } else if (value && typeof value === 'object') {
       // Recursively sanitize nested objects
-      sanitized[key] = sanitizeObject(value);
-    } else {
-      // Keep other types as is
-      sanitized[key] = value;
+      result[key] = sanitizeObject(value);
     }
-  });
+  }
   
-  return sanitized as T;
+  return result as T;
 }
 
 /**
- * Strip all HTML tags from a string
+ * Sanitize form data before submission
  * 
- * @param html HTML content
- * @returns Text with all HTML tags removed
+ * @param formData Form data to sanitize
+ * @returns Sanitized form data
  */
-export function stripHtml(html: string): string {
-  if (!html) return '';
-  
-  // Create a DOM element to parse the HTML
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  return doc.body.textContent || '';
-}
-
-/**
- * Sanitize user input for search queries
- * 
- * @param query Search query to sanitize
- * @returns Sanitized query
- */
-export function sanitizeSearchQuery(query: string): string {
-  if (!query) return '';
-  
-  // Remove special characters, limit length
-  return query
-    .replace(/[^\w\s]/g, ' ')
-    .trim()
-    .substring(0, 100);
+export function sanitizeFormData<T extends Record<string, any>>(formData: T): T {
+  return sanitizeObject(formData);
 }
 
 export default {
   sanitizeHtml,
+  sanitizeText,
   sanitizeUrl,
-  escapeHtml,
-  sanitizeFileName,
   sanitizeObject,
-  stripHtml,
-  sanitizeSearchQuery
+  sanitizeFormData
 };

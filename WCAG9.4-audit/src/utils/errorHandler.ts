@@ -1,279 +1,204 @@
 /**
  * Error Handling Utility
  * 
- * Provides utilities for creating, handling, and processing application errors
- * with standardized error types, codes, and messages to improve error reporting,
- * debugging, and user experience.
+ * Provides centralized error handling, custom error types,
+ * and consistent error formatting throughout the application.
  */
 
-// Standard error types for categorization
+// Error type enum to categorize errors
 export enum ErrorType {
-  // Data validation errors
   VALIDATION = 'validation_error',
-  
-  // Authentication/authorization errors
-  AUTH = 'authentication_error',
-  
-  // API-related errors (requests, responses)
+  AUTHENTICATION = 'authentication_error',
+  AUTHORIZATION = 'authorization_error',
   API = 'api_error',
-  
-  // Network-related errors
   NETWORK = 'network_error',
-  
-  // Security-related errors (XSS, CSRF, etc.)
+  RATE_LIMIT = 'rate_limit_error',
+  TIMEOUT = 'timeout_error',
+  UNKNOWN = 'unknown_error',
   SECURITY = 'security_error',
-  
-  // Database-related errors
-  DATABASE = 'database_error',
-  
-  // General application errors
-  APPLICATION = 'application_error',
-  
-  // Unknown/unexpected errors
-  UNKNOWN = 'unknown_error'
+  ACCESSIBILITY = 'accessibility_error'
 }
 
-// Application error interface
-export interface AppError extends Error {
+// Custom error class with enhanced properties
+export class AppError extends Error {
   type: ErrorType;
   code: string;
-  message: string;
   details?: Record<string, any>;
-  timestamp: string;
-  originalError?: any;
+  originalError?: unknown;
+  timestamp: Date;
+  
+  constructor(
+    type: ErrorType,
+    code: string,
+    message: string,
+    details?: Record<string, any>,
+    originalError?: unknown
+  ) {
+    super(message);
+    
+    // Standard Error properties
+    this.name = 'AppError';
+    
+    // Enhanced properties
+    this.type = type;
+    this.code = code;
+    this.details = details;
+    this.originalError = originalError;
+    this.timestamp = new Date();
+    
+    // Set prototype explicitly for instanceof to work
+    Object.setPrototypeOf(this, AppError.prototype);
+  }
+  
+  // Convert to plain object for logging/serializing
+  toJSON() {
+    return {
+      name: this.name,
+      type: this.type,
+      code: this.code,
+      message: this.message,
+      details: this.details,
+      timestamp: this.timestamp.toISOString(),
+      stack: this.stack
+    };
+  }
+  
+  // Get user-friendly error message
+  getUserMessage(): string {
+    // Default user messages by error type
+    const defaultMessages: Record<ErrorType, string> = {
+      [ErrorType.VALIDATION]: 'There was a problem with your input. Please check the form and try again.',
+      [ErrorType.AUTHENTICATION]: 'Authentication failed. Please sign in again.',
+      [ErrorType.AUTHORIZATION]: 'You do not have permission to perform this action.',
+      [ErrorType.API]: 'The server encountered an error. Please try again later.',
+      [ErrorType.NETWORK]: 'Network connection issue. Please check your internet connection.',
+      [ErrorType.RATE_LIMIT]: 'Too many requests. Please slow down and try again later.',
+      [ErrorType.TIMEOUT]: 'The request timed out. Please try again.',
+      [ErrorType.UNKNOWN]: 'An unexpected error occurred. Please try again later.',
+      [ErrorType.SECURITY]: 'A security issue was detected. Please try again or contact support.',
+      [ErrorType.ACCESSIBILITY]: 'An accessibility issue was detected in the content.'
+    };
+    
+    // Use custom message if available, otherwise use default
+    return this.message || defaultMessages[this.type];
+  }
 }
 
 /**
- * Create a standardized application error
- * 
- * @param type Error type for categorization
- * @param code Specific error code
- * @param message User-friendly error message
+ * Check if an error is an AppError
+ * @param error Error to check
+ * @returns True if error is an AppError
+ */
+export function isAppError(error: unknown): error is AppError {
+  return error instanceof AppError;
+}
+
+/**
+ * Create a new AppError
+ * @param type Error type
+ * @param code Error code
+ * @param message Error message
  * @param details Additional error details
- * @param originalError Original error if wrapping another error
- * @returns Standardized AppError object
+ * @param originalError Original error object
+ * @returns AppError instance
  */
 export function createError(
   type: ErrorType,
   code: string,
   message: string,
   details?: Record<string, any>,
-  originalError?: any
+  originalError?: unknown
 ): AppError {
-  const error = new Error(message) as AppError;
-  error.type = type;
-  error.code = code;
-  error.message = message;
-  error.details = details;
-  error.timestamp = new Date().toISOString();
-  error.originalError = originalError;
-  
-  // Capture stack trace
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(error, createError);
-  }
-  
-  return error;
+  return new AppError(type, code, message, details, originalError);
 }
 
 /**
- * Process an API error response and convert to standardized AppError
- * 
- * @param error Error from API request
- * @returns Standardized AppError
+ * Log an error with standardized format
+ * @param error Error to log
+ * @param context Additional context information
  */
-export function handleAPIError(error: any): AppError {
-  // Check if it's an Axios error with a response
-  if (error.response) {
-    const { status, data } = error.response;
-    
-    // Handle based on status code
-    if (status === 400) {
-      return createError(
-        ErrorType.VALIDATION,
-        'invalid_request',
-        data.message || 'Invalid request parameters',
-        data.details || {},
-        error
-      );
+export function logError(error: unknown, context?: Record<string, any>): void {
+  // Format the error for logging
+  const logData = {
+    timestamp: new Date().toISOString(),
+    context,
+    error: isAppError(error) 
+      ? error.toJSON()
+      : {
+          name: error instanceof Error ? error.name : 'Unknown',
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined
+        }
+  };
+  
+  // Log to console in development, in production would send to logging service
+  console.error('Error:', logData);
+}
+
+/**
+ * Generic error handler function for async operations
+ * @param fn Async function to execute
+ * @param errorHandler Custom error handler
+ * @returns Function with built-in error handling
+ */
+export function withErrorHandling<T extends any[], R>(
+  fn: (...args: T) => Promise<R>,
+  errorHandler?: (error: unknown) => Promise<R> | R
+): (...args: T) => Promise<R> {
+  return async (...args: T): Promise<R> => {
+    try {
+      return await fn(...args);
+    } catch (error) {
+      // Log the error
+      logError(error, { args });
+      
+      // If custom error handler provided, use it
+      if (errorHandler) {
+        return errorHandler(error);
+      }
+      
+      // Re-throw the error
+      throw error;
     }
-    
-    if (status === 401) {
-      return createError(
-        ErrorType.AUTH,
-        'unauthorized',
-        data.message || 'Authentication required',
-        data.details || {},
-        error
-      );
-    }
-    
-    if (status === 403) {
-      return createError(
-        ErrorType.AUTH,
-        'forbidden',
-        data.message || 'You do not have permission to access this resource',
-        data.details || {},
-        error
-      );
-    }
-    
-    if (status === 404) {
-      return createError(
-        ErrorType.API,
-        'not_found',
-        data.message || 'The requested resource was not found',
-        data.details || {},
-        error
-      );
-    }
-    
-    if (status === 429) {
-      return createError(
-        ErrorType.API,
-        'rate_limited',
-        data.message || 'Too many requests, please try again later',
-        { retryAfter: error.response.headers['retry-after'] },
-        error
-      );
-    }
-    
-    if (status >= 500) {
-      return createError(
-        ErrorType.API,
-        'server_error',
-        data.message || 'An unexpected server error occurred',
-        data.details || {},
-        error
-      );
-    }
-    
-    // Generic error for other status codes
-    return createError(
+  };
+}
+
+/**
+ * Handle API errors and transform them into AppErrors
+ * @param error Error to handle
+ * @param fallbackMessage Fallback error message
+ * @throws AppError
+ */
+export function handleApiError(error: unknown, fallbackMessage: string = 'API request failed'): never {
+  if (isAppError(error)) {
+    throw error;
+  }
+  
+  if (error instanceof Error) {
+    throw createError(
       ErrorType.API,
-      `http_${status}`,
-      data.message || `Request failed with status code ${status}`,
-      data.details || {},
+      'api_error',
+      error.message || fallbackMessage,
+      {},
       error
     );
   }
   
-  // Handle network errors (no response from server)
-  if (error.request) {
-    return createError(
-      ErrorType.NETWORK,
-      'network_error',
-      'Unable to connect to the server. Please check your internet connection.',
-      { request: error.request },
-      error
-    );
-  }
-  
-  // For everything else (setup errors, etc)
-  return createError(
+  throw createError(
     ErrorType.UNKNOWN,
-    'request_failed',
-    error.message || 'An unexpected error occurred',
+    'unknown_error',
+    fallbackMessage,
     {},
     error
   );
 }
 
-/**
- * Format error details for logging
- * 
- * @param error Error to format
- * @returns Formatted error object for logging
- */
-export function formatErrorForLogging(error: AppError): Record<string, any> {
-  return {
-    type: error.type,
-    code: error.code,
-    message: error.message,
-    details: error.details || {},
-    timestamp: error.timestamp,
-    stack: error.stack,
-    originalError: error.originalError ? {
-      message: error.originalError.message,
-      stack: error.originalError.stack
-    } : undefined
-  };
-}
-
-/**
- * Format error for user display
- * 
- * @param error Error to format
- * @returns User-friendly error object
- */
-export function formatErrorForUser(error: AppError): Record<string, any> {
-  // Create a user-friendly error without sensitive details
-  return {
-    code: error.code,
-    message: error.message,
-    ...(error.details?.userMessage ? { userMessage: error.details.userMessage } : {}),
-    timestamp: error.timestamp
-  };
-}
-
-/**
- * Get appropriate HTTP status code for an error
- * 
- * @param error Application error
- * @returns HTTP status code
- */
-export function getHttpStatusForError(error: AppError): number {
-  switch (error.type) {
-    case ErrorType.VALIDATION:
-      return 400;
-    case ErrorType.AUTH:
-      return error.code === 'unauthorized' ? 401 : 403;
-    case ErrorType.API:
-      if (error.code === 'not_found') return 404;
-      if (error.code === 'rate_limited') return 429;
-      return 500;
-    case ErrorType.SECURITY:
-      return 403;
-    case ErrorType.DATABASE:
-      return 500;
-    case ErrorType.NETWORK:
-      return 503;
-    case ErrorType.APPLICATION:
-    case ErrorType.UNKNOWN:
-    default:
-      return 500;
-  }
-}
-
-/**
- * Log error with appropriate level and formatting
- * 
- * @param error Error to log
- * @param level Log level (default: 'error')
- */
-export function logError(error: AppError, level: 'info' | 'warn' | 'error' = 'error'): void {
-  const formattedError = formatErrorForLogging(error);
-  
-  switch (level) {
-    case 'info':
-      console.info('[ERROR_INFO]', JSON.stringify(formattedError));
-      break;
-    case 'warn':
-      console.warn('[ERROR_WARNING]', JSON.stringify(formattedError));
-      break;
-    case 'error':
-    default:
-      console.error('[ERROR]', JSON.stringify(formattedError));
-  }
-}
-
-// Export all functions for use throughout the application
 export default {
   ErrorType,
+  AppError,
+  isAppError,
   createError,
-  handleAPIError,
-  formatErrorForLogging,
-  formatErrorForUser,
-  getHttpStatusForError,
-  logError
+  logError,
+  withErrorHandling,
+  handleApiError
 };
