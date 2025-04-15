@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { stripeService } from '../services/stripe';
+import stripeService from '../services/stripe';
 import { DEVELOPMENT_MODE } from './useAuth';
 
 export interface Plan {

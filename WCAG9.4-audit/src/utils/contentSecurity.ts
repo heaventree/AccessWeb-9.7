@@ -8,9 +8,26 @@
 import { createError, ErrorType } from './errorHandler';
 
 /**
+ * Define directive type for Content Security Policy
+ */
+export type CspDirective = 
+  | 'default-src' 
+  | 'script-src' 
+  | 'style-src'
+  | 'img-src'
+  | 'font-src'
+  | 'connect-src'
+  | 'frame-src'
+  | 'object-src'
+  | 'base-uri'
+  | 'form-action'
+  | 'frame-ancestors'
+  | 'upgrade-insecure-requests';
+
+/**
  * Default CSP directives
  */
-export const defaultCspDirectives = {
+export const defaultCspDirectives: Record<CspDirective, string[]> = {
   'default-src': ["'self'"],
   'script-src': ["'self'", "'strict-dynamic'"],
   'style-src': ["'self'", "'unsafe-inline'"],
@@ -39,7 +56,7 @@ export function generateNonce(): string {
  */
 export function validateSource(
   source: string,
-  directive: keyof typeof defaultCspDirectives
+  directive: CspDirective
 ): boolean {
   // Get allowed sources for the directive
   const allowedSources = defaultCspDirectives[directive] || [];
@@ -51,7 +68,8 @@ export function validateSource(
   
   // Check against wildcard patterns (domain*)
   for (const allowedSource of allowedSources) {
-    if (allowedSource.endsWith('*') && source.startsWith(allowedSource.slice(0, -1))) {
+    if (allowedSource.endsWith('*') && 
+        source.startsWith(allowedSource.slice(0, -1))) {
       return true;
     }
   }
