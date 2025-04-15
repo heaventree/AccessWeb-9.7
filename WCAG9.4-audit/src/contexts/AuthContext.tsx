@@ -1,292 +1,369 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { 
-  validateToken, 
-  loginUser,
-  registerUser
-} from '../utils/auth';
-import { User, AuthError, LoginResponse, RegistrationData, RegistrationResponse } from '../types/auth';
-import { IS_DEVELOPMENT_MODE } from '../utils/environment';
-import { authStorage } from '../utils/secureStorage';
-import { validateData, createLoginSchema, createRegistrationSchema } from '../utils/validation';
+/**
+ * Authentication Context
+ * 
+ * Provides centralized authentication state management and
+ * secure authentication operations throughout the application.
+ */
 
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
+import { LoginResponse, RegistrationResponse } from '../services/authApi';
+import { UserData, generateToken, generateRefreshToken, verifyToken, verifyRefreshToken, storeAuth, getStoredAuth, clearAuth, isAuthenticated, getCurrentUser, needsTokenRefresh, hasRole } from '../utils/auth';
+import { logError, createError, ErrorType } from '../utils/errorHandler';
+import { apiPost } from '../services/api';
+
+// Authentication context interface
 interface AuthContextType {
+  /**
+   * Current user data or null if not authenticated
+   */
+  user: UserData | null;
+  
+  /**
+   * Whether user is authenticated
+   */
   isAuthenticated: boolean;
-  user: User | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: AuthError }>;
-  register: (data: RegistrationData) => Promise<{ success: boolean; error?: AuthError }>;
-  logout: () => void;
-  verifyEmail: (token: string) => Promise<boolean>;
-  createPasswordResetToken: (email: string) => Promise<boolean>;
-  resetPassword: (token: string, newPassword: string) => Promise<boolean>;
-  isDevelopmentMode: boolean;
+  
+  /**
+   * Whether authentication is loading
+   */
+  isLoading: boolean;
+  
+  /**
+   * Login function
+   */
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
+  
+  /**
+   * Register function
+   */
+  register: (userData: { email: string; password: string; name: string }) => Promise<void>;
+  
+  /**
+   * Logout function
+   */
+  logout: () => Promise<void>;
+  
+  /**
+   * Refresh token function
+   */
+  refreshToken: () => Promise<boolean>;
+  
+  /**
+   * Check if user has specified role
+   */
+  hasRole: (role: string) => boolean;
+  
+  /**
+   * Forgot password function
+   */
+  forgotPassword: (email: string) => Promise<void>;
+  
+  /**
+   * Reset password function
+   */
+  resetPassword: (token: string, newPassword: string) => Promise<void>;
+  
+  /**
+   * Update profile function
+   */
+  updateProfile: (profileData: Partial<UserData>) => Promise<void>;
 }
 
-// Create the Auth Context with a default empty value
-export const AuthContext = createContext<AuthContextType>({
-  isAuthenticated: false,
+// Create context with default values
+const AuthContext = createContext<AuthContextType>({
   user: null,
-  loading: true,
-  login: async () => ({ success: false }),
-  register: async () => ({ success: false }),
-  logout: () => {},
-  verifyEmail: async () => false,
-  createPasswordResetToken: async () => false,
-  resetPassword: async () => false,
-  isDevelopmentMode: IS_DEVELOPMENT_MODE
+  isAuthenticated: false,
+  isLoading: true,
+  login: async () => {},
+  register: async () => {},
+  logout: async () => {},
+  refreshToken: async () => false,
+  hasRole: () => false,
+  forgotPassword: async () => {},
+  resetPassword: async () => {},
+  updateProfile: async () => {}
 });
 
+// Provider props interface
 interface AuthProviderProps {
-  children: React.ReactNode;
+  /**
+   * Children components
+   */
+  children: ReactNode;
+  
+  /**
+   * Optional initial user data
+   */
+  initialUser?: UserData | null;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const isDevelopmentMode = IS_DEVELOPMENT_MODE;
-
-  // Secure token storage function
-  const storeAuthToken = useCallback((token: string) => {
+/**
+ * Authentication Provider Component
+ * 
+ * Provides authentication state and operations to the component tree
+ */
+export function AuthProvider({ children, initialUser = null }: AuthProviderProps): JSX.Element {
+  // Authentication state
+  const [user, setUser] = useState<UserData | null>(initialUser);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  // Init function to get stored auth data
+  const initAuth = useCallback(async () => {
     try {
-      // Store token using secure storage utility with encryption
-      authStorage.setItem('token', token);
+      // Skip if already initialized or no stored auth data
+      if (!isLoading) return;
       
-      // Store token expiry time for proactive token refresh
-      const expiresAt = Date.now() + (23 * 60 * 60 * 1000); // 23 hours (1hr before expiry)
-      authStorage.setItem('tokenExpiry', expiresAt.toString());
-    } catch (error) {
-      console.error('Error storing auth token:', error);
-    }
-  }, []);
-
-  // Secure token removal function
-  const removeAuthToken = useCallback(() => {
-    try {
-      // Clear all auth-related data
-      authStorage.removeItem('token');
-      authStorage.removeItem('tokenExpiry');
-      authStorage.removeItem('refreshToken');
-    } catch (error) {
-      console.error('Error removing auth token:', error);
-    }
-  }, []);
-
-  // Check for existing authentication on mount and implement token refresh
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // Get token from secure storage
-        const token = authStorage.getItem('token');
-        
-        if (token) {
-          // Check if token is nearing expiry
-          const tokenExpiry = authStorage.getItem('tokenExpiry');
-          const isExpiringSoon = tokenExpiry && parseInt(tokenExpiry) < Date.now();
+      // Check if user is authenticated
+      const authData = getStoredAuth();
+      
+      if (authData) {
+        // Verify token
+        try {
+          await verifyToken(authData.token);
+          setUser(authData.user);
           
-          // Validate the token (checks signature, expiration, etc.)
-          const userData = await validateToken(token);
+          // Check if token needs refresh
+          if (await needsTokenRefresh(authData.token)) {
+            await refreshTokenInternal();
+          }
+        } catch (error) {
+          // Token verification failed, try refresh token
+          const refreshSuccess = await refreshTokenInternal();
           
-          if (userData) {
-            // If valid, set the user state
-            setUser({
-              id: userData.id,
-              email: userData.email,
-              role: userData.role,
-              name: userData.name || '',
-              organization: userData.organization || ''
-            });
-            
-            // If token is valid but nearing expiry, refresh it (in production)
-            // This would call a token refresh API endpoint
-            if (isExpiringSoon && !IS_DEVELOPMENT_MODE) {
-              // In a real implementation, we would refresh the token here
-              console.log('Token nearing expiry, refresh would be triggered');
-            }
-          } else {
-            // Token is invalid or expired, remove it
-            removeAuthToken();
+          // Clear auth if refresh failed
+          if (!refreshSuccess) {
+            clearAuth();
+            setUser(null);
           }
         }
-      } catch (error) {
-        console.error('Authentication check failed:', error);
-        removeAuthToken();
-      } finally {
-        setLoading(false);
+      } else {
+        setUser(null);
       }
-    };
-
-    checkAuth();
-    
-    // Set up token refresh check at regular intervals
-    const refreshInterval = setInterval(() => {
-      const tokenExpiry = authStorage.getItem('tokenExpiry');
-      if (tokenExpiry && parseInt(tokenExpiry) < Date.now() && user) {
-        // Token needs refresh
-        console.log('Token refresh interval triggered');
-        checkAuth();
-      }
-    }, 15 * 60 * 1000); // Check every 15 minutes
-    
-    return () => clearInterval(refreshInterval);
-  }, [removeAuthToken, user]);
-
-  // Login function
-  const login = async (email: string, password: string) => {
-    try {
-      // Call the login API function from auth.ts
-      const response = await loginUser(email, password);
-      
-      if (response.success && response.token && response.user) {
-        // Resolve the token if it's a promise
-        const resolvedToken = response.token instanceof Promise 
-          ? await response.token 
-          : response.token;
-          
-        // Store the token securely
-        storeAuthToken(resolvedToken);
-        // Set the user state
-        setUser(response.user);
-        return { success: true };
-      }
-      
-      return { 
-        success: false, 
-        error: response.error || { 
-          code: 'auth/unknown-error', 
-          message: 'Login failed' 
-        } 
-      };
     } catch (error) {
-      console.error('Login failed:', error);
-      return { 
-        success: false, 
-        error: { 
-          code: 'auth/unknown-error', 
-          message: 'An unexpected error occurred during login.' 
-        } 
-      };
+      logError(error, { context: 'AuthContext.initAuth' });
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading]);
+  
+  // Initialize auth on component mount
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+  
+  /**
+   * Login function
+   * @param email User email
+   * @param password User password
+   * @param rememberMe Whether to remember user
+   */
+  const login = async (email: string, password: string, rememberMe = false): Promise<void> => {
+    try {
+      // Send login request
+      const response = await apiPost<LoginResponse>('auth/login', { email, password });
+      
+      // Store auth data
+      storeAuth(response.token, response.refreshToken, response.user, rememberMe);
+      
+      // Update user data
+      setUser(response.user);
+    } catch (error) {
+      logError(error, { context: 'AuthContext.login' });
+      throw error;
     }
   };
   
-  // Register function
-  const register = async (data: RegistrationData) => {
+  /**
+   * Register function
+   * @param userData User registration data
+   */
+  const register = async (userData: { email: string; password: string; name: string }): Promise<void> => {
     try {
-      // Call the register API function from auth.ts
-      const response = await registerUser(data);
+      // Send registration request
+      await apiPost<RegistrationResponse>('auth/register', userData);
       
-      if (response.success && response.token && response.user) {
-        // Resolve the token if it's a promise
-        const resolvedToken = response.token instanceof Promise 
-          ? await response.token 
-          : response.token;
-          
-        // Store the token securely
-        storeAuthToken(resolvedToken);
-        // Set the user state
-        setUser(response.user);
-        return { success: true };
-      }
-      
-      return { 
-        success: false, 
-        error: response.error || { 
-          code: 'auth/unknown-error', 
-          message: 'Registration failed' 
-        } 
-      };
+      // Registration successful, but user not logged in yet
     } catch (error) {
-      console.error('Registration failed:', error);
-      return { 
-        success: false, 
-        error: { 
-          code: 'auth/unknown-error', 
-          message: 'An unexpected error occurred during registration.' 
-        } 
-      };
+      logError(error, { context: 'AuthContext.register' });
+      throw error;
     }
   };
-
-  // Logout function
-  const logout = useCallback(() => {
-    // Clear all auth data using our secure storage utility
-    removeAuthToken();
-    
-    // Reset user state
-    setUser(null);
-    
-    // In a real implementation, you might also want to:
-    // 1. Invalidate the token on the server
-    // 2. Clear any user-related cache
-    // 3. Reset any application state
-  }, [removeAuthToken]);
   
-  // Verify email function
-  const verifyEmail = async (token: string) => {
+  /**
+   * Logout function
+   */
+  const logout = async (): Promise<void> => {
     try {
-      // Mock implementation for development
-      if (isDevelopmentMode) {
-        // Simulate email verification success
-        return true;
+      // Send logout request to invalidate token on server
+      await apiPost('auth/logout');
+    } catch (error) {
+      logError(error, { context: 'AuthContext.logout' });
+      // Continue with logout even if server request fails
+    } finally {
+      // Clear auth data
+      clearAuth();
+      
+      // Clear user data
+      setUser(null);
+    }
+  };
+  
+  /**
+   * Internal refresh token function
+   * @returns Whether refresh was successful
+   */
+  const refreshTokenInternal = async (): Promise<boolean> => {
+    try {
+      // Get stored auth data
+      const authData = getStoredAuth();
+      
+      if (!authData) {
+        return false;
       }
       
-      // In production, this would call an API
-      return false;
+      // Verify refresh token
+      const userId = await verifyRefreshToken(authData.refreshToken);
+      
+      // Send refresh token request
+      const response = await apiPost<{
+        token: string;
+        refreshToken: string;
+        expiresIn: number;
+      }>('auth/refresh', { refreshToken: authData.refreshToken });
+      
+      // Store auth data
+      storeAuth(response.token, response.refreshToken, authData.user, true);
+      
+      // Update user data
+      setUser(authData.user);
+      
+      return true;
     } catch (error) {
-      console.error('Email verification failed:', error);
+      logError(error, { context: 'AuthContext.refreshTokenInternal' });
       return false;
     }
   };
   
-  // Create password reset token function
-  const createPasswordResetToken = async (email: string) => {
+  /**
+   * Public refresh token function
+   * @returns Whether refresh was successful
+   */
+  const refreshToken = async (): Promise<boolean> => {
+    return refreshTokenInternal();
+  };
+  
+  /**
+   * Check if user has role
+   * @param role Role to check
+   * @returns Whether user has role
+   */
+  const checkRole = (role: string): boolean => {
+    return hasRole(role, user);
+  };
+  
+  /**
+   * Forgot password function
+   * @param email User email
+   */
+  const forgotPassword = async (email: string): Promise<void> => {
     try {
-      // Mock implementation for development
-      if (isDevelopmentMode) {
-        // Simulate sending reset email
-        return true;
-      }
-      
-      // In production, this would call an API
-      return false;
+      // Send forgot password request
+      await apiPost<{ success: boolean; message: string }>('auth/forgot-password', { email });
     } catch (error) {
-      console.error('Password reset token creation failed:', error);
-      return false;
+      logError(error, { context: 'AuthContext.forgotPassword' });
+      throw error;
     }
   };
   
-  // Reset password function
-  const resetPassword = async (token: string, newPassword: string) => {
+  /**
+   * Reset password function
+   * @param token Reset token
+   * @param newPassword New password
+   */
+  const resetPassword = async (token: string, newPassword: string): Promise<void> => {
     try {
-      // Mock implementation for development
-      if (isDevelopmentMode) {
-        // Simulate password reset
-        return true;
-      }
-      
-      // In production, this would call an API
-      return false;
+      // Send reset password request
+      await apiPost<{ success: boolean; message: string }>('auth/reset-password', {
+        token,
+        newPassword
+      });
     } catch (error) {
-      console.error('Password reset failed:', error);
-      return false;
+      logError(error, { context: 'AuthContext.resetPassword' });
+      throw error;
     }
   };
-
-  const contextValue: AuthContextType = {
-    isAuthenticated: !!user,
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    verifyEmail,
-    createPasswordResetToken,
-    resetPassword,
-    isDevelopmentMode
+  
+  /**
+   * Update profile function
+   * @param profileData Profile data to update
+   */
+  const updateProfile = async (profileData: Partial<UserData>): Promise<void> => {
+    try {
+      // Send update profile request
+      const updatedUser = await apiPost<UserData>('auth/profile', profileData);
+      
+      // Update user data
+      if (user) {
+        const newUser = { ...user, ...updatedUser };
+        setUser(newUser);
+        
+        // Update stored user data
+        const authData = getStoredAuth();
+        
+        if (authData) {
+          storeAuth(authData.token, authData.refreshToken, newUser, true);
+        }
+      }
+    } catch (error) {
+      logError(error, { context: 'AuthContext.updateProfile' });
+      throw error;
+    }
   };
-
+  
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({
+      user,
+      isAuthenticated: !!user,
+      isLoading,
+      login,
+      register,
+      logout,
+      refreshToken,
+      hasRole: checkRole,
+      forgotPassword,
+      resetPassword,
+      updateProfile
+    }),
+    [user, isLoading]
+  );
+  
   return (
     <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
+
+/**
+ * Hook to use authentication context
+ * @returns Authentication context
+ */
+export function useAuth(): AuthContextType {
+  const context = useContext(AuthContext);
+  
+  if (context === undefined) {
+    throw createError(
+      ErrorType.INTERNAL,
+      'auth_context_missing',
+      'useAuth must be used within an AuthProvider',
+      undefined,
+      'The authentication system is not properly configured. Please contact support.'
+    );
+  }
+  
+  return context;
+}
+
+export default AuthContext;

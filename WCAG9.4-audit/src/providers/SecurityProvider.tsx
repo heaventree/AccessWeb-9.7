@@ -1,35 +1,16 @@
 /**
  * Security Provider
  * 
- * Centralized component that integrates all security features
- * and provides them to the application.
+ * Provides a centralized security layer that combines multiple security
+ * measures including CSP, rate limiting, CSRF protection, and data sanitization.
  */
 
-import React, { createContext, useContext, useEffect, ReactNode } from 'react';
-import { initContentSecurity } from '../utils/contentSecurity';
-import { initCsrfProtection } from '../utils/csrfProtection';
-import { getEnvBoolean } from '../utils/environment';
-import { setupSecureStorage } from '../utils/secureStorage';
-import { initSecurityHeaders } from '../utils/securityHeaders';
-import { ErrorBoundary } from '../components/ErrorBoundary';
-
-// Get security feature flags from environment
-const CSP_ENABLED = getEnvBoolean('VITE_CSP_ENABLED', true);
-const CSRF_ENABLED = getEnvBoolean('VITE_CSRF_ENABLED', true);
-const SECURITY_HEADERS_ENABLED = getEnvBoolean('VITE_SECURITY_HEADERS_ENABLED', true);
-
-// Security context type
-interface SecurityContextType {
-  /**
-   * Flag indicating if all security features are initialized
-   */
-  initialized: boolean;
-}
-
-// Create context with default values
-const SecurityContext = createContext<SecurityContextType>({
-  initialized: false,
-});
+import { ReactNode, useEffect } from 'react';
+import { initCSP, updateCSPNonce, validateCSP } from '../utils/contentSecurity';
+import { setupRateLimiting } from '../utils/rateLimiting';
+import { initCsrfProtection, generateCsrfToken, validateCsrfToken } from '../utils/csrfProtection';
+import { configureSanitizerDefaults } from '../utils/sanitization';
+import { loadEnvVariables } from '../utils/environment';
 
 // Security provider props
 interface SecurityProviderProps {
@@ -37,87 +18,54 @@ interface SecurityProviderProps {
    * Child components
    */
   children: ReactNode;
-  
-  /**
-   * Whether to enable CSP
-   */
-  enableCSP?: boolean;
-  
-  /**
-   * Whether to enable CSRF protection
-   */
-  enableCSRF?: boolean;
-  
-  /**
-   * Whether to enable security headers
-   */
-  enableSecurityHeaders?: boolean;
 }
 
 /**
  * Security Provider Component
  * 
- * Provides security features to the application
+ * Configures and applies security measures for the entire application
  */
-export function SecurityProvider({
-  children,
-  enableCSP = CSP_ENABLED,
-  enableCSRF = CSRF_ENABLED,
-  enableSecurityHeaders = SECURITY_HEADERS_ENABLED,
-}: SecurityProviderProps) {
-  // Initialize security features
+export function SecurityProvider({ children }: SecurityProviderProps): JSX.Element {
+  // Initialize security features on mount
   useEffect(() => {
-    // Initialize secure storage
-    setupSecureStorage();
+    // Initialize environment variables
+    loadEnvVariables();
     
     // Initialize Content Security Policy
-    if (enableCSP) {
-      initContentSecurity();
-    }
+    initCSP();
     
-    // Initialize CSRF protection
-    if (enableCSRF) {
-      initCsrfProtection();
-    }
+    // Configure sanitizer defaults
+    configureSanitizerDefaults();
     
-    // Initialize security headers
-    if (enableSecurityHeaders) {
-      initSecurityHeaders();
-    }
+    // Setup CSRF protection
+    initCsrfProtection();
     
-    // Log security initialization
-    console.info(
-      `Security initialized: CSP=${enableCSP}, CSRF=${enableCSRF}, Headers=${enableSecurityHeaders}`
-    );
-  }, [enableCSP, enableCSRF, enableSecurityHeaders]);
+    // Setup rate limiting
+    setupRateLimiting();
+    
+    // Update CSP nonce on each render for enhanced security
+    updateCSPNonce();
+    
+    // Set up interval to validate CSP
+    const validateInterval = setInterval(() => {
+      validateCSP();
+    }, 60000); // Check every minute
+    
+    // Cleanup function
+    return () => {
+      clearInterval(validateInterval);
+    };
+  }, []);
   
-  // Context value
-  const contextValue: SecurityContextType = {
-    initialized: true,
-  };
-  
-  // Provide security context and wrap with error boundary
   return (
-    <SecurityContext.Provider value={contextValue}>
-      <ErrorBoundary>
-        {children}
-      </ErrorBoundary>
-    </SecurityContext.Provider>
+    <>{children}</>
   );
 }
 
-/**
- * Hook to use security context
- * @returns Security context
- */
-export function useSecurity(): SecurityContextType {
-  const context = useContext(SecurityContext);
-  
-  if (context === undefined) {
-    throw new Error('useSecurity must be used within a SecurityProvider');
-  }
-  
-  return context;
-}
-
 export default SecurityProvider;
+
+// Export security utilities for use in components
+export { 
+  generateCsrfToken, 
+  validateCsrfToken,
+};

@@ -1,178 +1,226 @@
 /**
- * CSRF Protection
+ * CSRF Protection Utilities
  * 
- * Implements Cross-Site Request Forgery protection via
- * double-submit cookie pattern with cryptographic tokens.
+ * Provides Cross-Site Request Forgery (CSRF) protection mechanisms
+ * to prevent unauthorized requests.
  */
 
-import { generateSecureRandomString } from './crypto';
+import { getEnvString } from './environment';
+import { logError } from './errorHandler';
 import { secureLocalStorage } from './secureStorage';
-import { IS_DEVELOPMENT_MODE } from './environment';
 
-// Constants
-const CSRF_TOKEN_LENGTH = 64;
+// CSRF token storage key
+const CSRF_TOKEN_KEY = 'csrf_token';
+
+// CSRF configuration
 const CSRF_HEADER_NAME = 'X-CSRF-Token';
-const CSRF_STORAGE_KEY = 'csrf_token';
-
-/**
- * Generate a new CSRF token
- * @returns Secure random token
- */
-export function generateCsrfToken(): string {
-  // Create a cryptographically secure random token
-  const token = generateSecureRandomString(CSRF_TOKEN_LENGTH);
-  
-  // Store token in secure storage
-  secureLocalStorage.setItem(CSRF_STORAGE_KEY, token);
-  
-  return token;
-}
-
-/**
- * Get the current CSRF token, generating a new one if needed
- * @returns CSRF token
- */
-export function getCsrfToken(): string {
-  // Try to get existing token
-  const existingToken = secureLocalStorage.getItem(CSRF_STORAGE_KEY);
-  
-  if (existingToken) {
-    return existingToken;
-  }
-  
-  // Generate new token if none exists
-  return generateCsrfToken();
-}
-
-/**
- * Append CSRF token to headers
- * @param headers Headers object to modify
- * @returns Modified headers
- */
-export function appendCsrfHeader(headers: Headers): Headers {
-  // Get token
-  const token = getCsrfToken();
-  
-  // Set header
-  headers.set(CSRF_HEADER_NAME, token);
-  
-  return headers;
-}
-
-/**
- * Verify CSRF token
- * @param token Token to verify
- * @returns True if token is valid
- */
-export function verifyCsrfToken(token: string): boolean {
-  // Development mode bypass for testing
-  if (IS_DEVELOPMENT_MODE && token === 'DEVELOPMENT_MODE_BYPASS') {
-    return true;
-  }
-  
-  // Get stored token
-  const storedToken = secureLocalStorage.getItem(CSRF_STORAGE_KEY);
-  
-  // No stored token
-  if (!storedToken) {
-    return false;
-  }
-  
-  // Compare tokens with constant-time comparison to prevent timing attacks
-  return constantTimeCompare(storedToken, token);
-}
-
-/**
- * Constant-time string comparison to prevent timing attacks
- * @param a First string
- * @param b Second string
- * @returns True if strings are equal
- */
-function constantTimeCompare(a: string, b: string): boolean {
-  // If lengths differ, strings are not equal
-  if (a.length !== b.length) {
-    return false;
-  }
-  
-  // Compare characters with constant-time algorithm
-  let result = 0;
-  
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  
-  return result === 0;
-}
-
-/**
- * Include CSRF token in form
- * @param formElement Form element
- */
-export function includeCsrfTokenInForm(formElement: HTMLFormElement): void {
-  // Get token
-  const token = getCsrfToken();
-  
-  // Create hidden input
-  let inputElement = formElement.querySelector(`input[name="${CSRF_HEADER_NAME}"]`) as HTMLInputElement;
-  
-  if (!inputElement) {
-    // Create new input if it doesn't exist
-    inputElement = document.createElement('input');
-    inputElement.type = 'hidden';
-    inputElement.name = CSRF_HEADER_NAME;
-    formElement.appendChild(inputElement);
-  }
-  
-  // Set token value
-  inputElement.value = token;
-}
-
-/**
- * Create CSRF meta tag to include in HTML head
- */
-export function createCsrfMetaTag(): void {
-  // Get token
-  const token = getCsrfToken();
-  
-  // Check if meta tag already exists
-  let metaTag = document.querySelector(`meta[name="${CSRF_HEADER_NAME}"]`) as HTMLMetaElement;
-  
-  if (!metaTag) {
-    // Create new meta tag
-    metaTag = document.createElement('meta');
-    metaTag.name = CSRF_HEADER_NAME;
-    document.head.appendChild(metaTag);
-  }
-  
-  // Set token value
-  metaTag.content = token;
-}
+const CSRF_COOKIE_NAME = 'csrf_token';
+const CSRF_SECRET = getEnvString('VITE_CSRF_SECRET', 'wcag_secure_csrf_secret_please_change_in_production');
 
 /**
  * Initialize CSRF protection
  */
 export function initCsrfProtection(): void {
-  // Generate initial token
-  generateCsrfToken();
-  
-  // Create meta tag
-  if (typeof document !== 'undefined') {
-    createCsrfMetaTag();
+  try {
+    // Generate token if not exists
+    const token = getCsrfToken() || generateCsrfToken();
     
-    // Add event listener to automatically include CSRF token in forms
-    document.addEventListener('submit', (event) => {
-      const form = event.target as HTMLFormElement;
-      includeCsrfTokenInForm(form);
-    });
+    // Store token
+    storeCsrfToken(token);
+    
+    // Set up CSRF token for AJAX requests
+    setupCsrfForAjax();
+  } catch (error) {
+    logError(error, { context: 'initCsrfProtection' });
+  }
+}
+
+/**
+ * Generate a new CSRF token
+ * @returns Generated CSRF token
+ */
+export function generateCsrfToken(): string {
+  try {
+    // Generate random values for token
+    const randomBytes = new Uint8Array(32);
+    crypto.getRandomValues(randomBytes);
+    
+    // Convert to base64 string and remove non-alphanumeric characters
+    const token = btoa(String.fromCharCode(...randomBytes))
+      .replace(/\+/g, '')
+      .replace(/\//g, '')
+      .replace(/=/g, '')
+      .slice(0, 32);
+    
+    return token;
+  } catch (error) {
+    logError(error, { context: 'generateCsrfToken' });
+    
+    // Fallback to simpler method if Web Crypto API fails
+    return Math.random().toString(36).substring(2, 15) + 
+           Math.random().toString(36).substring(2, 15) +
+           Date.now().toString(36);
+  }
+}
+
+/**
+ * Get stored CSRF token
+ * @returns Stored CSRF token or null if not found
+ */
+export function getCsrfToken(): string | null {
+  try {
+    // Try to get from storage
+    return secureLocalStorage.getItem(CSRF_TOKEN_KEY);
+  } catch (error) {
+    logError(error, { context: 'getCsrfToken' });
+    return null;
+  }
+}
+
+/**
+ * Store CSRF token
+ * @param token CSRF token to store
+ */
+function storeCsrfToken(token: string): void {
+  try {
+    // Store in local storage (securely)
+    secureLocalStorage.setItem(CSRF_TOKEN_KEY, token);
+    
+    // Also store in a cookie for form submissions
+    document.cookie = `${CSRF_COOKIE_NAME}=${token}; path=/; SameSite=Strict; Secure`;
+  } catch (error) {
+    logError(error, { context: 'storeCsrfToken' });
+  }
+}
+
+/**
+ * Set up CSRF token for AJAX requests
+ */
+function setupCsrfForAjax(): void {
+  try {
+    // Add CSRF token to all AJAX requests
+    const originalOpen = XMLHttpRequest.prototype.open;
+    
+    XMLHttpRequest.prototype.open = function(...args) {
+      // Call original method
+      originalOpen.apply(this, args);
+      
+      // Add event listener to set CSRF header
+      this.addEventListener('readystatechange', function() {
+        if (this.readyState === 1) { // OPENED
+          const token = getCsrfToken();
+          
+          if (token) {
+            this.setRequestHeader(CSRF_HEADER_NAME, token);
+          }
+        }
+      });
+    };
+    
+    // Also protect fetch requests if available
+    if (typeof window.fetch === 'function') {
+      const originalFetch = window.fetch;
+      
+      window.fetch = function(input, init = {}) {
+        // Add CSRF token to headers
+        const token = getCsrfToken();
+        
+        if (token) {
+          init.headers = {
+            ...init.headers,
+            [CSRF_HEADER_NAME]: token
+          };
+        }
+        
+        // Call original fetch
+        return originalFetch(input, init);
+      };
+    }
+  } catch (error) {
+    logError(error, { context: 'setupCsrfForAjax' });
+  }
+}
+
+/**
+ * Validate CSRF token
+ * @param token Token to validate
+ * @returns Whether token is valid
+ */
+export function validateCsrfToken(token: string): boolean {
+  try {
+    const storedToken = getCsrfToken();
+    
+    // Check if token exists and matches stored token
+    return !!storedToken && token === storedToken;
+  } catch (error) {
+    logError(error, { context: 'validateCsrfToken' });
+    return false;
+  }
+}
+
+/**
+ * Refresh CSRF token
+ */
+export function refreshCsrfToken(): void {
+  try {
+    const newToken = generateCsrfToken();
+    storeCsrfToken(newToken);
+  } catch (error) {
+    logError(error, { context: 'refreshCsrfToken' });
+  }
+}
+
+/**
+ * Create a hidden CSRF input field for forms
+ * @returns HTML string with CSRF input element
+ */
+export function createCsrfInputField(): string {
+  try {
+    const token = getCsrfToken() || generateCsrfToken();
+    
+    if (!token) {
+      return '';
+    }
+    
+    return `<input type="hidden" name="_csrf" value="${token}" />`;
+  } catch (error) {
+    logError(error, { context: 'createCsrfInputField' });
+    return '';
+  }
+}
+
+/**
+ * Add CSRF token to URL
+ * @param url URL to add token to
+ * @returns URL with CSRF token
+ */
+export function addCsrfToUrl(url: string): string {
+  try {
+    const token = getCsrfToken();
+    
+    if (!token) {
+      return url;
+    }
+    
+    // Parse URL
+    const urlObj = new URL(url, window.location.origin);
+    
+    // Add token to query parameters
+    urlObj.searchParams.set('_csrf', token);
+    
+    return urlObj.toString();
+  } catch (error) {
+    logError(error, { context: 'addCsrfToUrl' });
+    return url;
   }
 }
 
 export default {
+  initCsrfProtection,
   generateCsrfToken,
   getCsrfToken,
-  appendCsrfHeader,
-  verifyCsrfToken,
-  includeCsrfTokenInForm,
-  createCsrfMetaTag,
-  initCsrfProtection
+  validateCsrfToken,
+  refreshCsrfToken,
+  createCsrfInputField,
+  addCsrfToUrl
 };

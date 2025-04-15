@@ -1,166 +1,302 @@
 /**
- * Rate Limiting
+ * Rate Limiting Utilities
  * 
- * Implements client-side rate limiting to prevent abuse and brute force attacks
- * by tracking request frequency and blocking excessive requests.
+ * Provides client-side rate limiting for API calls and form submissions
+ * to prevent abuse and brute force attacks.
  */
 
-import { logError, createError, ErrorType } from './errorHandler';
-import { getEnvBoolean } from './environment';
+import { getEnvNumber } from './environment';
+import { logError } from './errorHandler';
+import { secureLocalStorage } from './secureStorage';
 
-// Feature flag
-const RATE_LIMITING_ENABLED = getEnvBoolean('VITE_RATE_LIMITING_ENABLED', true);
+// Constants
+const RATE_LIMIT_PREFIX = 'rate_limit_';
+const DEFAULT_MAX_ATTEMPTS = getEnvNumber('VITE_RATE_LIMIT_MAX_ATTEMPTS', 5);
+const DEFAULT_TIMEOUT_MS = getEnvNumber('VITE_RATE_LIMIT_TIMEOUT_MS', 60 * 1000); // 1 minute
+const DEFAULT_COOLDOWN_MS = getEnvNumber('VITE_RATE_LIMIT_COOLDOWN_MS', 15 * 60 * 1000); // 15 minutes
 
-// Rate limit storage
-interface RateLimitBucket {
-  /**
-   * Number of requests in current window
-   */
-  count: number;
-  
-  /**
-   * Timestamp when the current window expires
-   */
-  expiresAt: number;
-}
-
-// Store rate limit buckets in memory
-const rateLimitBuckets: Record<string, RateLimitBucket> = {};
-
-// Rate limit options
-interface RateLimitOptions {
-  /**
-   * Key to identify the rate limit bucket
-   */
-  key: string;
-  
-  /**
-   * Time window in milliseconds
-   */
-  windowMs: number;
-  
-  /**
-   * Maximum number of requests allowed in the window
-   */
-  maxRequests: number;
+// Rate limit data
+interface RateLimitData {
+  attempts: number;
+  timestamp: number;
+  blocked: boolean;
+  blockedUntil: number;
 }
 
 /**
- * Check rate limit and throw error if exceeded
- * @param options Rate limit options
- * @throws Error if rate limit exceeded
+ * Set up rate limiting
  */
-export function checkRateLimit(options: RateLimitOptions): void {
-  // Skip if rate limiting is disabled
-  if (!RATE_LIMITING_ENABLED) {
-    return;
-  }
-  
+export function setupRateLimiting(): void {
+  // No specific setup needed, included for consistency with other modules
+}
+
+/**
+ * Check if an action is rate limited
+ * @param key Rate limit key
+ * @param maxAttempts Maximum attempts allowed
+ * @param timeoutMs Timeout in milliseconds
+ * @param cooldownMs Cooldown in milliseconds
+ * @returns Whether the action is rate limited
+ */
+export function isRateLimited(
+  key: string,
+  maxAttempts: number = DEFAULT_MAX_ATTEMPTS,
+  timeoutMs: number = DEFAULT_TIMEOUT_MS,
+  cooldownMs: number = DEFAULT_COOLDOWN_MS
+): boolean {
   try {
-    const { key, windowMs, maxRequests } = options;
+    // Generate storage key
+    const storageKey = `${RATE_LIMIT_PREFIX}${key}`;
+    
+    // Get current data
+    const dataString = secureLocalStorage.getItem(storageKey);
+    const data: RateLimitData = dataString 
+      ? JSON.parse(dataString) 
+      : { attempts: 0, timestamp: Date.now(), blocked: false, blockedUntil: 0 };
+    
     const now = Date.now();
     
-    // Get or create bucket
-    let bucket = rateLimitBuckets[key];
-    
-    if (!bucket || now > bucket.expiresAt) {
-      // Bucket doesn't exist or has expired, create new one
-      bucket = {
-        count: 0,
-        expiresAt: now + windowMs
-      };
+    // Check if blocked
+    if (data.blocked) {
+      // If block period has expired, reset the block
+      if (now >= data.blockedUntil) {
+        // Reset data
+        data.blocked = false;
+        data.attempts = 0;
+        data.timestamp = now;
+        data.blockedUntil = 0;
+        
+        // Save updated data
+        secureLocalStorage.setItem(storageKey, JSON.stringify(data));
+        
+        // Not rate limited anymore
+        return false;
+      }
       
-      rateLimitBuckets[key] = bucket;
+      // Still blocked
+      return true;
     }
     
-    // Increment request count
-    bucket.count++;
-    
-    // Check if rate limit exceeded
-    if (bucket.count > maxRequests) {
-      // Calculate retry after time in seconds
-      const retryAfterMs = bucket.expiresAt - now;
-      const retryAfterSecs = Math.ceil(retryAfterMs / 1000);
+    // Check if timeout has expired
+    if (now - data.timestamp > timeoutMs) {
+      // Reset attempts after timeout
+      data.attempts = 0;
+      data.timestamp = now;
       
-      // Throw rate limit error
-      throw createError(
-        ErrorType.RATE_LIMIT,
-        'rate_limit_exceeded',
-        `Rate limit exceeded. Try again in ${retryAfterSecs} seconds.`,
-        {
-          retryAfter: retryAfterSecs,
-          limit: maxRequests,
-          window: windowMs
-        },
-        'Too many requests. Please wait before trying again.',
-        'Rate limit reached. For security reasons, please wait a moment before trying again.'
-      );
+      // Save updated data
+      secureLocalStorage.setItem(storageKey, JSON.stringify(data));
+      
+      // Not rate limited
+      return false;
     }
+    
+    // Check if max attempts reached
+    if (data.attempts >= maxAttempts) {
+      // Block for cooldown period
+      data.blocked = true;
+      data.blockedUntil = now + cooldownMs;
+      
+      // Save updated data
+      secureLocalStorage.setItem(storageKey, JSON.stringify(data));
+      
+      // Rate limited
+      return true;
+    }
+    
+    // Not rate limited
+    return false;
   } catch (error) {
-    // Log error but don't rethrow non-rate limit errors to avoid blocking requests
-    if (!(error instanceof Error) || (error as any).type !== ErrorType.RATE_LIMIT) {
-      logError(error, { context: 'rateLimiting.checkRateLimit' });
-      return;
-    }
-    
-    // Rethrow rate limit errors
-    throw error;
+    logError(error, { context: 'isRateLimited' });
+    return false; // Don't block if there's an error
   }
 }
 
 /**
- * Reset rate limit for a specific key
- * @param key Rate limit key to reset
+ * Increment attempt counter for rate limiting
+ * @param key Rate limit key
+ * @param maxAttempts Maximum attempts allowed
+ * @param timeoutMs Timeout in milliseconds
+ * @param cooldownMs Cooldown in milliseconds
+ * @returns Whether the action is now rate limited
+ */
+export function incrementRateLimitCounter(
+  key: string,
+  maxAttempts: number = DEFAULT_MAX_ATTEMPTS,
+  timeoutMs: number = DEFAULT_TIMEOUT_MS,
+  cooldownMs: number = DEFAULT_COOLDOWN_MS
+): boolean {
+  try {
+    // Generate storage key
+    const storageKey = `${RATE_LIMIT_PREFIX}${key}`;
+    
+    // Get current data
+    const dataString = secureLocalStorage.getItem(storageKey);
+    const data: RateLimitData = dataString 
+      ? JSON.parse(dataString) 
+      : { attempts: 0, timestamp: Date.now(), blocked: false, blockedUntil: 0 };
+    
+    const now = Date.now();
+    
+    // Check if blocked
+    if (data.blocked) {
+      return true; // Already rate limited
+    }
+    
+    // Check if timeout has expired
+    if (now - data.timestamp > timeoutMs) {
+      // Reset attempts after timeout
+      data.attempts = 1; // Start with 1 for this attempt
+      data.timestamp = now;
+    } else {
+      // Increment attempts
+      data.attempts++;
+    }
+    
+    // Check if max attempts reached
+    if (data.attempts >= maxAttempts) {
+      // Block for cooldown period
+      data.blocked = true;
+      data.blockedUntil = now + cooldownMs;
+    }
+    
+    // Save updated data
+    secureLocalStorage.setItem(storageKey, JSON.stringify(data));
+    
+    // Return whether the action is now rate limited
+    return data.blocked;
+  } catch (error) {
+    logError(error, { context: 'incrementRateLimitCounter' });
+    return false; // Don't block if there's an error
+  }
+}
+
+/**
+ * Reset rate limit counter
+ * @param key Rate limit key
  */
 export function resetRateLimit(key: string): void {
-  delete rateLimitBuckets[key];
+  try {
+    // Generate storage key
+    const storageKey = `${RATE_LIMIT_PREFIX}${key}`;
+    
+    // Remove rate limit data
+    secureLocalStorage.removeItem(storageKey);
+  } catch (error) {
+    logError(error, { context: 'resetRateLimit' });
+  }
 }
 
 /**
- * Get current rate limit status
+ * Get time until rate limit expires
  * @param key Rate limit key
- * @returns Rate limit status or null if no bucket exists
+ * @returns Time in milliseconds until rate limit expires, or 0 if not rate limited
  */
-export function getRateLimitStatus(key: string): {
-  remaining: number;
-  total: number;
-  resetsIn: number;
-} | null {
-  const bucket = rateLimitBuckets[key];
-  
-  if (!bucket) {
-    return null;
+export function getRateLimitRemainingTime(key: string): number {
+  try {
+    // Generate storage key
+    const storageKey = `${RATE_LIMIT_PREFIX}${key}`;
+    
+    // Get current data
+    const dataString = secureLocalStorage.getItem(storageKey);
+    
+    if (!dataString) {
+      return 0; // No rate limit data
+    }
+    
+    const data: RateLimitData = JSON.parse(dataString);
+    
+    // If not blocked, no remaining time
+    if (!data.blocked) {
+      return 0;
+    }
+    
+    // Calculate remaining time
+    const now = Date.now();
+    const remainingTime = data.blockedUntil - now;
+    
+    // Return 0 if already expired
+    return Math.max(0, remainingTime);
+  } catch (error) {
+    logError(error, { context: 'getRateLimitRemainingTime' });
+    return 0;
   }
-  
-  // Calculate remaining requests
-  const now = Date.now();
-  
-  // If expired, return null
-  if (now > bucket.expiresAt) {
-    delete rateLimitBuckets[key];
-    return null;
-  }
-  
-  // Return status
-  return {
-    remaining: Math.max(0, bucket.count),
-    total: bucket.count,
-    resetsIn: Math.ceil((bucket.expiresAt - now) / 1000)
-  };
 }
 
 /**
- * Clear all rate limit buckets
+ * Get remaining attempts before rate limit
+ * @param key Rate limit key
+ * @param maxAttempts Maximum attempts allowed
+ * @returns Remaining attempts, or 0 if rate limited
  */
-export function clearAllRateLimits(): void {
-  Object.keys(rateLimitBuckets).forEach(key => {
-    delete rateLimitBuckets[key];
-  });
+export function getRateLimitRemainingAttempts(
+  key: string,
+  maxAttempts: number = DEFAULT_MAX_ATTEMPTS
+): number {
+  try {
+    // Generate storage key
+    const storageKey = `${RATE_LIMIT_PREFIX}${key}`;
+    
+    // Get current data
+    const dataString = secureLocalStorage.getItem(storageKey);
+    
+    if (!dataString) {
+      return maxAttempts; // No rate limit data, all attempts available
+    }
+    
+    const data: RateLimitData = JSON.parse(dataString);
+    
+    // If blocked, no attempts remaining
+    if (data.blocked) {
+      return 0;
+    }
+    
+    // Check if timeout has expired
+    const now = Date.now();
+    if (now - data.timestamp > DEFAULT_TIMEOUT_MS) {
+      return maxAttempts; // Timeout expired, all attempts available
+    }
+    
+    // Calculate remaining attempts
+    return Math.max(0, maxAttempts - data.attempts);
+  } catch (error) {
+    logError(error, { context: 'getRateLimitRemainingAttempts' });
+    return maxAttempts; // Return max attempts if there's an error
+  }
+}
+
+/**
+ * Format remaining time as a human-readable string
+ * @param ms Milliseconds
+ * @returns Formatted time string
+ */
+export function formatRateLimitTime(ms: number): string {
+  if (ms <= 0) {
+    return 'now';
+  }
+  
+  const seconds = Math.floor(ms / 1000);
+  
+  if (seconds < 60) {
+    return `${seconds} second${seconds !== 1 ? 's' : ''}`;
+  }
+  
+  const minutes = Math.floor(seconds / 60);
+  
+  if (minutes < 60) {
+    return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+  }
+  
+  const hours = Math.floor(minutes / 60);
+  
+  return `${hours} hour${hours !== 1 ? 's' : ''}`;
 }
 
 export default {
-  checkRateLimit,
+  setupRateLimiting,
+  isRateLimited,
+  incrementRateLimitCounter,
   resetRateLimit,
-  getRateLimitStatus,
-  clearAllRateLimits
+  getRateLimitRemainingTime,
+  getRateLimitRemainingAttempts,
+  formatRateLimitTime
 };

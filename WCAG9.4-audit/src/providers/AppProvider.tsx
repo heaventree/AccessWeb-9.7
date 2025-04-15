@@ -1,99 +1,63 @@
-import React from 'react';
-import { QueryClient } from '@tanstack/react-query';
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { ThemeProvider } from './ThemeProvider';
-import { Toaster } from 'react-hot-toast';
+/**
+ * App Provider
+ * 
+ * Root provider that incorporates all application contexts
+ * and providers for a secure and accessible application.
+ */
+
+import React, { ReactNode } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '../contexts/AuthContext';
-import { FloatingToolsProvider } from '../contexts/FloatingToolsContext';
-import SecurityProvider from './SecurityProvider';
+import { SecurityProvider } from './SecurityProvider';
+import { ErrorBoundary } from '../components/ErrorBoundary';
+import { IS_DEVELOPMENT_MODE } from '../utils/environment';
 
-// Create a mock HelmetProvider for now since it's causing compatibility issues
-const MockHelmetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <>{children}</>;
-};
+// App provider props
+interface AppProviderProps {
+  /**
+   * Child components
+   */
+  children: ReactNode;
+}
 
-// Custom persister with proper Promise handling
-const persister = createSyncStoragePersister({
-  storage: {
-    getItem: (key: string): string | null => {
-      const data = localStorage.getItem(key);
-      if (!data) return null;
-      try {
-        // Ensure we're returning a valid JSON string
-        return JSON.stringify(JSON.parse(data));
-      } catch {
-        return null;
-      }
-    },
-    setItem: (key: string, value: string): void => {
-      try {
-        localStorage.setItem(key, value);
-      } catch (err) {
-        console.error('Error saving to localStorage:', err);
-      }
-    },
-    removeItem: (key: string): void => {
-      localStorage.removeItem(key);
-    }
-  }
-});
-
-export const queryClient = new QueryClient({
+// Create query client for React Query
+const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 0,
-      cacheTime: 0,
       retry: 1,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-      refetchOnWindowFocus: true
-    }
-  }
+      refetchOnWindowFocus: !IS_DEVELOPMENT_MODE,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 10, // 10 minutes
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
 });
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
+/**
+ * App Provider Component
+ * 
+ * Top-level provider that wraps the entire application
+ */
+export function AppProvider({ children }: AppProviderProps): JSX.Element {
   return (
-    <PersistQueryClientProvider
-      client={queryClient}
-      persistOptions={{
-        persister,
-        maxAge: 0,
-        dehydrateOptions: {
-          shouldDehydrateQuery: query => {
-            // Don't persist sensitive data
-            return !query.queryKey.includes('auth');
-          }
-        },
-        serialize: (data) => {
-          try {
-            return JSON.stringify(data);
-          } catch (err) {
-            console.error('Failed to serialize query data:', err);
-            return '';
-          }
-        },
-        deserialize: (data) => {
-          try {
-            return JSON.parse(data);
-          } catch (err) {
-            console.error('Failed to deserialize query data:', err);
-            return {};
-          }
-        }
-      }}
-    >
-      <ThemeProvider>
-        <SecurityProvider>
-          <AuthProvider>
-            <FloatingToolsProvider>
-              <MockHelmetProvider>
-                <Toaster position="top-center" />
+    <ErrorBoundary>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <SecurityProvider>
+            <BrowserRouter>
+              <AuthProvider>
                 {children}
-              </MockHelmetProvider>
-            </FloatingToolsProvider>
-          </AuthProvider>
-        </SecurityProvider>
-      </ThemeProvider>
-    </PersistQueryClientProvider>
+              </AuthProvider>
+            </BrowserRouter>
+          </SecurityProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
+    </ErrorBoundary>
   );
 }
+
+export default AppProvider;

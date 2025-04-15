@@ -1,189 +1,241 @@
 /**
  * Sanitization Utilities
  * 
- * Provides robust data sanitization to prevent XSS and injection attacks
- * by cleaning user input and untrusted data.
+ * Provides secure data sanitization utilities to protect against
+ * XSS and other injection attacks.
  */
 
 import DOMPurify from 'dompurify';
+import { logError } from './errorHandler';
 
 /**
- * Sanitize HTML string to prevent XSS attacks
- * @param html HTML string to sanitize
- * @param config Optional DOMPurify configuration
- * @returns Sanitized HTML string
+ * Default DOMPurify configuration
+ */
+const DEFAULT_SANITIZE_CONFIG: DOMPurify.Config = {
+  USE_PROFILES: { html: true },
+  ALLOWED_TAGS: [
+    'a', 'b', 'br', 'code', 'div', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'i', 'li', 'ol', 'p', 'pre', 'span', 'strong', 'table', 'tbody', 'td',
+    'th', 'thead', 'tr', 'ul'
+  ],
+  ALLOWED_ATTR: [
+    'aria-*', 'class', 'data-*', 'href', 'id', 'rel', 'style', 'target', 'title'
+  ],
+  FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'form', 'input', 'button'],
+  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'eval'],
+  ALLOW_ARIA_ATTR: true,
+  ALLOW_DATA_ATTR: true,
+  SAFE_FOR_TEMPLATES: true,
+  SAFE_FOR_JQUERY: true,
+  SANITIZE_DOM: true,
+  ADD_ATTR: ['target']
+};
+
+/**
+ * Configure DOMPurify defaults
+ */
+export function configureSanitizerDefaults(): void {
+  try {
+    // Add hooks for additional security
+    DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+      // Set all links to open in a new tab and add security attributes
+      if (node.tagName === 'A') {
+        node.setAttribute('target', '_blank');
+        node.setAttribute('rel', 'noopener noreferrer');
+        
+        // Ensure links only use safe protocols
+        if (node.getAttribute('href')) {
+          const href = node.getAttribute('href') || '';
+          const isExternal = href.startsWith('http://') || href.startsWith('https://');
+          
+          if (isExternal) {
+            // Add warning class to external links
+            node.classList.add('external-link');
+          } else if (!href.startsWith('/') && !href.startsWith('#') && !href.startsWith('mailto:')) {
+            // Suspicious protocol, make it a placeholder
+            node.setAttribute('href', '#invalid-link');
+            node.classList.add('invalid-link');
+          }
+        }
+      }
+      
+      // Remove JS events from all elements
+      node.removeAttribute('onload');
+      node.removeAttribute('onerror');
+      node.removeAttribute('onclick');
+      node.removeAttribute('onmouseover');
+      
+      // Allow only certain inline styles and sanitize them
+      if (node.hasAttribute('style')) {
+        const style = node.getAttribute('style') || '';
+        const sanitizedStyle = sanitizeStyles(style);
+        
+        if (sanitizedStyle) {
+          node.setAttribute('style', sanitizedStyle);
+        } else {
+          node.removeAttribute('style');
+        }
+      }
+    });
+  } catch (error) {
+    logError(error, { context: 'configureSanitizerDefaults' });
+  }
+}
+
+/**
+ * Sanitize HTML content
+ * @param html HTML content to sanitize
+ * @param config Optional DOMPurify config
+ * @returns Sanitized HTML
  */
 export function sanitizeHtml(html: string, config?: DOMPurify.Config): string {
-  if (!html) return '';
-  
-  // Default configuration with strict settings
-  const defaultConfig: DOMPurify.Config = {
-    USE_PROFILES: { html: true },
-    ALLOWED_TAGS: [
-      'a', 'b', 'br', 'code', 'div', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'i', 'li', 'ol', 'p', 'pre', 'span', 'strong', 'table', 'tbody', 
-      'td', 'th', 'thead', 'tr', 'ul'
-    ],
-    ALLOWED_ATTR: [
-      'href', 'target', 'class', 'id', 'style', 'title', 'alt', 
-      'aria-label', 'aria-labelledby', 'aria-hidden', 'role',
-      'tabindex'
-    ],
-    ALLOW_DATA_ATTR: false,
-    ADD_ATTR: ['target'],
-    FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form', 'input'],
-    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
-    FORBID_CONTENTS: true,
-    WHOLE_DOCUMENT: false,
-    RETURN_DOM: false,
-    RETURN_DOM_FRAGMENT: false,
-    RETURN_TRUSTED_TYPE: false,
-    SAFE_FOR_TEMPLATES: true,
-    SANITIZE_DOM: true
-  };
-  
-  // Merge with user config
-  const finalConfig = { ...defaultConfig, ...(config || {}) };
-  
-  // Sanitize HTML
-  return DOMPurify.sanitize(html, finalConfig);
-}
-
-/**
- * Sanitize a text string (removes HTML tags completely)
- * @param text Text to sanitize
- * @returns Sanitized text string
- */
-export function sanitizeText(text: string): string {
-  if (!text) return '';
-  
-  // Convert to string if not already
-  const stringText = String(text);
-  
-  // Remove all HTML tags
-  return DOMPurify.sanitize(stringText, {
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
-    FORBID_CONTENTS: true,
-    WHOLE_DOCUMENT: false
-  });
-}
-
-/**
- * Validate and sanitize a URL
- * @param url URL to sanitize
- * @param allowedProtocols Allowed protocols
- * @returns Sanitized URL or empty string if invalid
- */
-export function sanitizeUrl(
-  url: string, 
-  allowedProtocols: string[] = ['http:', 'https:']
-): string {
-  if (!url) return '';
-  
   try {
-    // Attempt to parse URL
-    const parsed = new URL(url);
+    const mergedConfig = {
+      ...DEFAULT_SANITIZE_CONFIG,
+      ...(config || {})
+    };
     
-    // Check if protocol is allowed
-    if (!allowedProtocols.includes(parsed.protocol)) {
-      return '';
-    }
-    
-    // Return sanitized URL
-    return parsed.toString();
+    return DOMPurify.sanitize(html, mergedConfig);
   } catch (error) {
-    // Invalid URL
+    logError(error, { context: 'sanitizeHtml' });
     return '';
   }
 }
 
 /**
- * Sanitize an object recursively
- * @param obj Object to sanitize
- * @returns Sanitized object
+ * Sanitize plain text (remove all HTML)
+ * @param text Text to sanitize
+ * @returns Sanitized text
  */
-export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
-  if (!obj || typeof obj !== 'object' || obj === null) {
-    return obj;
-  }
-  
-  // Clone object to avoid mutating original
-  const sanitized = { ...obj };
-  
-  // Sanitize each property
-  Object.keys(sanitized).forEach(key => {
-    const value = sanitized[key];
+export function sanitizeText(text: string): string {
+  try {
+    if (!text) return '';
     
-    if (typeof value === 'string') {
-      // Sanitize string values
-      sanitized[key] = sanitizeText(value);
-    } else if (typeof value === 'object' && value !== null) {
-      // Recursively sanitize nested objects
-      if (Array.isArray(value)) {
-        // Handle arrays
-        sanitized[key] = value.map(item => 
-          typeof item === 'object' && item !== null
-            ? sanitizeObject(item)
-            : typeof item === 'string'
-              ? sanitizeText(item)
-              : item
-        );
-      } else {
-        // Handle objects
-        sanitized[key] = sanitizeObject(value);
-      }
-    }
-    // Primitive values (numbers, booleans) are kept as is
-  });
-  
-  return sanitized as T;
-}
-
-/**
- * Sanitize form data from a FormData object
- * @param formData FormData object
- * @returns Sanitized key-value object
- */
-export function sanitizeFormData(formData: FormData): Record<string, string | File> {
-  const sanitized: Record<string, string | File> = {};
-  
-  // Process each form field
-  for (const [key, value] of formData.entries()) {
-    if (typeof value === 'string') {
-      // Sanitize string values
-      sanitized[key] = sanitizeText(value);
-    } else {
-      // Keep file objects as is
-      sanitized[key] = value;
-    }
+    // Use DOMPurify with strict config to strip all HTML
+    const config: DOMPurify.Config = {
+      ALLOWED_TAGS: [],
+      ALLOWED_ATTR: [],
+      KEEP_CONTENT: true
+    };
+    
+    return DOMPurify.sanitize(text, config);
+  } catch (error) {
+    logError(error, { context: 'sanitizeText' });
+    return '';
   }
-  
-  return sanitized;
 }
 
 /**
- * Create a safe HTML attribute value
- * @param value Value to sanitize for HTML attribute
- * @returns Sanitized attribute value
+ * Sanitize URL
+ * @param url URL to sanitize
+ * @returns Sanitized URL
  */
-export function sanitizeHtmlAttribute(value: string): string {
-  if (!value) return '';
-  
-  // Convert to string and escape special characters
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+export function sanitizeUrl(url: string): string {
+  try {
+    if (!url) return '';
+    
+    // Validate URL format
+    try {
+      // Use URL constructor to validate
+      new URL(url);
+      
+      // Check for unsafe protocols
+      const protocol = url.split(':')[0].toLowerCase();
+      const safeProtocols = ['http', 'https', 'mailto', 'tel', 'ftp'];
+      
+      if (!safeProtocols.includes(protocol)) {
+        return '#';
+      }
+      
+      // Sanitize URL components
+      return DOMPurify.sanitize(url, {
+        ALLOWED_TAGS: [],
+        ALLOWED_ATTR: []
+      });
+    } catch (error) {
+      // Not a valid URL
+      return '#';
+    }
+  } catch (error) {
+    logError(error, { context: 'sanitizeUrl' });
+    return '#';
+  }
+}
+
+/**
+ * Sanitize CSS styles
+ * @param styles CSS styles to sanitize
+ * @returns Sanitized styles
+ */
+export function sanitizeStyles(styles: string): string {
+  try {
+    if (!styles) return '';
+    
+    // Split styles by semicolon
+    const styleProperties = styles.split(';').filter(Boolean);
+    const allowedProperties = [
+      'color', 'background-color', 'font-size', 'font-weight', 'font-style',
+      'text-align', 'text-decoration', 'margin', 'padding', 'border',
+      'display', 'width', 'height', 'max-width', 'max-height'
+    ];
+    
+    // Filter and validate each property
+    const sanitizedProperties = styleProperties
+      .map(prop => {
+        const [name, value] = prop.split(':').map(s => s.trim());
+        
+        // Check if property is allowed
+        if (!allowedProperties.includes(name)) {
+          return null;
+        }
+        
+        // Check for potentially unsafe values
+        if (
+          value.includes('javascript:') ||
+          value.includes('expression') ||
+          value.includes('url(') ||
+          value.includes('eval(')
+        ) {
+          return null;
+        }
+        
+        return `${name}: ${value}`;
+      })
+      .filter(Boolean);
+    
+    return sanitizedProperties.join('; ');
+  } catch (error) {
+    logError(error, { context: 'sanitizeStyles' });
+    return '';
+  }
+}
+
+/**
+ * Sanitize a filename to be safe for storage
+ * @param filename Filename to sanitize
+ * @returns Sanitized filename
+ */
+export function sanitizeFilename(filename: string): string {
+  try {
+    if (!filename) return '';
+    
+    // Remove path traversal and special characters
+    const sanitized = filename
+      .replace(/[/\\?%*:|"<>]/g, '')
+      .replace(/\.\./g, '');
+    
+    return sanitized || 'file';
+  } catch (error) {
+    logError(error, { context: 'sanitizeFilename' });
+    return 'file';
+  }
 }
 
 export default {
+  configureSanitizerDefaults,
   sanitizeHtml,
   sanitizeText,
   sanitizeUrl,
-  sanitizeObject,
-  sanitizeFormData,
-  sanitizeHtmlAttribute
+  sanitizeStyles,
+  sanitizeFilename
 };

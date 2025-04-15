@@ -7,7 +7,7 @@
 
 import { encrypt, decrypt, sha256Hash } from './crypto';
 import { logError } from './errorHandler';
-import { IS_DEVELOPMENT_MODE } from './environment';
+import { isDevelopment } from './environment';
 
 // Security configuration
 const STORAGE_PREFIX = 'wcag_sec_';
@@ -40,7 +40,7 @@ export async function setupSecureStorage(): Promise<void> {
     localStorage.setItem(ENCRYPTION_KEY, key);
     
     // Log initialization in development
-    if (IS_DEVELOPMENT_MODE) {
+    if (isDevelopment()) {
       console.info('Secure storage initialized');
     }
   } catch (error) {

@@ -1,159 +1,201 @@
 /**
  * Environment Utilities
  * 
- * Securely access and validate environment variables with
- * type safety and default fallbacks.
+ * Provides a secure and centralized way to access environment variables
+ * and configuration.
  */
 
-// Environment detection
-export const IS_PRODUCTION = import.meta.env.PROD;
-export const IS_DEVELOPMENT_MODE = import.meta.env.DEV;
-export const IS_TEST_MODE = import.meta.env.MODE === 'test';
-export const APP_MODE = import.meta.env.MODE || 'development';
+import { logError } from './errorHandler';
 
-// Default constants
-export const API_BASE_URL = getEnvString('VITE_API_BASE_URL', IS_DEVELOPMENT_MODE 
-  ? 'http://localhost:3000/api'
-  : 'https://api.accessibility.example.com');
-
-export const API_VERSION = getEnvString('VITE_API_VERSION', 'v1');
-export const API_TIMEOUT = getEnvNumber('VITE_API_TIMEOUT', 30000); // 30 seconds
-
-export const AUTH_TOKEN_EXPIRY = getEnvNumber('VITE_AUTH_TOKEN_EXPIRY', 60 * 60); // 1 hour
-export const REFRESH_TOKEN_EXPIRY = getEnvNumber('VITE_REFRESH_TOKEN_EXPIRY', 7 * 24 * 60 * 60); // 7 days
-
-export const CSP_REPORT_URI = getEnvString('VITE_CSP_REPORT_URI', '');
-export const MAX_UPLOAD_SIZE = getEnvNumber('VITE_MAX_UPLOAD_SIZE', 10 * 1024 * 1024); // 10MB
+// Cache for environment variables
+const envCache: Record<string, string> = {};
 
 /**
- * Get a string value from environment variables
- * @param key Variable name
- * @param defaultValue Fallback value
+ * Load all environment variables into cache
+ */
+export function loadEnvVariables(): void {
+  try {
+    // Import.meta.env is available in Vite applications
+    if (import.meta.env) {
+      // Load all environment variables from import.meta.env
+      Object.entries(import.meta.env).forEach(([key, value]) => {
+        if (typeof value === 'string') {
+          envCache[key] = value;
+        }
+      });
+    }
+    
+    // Also load from process.env if available (for SSR or Node.js environments)
+    if (typeof process !== 'undefined' && process.env) {
+      Object.entries(process.env).forEach(([key, value]) => {
+        if (typeof value === 'string') {
+          envCache[key] = value;
+        }
+      });
+    }
+  } catch (error) {
+    logError(error, { context: 'loadEnvVariables' });
+  }
+}
+
+/**
+ * Get a string environment variable
+ * @param key Environment variable key
+ * @param defaultValue Default value if environment variable is not set
  * @returns Environment variable value or default
  */
 export function getEnvString(key: string, defaultValue: string = ''): string {
-  const value = import.meta.env[key];
-  return value !== undefined ? String(value) : defaultValue;
+  try {
+    // Check cache first
+    if (envCache[key]) {
+      return envCache[key];
+    }
+    
+    // Try to get from import.meta.env (Vite)
+    if (import.meta.env && import.meta.env[key]) {
+      const value = import.meta.env[key];
+      
+      if (typeof value === 'string') {
+        // Cache value for future use
+        envCache[key] = value;
+        return value;
+      }
+    }
+    
+    // Try to get from process.env (Node.js)
+    if (typeof process !== 'undefined' && process.env && process.env[key]) {
+      const value = process.env[key];
+      
+      if (typeof value === 'string') {
+        // Cache value for future use
+        envCache[key] = value;
+        return value;
+      }
+    }
+    
+    // Return default value if not found
+    return defaultValue;
+  } catch (error) {
+    logError(error, { context: 'getEnvString', data: { key } });
+    return defaultValue;
+  }
 }
 
 /**
- * Get a number value from environment variables
- * @param key Variable name
- * @param defaultValue Fallback value
- * @returns Environment variable value or default
+ * Get a number environment variable
+ * @param key Environment variable key
+ * @param defaultValue Default value if environment variable is not set or not a valid number
+ * @returns Environment variable value as number or default
  */
 export function getEnvNumber(key: string, defaultValue: number = 0): number {
-  const value = import.meta.env[key];
-  
-  if (value === undefined) {
+  try {
+    const stringValue = getEnvString(key, String(defaultValue));
+    const numberValue = Number(stringValue);
+    
+    // Return default if not a valid number
+    return isNaN(numberValue) ? defaultValue : numberValue;
+  } catch (error) {
+    logError(error, { context: 'getEnvNumber', data: { key } });
     return defaultValue;
   }
-  
-  const parsed = Number(value);
-  return isNaN(parsed) ? defaultValue : parsed;
 }
 
 /**
- * Get a boolean value from environment variables
- * @param key Variable name
- * @param defaultValue Fallback value
- * @returns Environment variable value or default
+ * Get a boolean environment variable
+ * @param key Environment variable key
+ * @param defaultValue Default value if environment variable is not set
+ * @returns Environment variable value as boolean or default
  */
 export function getEnvBoolean(key: string, defaultValue: boolean = false): boolean {
-  const value = import.meta.env[key];
-  
-  if (value === undefined) {
+  try {
+    const stringValue = getEnvString(key, String(defaultValue));
+    
+    // Check for truthy values
+    return ['true', 'yes', '1'].includes(stringValue.toLowerCase());
+  } catch (error) {
+    logError(error, { context: 'getEnvBoolean', data: { key } });
     return defaultValue;
   }
-  
-  return value === 'true' || value === '1' || value === 'yes';
 }
 
 /**
- * Get a JSON value from environment variables
- * @param key Variable name
- * @param defaultValue Fallback value
- * @returns Parsed environment variable value or default
+ * Get an array environment variable (comma-separated values)
+ * @param key Environment variable key
+ * @param defaultValue Default value if environment variable is not set
+ * @returns Environment variable value as array or default
+ */
+export function getEnvArray(key: string, defaultValue: string[] = []): string[] {
+  try {
+    const stringValue = getEnvString(key, '');
+    
+    // Return default if empty
+    if (!stringValue) {
+      return defaultValue;
+    }
+    
+    // Split by comma and trim each value
+    return stringValue.split(',').map(item => item.trim());
+  } catch (error) {
+    logError(error, { context: 'getEnvArray', data: { key } });
+    return defaultValue;
+  }
+}
+
+/**
+ * Get a JSON environment variable
+ * @param key Environment variable key
+ * @param defaultValue Default value if environment variable is not set or not valid JSON
+ * @returns Environment variable value as parsed JSON or default
  */
 export function getEnvJson<T>(key: string, defaultValue: T): T {
-  const value = import.meta.env[key];
-  
-  if (value === undefined) {
-    return defaultValue;
-  }
-  
   try {
-    return JSON.parse(value) as T;
+    const stringValue = getEnvString(key, '');
+    
+    // Return default if empty
+    if (!stringValue) {
+      return defaultValue;
+    }
+    
+    // Parse JSON
+    return JSON.parse(stringValue) as T;
   } catch (error) {
-    console.error(`Error parsing JSON from env var ${key}:`, error);
+    logError(error, { context: 'getEnvJson', data: { key } });
     return defaultValue;
   }
 }
 
 /**
- * Require an environment variable, throw error if missing
- * @param key Variable name
- * @param errorMessage Optional custom error message
- * @returns Environment variable value
- * @throws Error if variable is missing
+ * Check if running in development mode
+ * @returns Whether running in development mode
  */
-export function requireEnvVariable(key: string, errorMessage?: string): string {
-  const value = import.meta.env[key];
-  
-  if (value === undefined) {
-    throw new Error(
-      errorMessage || 
-      `Required environment variable ${key} is missing. Please check your .env file.`
-    );
-  }
-  
-  return String(value);
+export function isDevelopment(): boolean {
+  return getEnvString('NODE_ENV', 'development') === 'development';
 }
 
 /**
- * Check if an environment variable exists
- * @param key Variable name
- * @returns True if variable exists
+ * Check if running in production mode
+ * @returns Whether running in production mode
  */
-export function hasEnvVariable(key: string): boolean {
-  return import.meta.env[key] !== undefined;
+export function isProduction(): boolean {
+  return getEnvString('NODE_ENV', 'development') === 'production';
 }
 
 /**
- * Get the current deployment environment
- * @returns Environment name
+ * Check if running in test mode
+ * @returns Whether running in test mode
  */
-export function getEnvironment(): 'development' | 'staging' | 'production' | 'test' {
-  const env = getEnvString('NODE_ENV', 'development');
-  
-  switch (env) {
-    case 'production':
-      return 'production';
-    case 'staging':
-      return 'staging';
-    case 'test':
-      return 'test';
-    case 'development':
-    default:
-      return 'development';
-  }
+export function isTest(): boolean {
+  return getEnvString('NODE_ENV', 'development') === 'test';
 }
 
 export default {
-  IS_PRODUCTION,
-  IS_DEVELOPMENT_MODE,
-  IS_TEST_MODE,
-  APP_MODE,
-  API_BASE_URL,
-  API_VERSION,
-  API_TIMEOUT,
-  AUTH_TOKEN_EXPIRY,
-  REFRESH_TOKEN_EXPIRY,
+  loadEnvVariables,
   getEnvString,
   getEnvNumber,
   getEnvBoolean,
+  getEnvArray,
   getEnvJson,
-  requireEnvVariable,
-  hasEnvVariable,
-  getEnvironment
+  isDevelopment,
+  isProduction,
+  isTest
 };

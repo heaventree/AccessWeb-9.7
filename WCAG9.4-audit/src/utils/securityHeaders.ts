@@ -6,7 +6,7 @@
  */
 
 import { logError } from './errorHandler';
-import { IS_DEVELOPMENT_MODE } from './environment';
+import { isDevelopment } from './environment';
 import { buildCspHeader, getNonce } from './contentSecurity';
 
 // Security headers configuration
@@ -27,7 +27,7 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
   
   // HSTS for forcing HTTPS connections (not added in development)
-  ...(IS_DEVELOPMENT_MODE ? {} : {
+  ...(isDevelopment() ? {} : {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload'
   })
 };
@@ -123,7 +123,7 @@ export function initSecurityHeaders(): void {
     createSecurityHeaderMetaTags();
     
     // Log initialization in development
-    if (IS_DEVELOPMENT_MODE) {
+    if (isDevelopment()) {
       console.info('Security headers initialized');
     }
   } catch (error) {
