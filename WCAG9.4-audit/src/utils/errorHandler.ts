@@ -15,6 +15,21 @@ export enum ErrorSeverity {
   INFO = 'info'
 }
 
+// Define specific error types for error classification
+export enum ErrorType {
+  INTERNAL = 'internal',
+  NETWORK = 'network',
+  API = 'api',
+  VALIDATION = 'validation',
+  AUTHENTICATION = 'authentication',
+  AUTHORIZATION = 'authorization',
+  NOT_FOUND = 'not_found',
+  RATE_LIMIT = 'rate_limit',
+  TIMEOUT = 'timeout',
+  SECURITY = 'security',
+  UNKNOWN = 'unknown'
+}
+
 // Error context data for additional debug information
 export interface ErrorContext {
   context?: string;
@@ -225,6 +240,94 @@ export function isErrorType(error: unknown, errorType: any): boolean {
 }
 
 /**
+ * Create a custom error with type and additional data
+ * @param message Error message
+ * @param type Error type
+ * @param data Additional error data
+ * @returns Custom error
+ */
+export function createError(message: string, type: ErrorType, data: Record<string, any> = {}): Error {
+  const error = new Error(message);
+  (error as any).type = type;
+  (error as any).data = data;
+  (error as any).timestamp = Date.now();
+  
+  return error;
+}
+
+/**
+ * Handle API errors consistently
+ * @param error Original error 
+ * @param context Error context
+ * @returns Properly formatted error
+ */
+export function handleApiError(error: unknown, context: ErrorContext = {}): Error {
+  // Default to API error type
+  let errorType = ErrorType.API;
+  let errorMessage = "An unexpected API error occurred";
+  
+  // Extract response details if available
+  if (error instanceof Response || (error && typeof error === 'object' && 'status' in error)) {
+    const response = error as Response;
+    
+    // Map HTTP status codes to error types
+    switch (response.status) {
+      case 400:
+        errorType = ErrorType.VALIDATION;
+        errorMessage = "The request was invalid";
+        break;
+      case 401:
+      case 403:
+        errorType = ErrorType.AUTHENTICATION;
+        errorMessage = "You don't have permission to access this resource";
+        break;
+      case 404:
+        errorType = ErrorType.NOT_FOUND;
+        errorMessage = "The requested resource was not found";
+        break;
+      case 429:
+        errorType = ErrorType.RATE_LIMIT;
+        errorMessage = "Too many requests, please try again later";
+        break;
+      case 500:
+      case 502:
+      case 503:
+      case 504:
+        errorType = ErrorType.API;
+        errorMessage = "The server encountered an error";
+        break;
+    }
+  } else if (error instanceof Error) {
+    errorMessage = error.message;
+    
+    // Check for network errors
+    if (
+      error.name === 'NetworkError' || 
+      error.message.includes('network') ||
+      error.message.includes('connection')
+    ) {
+      errorType = ErrorType.NETWORK;
+      errorMessage = "Network error occurred. Please check your connection.";
+    }
+  }
+  
+  // Create standardized error
+  const standardError = createError(errorMessage, errorType, { 
+    originalError: error,
+    ...context
+  });
+  
+  // Log the error
+  logError(standardError, {
+    context: context.context || 'API',
+    severity: ErrorSeverity.ERROR,
+    ...context
+  });
+  
+  return standardError;
+}
+
+/**
  * Get user-friendly error message
  * @param error Error to get message for
  * @returns User-friendly error message
@@ -300,5 +403,8 @@ export default {
   isErrorType,
   getUserFriendlyErrorMessage,
   getAccessibleErrorProps,
-  ErrorSeverity
+  ErrorSeverity,
+  ErrorType,
+  createError,
+  handleApiError
 };

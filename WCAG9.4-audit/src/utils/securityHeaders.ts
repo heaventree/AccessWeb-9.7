@@ -7,7 +7,7 @@
 
 import { logError } from './errorHandler';
 import { isDevelopment } from './environment';
-import { buildCspHeader, getNonce } from './contentSecurity';
+import contentSecurity from './contentSecurity';
 
 // Security headers configuration
 const SECURITY_HEADERS = {
@@ -68,8 +68,8 @@ export function createSecurityHeaderMetaTags(): void {
   }
   
   try {
-    // Add Content-Security-Policy from buildCspHeader function
-    const cspValue = buildCspHeader();
+    // Add Content-Security-Policy from buildCSPContent function
+    const cspValue = contentSecurity.buildCSPContent ? contentSecurity.buildCSPContent() : '';
     addMetaTag('Content-Security-Policy', cspValue);
     
     // Add other security headers as meta tags
@@ -78,7 +78,7 @@ export function createSecurityHeaderMetaTags(): void {
     });
     
     // Add nonce meta tag
-    addMetaTag('csp-nonce', getNonce());
+    addMetaTag('csp-nonce', contentSecurity.getNonce());
   } catch (error) {
     logError(error, { context: 'securityHeaders.createSecurityHeaderMetaTags' });
   }

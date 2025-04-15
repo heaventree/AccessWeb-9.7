@@ -103,7 +103,7 @@ function applyCSPMetaTag(): void {
  * Build CSP content string
  * @returns CSP content string
  */
-function buildCSPContent(): string {
+export function buildCSPContent(): string {
   try {
     // Get CSP configuration from environment
     const reportUri = getEnvString('VITE_CSP_REPORT_URI', '/api/csp-report');
@@ -242,5 +242,6 @@ export default {
   updateCSPNonce,
   validateCSP,
   getNonce,
-  addNonceToScript
+  addNonceToScript,
+  buildCSPContent
 };
