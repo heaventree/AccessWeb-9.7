@@ -1,179 +1,193 @@
 /**
  * Security Headers Utility
  * 
- * Provides utilities for setting secure HTTP headers both on the client-side
- * and for server configurations to enhance application security.
+ * Provides HTTP security headers for protecting against various attacks
+ * including XSS, clickjacking, MIME sniffing, and cross-origin issues.
  */
 
-import { getCurrentNonce } from './contentSecurity';
+import { IS_DEVELOPMENT_MODE } from './environment';
 
+/**
+ * Security Headers Configuration
+ */
 export interface SecurityHeadersConfig {
-  // CSP nonce if needed
-  nonce?: string;
+  /**
+   * X-XSS-Protection header value
+   */
+  xssProtection?: string;
   
-  // Allow reporting to these endpoints
-  reportTo?: string[];
+  /**
+   * X-Content-Type-Options header value
+   */
+  contentTypeOptions?: string;
   
-  // Report-only mode for CSP
-  cspReportOnly?: boolean;
-}
-
-/**
- * HSTS (HTTP Strict Transport Security) configuration
- * This tells browsers to only use HTTPS for the domain
- */
-export function getHSTSHeader(): string {
-  return 'max-age=63072000; includeSubDomains; preload';
-}
-
-/**
- * X-Content-Type-Options header 
- * Prevents MIME type sniffing
- */
-export function getContentTypeOptionsHeader(): string {
-  return 'nosniff';
-}
-
-/**
- * X-Frame-Options header
- * Prevents clickjacking attacks
- */
-export function getFrameOptionsHeader(): string {
-  return 'DENY';
-}
-
-/**
- * X-XSS-Protection header
- * Enables browser's built-in XSS protection
- */
-export function getXSSProtectionHeader(): string {
-  return '1; mode=block';
-}
-
-/**
- * Referrer-Policy header
- * Controls information sent in the Referer header
- */
-export function getReferrerPolicyHeader(): string {
-  return 'strict-origin-when-cross-origin';
-}
-
-/**
- * Permissions-Policy header
- * Controls which browser features can be used
- */
-export function getPermissionsPolicyHeader(): string {
-  return (
-    'accelerometer=(), camera=(), geolocation=(), gyroscope=(), ' +
-    'magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=()'
-  );
-}
-
-/**
- * Generate Content-Security-Policy header
- * Defines approved sources of content
- */
-export function getCSPHeader(config: SecurityHeadersConfig = {}): string {
-  const nonce = config.nonce || getCurrentNonce() || '';
+  /**
+   * X-Frame-Options header value
+   */
+  frameOptions?: string;
   
-  // Define CSP directives
-  const directives = [
-    // Default behavior for resources not explicitly listed
-    "default-src 'self'",
-    
-    // Scripts can come from self and specified domains with nonce
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-    
-    // Styles from self and specified domains, allow inline styles
-    "style-src 'self' 'unsafe-inline'",
-    
-    // Images from self, data URIs, and any HTTPS source
-    "img-src 'self' data: https:",
-    
-    // Fonts from self and specified font providers
-    "font-src 'self' https://fonts.gstatic.com",
-    
-    // Connect to self and specified APIs
-    "connect-src 'self' https://api.example.com",
-    
-    // No frames/iframes allowed
-    "frame-src 'none'",
-    
-    // No plugins allowed
-    "object-src 'none'",
-    
-    // Form submissions only to self
-    "form-action 'self'",
-    
-    // Cannot be embedded in frames
-    "frame-ancestors 'none'",
-    
-    // Upgrade insecure requests
-    "upgrade-insecure-requests"
-  ];
+  /**
+   * Referrer-Policy header value
+   */
+  referrerPolicy?: string;
   
-  // Add reporting endpoint if specified
-  if (config.reportTo && config.reportTo.length > 0) {
-    directives.push(`report-uri ${config.reportTo.join(' ')}`);
-    directives.push(`report-to ${config.reportTo.join(' ')}`);
+  /**
+   * Strict-Transport-Security header value
+   */
+  strictTransportSecurity?: string;
+  
+  /**
+   * X-Permitted-Cross-Domain-Policies header value
+   */
+  permittedCrossDomainPolicies?: string;
+  
+  /**
+   * Feature-Policy/Permissions-Policy header value
+   */
+  permissionsPolicy?: string;
+  
+  /**
+   * Additional custom headers
+   */
+  customHeaders?: Record<string, string>;
+}
+
+/**
+ * Default secure HTTP header values
+ */
+export const DEFAULT_SECURITY_HEADERS: SecurityHeadersConfig = {
+  // Prevent XSS attacks
+  xssProtection: '1; mode=block',
+  
+  // Prevent MIME type sniffing
+  contentTypeOptions: 'nosniff',
+  
+  // Prevent clickjacking
+  frameOptions: 'DENY',
+  
+  // Control information sent in referrer header
+  referrerPolicy: 'strict-origin-when-cross-origin',
+  
+  // Enforce HTTPS
+  strictTransportSecurity: 'max-age=63072000; includeSubDomains; preload',
+  
+  // Prevent Flash/PDF from accessing data
+  permittedCrossDomainPolicies: 'none',
+  
+  // Restrict browser features
+  permissionsPolicy: "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+};
+
+/**
+ * Create secure HTTP headers to defend against common web vulnerabilities
+ * @param config Security headers configuration to override defaults
+ * @returns Headers object
+ */
+export function createSecurityHeaders(config: Partial<SecurityHeadersConfig> = {}): Record<string, string> {
+  // Start with defaults
+  const defaultConfig = { ...DEFAULT_SECURITY_HEADERS };
+  
+  // In development mode, adjust some headers for easier testing
+  if (IS_DEVELOPMENT_MODE) {
+    defaultConfig.frameOptions = 'SAMEORIGIN'; // Allow frames for dev tools
+    defaultConfig.strictTransportSecurity = ''; // Don't enforce HTTPS in dev
   }
   
-  return directives.join('; ');
-}
-
-/**
- * Configure security headers for fetch API requests
- */
-export function addSecurityHeaders(headers: Headers): Headers {
-  headers.set('X-Content-Type-Options', getContentTypeOptionsHeader());
-  headers.set('X-XSS-Protection', getXSSProtectionHeader());
-  headers.set('X-Frame-Options', getFrameOptionsHeader());
+  // Merge with provided config
+  const mergedConfig = { ...defaultConfig, ...config };
+  const headers: Record<string, string> = {};
+  
+  // Set standard security headers
+  if (mergedConfig.xssProtection) {
+    headers['X-XSS-Protection'] = mergedConfig.xssProtection;
+  }
+  
+  if (mergedConfig.contentTypeOptions) {
+    headers['X-Content-Type-Options'] = mergedConfig.contentTypeOptions;
+  }
+  
+  if (mergedConfig.frameOptions) {
+    headers['X-Frame-Options'] = mergedConfig.frameOptions;
+  }
+  
+  if (mergedConfig.referrerPolicy) {
+    headers['Referrer-Policy'] = mergedConfig.referrerPolicy;
+  }
+  
+  if (mergedConfig.strictTransportSecurity) {
+    headers['Strict-Transport-Security'] = mergedConfig.strictTransportSecurity;
+  }
+  
+  if (mergedConfig.permittedCrossDomainPolicies) {
+    headers['X-Permitted-Cross-Domain-Policies'] = mergedConfig.permittedCrossDomainPolicies;
+  }
+  
+  if (mergedConfig.permissionsPolicy) {
+    // Support both old and new header names
+    headers['Permissions-Policy'] = mergedConfig.permissionsPolicy;
+    headers['Feature-Policy'] = mergedConfig.permissionsPolicy;
+  }
+  
+  // Add any custom headers
+  if (mergedConfig.customHeaders) {
+    Object.entries(mergedConfig.customHeaders).forEach(([key, value]) => {
+      headers[key] = value;
+    });
+  }
   
   return headers;
 }
 
 /**
- * Get all recommended security headers for a server response
+ * Apply security headers to fetch request options
+ * @param requestInit Fetch request init object
+ * @param config Security headers configuration
+ * @returns Updated request init with security headers
  */
-export function getAllSecurityHeaders(config: SecurityHeadersConfig = {}): Record<string, string> {
-  return {
-    'Strict-Transport-Security': getHSTSHeader(),
-    'X-Content-Type-Options': getContentTypeOptionsHeader(),
-    'X-Frame-Options': getFrameOptionsHeader(),
-    'X-XSS-Protection': getXSSProtectionHeader(),
-    'Referrer-Policy': getReferrerPolicyHeader(),
-    'Permissions-Policy': getPermissionsPolicyHeader(),
-    [config.cspReportOnly ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy']: getCSPHeader(config)
-  };
+export function applySecurityHeadersToRequest(
+  requestInit: RequestInit = {}, 
+  config: Partial<SecurityHeadersConfig> = {}
+): RequestInit {
+  const securityHeaders = createSecurityHeaders(config);
+  
+  // Create headers object if it doesn't exist
+  if (!requestInit.headers) {
+    requestInit.headers = new Headers();
+  }
+  
+  // Convert headers to Headers object if it's a plain object
+  const headers = requestInit.headers instanceof Headers 
+    ? requestInit.headers 
+    : new Headers(requestInit.headers as Record<string, string>);
+  
+  // Add security headers
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    if (!headers.has(key)) {
+      headers.set(key, value);
+    }
+  });
+  
+  // Update request headers
+  requestInit.headers = headers;
+  
+  return requestInit;
 }
 
 /**
- * Apply security headers to document (useful for SPA applications) 
- * Cannot set some headers as they're server-only, but works for meta tags
+ * Log the security headers for debugging/auditing
+ * @param headers Security headers object
  */
-export function applySecurityHeadersToDocument(config: SecurityHeadersConfig = {}): void {
-  // CSP as meta tag
-  const cspMeta = document.createElement('meta');
-  cspMeta.httpEquiv = config.cspReportOnly ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy';
-  cspMeta.content = getCSPHeader(config);
-  document.head.appendChild(cspMeta);
-  
-  // Referrer Policy as meta tag
-  const referrerMeta = document.createElement('meta');
-  referrerMeta.name = 'referrer';
-  referrerMeta.content = getReferrerPolicyHeader();
-  document.head.appendChild(referrerMeta);
+export function logSecurityHeaders(headers: Record<string, string>): void {
+  console.group('Security Headers');
+  Object.entries(headers).forEach(([key, value]) => {
+    console.log(`${key}: ${value}`);
+  });
+  console.groupEnd();
 }
 
 export default {
-  getHSTSHeader,
-  getContentTypeOptionsHeader,
-  getFrameOptionsHeader,
-  getXSSProtectionHeader,
-  getReferrerPolicyHeader,
-  getPermissionsPolicyHeader,
-  getCSPHeader,
-  addSecurityHeaders,
-  getAllSecurityHeaders,
-  applySecurityHeadersToDocument
+  createSecurityHeaders,
+  applySecurityHeadersToRequest,
+  logSecurityHeaders,
+  DEFAULT_SECURITY_HEADERS
 };
