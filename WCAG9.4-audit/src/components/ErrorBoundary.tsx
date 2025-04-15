@@ -1,34 +1,106 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { ErrorFallback } from './ErrorFallback';
+/**
+ * Error Boundary Component
+ * 
+ * A React error boundary that catches errors in component trees and displays a
+ * fallback UI. This helps prevent the entire app from crashing when an error occurs.
+ * 
+ * Implements best practices for error recovery, logging, and user experience.
+ */
 
-interface Props {
+import React, { Component, ErrorInfo, ReactNode, ReactElement } from 'react';
+import { logError, ErrorType, createError, getUserFriendlyErrorMessage } from '../utils/errorHandler';
+import { IS_DEVELOPMENT_MODE } from '../utils/environment';
+import ErrorFallback from './ErrorFallback';
+
+interface ErrorBoundaryProps {
   children: ReactNode;
+  fallback?: ReactNode | ((error: Error, resetError: () => void) => ReactElement);
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = {
     hasError: false,
     error: null
   };
 
-  public static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    // Update state so the next render will show the fallback UI
     return { hasError: true, error };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    // Format and log the error
+    const formattedError = createError(
+      ErrorType.SYSTEM,
+      'react_error',
+      error.message || 'An error occurred in the application',
+      { 
+        componentStack: errorInfo.componentStack,
+        stack: error.stack
+      }
+    );
+    
+    logError(formattedError);
+    
+    // Call the onError callback if provided
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
   }
 
-  public render() {
-    if (this.state.hasError) {
-      return <ErrorFallback error={this.state.error!} resetErrorBoundary={() => window.location.reload()} />;
+  resetError = (): void => {
+    this.setState({ hasError: false, error: null });
+  };
+
+  render(): ReactNode {
+    if (this.state.hasError && this.state.error) {
+      // If a custom fallback was provided as a function, use it
+      if (typeof this.props.fallback === 'function') {
+        return this.props.fallback(this.state.error, this.resetError);
+      }
+      
+      // If a custom fallback was provided as a ReactNode, use it
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
+      // Otherwise, use our ErrorFallback component
+      return (
+        <ErrorFallback 
+          error={this.state.error}
+          resetError={this.resetError}
+        />
+      );
     }
 
     return this.props.children;
   }
 }
+
+/**
+ * Higher-order component that wraps a component with an ErrorBoundary
+ */
+export const withErrorBoundary = <P extends object>(
+  Component: React.ComponentType<P>,
+  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
+): React.FC<P> => {
+  const WithErrorBoundary: React.FC<P> = (props) => (
+    <ErrorBoundary {...errorBoundaryProps}>
+      <Component {...props} />
+    </ErrorBoundary>
+  );
+  
+  WithErrorBoundary.displayName = `WithErrorBoundary(${
+    Component.displayName || Component.name || 'Component'
+  })`;
+  
+  return WithErrorBoundary;
+};
+
+export default ErrorBoundary;

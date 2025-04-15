@@ -1,41 +1,111 @@
+/**
+ * Error Fallback Component
+ * 
+ * A dedicated fallback UI to display when errors occur.
+ * This component is used by the ErrorBoundary when an error is caught.
+ * 
+ * Implements best practices for error display, including accessibility considerations.
+ */
+
 import React from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { ErrorResponse } from '../utils/errorHandler';
 import { IS_DEVELOPMENT_MODE } from '../utils/environment';
+import { getUserFriendlyErrorMessage } from '../utils/errorHandler';
 
 interface ErrorFallbackProps {
-  error: Error;
-  resetErrorBoundary: () => void;
+  error: Error | ErrorResponse;
+  resetError?: () => void;
+  title?: string;
+  showResetButton?: boolean;
+  showTechnicalDetails?: boolean;
 }
 
-export function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
+const ErrorFallback: React.FC<ErrorFallbackProps> = ({
+  error,
+  resetError,
+  title = 'Something went wrong',
+  showResetButton = true,
+  showTechnicalDetails
+}) => {
+  // If the error has a type property, it's an ErrorResponse
+  const isErrorResponse = (err: any): err is ErrorResponse => {
+    return err && typeof err === 'object' && 'type' in err && 'code' in err;
+  };
+  
+  // Get the appropriate error message
+  const errorMessage = getUserFriendlyErrorMessage(error);
+  
+  // Determine if technical details should be shown
+  const displayTechnicalDetails = showTechnicalDetails !== undefined
+    ? showTechnicalDetails
+    : IS_DEVELOPMENT_MODE;
+  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 text-center">
-        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-          <AlertTriangle className="h-6 w-6 text-red-600" aria-hidden="true" />
-        </div>
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Application Error
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            We're sorry, but something went wrong. Please try again or contact support if the problem persists.
-          </p>
-          {IS_DEVELOPMENT_MODE && (
-            <pre className="mt-4 p-4 bg-red-50 rounded-lg text-left text-sm text-red-700 overflow-auto">
-              {error.message}
-            </pre>
-          )}
-        </div>
-        <div>
-          <button
-            onClick={resetErrorBoundary}
-            className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+    <div 
+      className="error-fallback"
+      role="alert"
+      aria-live="assertive"
+      data-testid="error-fallback"
+    >
+      <div className="error-fallback-container">
+        <h2 id="error-title" className="error-fallback-title">
+          {title}
+        </h2>
+        
+        <p className="error-fallback-message">
+          {errorMessage}
+        </p>
+        
+        {displayTechnicalDetails && (
+          <details className="error-fallback-details">
+            <summary className="error-fallback-summary">
+              Technical details (for developers)
+            </summary>
+            
+            <div className="error-fallback-technical">
+              {isErrorResponse(error) ? (
+                <>
+                  <p><strong>Type:</strong> {error.type}</p>
+                  <p><strong>Code:</strong> {error.code}</p>
+                  <p><strong>Message:</strong> {error.message}</p>
+                  
+                  {error.details && (
+                    <>
+                      <p><strong>Details:</strong></p>
+                      <pre>{JSON.stringify(error.details, null, 2)}</pre>
+                    </>
+                  )}
+                  
+                  {error.stack && (
+                    <>
+                      <p><strong>Stack:</strong></p>
+                      <pre>{error.stack}</pre>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p><strong>Message:</strong> {error.message}</p>
+                  <p><strong>Stack:</strong></p>
+                  <pre>{error.stack}</pre>
+                </>
+              )}
+            </div>
+          </details>
+        )}
+        
+        {showResetButton && resetError && (
+          <button 
+            onClick={resetError}
+            className="error-fallback-button"
+            aria-describedby="error-title"
           >
             Try Again
           </button>
-        </div>
+        )}
       </div>
     </div>
   );
-}
+};
+
+export default ErrorFallback;
