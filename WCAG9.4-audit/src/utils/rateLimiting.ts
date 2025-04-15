@@ -6,7 +6,7 @@
  */
 
 import { getEnvNumber } from './environment';
-import { logError } from './errorHandler';
+import { ErrorType, createError, logError } from './errorHandler';
 import { secureLocalStorage } from './secureStorage';
 
 // Constants
@@ -265,6 +265,61 @@ export function getRateLimitRemainingAttempts(
 }
 
 /**
+ * Rate limit options interface
+ */
+interface RateLimitOptions {
+  /**
+   * Rate limit key
+   */
+  key: string;
+  
+  /**
+   * Time window in milliseconds
+   */
+  windowMs?: number;
+  
+  /**
+   * Maximum requests allowed in the time window
+   */
+  maxRequests?: number;
+  
+  /**
+   * Cooldown period in milliseconds when rate limit is exceeded
+   */
+  cooldownMs?: number;
+}
+
+/**
+ * Check rate limit and increment counter
+ * Throws error if rate limited
+ * @param options Rate limit options
+ */
+export function checkRateLimit(options: RateLimitOptions): void {
+  const { 
+    key, 
+    windowMs = DEFAULT_TIMEOUT_MS, 
+    maxRequests = DEFAULT_MAX_ATTEMPTS,
+    cooldownMs = DEFAULT_COOLDOWN_MS 
+  } = options;
+  
+  // Check if rate limited
+  if (isRateLimited(key, maxRequests, windowMs, cooldownMs)) {
+    const remainingTime = getRateLimitRemainingTime(key);
+    const formattedTime = formatRateLimitTime(remainingTime);
+    
+    throw createError(
+      ErrorType.RATE_LIMIT,
+      'rate_limit_exceeded',
+      `Rate limit exceeded. Please try again in ${formattedTime}.`,
+      { key, windowMs, maxRequests, remainingTime }
+    );
+  }
+  
+  // Increment rate limit counter
+  incrementRateLimitCounter(key, maxRequests, windowMs, cooldownMs);
+}
+
+/**
  * Format remaining time as a human-readable string
  * @param ms Milliseconds
  * @returns Formatted time string
@@ -298,5 +353,6 @@ export default {
   resetRateLimit,
   getRateLimitRemainingTime,
   getRateLimitRemainingAttempts,
-  formatRateLimitTime
+  formatRateLimitTime,
+  checkRateLimit
 };
