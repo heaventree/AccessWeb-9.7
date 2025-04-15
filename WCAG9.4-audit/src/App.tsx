@@ -5,17 +5,13 @@
  * and sets up secure routing and accessibility features.
  */
 
-import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AppProvider } from './providers/AppProvider';
 import ErrorBoundary from './components/ErrorBoundary';
-import { ProtectedRoute } from './components/ProtectedRoute';
 import ErrorFallback from './components/ErrorFallback';
 
 // Use lazy loading for improved performance and code splitting
-const HomePage = lazy(() => import('./pages/HomePage'));
-const LoginPage = lazy(() => import('./pages/LoginPage'));
-const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const AccessibilityTestPage = lazy(() => import('./pages/AccessibilityTestPage'));
@@ -38,6 +34,20 @@ const PageLoader = (): JSX.Element => (
 );
 
 /**
+ * Temporary redirect to dashboard for development
+ */
+const AppRedirect = () => {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Redirect to dashboard directly
+    navigate('/dashboard');
+  }, [navigate]);
+  
+  return <PageLoader />;
+};
+
+/**
  * Main application component
  */
 function App(): JSX.Element {
@@ -58,62 +68,18 @@ function App(): JSX.Element {
       >
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            {/* Temporary development route - redirect to dashboard */}
+            <Route path="/" element={<AppRedirect />} />
+            <Route path="/login" element={<AppRedirect />} />
+            <Route path="/register" element={<AppRedirect />} />
             
-            {/* Protected routes requiring authentication */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/test"
-              element={
-                <ProtectedRoute>
-                  <AccessibilityTestPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/reports"
-              element={
-                <ProtectedRoute>
-                  <ReportsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/reports/:reportId"
-              element={
-                <ProtectedRoute>
-                  <ReportDetailPage />
-                </ProtectedRoute>
-              }
-            />
-            
-            {/* Admin routes requiring admin role */}
-            <Route
-              path="/admin/*"
-              element={
-                <ProtectedRoute requiredRole="admin" redirectTo="/unauthorized">
-                  <AdminPage />
-                </ProtectedRoute>
-              }
-            />
+            {/* Main application routes */}
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/test" element={<AccessibilityTestPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/reports/:reportId" element={<ReportDetailPage />} />
+            <Route path="/admin/*" element={<AdminPage />} />
             
             {/* Error and utility routes */}
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
