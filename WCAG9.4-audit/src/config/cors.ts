@@ -6,66 +6,57 @@
  * external domains can access our API resources.
  */
 
-import { IS_DEVELOPMENT_MODE } from '../utils/environment';
+import { IS_DEVELOPMENT_MODE, getEnvironmentVariable } from '../utils/environment';
 
 /**
  * CORS Configuration settings
  */
 export const corsConfig = {
-  // List of allowed origins (domains) that can access the API
+  // Allowed origins (domains) that can access our API
+  // In production, this is strictly limited to trusted domains
+  // In development, we allow local development servers
   allowedOrigins: IS_DEVELOPMENT_MODE
     ? [
+        'http://localhost:3000',
         'http://localhost:5000',
-        'http://localhost:3000', 
-        'http://127.0.0.1:5000',
         'http://127.0.0.1:3000',
+        'http://127.0.0.1:5000',
+        'https://localhost:3000',
+        'https://localhost:5000',
       ]
     : [
-        // Production domains
-        'https://accessibilitychecker.app',
-        'https://www.accessibilitychecker.app',
-        'https://api.accessibilitychecker.app',
+        // Production domains - should be configured via environment variables
+        getEnvironmentVariable('APP_DOMAIN', 'https://app.wcag-accessibility.com'),
+        getEnvironmentVariable('API_DOMAIN', 'https://api.wcag-accessibility.com'),
       ],
   
-  // HTTP methods that are allowed
-  allowedMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  // Allow credentials (cookies, authorization headers, etc.)
+  allowCredentials: true,
   
-  // HTTP headers that can be used when making the actual request
+  // Maximum age (in seconds) of the preflight request
+  maxAge: 86400, // 24 hours
+  
+  // Allowed HTTP methods
+  allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  
+  // Allowed HTTP headers
   allowedHeaders: [
     'Content-Type',
     'Authorization',
-    'X-CSRF-Token',
     'X-Requested-With',
     'Accept',
     'Origin',
+    'X-CSRF-Token',
+    'X-API-Key',
   ],
   
-  // HTTP headers that can be exposed to the client
-  exposedHeaders: ['Content-Range', 'X-Total-Count'],
-  
-  // Whether cookies and authentication can be included in cross-origin requests
-  allowCredentials: true,
-  
-  // How long the results of a preflight request can be cached (in seconds)
-  maxAge: 86400, // 24 hours
-  
-  // Function to validate if an origin is allowed
-  isOriginAllowed: (origin: string): boolean => {
-    if (!origin) return false;
-    
-    return corsConfig.allowedOrigins.some(allowedOrigin => {
-      // Exact match
-      if (allowedOrigin === origin) return true;
-      
-      // Wildcard subdomain match (for production multi-tenant scenarios)
-      if (allowedOrigin.startsWith('*.')) {
-        const domain = allowedOrigin.slice(2); // Remove '*.'
-        return origin.endsWith(domain) && origin.slice(0, -domain.length).lastIndexOf('.') !== -1;
-      }
-      
-      return false;
-    });
-  }
+  // Headers exposed to the client
+  exposedHeaders: [
+    'Content-Length',
+    'X-Ratelimit-Limit',
+    'X-Ratelimit-Remaining',
+    'X-Ratelimit-Reset',
+  ],
 };
 
 /**
@@ -74,27 +65,24 @@ export const corsConfig = {
  * @returns Object with CORS headers
  */
 export const generateCorsHeaders = (origin: string | null): Record<string, string> => {
-  const headers: Record<string, string> = {};
+  // Determine if the origin is allowed
+  const allowedOrigin = validateCors(origin) 
+    ? origin 
+    : corsConfig.allowedOrigins[0];
   
-  // Only set Access-Control-Allow-Origin if the origin is allowed
-  if (origin && corsConfig.isOriginAllowed(origin)) {
-    headers['Access-Control-Allow-Origin'] = origin;
-  } else if (IS_DEVELOPMENT_MODE) {
-    // In development, allow from localhost
-    headers['Access-Control-Allow-Origin'] = 'http://localhost:5000';
-  } else {
-    // In production, default to the primary domain
-    headers['Access-Control-Allow-Origin'] = 'https://accessibilitychecker.app';
-  }
-  
-  // Add other CORS headers
-  headers['Access-Control-Allow-Methods'] = corsConfig.allowedMethods.join(', ');
-  headers['Access-Control-Allow-Headers'] = corsConfig.allowedHeaders.join(', ');
-  headers['Access-Control-Expose-Headers'] = corsConfig.exposedHeaders.join(', ');
-  headers['Access-Control-Allow-Credentials'] = corsConfig.allowCredentials.toString();
-  headers['Access-Control-Max-Age'] = corsConfig.maxAge.toString();
-  
-  return headers;
+  // Generate the headers
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin || '*',
+    'Access-Control-Allow-Methods': corsConfig.allowedMethods.join(', '),
+    'Access-Control-Allow-Headers': corsConfig.allowedHeaders.join(', '),
+    'Access-Control-Expose-Headers': corsConfig.exposedHeaders.join(', '),
+    'Access-Control-Allow-Credentials': String(corsConfig.allowCredentials),
+    'Access-Control-Max-Age': String(corsConfig.maxAge),
+    // Add security headers
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '1; mode=block',
+  };
 };
 
 /**
@@ -103,9 +91,29 @@ export const generateCorsHeaders = (origin: string | null): Record<string, strin
  * @returns Whether the request passes CORS validation
  */
 export const validateCors = (origin: string | null): boolean => {
-  // If no origin, only allow in development mode
-  if (!origin) return IS_DEVELOPMENT_MODE;
+  // If no origin is provided, it's a same-origin request, which is allowed
+  if (!origin) return true;
   
-  // Check if origin is allowed
-  return corsConfig.isOriginAllowed(origin);
+  // Check if the origin is in the allowed origins list
+  if (corsConfig.allowedOrigins.includes(origin)) {
+    return true;
+  }
+  
+  // In development mode, be more permissive for testing
+  if (IS_DEVELOPMENT_MODE) {
+    // Allow localhost with any port
+    if (origin.match(/^https?:\/\/localhost(:\d+)?$/) ||
+        origin.match(/^https?:\/\/127\.0\.0\.1(:\d+)?$/)) {
+      return true;
+    }
+  }
+  
+  // Check if the origin matches a domain pattern
+  const domainPatterns = [
+    // Add any domain patterns here, e.g. *.example.com
+    /^https:\/\/.*\.wcag-accessibility\.com$/,
+    /^https:\/\/wcag-accessibility\.com$/
+  ];
+  
+  return domainPatterns.some(pattern => pattern.test(origin));
 };

@@ -30,6 +30,14 @@ export const getEnvVariable = (name: string, defaultValue: string): string => {
 };
 
 /**
+ * Get an environment variable with more descriptive naming
+ * Alias for getEnvVariable for better clarity
+ */
+export const getEnvironmentVariable = (name: string, defaultValue: string): string => {
+  return getEnvVariable(name, defaultValue);
+};
+
+/**
  * Get a boolean environment variable
  * Converts string values to booleans
  */

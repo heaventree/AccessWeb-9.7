@@ -7,7 +7,8 @@
 
 import { authStorage } from '../utils/secureStorage';
 import { getApiUrl, IS_DEVELOPMENT_MODE } from '../utils/environment';
-import { corsConfig, validateCors } from '../config/cors';
+import { corsConfig, validateCors, generateCorsHeaders } from '../config/cors';
+import { ErrorType, createError, handleApiError } from '../utils/errorHandler';
 
 export interface ApiRequestOptions extends RequestInit {
   useAuth?: boolean;
@@ -70,7 +71,12 @@ export class ApiService {
     try {
       // Rate limiting check
       if (!this.checkRateLimit()) {
-        throw new Error('Rate limit exceeded. Please try again later.');
+        throw createError(
+          ErrorType.API,
+          'rate_limit_exceeded',
+          'Rate limit exceeded. Please try again later.',
+          { maxRequests: this.rateLimit.maxRequests, timeWindow: this.rateLimit.timeWindow }
+        );
       }
 
       // Create abort controller for timeout if not provided
@@ -113,11 +119,12 @@ export class ApiService {
       if (!IS_DEVELOPMENT_MODE) {
         const apiUrl = new URL(`${this.baseUrl}${endpoint}`);
         if (!validateCors(apiUrl.origin)) {
-          throw {
-            code: 'cors_error',
-            message: 'Request blocked due to CORS policy',
-            details: { origin: apiUrl.origin }
-          };
+          throw createError(
+            ErrorType.NETWORK,
+            'cors_error',
+            'Request blocked due to CORS policy',
+            { origin: apiUrl.origin }
+          );
         }
       }
       
@@ -186,23 +193,32 @@ export class ApiService {
     } catch (error) {
       // Re-throw abort errors
       if (error instanceof DOMException && error.name === 'AbortError') {
-        throw {
-          code: 'request_timeout',
-          message: 'Request timed out',
-        };
+        throw createError(
+          ErrorType.NETWORK,
+          'request_timeout',
+          'Request timed out',
+          { endpoint, method: options.method || 'GET', timeout: timeoutMs }
+        );
       }
 
-      // Handle unexpected errors
-      if (!(error as ApiErrorResponse).code) {
-        console.error('API request failed:', error);
-        throw {
-          code: 'unexpected_error',
-          message: 'An unexpected error occurred',
-          details: { originalError: String(error) },
-        };
+      // If it's already a properly formatted error response from our error handler, rethrow
+      if ((error as any)?.type && (error as any)?.code) {
+        throw error;
       }
 
-      throw error;
+      // For API errors that have a code property but not our full error format
+      if ((error as ApiErrorResponse)?.code) {
+        throw createError(
+          ErrorType.API,
+          (error as ApiErrorResponse).code,
+          (error as ApiErrorResponse).message || 'API request failed',
+          (error as ApiErrorResponse).details
+        );
+      }
+
+      // Handle all other unexpected errors
+      console.error('API request failed:', error);
+      throw handleApiError(error);
     }
   }
 
