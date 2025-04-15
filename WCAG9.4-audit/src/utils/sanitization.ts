@@ -231,11 +231,60 @@ export function sanitizeFilename(filename: string): string {
   }
 }
 
+// Export directly to ensure it's available for named imports
+
+/**
+ * Recursively sanitize an object's string properties
+ * @param obj Object to sanitize
+ * @returns Sanitized object
+ */
+export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
+  try {
+    if (!obj || typeof obj !== 'object') {
+      return obj;
+    }
+
+    // Create a copy of the object to avoid modifying the original
+    const result = { ...obj };
+
+    // Process each property
+    Object.keys(result).forEach(key => {
+      const value = result[key];
+
+      // Handle different types
+      if (typeof value === 'string') {
+        // Sanitize string values
+        result[key] = sanitizeText(value);
+      } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+        // Recursively sanitize nested objects
+        result[key] = sanitizeObject(value);
+      } else if (Array.isArray(value)) {
+        // Sanitize arrays
+        result[key] = value.map(item => {
+          if (typeof item === 'string') {
+            return sanitizeText(item);
+          } else if (item && typeof item === 'object') {
+            return sanitizeObject(item);
+          }
+          return item;
+        });
+      }
+      // Leave other types unchanged
+    });
+
+    return result;
+  } catch (error) {
+    logError(error, { context: 'sanitizeObject' });
+    return obj;
+  }
+}
+
 export default {
   configureSanitizerDefaults,
   sanitizeHtml,
   sanitizeText,
   sanitizeUrl,
   sanitizeStyles,
-  sanitizeFilename
+  sanitizeFilename,
+  sanitizeObject
 };
