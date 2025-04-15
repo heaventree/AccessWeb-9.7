@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   ChevronDown, 
   ChevronUp, 
@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { AccessibilityIssue, WCAGInfo } from '../types';
-import type { Website } from '../lib/accessibility-fixes/types';
 import { Modal } from './Modal';
 import { getWCAGInfo } from '../utils/wcagHelper';
 import { AIRecommendations } from './AIRecommendations'; 
@@ -33,6 +32,19 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
   const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
   const [selectedIssue, setSelectedIssue] = useState<AccessibilityIssue | null>(null);
   const [modalView, setModalView] = useState<ModalView>(null);
+  
+  // Reference to the modal trigger button for focus management
+  const modalTriggerRef = useRef<HTMLButtonElement>(null);
+  
+  // For live region announcements
+  const [ariaLiveText, setAriaLiveText] = useState<string>('');
+  
+  // Update live region when expanding/collapsing
+  const updateLiveRegion = (action: string, issueName: string) => {
+    setAriaLiveText(`${issueName} ${action}`);
+    // Clear after announcement
+    setTimeout(() => setAriaLiveText(''), 2000);
+  };
 
   const getImpactColor = (impact: AccessibilityIssue['impact']) => {
     if (type === 'passes') return 'bg-emerald-50 border-emerald-200';
@@ -57,12 +69,15 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
     }
   };
 
-  const toggleIssue = (id: string) => {
-    setExpandedIssue(expandedIssue === id ? null : id);
+  const toggleIssue = (id: string, description: string) => {
+    const isExpanding = expandedIssue !== id;
+    setExpandedIssue(isExpanding ? id : null);
+    updateLiveRegion(isExpanding ? 'expanded' : 'collapsed', description);
   };
 
   const toggleAllIssues = (shouldExpand: boolean) => {
     setExpandedIssue(shouldExpand ? issues[0]?.id || null : null);
+    updateLiveRegion(shouldExpand ? 'all sections expanded' : 'all sections collapsed', '');
   };
 
   const openIssueDetails = (issue: AccessibilityIssue) => {
@@ -117,6 +132,11 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
 
   return (
     <>
+      {/* Hidden live region for screen reader announcements */}
+      <div className="sr-only" aria-live="polite">
+        {ariaLiveText}
+      </div>
+      
       <div className="mb-4 flex justify-end gap-2">
         <button
           onClick={() => toggleAllIssues(true)}
@@ -150,7 +170,7 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
               <div className="flex justify-between items-start">
                 <button 
                   className="flex-1 text-left flex items-center transition-colors duration-300"
-                  onClick={() => toggleIssue(issue.id)}
+                  onClick={() => toggleIssue(issue.id, issue.description)}
                   aria-expanded={isExpanded}
                   aria-controls={`issue-content-${issue.id}`}
                 >
