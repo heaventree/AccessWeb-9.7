@@ -8,8 +8,7 @@
  */
 
 import React, { Component, ErrorInfo, ReactNode, ReactElement } from 'react';
-import { logError, ErrorType, createError, getUserFriendlyErrorMessage } from '../utils/errorHandler';
-import { IS_DEVELOPMENT_MODE } from '../utils/environment';
+import { logError, ErrorType, createError } from '../utils/errorHandler';
 import ErrorFallback from './ErrorFallback';
 
 interface ErrorBoundaryProps {

@@ -7,7 +7,7 @@
 
 import { authStorage } from '../utils/secureStorage';
 import { getApiUrl, IS_DEVELOPMENT_MODE } from '../utils/environment';
-import { corsConfig, validateCors, generateCorsHeaders } from '../config/cors';
+import { corsConfig, validateCors } from '../config/cors';
 import { ErrorType, createError, handleApiError } from '../utils/errorHandler';
 
 export interface ApiRequestOptions extends RequestInit {
@@ -83,7 +83,7 @@ export class ApiService {
       const abortController = options.abortController || new AbortController();
       
       // Set up timeout
-      const timeoutMs = options.timeout || this.defaultOptions.timeout;
+      const timeoutMs = options.timeout || this.defaultOptions.timeout || 30000;
       const timeoutId = setTimeout(() => {
         abortController.abort();
       }, timeoutMs);
@@ -193,11 +193,12 @@ export class ApiService {
     } catch (error) {
       // Re-throw abort errors
       if (error instanceof DOMException && error.name === 'AbortError') {
+        const timeout = options.timeout || this.defaultOptions.timeout || 30000;
         throw createError(
           ErrorType.NETWORK,
           'request_timeout',
           'Request timed out',
-          { endpoint, method: options.method || 'GET', timeout: timeoutMs }
+          { endpoint, method: options.method || 'GET', timeout }
         );
       }
 
@@ -339,3 +340,6 @@ export class ApiService {
 // Create and export default API service instance
 const api = new ApiService();
 export default api;
+
+// Re-export specialized API services
+export { default as authApi } from './authApi';
