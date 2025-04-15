@@ -32,6 +32,11 @@ export interface ErrorFallbackProps {
   errorMessage?: string;
   
   /**
+   * Alternative custom error message
+   */
+  message?: string;
+  
+  /**
    * Error stack trace
    */
   errorStack?: string;
@@ -57,16 +62,21 @@ const ErrorFallback: FC<ErrorFallbackProps> = ({
   errorInfo,
   resetErrorBoundary,
   errorMessage,
+  message,
   errorStack,
-  showDetails = isDevelopment()
+  showDetails = isDevelopment(),
+  title
 }) => {
   // Get user-friendly error message
   const friendlyMessage = error
     ? getUserFriendlyErrorMessage(error)
     : 'An unexpected error occurred';
   
-  // Use custom message if provided
-  const displayMessage = errorMessage || friendlyMessage;
+  // Use custom message if provided (support both message and errorMessage props)
+  const displayMessage = message || errorMessage || friendlyMessage;
+  
+  // Use custom title if provided
+  const displayTitle = title || 'Something went wrong';
   
   // Use error stack if available
   const displayStack = errorStack || (errorInfo ? errorInfo.componentStack : '');
@@ -81,7 +91,7 @@ const ErrorFallback: FC<ErrorFallbackProps> = ({
         </div>
         
         <div className="error-fallback-content">
-          <h2 className="error-fallback-title">Something went wrong</h2>
+          <h2 className="error-fallback-title">{displayTitle}</h2>
           
           <p className="error-fallback-message">{displayMessage}</p>
           

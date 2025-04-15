@@ -48,6 +48,8 @@ function App(): JSX.Element {
           <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <ErrorFallback 
               error={new Error('Application error')}
+              errorInfo={null}
+              resetErrorBoundary={() => window.location.reload()}
               title="Application Error"
               message="We're sorry, but something went wrong. Please try refreshing the page."
             />
