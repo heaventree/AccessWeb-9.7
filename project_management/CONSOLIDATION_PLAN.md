@@ -1,135 +1,203 @@
-# WCAG Accessibility Audit Tool - Documentation Consolidation Plan
+# Documentation Consolidation Plan
 
-This document outlines the steps to consolidate documentation scattered across the project into the unified `project_management/` directory for the WCAG Accessibility Audit Tool.
+**Current Version:** 1.0  
+**Last Updated:** April 15, 2024  
+**Status:** In Progress  
 
-## Current Status
+## Overview
 
-Documentation is currently scattered across multiple directories:
+This document outlines the strategy for consolidating all project documentation for the WCAG Accessibility Audit Tool into a centralized, well-organized structure. The goal is to create a single source of truth that is intuitive to navigate while preserving historical information.
 
-1. `project_management/` - New PM system structure (previously used for Payymo):
-   - PLANNING.md
-   - TASK.md
-   - ROADMAP.md
-   - ISSUES.md
-   - CHANGELOG.md
-   - AI_AGENT_GUIDELINES.md
-   - MASTER_INDEX.md
-   - project.index.json
-   - README.md
+## Current Documentation State
 
-2. `GUIDES/` - Technical documentation for the WCAG Accessibility Audit Tool:
-   - 00_Project_Introduction_Overview.md
-   - 01_Technology_Stack.md
-   - 02_Directory_File_Structure.md
-   - 03_Routing_Navigation.md
-   - (and many more files covering technical aspects)
+Documentation is currently scattered across several locations:
 
-3. `HANDOVERS/` - Project updates and milestone completion reports:
-   - 2024-04-12-WordPress-Integration-Enhancement.md
-   - 2024-04-14-WordPress-Integration-Enhancement-Completion.md
-   - WCAG9.4-COMPLETION-REPORT.md
-   - FEEDBACK_IMPLEMENTATION.md
-   - (and various other reports and notes)
+1. **GUIDES/** - Core documentation on project architecture and technical standards
+2. **HANDOVERS/** - Implementation guides and milestone reports
+3. **WCAG9.4-audit/** - Specific feature documentation and roadmaps
+4. Various markdown files in the root directory
 
-4. `WCAG9.4-audit/` - Contains project files including some documentation:
-   - ROADMAP.md
-   - ANIMATED_WALKTHROUGH_SPEC.md
-   - CONTENT_REORGANIZATION.md
-   - (source code and implementation files)
+Issues with the current approach include:
 
-## Consolidation Plan
+- Duplication of information
+- Inconsistent formatting and structure
+- Difficult to find specific documentation
+- References to outdated project names (e.g., previous project references)
+- Lack of clear versioning and document status
 
-### Step 1: Update Project Management Core Files
+## Consolidation Strategy
 
-1. Update the main project management files to reflect the WCAG Accessibility Audit Tool:
-   - Replace Payymo references in README.md with WCAG Accessibility Audit Tool information
-   - Update MASTER_INDEX.md to create a proper directory structure for our project
-   - Update AI_AGENT_GUIDELINES.md with WCAG Accessibility-specific guidelines
+### 1. Central Repository Creation
 
-### Step 2: Create Technical Documentation Structure
+Create a structured `project_management/` directory with specialized subfolders:
 
-1. Create structured subdirectories in the project_management folder:
-   ```
-   mkdir -p project_management/technical/architecture
-   mkdir -p project_management/technical/best_practices
-   mkdir -p project_management/technical/security
-   mkdir -p project_management/technical/guides
-   mkdir -p project_management/technical/apis
-   mkdir -p project_management/technical/integrations
-   ```
+```
+project_management/
+├── archive/                 # Archived original documentation
+├── assessments/             # Project assessments and audits
+├── change_management/       # Change request process
+├── communication/           # Communication plans and templates
+├── governance/              # Project governance
+├── implementation/          # Implementation guides
+├── improvement/             # Process improvements
+├── onboarding/              # Onboarding documentation
+├── planning/                # Project planning
+├── quality/                 # Quality assurance
+├── requirements/            # Project requirements
+├── risk_management/         # Risk assessment and mitigation
+├── technical/               # Technical documentation
+└── updates/                 # Project updates
+```
 
-2. Migrate GUIDES content to the appropriate technical subdirectories:
-   - Architecture files to technical/architecture/
-   - Development guidelines to technical/guides/
-   - Security-related docs to technical/security/
-   - WordPress integration docs to technical/integrations/
-
-### Step 3: Consolidate Progress Reports and Updates
-
-1. Create a structured updates section:
-   ```
-   mkdir -p project_management/updates
-   mkdir -p project_management/updates/milestones
-   mkdir -p project_management/updates/handovers
-   ```
-
-2. Copy and organize HANDOVERS documents:
-   - WordPress integration reports to updates/milestones/
-   - Feedback implementation guides to updates/handovers/
-   - Completion reports to updates/milestones/
-
-### Step 4: Consolidate Roadmap and Planning Documents
-
-1. Merge WCAG9.4-audit/ROADMAP.md into project_management/ROADMAP.md
-2. Extract information from ANIMATED_WALKTHROUGH_SPEC.md and CONTENT_REORGANIZATION.md to create feature specifications in project_management/technical/specifications/
-
-### Step 5: Create Archive Folders for Original Documents
-
-1. Create archive folders to preserve the original documentation structure:
-   ```
-   mkdir -p project_management/archive/guides
-   mkdir -p project_management/archive/handovers
-   ```
-
-2. Copy original documentation to archive folders:
-   ```
-   cp -R GUIDES/* project_management/archive/guides/
-   cp -R HANDOVERS/* project_management/archive/handovers/
-   ```
-
-### Step 6: Update Master Index and Create Directory Structure Document
-
-1. Thoroughly update MASTER_INDEX.md to reflect the new structure and include links to all documentation
-2. Create a DIRECTORY_STRUCTURE.md document explaining the organization of the project management system
-3. Update the project.index.json file to match the new structure for machine-readable access
-
-## Implementation Approach
+### 2. Document Migration Process
 
 For each document being migrated:
 
-1. **Read Original Content**: Fully understand the original document content
-2. **Extract Relevant Information**: Identify key information related to the WCAG Accessibility Audit Tool
-3. **Transform Format**: Restructure content to match the new documentation format
-4. **Remove Unrelated Content**: Delete information specific to other projects (like Payymo)
-5. **Add Cross-References**: Add links to related documents in the new structure
-6. **Update Metadata**: Ensure dates, version numbers, and status information are current
-7. **Verify Technical Accuracy**: Ensure all technical details match the actual implementation
+1. **Review & Update**:
+   - Update references to previous project names (replace with "WCAG Accessibility Audit Tool")
+   - Standardize formatting and structure
+   - Update technical information to reflect current implementation
+   - Add version tracking and last-updated dates
 
-## Post-Consolidation Steps
+2. **Categorize & Place**:
+   - Determine the most appropriate location based on document type
+   - Create logical subfolder structure within major categories
+   - Use consistent file naming conventions
 
-1. Perform a comprehensive review of all documentation for consistency
-2. Create a changelog entry documenting the consolidation process
-3. Update the README.md in all original documentation locations with pointers to the new documentation
-4. Add a task to TASK.md to review and validate the consolidated documentation
+3. **Cross-Reference**:
+   - Add references to related documents
+   - Update links to point to new document locations
 
-## Documentation Standards
+4. **Archive Original**:
+   - Preserve original documents in archive folder
+   - Create redirection notices in original locations
 
-All consolidated documentation will follow these standards:
+### 3. Priority Document Migration
 
-1. **Markdown Format**: All documentation in Markdown with consistent formatting
-2. **Clear Headings**: Proper heading hierarchy (H1 for title, H2 for sections, etc.)
-3. **File Naming**: Uppercase for main index files, lowercase with underscores for specific guides
-4. **Cross-Referencing**: Consistent use of relative links between documents
-5. **Dated Updates**: All milestone and update documents include clear dates
-6. **Version Tracking**: References to software versions are specific and accurate
-7. **Task IDs**: Integration with task tracking using consistent ID formats
+Documents will be migrated in the following priority order:
+
+1. **High Priority (Immediate)**
+   - Core architecture documentation
+   - API specifications
+   - Implementation guides for active features
+   - Current milestone reports
+
+2. **Medium Priority (Within 2 Weeks)**
+   - Technical standards and guidelines
+   - Development processes
+   - Testing procedures
+   - Deployment guides
+
+3. **Lower Priority (Within 1 Month)**
+   - Historical documents
+   - Outdated specifications for reference
+   - Early-stage planning documents
+
+### 4. Document Structure Standardization
+
+All migrated documents will follow a standardized structure:
+
+```markdown
+# Document Title
+
+**Current Version:** X.Y.Z  
+**Last Updated:** YYYY-MM-DD  
+**Status:** [Draft|In Review|Approved|Production|Archived]  
+
+## Overview
+
+Brief description of the document purpose.
+
+## Main Content Sections
+
+...
+
+## Related Documents
+
+- [Document Name](./path/to/document.md) - Brief description
+- [Another Document](./path/to/another.md) - Brief description
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0   | YYYY-MM-DD | Name | Initial version |
+| 1.1.0   | YYYY-MM-DD | Name | Added X feature |
+```
+
+### 5. Navigation & Discovery Improvements
+
+To improve document discovery:
+
+1. **Master Index Creation**:
+   - Create comprehensive `MASTER_INDEX.md` with links to all documents
+   - Organize by category and document type
+   - Include brief descriptions
+
+2. **README Updates**:
+   - Update all folder-level README.md files
+   - Provide context and navigation guidance
+
+3. **Redirection System**:
+   - Add README.md files in original document locations
+   - Point users to new locations
+
+### 6. Document Maintenance Process
+
+Establish ongoing maintenance procedures:
+
+1. **Version Control**:
+   - Follow semantic versioning (Major.Minor.Patch)
+   - Update the "Last Updated" date on every change
+   - Maintain change history section
+
+2. **Regular Reviews**:
+   - Schedule monthly documentation reviews
+   - Verify accuracy and currency of information
+   - Update technical details as implementation changes
+
+3. **New Document Guidelines**:
+   - Provide template for new documentation
+   - Define approval process for new documents
+   - Establish naming conventions
+
+## Implementation Timeline
+
+| Phase | Timeframe | Deliverables |
+|-------|-----------|--------------|
+| 1. Setup | Days 1-2 | Create folder structure, templates, and guidelines |
+| 2. High Priority Migration | Days 3-5 | Migrate and update core documentation |
+| 3. Medium Priority Migration | Days 6-14 | Migrate and update technical guides |
+| 4. Low Priority Migration | Days 15-30 | Complete remaining document migration |
+| 5. Final Review | Days 31-35 | Comprehensive review and final adjustments |
+| 6. Team Training | Day 36 | Team briefing on new documentation system |
+
+## Success Criteria
+
+The consolidation will be considered successful when:
+
+1. All documentation is migrated to the appropriate locations
+2. All references to previous project names are updated
+3. All documents follow the standardized format
+4. Navigation system (indexes, READMEs) is complete
+5. Team members can easily locate relevant documentation
+6. Redirection notices are in place for all original locations
+
+## Current Progress
+
+| Category | Total Docs | Migrated | % Complete |
+|----------|------------|----------|------------|
+| Architecture | 8 | 3 | 37.5% |
+| Guides | 15 | 1 | 6.7% |
+| Specifications | 5 | 2 | 40% |
+| Milestones | 3 | 2 | 66.7% |
+| Integrations | 2 | 1 | 50% |
+| Overall | 33 | 9 | 27.3% |
+
+## Next Steps
+
+1. Complete migration of remaining high-priority documents
+2. Update cross-references between documents
+3. Create additional directory-level README files
+4. Implement document review schedule
+5. Create document maintenance guidelines
