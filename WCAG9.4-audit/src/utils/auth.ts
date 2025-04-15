@@ -215,6 +215,22 @@ export const registerUser = async (
   data: RegistrationData
 ): Promise<RegistrationResponse> => {
   try {
+    // Validate password strength
+    import('./passwordPolicy').then(({ enforcePasswordPolicy }) => {
+      // Enforce password policy
+      try {
+        enforcePasswordPolicy(data.password);
+      } catch (policyError: any) {
+        throw {
+          code: 'auth/weak-password',
+          message: policyError.message,
+          details: policyError.details
+        };
+      }
+    }).catch(error => {
+      console.error('Failed to load password policy:', error);
+    });
+    
     // This would typically be an API call to register the user
     // For demonstration purposes, we'll mock the response
     

@@ -109,7 +109,9 @@ export class ApiService {
       // Add CSRF protection if method is not GET or HEAD
       const method = options.method || 'GET';
       if (method !== 'GET' && method !== 'HEAD') {
-        const csrfToken = authStorage.getItem('csrf') || this.generateCsrfToken();
+        // Use our dedicated CSRF protection utility
+        const csrfProtection = require('../utils/csrfProtection').default;
+        const csrfToken = csrfProtection.getCsrfToken();
         headers.set('X-CSRF-Token', csrfToken);
       }
 
@@ -282,15 +284,7 @@ export class ApiService {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' });
   }
 
-  /**
-   * Generate a CSRF token
-   */
-  private generateCsrfToken(): string {
-    const token = Math.random().toString(36).substring(2, 15) + 
-                 Math.random().toString(36).substring(2, 15);
-    authStorage.setItem('csrf', token);
-    return token;
-  }
+
 
   /**
    * Check if we should retry based on status code
