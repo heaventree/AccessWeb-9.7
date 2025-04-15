@@ -1,233 +1,166 @@
 /**
- * Rate Limiting Utility
+ * Rate Limiting
  * 
- * Provides client-side rate limiting protection against brute force attacks
- * and excessive API usage. Helps prevent account lockouts and API throttling.
+ * Implements client-side rate limiting to prevent abuse and brute force attacks
+ * by tracking request frequency and blocking excessive requests.
  */
 
-import { ErrorType, createError } from './errorHandler';
-import { RATE_LIMITING_ENABLED } from './environment';
+import { logError, createError, ErrorType } from './errorHandler';
+import { getEnvBoolean } from './environment';
 
-// Rate limiting storage prefix
-const RATE_LIMIT_PREFIX = 'rate_limit:';
+// Feature flag
+const RATE_LIMITING_ENABLED = getEnvBoolean('VITE_RATE_LIMITING_ENABLED', true);
 
-// Default rate limits
-const DEFAULT_WINDOW_MS = 60000; // 1 minute
-const DEFAULT_MAX_REQUESTS = 60; // 60 requests per minute
-
-/**
- * Rate limiter configuration
- */
-interface RateLimiterOptions {
+// Rate limit storage
+interface RateLimitBucket {
   /**
-   * Identifier for this rate limit (e.g., 'login', 'api')
+   * Number of requests in current window
+   */
+  count: number;
+  
+  /**
+   * Timestamp when the current window expires
+   */
+  expiresAt: number;
+}
+
+// Store rate limit buckets in memory
+const rateLimitBuckets: Record<string, RateLimitBucket> = {};
+
+// Rate limit options
+interface RateLimitOptions {
+  /**
+   * Key to identify the rate limit bucket
    */
   key: string;
   
   /**
    * Time window in milliseconds
    */
-  windowMs?: number;
+  windowMs: number;
   
   /**
    * Maximum number of requests allowed in the window
    */
-  maxRequests?: number;
-  
-  /**
-   * Whether to throw an error when rate limit is exceeded (true)
-   * or just return a boolean result (false)
-   */
-  throwOnLimit?: boolean;
-}
-
-/**
- * Rate limit information
- */
-interface RateLimitInfo {
-  /**
-   * Timestamp when the window started
-   */
-  windowStart: number;
-  
-  /**
-   * Number of requests made in current window
-   */
-  requestCount: number;
-  
-  /**
-   * Maximum requests allowed in window
-   */
   maxRequests: number;
-  
-  /**
-   * Window duration in milliseconds
-   */
-  windowMs: number;
 }
 
 /**
- * Get the stored rate limit information
- * @param key Rate limit key
- * @returns Rate limit info or null if not found
+ * Check rate limit and throw error if exceeded
+ * @param options Rate limit options
+ * @throws Error if rate limit exceeded
  */
-function getRateLimitInfo(key: string): RateLimitInfo | null {
-  try {
-    const storageKey = RATE_LIMIT_PREFIX + key;
-    const stored = localStorage.getItem(storageKey);
-    
-    if (!stored) {
-      return null;
-    }
-    
-    return JSON.parse(stored) as RateLimitInfo;
-  } catch (error) {
-    console.error(`Error getting rate limit info for ${key}:`, error);
-    return null;
-  }
-}
-
-/**
- * Store rate limit information
- * @param key Rate limit key
- * @param info Rate limit info
- */
-function storeRateLimitInfo(key: string, info: RateLimitInfo): void {
-  try {
-    const storageKey = RATE_LIMIT_PREFIX + key;
-    localStorage.setItem(storageKey, JSON.stringify(info));
-  } catch (error) {
-    console.error(`Error storing rate limit info for ${key}:`, error);
-  }
-}
-
-/**
- * Check and increment rate limit counter
- * @param options Rate limiter options
- * @returns Boolean indicating if request is allowed
- * @throws Error if rate limit exceeded and throwOnLimit is true
- */
-export function checkRateLimit(options: RateLimiterOptions): boolean {
+export function checkRateLimit(options: RateLimitOptions): void {
   // Skip if rate limiting is disabled
   if (!RATE_LIMITING_ENABLED) {
-    return true;
+    return;
   }
   
-  const {
-    key,
-    windowMs = DEFAULT_WINDOW_MS,
-    maxRequests = DEFAULT_MAX_REQUESTS,
-    throwOnLimit = true
-  } = options;
-  
-  // Get current limit info
-  let limitInfo = getRateLimitInfo(key);
-  const now = Date.now();
-  
-  // Create new window if needed
-  if (!limitInfo || (now - limitInfo.windowStart) > limitInfo.windowMs) {
-    limitInfo = {
-      windowStart: now,
-      requestCount: 0,
-      maxRequests,
-      windowMs
-    };
-  }
-  
-  // Check if limit exceeded
-  if (limitInfo.requestCount >= limitInfo.maxRequests) {
-    // Calculate time remaining until rate limit resets
-    const resetTime = limitInfo.windowStart + limitInfo.windowMs;
-    const msRemaining = Math.max(0, resetTime - now);
-    const secondsRemaining = Math.ceil(msRemaining / 1000);
+  try {
+    const { key, windowMs, maxRequests } = options;
+    const now = Date.now();
     
-    if (throwOnLimit) {
+    // Get or create bucket
+    let bucket = rateLimitBuckets[key];
+    
+    if (!bucket || now > bucket.expiresAt) {
+      // Bucket doesn't exist or has expired, create new one
+      bucket = {
+        count: 0,
+        expiresAt: now + windowMs
+      };
+      
+      rateLimitBuckets[key] = bucket;
+    }
+    
+    // Increment request count
+    bucket.count++;
+    
+    // Check if rate limit exceeded
+    if (bucket.count > maxRequests) {
+      // Calculate retry after time in seconds
+      const retryAfterMs = bucket.expiresAt - now;
+      const retryAfterSecs = Math.ceil(retryAfterMs / 1000);
+      
+      // Throw rate limit error
       throw createError(
         ErrorType.RATE_LIMIT,
         'rate_limit_exceeded',
-        `Rate limit exceeded. Please try again in ${secondsRemaining} seconds.`,
+        `Rate limit exceeded. Try again in ${retryAfterSecs} seconds.`,
         {
-          key,
-          maxRequests: limitInfo.maxRequests,
-          windowMs: limitInfo.windowMs,
-          resetTime,
-          remainingSeconds: secondsRemaining
-        }
+          retryAfter: retryAfterSecs,
+          limit: maxRequests,
+          window: windowMs
+        },
+        'Too many requests. Please wait before trying again.',
+        'Rate limit reached. For security reasons, please wait a moment before trying again.'
       );
     }
+  } catch (error) {
+    // Log error but don't rethrow non-rate limit errors to avoid blocking requests
+    if (!(error instanceof Error) || (error as any).type !== ErrorType.RATE_LIMIT) {
+      logError(error, { context: 'rateLimiting.checkRateLimit' });
+      return;
+    }
     
-    return false;
+    // Rethrow rate limit errors
+    throw error;
   }
-  
-  // Increment counter and store
-  limitInfo.requestCount++;
-  storeRateLimitInfo(key, limitInfo);
-  
-  return true;
 }
 
 /**
- * Get remaining requests for a rate limit key
- * @param key Rate limit key
- * @param defaultMax Default max requests if not found
- * @returns Number of remaining requests allowed
- */
-export function getRemainingRequests(key: string, defaultMax: number = DEFAULT_MAX_REQUESTS): number {
-  // Skip if rate limiting is disabled
-  if (!RATE_LIMITING_ENABLED) {
-    return defaultMax;
-  }
-  
-  const limitInfo = getRateLimitInfo(key);
-  
-  if (!limitInfo) {
-    return defaultMax;
-  }
-  
-  // Check if window has expired
-  const now = Date.now();
-  if ((now - limitInfo.windowStart) > limitInfo.windowMs) {
-    return limitInfo.maxRequests;
-  }
-  
-  return Math.max(0, limitInfo.maxRequests - limitInfo.requestCount);
-}
-
-/**
- * Reset a rate limit counter
- * @param key Rate limit key
+ * Reset rate limit for a specific key
+ * @param key Rate limit key to reset
  */
 export function resetRateLimit(key: string): void {
-  try {
-    const storageKey = RATE_LIMIT_PREFIX + key;
-    localStorage.removeItem(storageKey);
-  } catch (error) {
-    console.error(`Error resetting rate limit for ${key}:`, error);
-  }
+  delete rateLimitBuckets[key];
 }
 
 /**
- * Create a rate-limited version of a function
- * @param fn Function to rate limit
- * @param options Rate limiter options
- * @returns Rate-limited function
+ * Get current rate limit status
+ * @param key Rate limit key
+ * @returns Rate limit status or null if no bucket exists
  */
-export function createRateLimitedFunction<T extends (...args: any[]) => any>(
-  fn: T,
-  options: RateLimiterOptions
-): (...args: Parameters<T>) => ReturnType<T> {
-  return (...args: Parameters<T>): ReturnType<T> => {
-    // Check rate limit
-    checkRateLimit(options);
-    
-    // Call function if not exceeded
-    return fn(...args);
+export function getRateLimitStatus(key: string): {
+  remaining: number;
+  total: number;
+  resetsIn: number;
+} | null {
+  const bucket = rateLimitBuckets[key];
+  
+  if (!bucket) {
+    return null;
+  }
+  
+  // Calculate remaining requests
+  const now = Date.now();
+  
+  // If expired, return null
+  if (now > bucket.expiresAt) {
+    delete rateLimitBuckets[key];
+    return null;
+  }
+  
+  // Return status
+  return {
+    remaining: Math.max(0, bucket.count),
+    total: bucket.count,
+    resetsIn: Math.ceil((bucket.expiresAt - now) / 1000)
   };
+}
+
+/**
+ * Clear all rate limit buckets
+ */
+export function clearAllRateLimits(): void {
+  Object.keys(rateLimitBuckets).forEach(key => {
+    delete rateLimitBuckets[key];
+  });
 }
 
 export default {
   checkRateLimit,
-  getRemainingRequests,
   resetRateLimit,
-  createRateLimitedFunction
+  getRateLimitStatus,
+  clearAllRateLimits
 };

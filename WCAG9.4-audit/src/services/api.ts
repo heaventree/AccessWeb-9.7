@@ -9,6 +9,11 @@ import { apiClient } from '../utils/apiClient';
 import { ErrorType, createError, handleApiError } from '../utils/errorHandler';
 import { sanitizeObject } from '../utils/sanitization';
 import { API_BASE_URL, API_VERSION } from '../utils/environment';
+import authApi from './authApi';
+import accessibilityApi from './accessibilityApi';
+
+// Re-export specialized API services
+export { authApi, accessibilityApi };
 
 // Base endpoint for API requests
 const baseEndpoint = `${API_BASE_URL}/${API_VERSION}`;
@@ -150,5 +155,7 @@ export default {
   get: apiGet,
   post: apiPost,
   put: apiPut,
-  delete: apiDelete
+  delete: apiDelete,
+  auth: authApi,
+  accessibility: accessibilityApi
 };

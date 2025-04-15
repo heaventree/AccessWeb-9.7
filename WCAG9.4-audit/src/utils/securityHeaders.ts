@@ -1,193 +1,139 @@
 /**
- * Security Headers Utility
+ * Security Headers
  * 
- * Provides HTTP security headers for protecting against various attacks
- * including XSS, clickjacking, MIME sniffing, and cross-origin issues.
+ * Implements HTTP security headers to protect against common web vulnerabilities
+ * by restricting how browsers interact with the application.
  */
 
+import { logError } from './errorHandler';
 import { IS_DEVELOPMENT_MODE } from './environment';
+import { buildCspHeader, getNonce } from './contentSecurity';
 
-/**
- * Security Headers Configuration
- */
-export interface SecurityHeadersConfig {
-  /**
-   * X-XSS-Protection header value
-   */
-  xssProtection?: string;
-  
-  /**
-   * X-Content-Type-Options header value
-   */
-  contentTypeOptions?: string;
-  
-  /**
-   * X-Frame-Options header value
-   */
-  frameOptions?: string;
-  
-  /**
-   * Referrer-Policy header value
-   */
-  referrerPolicy?: string;
-  
-  /**
-   * Strict-Transport-Security header value
-   */
-  strictTransportSecurity?: string;
-  
-  /**
-   * X-Permitted-Cross-Domain-Policies header value
-   */
-  permittedCrossDomainPolicies?: string;
-  
-  /**
-   * Feature-Policy/Permissions-Policy header value
-   */
-  permissionsPolicy?: string;
-  
-  /**
-   * Additional custom headers
-   */
-  customHeaders?: Record<string, string>;
-}
-
-/**
- * Default secure HTTP header values
- */
-export const DEFAULT_SECURITY_HEADERS: SecurityHeadersConfig = {
-  // Prevent XSS attacks
-  xssProtection: '1; mode=block',
-  
-  // Prevent MIME type sniffing
-  contentTypeOptions: 'nosniff',
+// Security headers configuration
+const SECURITY_HEADERS = {
+  // Prevent browsers from incorrectly detecting non-scripts as scripts
+  'X-Content-Type-Options': 'nosniff',
   
   // Prevent clickjacking
-  frameOptions: 'DENY',
+  'X-Frame-Options': 'DENY',
   
-  // Control information sent in referrer header
-  referrerPolicy: 'strict-origin-when-cross-origin',
+  // Prevent XSS attacks
+  'X-XSS-Protection': '1; mode=block',
   
-  // Enforce HTTPS
-  strictTransportSecurity: 'max-age=63072000; includeSubDomains; preload',
+  // Control how much information is included in referrer header
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
   
-  // Prevent Flash/PDF from accessing data
-  permittedCrossDomainPolicies: 'none',
+  // Prevent browser features for security reasons
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
   
-  // Restrict browser features
-  permissionsPolicy: "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+  // HSTS for forcing HTTPS connections (not added in development)
+  ...(IS_DEVELOPMENT_MODE ? {} : {
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload'
+  })
 };
 
 /**
- * Create secure HTTP headers to defend against common web vulnerabilities
- * @param config Security headers configuration to override defaults
- * @returns Headers object
+ * Apply security headers to a fetch request
+ * @param init Fetch request init
+ * @returns Modified fetch request init
  */
-export function createSecurityHeaders(config: Partial<SecurityHeadersConfig> = {}): Record<string, string> {
-  // Start with defaults
-  const defaultConfig = { ...DEFAULT_SECURITY_HEADERS };
-  
-  // In development mode, adjust some headers for easier testing
-  if (IS_DEVELOPMENT_MODE) {
-    defaultConfig.frameOptions = 'SAMEORIGIN'; // Allow frames for dev tools
-    defaultConfig.strictTransportSecurity = ''; // Don't enforce HTTPS in dev
-  }
-  
-  // Merge with provided config
-  const mergedConfig = { ...defaultConfig, ...config };
-  const headers: Record<string, string> = {};
-  
-  // Set standard security headers
-  if (mergedConfig.xssProtection) {
-    headers['X-XSS-Protection'] = mergedConfig.xssProtection;
-  }
-  
-  if (mergedConfig.contentTypeOptions) {
-    headers['X-Content-Type-Options'] = mergedConfig.contentTypeOptions;
-  }
-  
-  if (mergedConfig.frameOptions) {
-    headers['X-Frame-Options'] = mergedConfig.frameOptions;
-  }
-  
-  if (mergedConfig.referrerPolicy) {
-    headers['Referrer-Policy'] = mergedConfig.referrerPolicy;
-  }
-  
-  if (mergedConfig.strictTransportSecurity) {
-    headers['Strict-Transport-Security'] = mergedConfig.strictTransportSecurity;
-  }
-  
-  if (mergedConfig.permittedCrossDomainPolicies) {
-    headers['X-Permitted-Cross-Domain-Policies'] = mergedConfig.permittedCrossDomainPolicies;
-  }
-  
-  if (mergedConfig.permissionsPolicy) {
-    // Support both old and new header names
-    headers['Permissions-Policy'] = mergedConfig.permissionsPolicy;
-    headers['Feature-Policy'] = mergedConfig.permissionsPolicy;
-  }
-  
-  // Add any custom headers
-  if (mergedConfig.customHeaders) {
-    Object.entries(mergedConfig.customHeaders).forEach(([key, value]) => {
-      headers[key] = value;
-    });
-  }
-  
-  return headers;
-}
-
-/**
- * Apply security headers to fetch request options
- * @param requestInit Fetch request init object
- * @param config Security headers configuration
- * @returns Updated request init with security headers
- */
-export function applySecurityHeadersToRequest(
-  requestInit: RequestInit = {}, 
-  config: Partial<SecurityHeadersConfig> = {}
-): RequestInit {
-  const securityHeaders = createSecurityHeaders(config);
+export function applySecurityHeadersToRequest(init: RequestInit): RequestInit {
+  // Clone init to avoid modifying the original
+  const secureInit = { ...init };
   
   // Create headers object if it doesn't exist
-  if (!requestInit.headers) {
-    requestInit.headers = new Headers();
+  if (!secureInit.headers) {
+    secureInit.headers = {};
   }
   
-  // Convert headers to Headers object if it's a plain object
-  const headers = requestInit.headers instanceof Headers 
-    ? requestInit.headers 
-    : new Headers(requestInit.headers as Record<string, string>);
+  // Convert to Headers object if it's an object
+  if (!(secureInit.headers instanceof Headers)) {
+    secureInit.headers = new Headers(secureInit.headers as Record<string, string>);
+  }
   
   // Add security headers
-  Object.entries(securityHeaders).forEach(([key, value]) => {
-    if (!headers.has(key)) {
-      headers.set(key, value);
-    }
+  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+    (secureInit.headers as Headers).set(key, value);
   });
   
-  // Update request headers
-  requestInit.headers = headers;
-  
-  return requestInit;
+  return secureInit;
 }
 
 /**
- * Log the security headers for debugging/auditing
- * @param headers Security headers object
+ * Create meta tags for security headers
  */
-export function logSecurityHeaders(headers: Record<string, string>): void {
-  console.group('Security Headers');
-  Object.entries(headers).forEach(([key, value]) => {
-    console.log(`${key}: ${value}`);
-  });
-  console.groupEnd();
+export function createSecurityHeaderMetaTags(): void {
+  if (typeof document === 'undefined') {
+    return;
+  }
+  
+  try {
+    // Add Content-Security-Policy from buildCspHeader function
+    const cspValue = buildCspHeader();
+    addMetaTag('Content-Security-Policy', cspValue);
+    
+    // Add other security headers as meta tags
+    Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+      addMetaTag(`http-equiv`, key, value);
+    });
+    
+    // Add nonce meta tag
+    addMetaTag('csp-nonce', getNonce());
+  } catch (error) {
+    logError(error, { context: 'securityHeaders.createSecurityHeaderMetaTags' });
+  }
+}
+
+/**
+ * Add a meta tag to the document head
+ * @param name Meta tag name
+ * @param content Meta tag content
+ */
+function addMetaTag(name: string, content: string, httpEquiv?: string): void {
+  // Check if meta tag already exists
+  let meta = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
+  
+  if (httpEquiv) {
+    meta = document.querySelector(`meta[http-equiv="${httpEquiv}"]`) as HTMLMetaElement;
+  }
+  
+  if (!meta) {
+    // Create new meta tag
+    meta = document.createElement('meta');
+    
+    if (httpEquiv) {
+      meta.httpEquiv = httpEquiv;
+    } else {
+      meta.name = name;
+    }
+    
+    document.head.appendChild(meta);
+  }
+  
+  // Set content
+  meta.content = content;
+}
+
+/**
+ * Initialize security headers
+ */
+export function initSecurityHeaders(): void {
+  try {
+    // Create meta tags for security headers
+    createSecurityHeaderMetaTags();
+    
+    // Log initialization in development
+    if (IS_DEVELOPMENT_MODE) {
+      console.info('Security headers initialized');
+    }
+  } catch (error) {
+    logError(error, { context: 'securityHeaders.initSecurityHeaders' });
+  }
 }
 
 export default {
-  createSecurityHeaders,
+  SECURITY_HEADERS,
   applySecurityHeadersToRequest,
-  logSecurityHeaders,
-  DEFAULT_SECURITY_HEADERS
+  createSecurityHeaderMetaTags,
+  initSecurityHeaders
 };

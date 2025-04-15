@@ -1,119 +1,164 @@
 /**
  * CORS Configuration
  * 
- * This file provides CORS (Cross-Origin Resource Sharing) configuration settings
- * for the application's API endpoints. These settings are used to restrict which
- * external domains can access our API resources.
+ * Defines secure Cross-Origin Resource Sharing settings to
+ * prevent unauthorized cross-origin requests.
  */
 
-import { IS_DEVELOPMENT_MODE, getEnvironmentVariable } from '../utils/environment';
+import { IS_DEVELOPMENT_MODE, getEnvString } from '../utils/environment';
 
 /**
- * CORS Configuration settings
+ * CORS configuration interface
  */
-export const corsConfig = {
-  // Allowed origins (domains) that can access our API
-  // In production, this is strictly limited to trusted domains
-  // In development, we allow local development servers
+export interface CorsConfig {
+  /**
+   * Allowed origins
+   */
+  allowedOrigins: string[];
+
+  /**
+   * Allowed HTTP methods
+   */
+  allowedMethods: string[];
+
+  /**
+   * Allowed HTTP headers
+   */
+  allowedHeaders: string[];
+
+  /**
+   * Exposed HTTP headers
+   */
+  exposedHeaders: string[];
+
+  /**
+   * Whether to allow credentials
+   */
+  allowCredentials: boolean;
+
+  /**
+   * Max age for preflight requests
+   */
+  maxAge: number;
+}
+
+/**
+ * Default CORS configuration
+ */
+export const DEFAULT_CORS_CONFIG: CorsConfig = {
+  // Default to allow only our own domain in production,
+  // or localhost in development
   allowedOrigins: IS_DEVELOPMENT_MODE
-    ? [
-        'http://localhost:3000',
-        'http://localhost:5000',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:5000',
-        'https://localhost:3000',
-        'https://localhost:5000',
-      ]
-    : [
-        // Production domains - should be configured via environment variables
-        getEnvironmentVariable('APP_DOMAIN', 'https://app.wcag-accessibility.com'),
-        getEnvironmentVariable('API_DOMAIN', 'https://api.wcag-accessibility.com'),
-      ],
-  
-  // Allow credentials (cookies, authorization headers, etc.)
-  allowCredentials: true,
-  
-  // Maximum age (in seconds) of the preflight request
-  maxAge: 86400, // 24 hours
-  
-  // Allowed HTTP methods
-  allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  
-  // Allowed HTTP headers
+    ? ['http://localhost:*', 'https://localhost:*']
+    : [getEnvString('ALLOWED_ORIGIN', 'https://accessibility.example.com')],
+
+  // Standard allowed methods
+  allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+
+  // Standard allowed headers + our custom ones
   allowedHeaders: [
     'Content-Type',
     'Authorization',
+    'X-CSRF-Token',
     'X-Requested-With',
     'Accept',
-    'Origin',
-    'X-CSRF-Token',
-    'X-API-Key',
-  ],
-  
-  // Headers exposed to the client
-  exposedHeaders: [
+    'Accept-Version',
     'Content-Length',
-    'X-Ratelimit-Limit',
-    'X-Ratelimit-Remaining',
-    'X-Ratelimit-Reset',
+    'Content-MD5',
+    'Date',
+    'X-Api-Version'
   ],
+
+  // Headers we want to expose to the client
+  exposedHeaders: [
+    'X-Total-Count',
+    'X-Pagination-Page',
+    'X-Pagination-Limit'
+  ],
+
+  // Allow credentials for authenticated requests
+  allowCredentials: true,
+
+  // Cache preflight requests for 1 hour (3600 seconds)
+  maxAge: 3600
 };
 
 /**
- * Generate CORS headers for server responses
- * @param origin The request origin
- * @returns Object with CORS headers
+ * Get the CORS configuration
+ * @param override Optional override settings
+ * @returns CORS configuration
  */
-export const generateCorsHeaders = (origin: string | null): Record<string, string> => {
-  // Determine if the origin is allowed
-  const allowedOrigin = validateCors(origin) 
-    ? origin 
-    : corsConfig.allowedOrigins[0];
-  
-  // Generate the headers
+export function getCorsConfig(override?: Partial<CorsConfig>): CorsConfig {
+  if (!override) {
+    return DEFAULT_CORS_CONFIG;
+  }
+
   return {
-    'Access-Control-Allow-Origin': allowedOrigin || '*',
-    'Access-Control-Allow-Methods': corsConfig.allowedMethods.join(', '),
-    'Access-Control-Allow-Headers': corsConfig.allowedHeaders.join(', '),
-    'Access-Control-Expose-Headers': corsConfig.exposedHeaders.join(', '),
-    'Access-Control-Allow-Credentials': String(corsConfig.allowCredentials),
-    'Access-Control-Max-Age': String(corsConfig.maxAge),
-    // Add security headers
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-    'X-XSS-Protection': '1; mode=block',
+    ...DEFAULT_CORS_CONFIG,
+    ...override,
+    // Merge arrays instead of replacing them
+    allowedOrigins: override.allowedOrigins
+      ? [...DEFAULT_CORS_CONFIG.allowedOrigins, ...override.allowedOrigins]
+      : DEFAULT_CORS_CONFIG.allowedOrigins,
+    allowedMethods: override.allowedMethods
+      ? [...DEFAULT_CORS_CONFIG.allowedMethods, ...override.allowedMethods]
+      : DEFAULT_CORS_CONFIG.allowedMethods,
+    allowedHeaders: override.allowedHeaders
+      ? [...DEFAULT_CORS_CONFIG.allowedHeaders, ...override.allowedHeaders]
+      : DEFAULT_CORS_CONFIG.allowedHeaders,
+    exposedHeaders: override.exposedHeaders
+      ? [...DEFAULT_CORS_CONFIG.exposedHeaders, ...override.exposedHeaders]
+      : DEFAULT_CORS_CONFIG.exposedHeaders
   };
-};
+}
 
 /**
- * Check if a request passes CORS validation
- * @param origin The request origin
- * @returns Whether the request passes CORS validation
+ * Create CORS headers for fetch requests
+ * @param config CORS configuration
+ * @returns Headers object
  */
-export const validateCors = (origin: string | null): boolean => {
-  // If no origin is provided, it's a same-origin request, which is allowed
-  if (!origin) return true;
-  
-  // Check if the origin is in the allowed origins list
-  if (corsConfig.allowedOrigins.includes(origin)) {
+export function createCorsHeaders(config: CorsConfig = DEFAULT_CORS_CONFIG): Record<string, string> {
+  return {
+    'Access-Control-Allow-Origin': config.allowedOrigins.join(', '),
+    'Access-Control-Allow-Methods': config.allowedMethods.join(', '),
+    'Access-Control-Allow-Headers': config.allowedHeaders.join(', '),
+    'Access-Control-Expose-Headers': config.exposedHeaders.join(', '),
+    'Access-Control-Allow-Credentials': config.allowCredentials ? 'true' : 'false',
+    'Access-Control-Max-Age': config.maxAge.toString()
+  };
+}
+
+/**
+ * Check if an origin is allowed
+ * @param origin Origin to check
+ * @param config CORS configuration
+ * @returns True if origin is allowed
+ */
+export function isOriginAllowed(origin: string, config: CorsConfig = DEFAULT_CORS_CONFIG): boolean {
+  // Check direct match
+  if (config.allowedOrigins.includes(origin)) {
     return true;
   }
-  
-  // In development mode, be more permissive for testing
-  if (IS_DEVELOPMENT_MODE) {
-    // Allow localhost with any port
-    if (origin.match(/^https?:\/\/localhost(:\d+)?$/) ||
-        origin.match(/^https?:\/\/127\.0\.0\.1(:\d+)?$/)) {
-      return true;
+
+  // Check wildcard matches
+  return config.allowedOrigins.some(allowedOrigin => {
+    // Handle wildcard subdomains
+    if (allowedOrigin.includes('*')) {
+      const regexPattern = allowedOrigin
+        .replace(/\./g, '\\.')  // Escape dots
+        .replace(/\*/g, '.*');  // Replace * with .*
+      
+      const regex = new RegExp(`^${regexPattern}$`);
+      return regex.test(origin);
     }
-  }
-  
-  // Check if the origin matches a domain pattern
-  const domainPatterns = [
-    // Add any domain patterns here, e.g. *.example.com
-    /^https:\/\/.*\.wcag-accessibility\.com$/,
-    /^https:\/\/wcag-accessibility\.com$/
-  ];
-  
-  return domainPatterns.some(pattern => pattern.test(origin));
+    
+    return false;
+  });
+}
+
+export default {
+  DEFAULT_CORS_CONFIG,
+  getCorsConfig,
+  createCorsHeaders,
+  isOriginAllowed
 };

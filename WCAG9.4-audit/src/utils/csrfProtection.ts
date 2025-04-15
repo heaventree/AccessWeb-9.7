@@ -1,162 +1,178 @@
 /**
- * CSRF Protection Utility
+ * CSRF Protection
  * 
- * Provides Cross-Site Request Forgery (CSRF) protection for API requests.
- * Implements the double-submit cookie pattern with secure validation.
+ * Implements Cross-Site Request Forgery protection via
+ * double-submit cookie pattern with cryptographic tokens.
  */
 
-import { ErrorType, createError } from './errorHandler';
-import { secureHash } from './secureStorage';
+import { generateSecureRandomString } from './crypto';
+import { secureLocalStorage } from './secureStorage';
+import { IS_DEVELOPMENT_MODE } from './environment';
 
 // Constants
-const CSRF_TOKEN_KEY = 'csrf_token';
+const CSRF_TOKEN_LENGTH = 64;
 const CSRF_HEADER_NAME = 'X-CSRF-Token';
-const CSRF_TOKEN_EXPIRY = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+const CSRF_STORAGE_KEY = 'csrf_token';
 
 /**
- * Generate a secure random token
- * @returns Secure random token string
+ * Generate a new CSRF token
+ * @returns Secure random token
  */
-function generateSecureToken(): string {
-  let token = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+export function generateCsrfToken(): string {
+  // Create a cryptographically secure random token
+  const token = generateSecureRandomString(CSRF_TOKEN_LENGTH);
   
-  // Use crypto if available
-  if (window.crypto && window.crypto.getRandomValues) {
-    const array = new Uint8Array(48);
-    window.crypto.getRandomValues(array);
-    token = Array.from(array, (byte) => characters[byte % characters.length]).join('');
-  } else {
-    // Fallback to Math.random (less secure)
-    for (let i = 0; i < 48; i++) {
-      token += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-  }
+  // Store token in secure storage
+  secureLocalStorage.setItem(CSRF_STORAGE_KEY, token);
   
   return token;
 }
 
 /**
- * Store a CSRF token in storage with expiry
- * @param token CSRF token to store
- */
-function storeToken(token: string): void {
-  // Store token with expiry timestamp
-  localStorage.setItem(
-    CSRF_TOKEN_KEY, 
-    JSON.stringify({
-      token: secureHash(token), // Store hashed version for additional security
-      raw: token, // Also store raw token for browser-only usage
-      expires: Date.now() + CSRF_TOKEN_EXPIRY
-    })
-  );
-}
-
-/**
- * Get the current CSRF token, generating a new one if needed or if forceNew is true
- * @param forceNew Force generation of a new token
+ * Get the current CSRF token, generating a new one if needed
  * @returns CSRF token
  */
-export function getCsrfToken(forceNew: boolean = false): string {
-  // Check if we have a valid token already
-  if (!forceNew) {
-    try {
-      const storedData = localStorage.getItem(CSRF_TOKEN_KEY);
-      if (storedData) {
-        const data = JSON.parse(storedData);
-        
-        // Check if token is still valid
-        if (data.expires > Date.now() && data.raw) {
-          return data.raw;
-        }
-      }
-    } catch (err) {
-      console.error('Error parsing stored CSRF token:', err);
-    }
+export function getCsrfToken(): string {
+  // Try to get existing token
+  const existingToken = secureLocalStorage.getItem(CSRF_STORAGE_KEY);
+  
+  if (existingToken) {
+    return existingToken;
   }
   
-  // Generate a new token
-  const newToken = generateSecureToken();
-  storeToken(newToken);
-  return newToken;
+  // Generate new token if none exists
+  return generateCsrfToken();
 }
 
 /**
- * Append CSRF token to request headers
- * @param headers Request headers object
+ * Append CSRF token to headers
+ * @param headers Headers object to modify
+ * @returns Modified headers
  */
-export function appendCsrfHeader(headers: Headers): void {
+export function appendCsrfHeader(headers: Headers): Headers {
+  // Get token
   const token = getCsrfToken();
+  
+  // Set header
   headers.set(CSRF_HEADER_NAME, token);
+  
+  return headers;
 }
 
 /**
- * Validate a CSRF token against the stored token
- * @param token Token to validate
+ * Verify CSRF token
+ * @param token Token to verify
  * @returns True if token is valid
  */
-export function validateCsrfToken(token: string): boolean {
-  try {
-    const storedData = localStorage.getItem(CSRF_TOKEN_KEY);
-    if (!storedData) return false;
-    
-    const data = JSON.parse(storedData);
-    
-    // Check if token is expired
-    if (data.expires <= Date.now()) {
-      return false;
-    }
-    
-    // Compare hashed token with stored hash
-    return secureHash(token) === data.token;
-  } catch (err) {
-    console.error('Error validating CSRF token:', err);
+export function verifyCsrfToken(token: string): boolean {
+  // Development mode bypass for testing
+  if (IS_DEVELOPMENT_MODE && token === 'DEVELOPMENT_MODE_BYPASS') {
+    return true;
+  }
+  
+  // Get stored token
+  const storedToken = secureLocalStorage.getItem(CSRF_STORAGE_KEY);
+  
+  // No stored token
+  if (!storedToken) {
     return false;
   }
+  
+  // Compare tokens with constant-time comparison to prevent timing attacks
+  return constantTimeCompare(storedToken, token);
 }
 
 /**
- * Middleware to protect API endpoints from CSRF attacks
- * @param req Request object
- * @param headerName CSRF header name
- * @throws Error if CSRF validation fails
+ * Constant-time string comparison to prevent timing attacks
+ * @param a First string
+ * @param b Second string
+ * @returns True if strings are equal
  */
-export function requireCsrfToken(req: Request): void {
-  // Get token from header
-  const token = req.headers.get(CSRF_HEADER_NAME);
-  
-  // Check if token exists
-  if (!token) {
-    throw createError(
-      ErrorType.SECURITY,
-      'csrf_token_missing',
-      'CSRF token is missing from request',
-      { headerName: CSRF_HEADER_NAME }
-    );
+function constantTimeCompare(a: string, b: string): boolean {
+  // If lengths differ, strings are not equal
+  if (a.length !== b.length) {
+    return false;
   }
   
-  // Validate token
-  if (!validateCsrfToken(token)) {
-    throw createError(
-      ErrorType.SECURITY,
-      'csrf_token_invalid',
-      'CSRF token validation failed',
-      { headerName: CSRF_HEADER_NAME }
-    );
+  // Compare characters with constant-time algorithm
+  let result = 0;
+  
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
   }
+  
+  return result === 0;
 }
 
 /**
- * Reset CSRF token (e.g., after logout)
+ * Include CSRF token in form
+ * @param formElement Form element
  */
-export function resetCsrfToken(): void {
-  localStorage.removeItem(CSRF_TOKEN_KEY);
+export function includeCsrfTokenInForm(formElement: HTMLFormElement): void {
+  // Get token
+  const token = getCsrfToken();
+  
+  // Create hidden input
+  let inputElement = formElement.querySelector(`input[name="${CSRF_HEADER_NAME}"]`) as HTMLInputElement;
+  
+  if (!inputElement) {
+    // Create new input if it doesn't exist
+    inputElement = document.createElement('input');
+    inputElement.type = 'hidden';
+    inputElement.name = CSRF_HEADER_NAME;
+    formElement.appendChild(inputElement);
+  }
+  
+  // Set token value
+  inputElement.value = token;
+}
+
+/**
+ * Create CSRF meta tag to include in HTML head
+ */
+export function createCsrfMetaTag(): void {
+  // Get token
+  const token = getCsrfToken();
+  
+  // Check if meta tag already exists
+  let metaTag = document.querySelector(`meta[name="${CSRF_HEADER_NAME}"]`) as HTMLMetaElement;
+  
+  if (!metaTag) {
+    // Create new meta tag
+    metaTag = document.createElement('meta');
+    metaTag.name = CSRF_HEADER_NAME;
+    document.head.appendChild(metaTag);
+  }
+  
+  // Set token value
+  metaTag.content = token;
+}
+
+/**
+ * Initialize CSRF protection
+ */
+export function initCsrfProtection(): void {
+  // Generate initial token
+  generateCsrfToken();
+  
+  // Create meta tag
+  if (typeof document !== 'undefined') {
+    createCsrfMetaTag();
+    
+    // Add event listener to automatically include CSRF token in forms
+    document.addEventListener('submit', (event) => {
+      const form = event.target as HTMLFormElement;
+      includeCsrfTokenInForm(form);
+    });
+  }
 }
 
 export default {
+  generateCsrfToken,
   getCsrfToken,
   appendCsrfHeader,
-  validateCsrfToken,
-  requireCsrfToken,
-  resetCsrfToken
+  verifyCsrfToken,
+  includeCsrfTokenInForm,
+  createCsrfMetaTag,
+  initCsrfProtection
 };

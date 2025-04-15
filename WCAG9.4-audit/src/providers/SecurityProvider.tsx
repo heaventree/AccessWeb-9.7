@@ -1,104 +1,123 @@
 /**
  * Security Provider
  * 
- * Centralizes security features and mechanisms into a single provider component
- * that wraps the application to ensure consistent security enforcement.
+ * Centralized component that integrates all security features
+ * and provides them to the application.
  */
 
-import React, { ReactNode, useEffect, useState } from 'react';
-import { CSP_ENABLED, IS_DEVELOPMENT_MODE } from '../utils/environment';
-import { installCsp, getCurrentNonce } from '../utils/contentSecurity';
-import ErrorBoundary from '../components/ErrorBoundary';
-import { getCsrfToken } from '../utils/csrfProtection';
-import { resetRateLimit } from '../utils/rateLimiting';
+import React, { createContext, useContext, useEffect, ReactNode } from 'react';
+import { initContentSecurity } from '../utils/contentSecurity';
+import { initCsrfProtection } from '../utils/csrfProtection';
+import { getEnvBoolean } from '../utils/environment';
+import { setupSecureStorage } from '../utils/secureStorage';
+import { initSecurityHeaders } from '../utils/securityHeaders';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
+// Get security feature flags from environment
+const CSP_ENABLED = getEnvBoolean('VITE_CSP_ENABLED', true);
+const CSRF_ENABLED = getEnvBoolean('VITE_CSRF_ENABLED', true);
+const SECURITY_HEADERS_ENABLED = getEnvBoolean('VITE_SECURITY_HEADERS_ENABLED', true);
+
+// Security context type
+interface SecurityContextType {
+  /**
+   * Flag indicating if all security features are initialized
+   */
+  initialized: boolean;
+}
+
+// Create context with default values
+const SecurityContext = createContext<SecurityContextType>({
+  initialized: false,
+});
+
+// Security provider props
 interface SecurityProviderProps {
+  /**
+   * Child components
+   */
   children: ReactNode;
+  
+  /**
+   * Whether to enable CSP
+   */
+  enableCSP?: boolean;
+  
+  /**
+   * Whether to enable CSRF protection
+   */
+  enableCSRF?: boolean;
+  
+  /**
+   * Whether to enable security headers
+   */
+  enableSecurityHeaders?: boolean;
 }
 
 /**
- * SecurityProvider wraps the application with various security features
- * including CSP, error boundaries, CSRF protection, and rate limiting.
+ * Security Provider Component
+ * 
+ * Provides security features to the application
  */
-const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) => {
-  const [securityInitialized, setSecurityInitialized] = useState(false);
-  
-  // Initialize security features on component mount
+export function SecurityProvider({
+  children,
+  enableCSP = CSP_ENABLED,
+  enableCSRF = CSRF_ENABLED,
+  enableSecurityHeaders = SECURITY_HEADERS_ENABLED,
+}: SecurityProviderProps) {
+  // Initialize security features
   useEffect(() => {
-    // Setup Content Security Policy
-    if (CSP_ENABLED) {
-      try {
-        // Configure CSP based on environment
-        const cspConfig = IS_DEVELOPMENT_MODE
-          ? {
-              // More permissive in development
-              'script-src': ["'self'", "'unsafe-eval'", "'unsafe-inline'"],
-              'connect-src': ["'self'", 'ws:', 'wss:', 'https://api.example.com']
-            }
-          : {
-              // More restrictive in production
-              'script-src': ["'self'", "'strict-dynamic'"],
-              'connect-src': ["'self'", 'https://api.example.com']
-            };
-        
-        // Install CSP
-        installCsp(cspConfig);
-        console.log('Content Security Policy installed successfully');
-      } catch (error) {
-        console.error('Failed to install Content Security Policy:', error);
-      }
+    // Initialize secure storage
+    setupSecureStorage();
+    
+    // Initialize Content Security Policy
+    if (enableCSP) {
+      initContentSecurity();
     }
     
     // Initialize CSRF protection
-    try {
-      // Generate a new CSRF token if needed
-      getCsrfToken();
-      console.log('CSRF protection initialized successfully');
-    } catch (error) {
-      console.error('Failed to initialize CSRF protection:', error);
+    if (enableCSRF) {
+      initCsrfProtection();
     }
     
-    // Reset rate limits on new session
-    try {
-      // Reset global API rate limit
-      resetRateLimit('global_api');
-      console.log('Rate limiting reset successfully');
-    } catch (error) {
-      console.error('Failed to reset rate limits:', error);
+    // Initialize security headers
+    if (enableSecurityHeaders) {
+      initSecurityHeaders();
     }
     
-    // Mark security as initialized
-    setSecurityInitialized(true);
-    
-    // Cleanup function
-    return () => {
-      // Any cleanup for security features if needed
-    };
-  }, []);
+    // Log security initialization
+    console.info(
+      `Security initialized: CSP=${enableCSP}, CSRF=${enableCSRF}, Headers=${enableSecurityHeaders}`
+    );
+  }, [enableCSP, enableCSRF, enableSecurityHeaders]);
   
-  // Security-related attributes for the container
-  const securityAttrs = {
-    // Use nonce for inline scripts if CSP is enabled
-    ...(CSP_ENABLED && { 'data-csp-nonce': getCurrentNonce() }),
-    // Add security indicator for testing/debugging
-    'data-security-initialized': securityInitialized.toString()
+  // Context value
+  const contextValue: SecurityContextType = {
+    initialized: true,
   };
   
+  // Provide security context and wrap with error boundary
   return (
-    <ErrorBoundary component="SecurityProvider">
-      <div 
-        className="security-provider"
-        {...securityAttrs}
-      >
-        {/* Only render children once security is initialized */}
-        {securityInitialized ? children : (
-          <div aria-live="polite" aria-atomic="true" role="status">
-            <p>Initializing security features...</p>
-          </div>
-        )}
-      </div>
-    </ErrorBoundary>
+    <SecurityContext.Provider value={contextValue}>
+      <ErrorBoundary>
+        {children}
+      </ErrorBoundary>
+    </SecurityContext.Provider>
   );
-};
+}
+
+/**
+ * Hook to use security context
+ * @returns Security context
+ */
+export function useSecurity(): SecurityContextType {
+  const context = useContext(SecurityContext);
+  
+  if (context === undefined) {
+    throw new Error('useSecurity must be used within a SecurityProvider');
+  }
+  
+  return context;
+}
 
 export default SecurityProvider;

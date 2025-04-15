@@ -1,200 +1,221 @@
 /**
  * Authentication API Service
  * 
- * Provides specialized API methods for authentication-related operations.
- * Uses the base API service for secure HTTP requests.
+ * Provides centralized, secure authentication API endpoints with
+ * specialized handling for auth-related operations.
  */
 
-import api from './api';
-import { validateData } from '../utils/validation';
-import { z } from 'zod';
+import { apiClient } from '../utils/apiClient';
+import { AccountLockoutManager } from '../utils/passwordPolicy';
+import { ErrorType, createError } from '../utils/errorHandler';
 
-// Type definitions for API responses
-export interface LoginResponse {
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-  };
-  token: string;
-  refreshToken: string;
-  expiresAt: number;
-}
-
-export interface RegistrationResponse {
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-  };
-  token: string;
-  refreshToken: string;
-  expiresAt: number;
-}
-
-export interface TokenRefreshResponse {
-  token: string;
-  refreshToken: string;
-  expiresAt: number;
-}
-
-export interface ForgotPasswordResponse {
-  success: boolean;
-  message: string;
-}
-
-export interface ResetPasswordResponse {
-  success: boolean;
-  message: string;
-}
-
-export interface ChangePasswordResponse {
-  success: boolean;
-  message: string;
-}
-
-export interface UserProfileResponse {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-  createdAt: string;
-  updatedAt: string;
-  profile?: {
-    avatar?: string;
-    bio?: string;
-    company?: string;
-    website?: string;
-    location?: string;
-  };
-}
-
-// Input validation schemas
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  rememberMe: z.boolean().optional(),
-});
-
-const registrationSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string().min(8),
-  acceptTerms: z.boolean().refine(val => val === true, {
-    message: 'You must accept the terms and conditions'
-  }),
-});
-
-const forgotPasswordSchema = z.object({
-  email: z.string().email(),
-});
-
-const resetPasswordSchema = z.object({
-  token: z.string(),
-  password: z.string().min(8),
-  confirmPassword: z.string().min(8),
-}).refine(data => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
-
-const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1),
-  newPassword: z.string().min(8),
-  confirmPassword: z.string().min(8),
-}).refine(data => data.newPassword === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
-
-/**
- * Auth API methods
- */
-const authApi = {
-  /**
-   * Log in a user
-   */
-  async login(data: z.infer<typeof loginSchema>): Promise<LoginResponse> {
-    // Validate input data
-    const validatedData = validateData(loginSchema, data);
-    
-    // Make API request
-    return api.post<LoginResponse>('/auth/login', validatedData);
-  },
-  
-  /**
-   * Register a new user
-   */
-  async register(data: z.infer<typeof registrationSchema>): Promise<RegistrationResponse> {
-    // Validate input data
-    const validatedData = validateData(registrationSchema, data);
-    
-    // Make API request
-    return api.post<RegistrationResponse>('/auth/register', validatedData);
-  },
-  
-  /**
-   * Refresh authentication token
-   */
-  async refreshToken(refreshToken: string): Promise<TokenRefreshResponse> {
-    return api.post<TokenRefreshResponse>('/auth/refresh', { refreshToken });
-  },
-  
-  /**
-   * Log out a user
-   */
-  async logout(): Promise<{ success: boolean }> {
-    return api.post<{ success: boolean }>('/auth/logout', {});
-  },
-  
-  /**
-   * Send a password reset email
-   */
-  async forgotPassword(email: string): Promise<ForgotPasswordResponse> {
-    const validatedData = validateData(forgotPasswordSchema, { email });
-    
-    return api.post<ForgotPasswordResponse>('/auth/forgot-password', validatedData);
-  },
-  
-  /**
-   * Reset password with token
-   */
-  async resetPassword(data: z.infer<typeof resetPasswordSchema>): Promise<ResetPasswordResponse> {
-    const validatedData = validateData(resetPasswordSchema, data);
-    
-    return api.post<ResetPasswordResponse>('/auth/reset-password', validatedData);
-  },
-  
-  /**
-   * Change user password
-   */
-  async changePassword(data: z.infer<typeof changePasswordSchema>): Promise<ChangePasswordResponse> {
-    const validatedData = validateData(changePasswordSchema, data);
-    
-    return api.post<ChangePasswordResponse>('/auth/change-password', validatedData);
-  },
-  
-  /**
-   * Get current user profile
-   */
-  async getProfile(): Promise<UserProfileResponse> {
-    return api.get<UserProfileResponse>('/auth/profile');
-  },
-  
-  /**
-   * Verify if user is authenticated
-   */
-  async verifyAuth(): Promise<{ authenticated: boolean; user?: UserProfileResponse }> {
-    try {
-      const user = await this.getProfile();
-      return { authenticated: true, user };
-    } catch (error) {
-      return { authenticated: false };
-    }
-  }
+// Auth API endpoints
+const AUTH_ENDPOINTS = {
+  LOGIN: 'auth/login',
+  REGISTER: 'auth/register',
+  LOGOUT: 'auth/logout',
+  REFRESH_TOKEN: 'auth/refresh',
+  VERIFY_EMAIL: 'auth/verify',
+  FORGOT_PASSWORD: 'auth/forgot-password',
+  RESET_PASSWORD: 'auth/reset-password',
+  CHANGE_PASSWORD: 'auth/change-password',
+  GET_PROFILE: 'auth/profile',
+  UPDATE_PROFILE: 'auth/profile'
 };
 
-export default authApi;
+// Login response interface
+export interface LoginResponse {
+  token: string;
+  refreshToken: string;
+  expiresIn: number;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  };
+}
+
+// Registration response interface
+export interface RegistrationResponse {
+  success: boolean;
+  message: string;
+  user?: {
+    id: string;
+    email: string;
+  };
+}
+
+/**
+ * Login user with email and password
+ * @param email User email
+ * @param password User password
+ * @returns Login response
+ */
+export async function login(email: string, password: string): Promise<LoginResponse> {
+  try {
+    // Check if account is locked
+    if (AccountLockoutManager.isAccountLocked(email)) {
+      const timeRemaining = AccountLockoutManager.getLockoutTimeRemaining(email);
+      throw createError(
+        ErrorType.AUTHENTICATION,
+        'account_locked',
+        `Account is temporarily locked. Please try again in ${Math.ceil(timeRemaining / 60)} minutes`,
+        { timeRemaining }
+      );
+    }
+    
+    // Make login request
+    const response = await apiClient.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, {
+      email,
+      password
+    });
+    
+    // Reset any failed attempts
+    AccountLockoutManager.resetLockout(email);
+    
+    return response;
+  } catch (error) {
+    // Record failed attempt
+    if (
+      error instanceof Error &&
+      (error as any).type === ErrorType.AUTHENTICATION
+    ) {
+      AccountLockoutManager.recordFailedAttempt(email);
+    }
+    
+    throw error;
+  }
+}
+
+/**
+ * Register a new user
+ * @param userData User registration data
+ * @returns Registration response
+ */
+export async function register(userData: {
+  email: string;
+  password: string;
+  name: string;
+}): Promise<RegistrationResponse> {
+  return apiClient.post<RegistrationResponse>(AUTH_ENDPOINTS.REGISTER, userData);
+}
+
+/**
+ * Logout the current user
+ * @returns Success status
+ */
+export async function logout(): Promise<boolean> {
+  try {
+    await apiClient.post(AUTH_ENDPOINTS.LOGOUT);
+    return true;
+  } catch (error) {
+    console.error('Error during logout:', error);
+    return false;
+  }
+}
+
+/**
+ * Refresh the authentication token
+ * @param refreshToken Current refresh token
+ * @returns New tokens
+ */
+export async function refreshToken(refreshToken: string): Promise<{
+  token: string;
+  refreshToken: string;
+  expiresIn: number;
+}> {
+  return apiClient.post(AUTH_ENDPOINTS.REFRESH_TOKEN, { refreshToken });
+}
+
+/**
+ * Verify email address
+ * @param token Verification token
+ * @returns Success status
+ */
+export async function verifyEmail(token: string): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  return apiClient.post(AUTH_ENDPOINTS.VERIFY_EMAIL, { token });
+}
+
+/**
+ * Request password reset
+ * @param email User email
+ * @returns Success status
+ */
+export async function forgotPassword(email: string): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  return apiClient.post(AUTH_ENDPOINTS.FORGOT_PASSWORD, { email });
+}
+
+/**
+ * Reset password with token
+ * @param token Reset token
+ * @param newPassword New password
+ * @returns Success status
+ */
+export async function resetPassword(
+  token: string,
+  newPassword: string
+): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  return apiClient.post(AUTH_ENDPOINTS.RESET_PASSWORD, {
+    token,
+    newPassword
+  });
+}
+
+/**
+ * Change password (authenticated)
+ * @param currentPassword Current password
+ * @param newPassword New password
+ * @returns Success status
+ */
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  return apiClient.post(AUTH_ENDPOINTS.CHANGE_PASSWORD, {
+    currentPassword,
+    newPassword
+  });
+}
+
+/**
+ * Get current user's profile
+ * @returns User profile
+ */
+export async function getProfile(): Promise<any> {
+  return apiClient.get(AUTH_ENDPOINTS.GET_PROFILE);
+}
+
+/**
+ * Update user profile
+ * @param profileData Profile data
+ * @returns Updated profile
+ */
+export async function updateProfile(profileData: Record<string, any>): Promise<any> {
+  return apiClient.put(AUTH_ENDPOINTS.UPDATE_PROFILE, profileData);
+}
+
+export default {
+  login,
+  register,
+  logout,
+  refreshToken,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+  changePassword,
+  getProfile,
+  updateProfile
+};
