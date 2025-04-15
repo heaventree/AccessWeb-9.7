@@ -215,6 +215,22 @@ export function addCsrfToUrl(url: string): string {
   }
 }
 
+/**
+ * Append CSRF header to Headers object for fetch requests
+ * @param headers Headers object to append CSRF token to
+ */
+export function appendCsrfHeader(headers: Headers): void {
+  try {
+    const token = getCsrfToken();
+    
+    if (token) {
+      headers.set(CSRF_HEADER_NAME, token);
+    }
+  } catch (error) {
+    logError(error, { context: 'appendCsrfHeader' });
+  }
+}
+
 export default {
   initCsrfProtection,
   generateCsrfToken,
@@ -222,5 +238,6 @@ export default {
   validateCsrfToken,
   refreshCsrfToken,
   createCsrfInputField,
-  addCsrfToUrl
+  addCsrfToUrl,
+  appendCsrfHeader
 };

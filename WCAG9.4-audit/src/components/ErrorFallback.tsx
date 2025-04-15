@@ -40,6 +40,11 @@ export interface ErrorFallbackProps {
    * Whether to show detailed error information
    */
   showDetails?: boolean;
+  
+  /**
+   * Custom error title
+   */
+  title?: string;
 }
 
 /**
