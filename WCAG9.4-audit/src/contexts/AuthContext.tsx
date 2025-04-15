@@ -1,12 +1,12 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { 
-  generateToken, 
   validateToken, 
   loginUser,
   registerUser
 } from '../utils/auth';
 import { User, AuthError, LoginResponse, RegistrationData, RegistrationResponse } from '../types/auth';
 import { IS_DEVELOPMENT_MODE } from '../utils/environment';
+import { authStorage } from '../utils/secureStorage';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -47,10 +47,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Secure token storage function
   const storeAuthToken = useCallback((token: string) => {
     try {
-      // For better security in production:
-      // - Use HttpOnly cookies via server-side auth
-      // - Or use more secure client storage methods
-      localStorage.setItem('token', token);
+      // Store token using secure storage utility with encryption
+      authStorage.setItem('token', token);
+      
+      // Store token expiry time for proactive token refresh
+      const expiresAt = Date.now() + (23 * 60 * 60 * 1000); // 23 hours (1hr before expiry)
+      authStorage.setItem('tokenExpiry', expiresAt.toString());
     } catch (error) {
       console.error('Error storing auth token:', error);
     }
@@ -59,20 +61,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Secure token removal function
   const removeAuthToken = useCallback(() => {
     try {
-      localStorage.removeItem('token');
+      // Clear all auth-related data
+      authStorage.removeItem('token');
+      authStorage.removeItem('tokenExpiry');
+      authStorage.removeItem('refreshToken');
     } catch (error) {
       console.error('Error removing auth token:', error);
     }
   }, []);
 
-  // Check for existing authentication on mount
+  // Check for existing authentication on mount and implement token refresh
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Get token from storage
-        const token = localStorage.getItem('token');
+        // Get token from secure storage
+        const token = authStorage.getItem('token');
         
         if (token) {
+          // Check if token is nearing expiry
+          const tokenExpiry = authStorage.getItem('tokenExpiry');
+          const isExpiringSoon = tokenExpiry && parseInt(tokenExpiry) < Date.now();
+          
           // Validate the token (checks signature, expiration, etc.)
           const userData = await validateToken(token);
           
@@ -85,6 +94,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               name: userData.name || '',
               organization: userData.organization || ''
             });
+            
+            // If token is valid but nearing expiry, refresh it (in production)
+            // This would call a token refresh API endpoint
+            if (isExpiringSoon && !IS_DEVELOPMENT_MODE) {
+              // In a real implementation, we would refresh the token here
+              console.log('Token nearing expiry, refresh would be triggered');
+            }
           } else {
             // Token is invalid or expired, remove it
             removeAuthToken();
@@ -99,7 +115,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     checkAuth();
-  }, [removeAuthToken]);
+    
+    // Set up token refresh check at regular intervals
+    const refreshInterval = setInterval(() => {
+      const tokenExpiry = authStorage.getItem('tokenExpiry');
+      if (tokenExpiry && parseInt(tokenExpiry) < Date.now() && user) {
+        // Token needs refresh
+        console.log('Token refresh interval triggered');
+        checkAuth();
+      }
+    }, 15 * 60 * 1000); // Check every 15 minutes
+    
+    return () => clearInterval(refreshInterval);
+  }, [removeAuthToken, user]);
 
   // Login function
   const login = async (email: string, password: string) => {
@@ -178,10 +206,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Logout function
-  const logout = () => {
-    localStorage.removeItem('token');
+  const logout = useCallback(() => {
+    // Clear all auth data using our secure storage utility
+    removeAuthToken();
+    
+    // Reset user state
     setUser(null);
-  };
+    
+    // In a real implementation, you might also want to:
+    // 1. Invalidate the token on the server
+    // 2. Clear any user-related cache
+    // 3. Reset any application state
+  }, [removeAuthToken]);
   
   // Verify email function
   const verifyEmail = async (token: string) => {
