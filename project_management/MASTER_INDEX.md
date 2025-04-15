@@ -31,6 +31,7 @@ Documentation is organized into the following categories:
 
 - [Security Architecture Overview](./technical/security/security-architecture-overview.md) - High-level overview of the security architecture
 - [Authentication Implementation](./technical/security/authentication-implementation.md) - Details of the authentication system
+- [Authentication Components](./technical/security/auth-components.md) - Authentication and authorization components documentation
 - [Authorization Framework](./technical/security/authorization-framework.md) - Authorization and access control framework
 - [Data Protection](./technical/security/data-protection.md) - Data protection measures and implementations
 - [API Security](./technical/security/api-security.md) - API security measures and implementations
@@ -39,6 +40,8 @@ Documentation is organized into the following categories:
 
 - [Component Inventory](./technical/verification/component-inventory.md) - Inventory of all system components
 - [Implementation Verification Framework](./technical/verification/implementation-verification-framework.md) - Framework for verifying implementations
+- [Security Implementation Verification Report](./technical/verification/reports/security-implementation-verification-report.md) - Verification of security implementation
+- [Authentication Components Verification Report](./technical/verification/reports/authentication-components-verification-report.md) - Verification of authentication components
 
 ### API Documentation
 
@@ -90,11 +93,13 @@ Documentation is organized into the following categories:
 ### Audits
 
 - [Senior Code Audit Report](./assessments/audits/2024-04-15-senior-code-audit-report.md) - Senior code audit findings
+- [Security Audit Update](./assessments/audits/2024-04-15-security-audit-update.md) - Update on security improvements
 - [Documentation Audit Report](./assessments/audits/2024-04-15-documentation-audit-report.md) - Documentation audit findings
 
 ### Remediation
 
 - [Comprehensive Remediation Strategy](./assessments/remediation/2024-04-15-comprehensive-remediation-strategy.md) - Strategy for addressing audit findings
+- [Security Architecture Progress](./assessments/remediation/security-architecture-progress.md) - Progress on security architecture improvements
 - [Remediation Timeline](./assessments/remediation/remediation_timeline.md) - Timeline for implementing remediation
 
 ### Tasks
