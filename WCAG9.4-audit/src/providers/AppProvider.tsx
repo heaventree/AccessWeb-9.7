@@ -5,14 +5,14 @@
  * and providers for a secure and accessible application.
  */
 
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '../contexts/AuthContext';
 import { SecurityProvider } from './SecurityProvider';
-import { ErrorBoundary } from '../components/ErrorBoundary';
-import { IS_DEVELOPMENT_MODE } from '../utils/environment';
+import ErrorBoundary from '../components/ErrorBoundary';
+import { isDevelopment } from '../utils/environment';
 
 // App provider props
 interface AppProviderProps {
@@ -27,7 +27,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      refetchOnWindowFocus: !IS_DEVELOPMENT_MODE,
+      refetchOnWindowFocus: !isDevelopment(),
       staleTime: 1000 * 60 * 5, // 5 minutes
       gcTime: 1000 * 60 * 10, // 10 minutes
     },

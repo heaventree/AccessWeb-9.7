@@ -188,6 +188,11 @@ export function isTest(): boolean {
   return getEnvString('NODE_ENV', 'development') === 'test';
 }
 
+/**
+ * API timeout in milliseconds
+ */
+export const API_TIMEOUT: number = getEnvNumber('VITE_API_TIMEOUT', 30000);
+
 export default {
   loadEnvVariables,
   getEnvString,
@@ -197,5 +202,6 @@ export default {
   getEnvJson,
   isDevelopment,
   isProduction,
-  isTest
+  isTest,
+  API_TIMEOUT
 };
