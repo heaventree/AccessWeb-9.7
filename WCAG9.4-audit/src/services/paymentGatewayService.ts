@@ -1,5 +1,5 @@
 import type { PaymentGateway } from '../types';
-import { getEnvVariable } from '../utils/environment';
+import { getEnvString } from '../utils/environment';
 
 // Simulated database
 let gateways: PaymentGateway[] = [

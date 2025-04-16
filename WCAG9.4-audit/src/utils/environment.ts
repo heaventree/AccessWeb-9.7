@@ -39,6 +39,16 @@ export function loadEnvVariables(): void {
 }
 
 /**
+ * Get any environment variable (alias for getEnvString for backward compatibility)
+ * @param key Environment variable key
+ * @param defaultValue Default value if environment variable is not set
+ * @returns Environment variable value or default
+ */
+export function getEnvVariable(key: string, defaultValue: string = ''): string {
+  return getEnvString(key, defaultValue);
+}
+
+/**
  * Get a string environment variable
  * @param key Environment variable key
  * @param defaultValue Default value if environment variable is not set
@@ -205,6 +215,7 @@ export const API_VERSION: string = getEnvString('VITE_API_VERSION', 'v1');
 
 export default {
   loadEnvVariables,
+  getEnvVariable,
   getEnvString,
   getEnvNumber,
   getEnvBoolean,
