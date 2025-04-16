@@ -4,7 +4,6 @@ import { toast } from 'react-hot-toast';
 import { queryClient } from '../providers/AppProvider';
 import type { 
   APIKey, 
-  APILog, 
   AccessibilityTestRequest,
   AccessibilityTestResponse,
   RegionalStandards,
@@ -18,7 +17,7 @@ export const api = {
       const keys = await storageService.getItem<APIKey[]>('api_keys') || [];
       return keys;
     } catch (error) {
-      const apiError = handleAPIError(error);
+      const apiError = handleApiError(error);
       toast.error(apiError.message);
       return [];
     }
@@ -43,12 +42,12 @@ export const api = {
       await storageService.setItem('api_keys', keys);
 
       // Invalidate and refetch keys list
-      await queryClient.invalidateQueries(['api-keys']);
+      await queryClient.invalidateQueries({ queryKey: ['api-keys'] });
       toast.success('API key created successfully');
 
       return newKey;
     } catch (error) {
-      const apiError = handleAPIError(error);
+      const apiError = handleApiError(error);
       toast.error(apiError.message);
       throw apiError;
     }
@@ -64,7 +63,7 @@ export const api = {
       };
       return usage;
     } catch (error) {
-      const apiError = handleAPIError(error);
+      const apiError = handleApiError(error);
       toast.error(apiError.message);
       return {
         totalCalls: 0,
@@ -83,7 +82,7 @@ export const api = {
       }
       return standards;
     } catch (error) {
-      const apiError = handleAPIError(error);
+      const apiError = handleApiError(error);
       toast.error(apiError.message);
       throw apiError;
     }
@@ -98,7 +97,7 @@ export const api = {
       }
       return standards[region as keyof RegionalStandards];
     } catch (error) {
-      const apiError = handleAPIError(error);
+      const apiError = handleApiError(error);
       toast.error(apiError.message);
       throw apiError;
     }
@@ -140,7 +139,7 @@ export const api = {
 
       return response;
     } catch (error) {
-      const apiError = handleAPIError(error);
+      const apiError = handleApiError(error);
       toast.error(apiError.message);
       throw apiError;
     }

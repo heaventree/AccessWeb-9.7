@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '../contexts/AuthContext';
 import { SecurityProvider } from './SecurityProvider';
+import { ThemeProvider } from './ThemeProvider';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { isDevelopment } from '../utils/environment';
 
@@ -23,7 +24,7 @@ interface AppProviderProps {
 }
 
 // Create query client for React Query
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
@@ -50,7 +51,9 @@ export function AppProvider({ children }: AppProviderProps): JSX.Element {
           <SecurityProvider>
             <BrowserRouter>
               <AuthProvider>
-                {children}
+                <ThemeProvider>
+                  {children}
+                </ThemeProvider>
               </AuthProvider>
             </BrowserRouter>
           </SecurityProvider>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiEye, FiX, FiMessageCircle, FiAlertCircle, FiHelpCircle, FiPlusCircle } from 'react-icons/fi';
+import { FiEye, FiX, FiMessageCircle, FiAlertCircle, FiHelpCircle, FiSettings } from 'react-icons/fi';
 import { useAccessibilityTips } from '../contexts/AccessibilityTipsContext';
 import { AccessibilityTipTooltip } from './accessibility/AccessibilityTipTooltip';
 
@@ -59,7 +59,7 @@ export function AccessibilityToolbar() {
               className="text-gray-400 hover:text-gray-600 transition-colors"
               aria-label="Close toolbar"
             >
-              <FiX size={20} />
+              <span aria-hidden="true"><FiX size={20} /></span>
             </button>
           </div>
 
@@ -67,7 +67,7 @@ export function AccessibilityToolbar() {
             {/* Quick Tips Toggle */}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <FiEye className="mr-2 text-primary-600" size={18} />
+                <span aria-hidden="true"><FiEye className="mr-2 text-primary-600" size={18} /></span>
                 <span className="text-sm font-medium text-gray-700">Accessibility Tips</span>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -95,7 +95,7 @@ export function AccessibilityToolbar() {
                 className="w-full flex items-center p-2 text-left text-sm bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                 onClick={() => {}}
               >
-                <FiAlertCircle className="mr-2 text-yellow-500" size={16} />
+                <span aria-hidden="true"><FiAlertCircle className="mr-2 text-yellow-500" size={16} /></span>
                 <span>Run accessibility audit</span>
               </button>
               
@@ -103,7 +103,7 @@ export function AccessibilityToolbar() {
                 className="w-full flex items-center p-2 text-left text-sm bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                 onClick={() => {}}
               >
-                <FiMessageCircle className="mr-2 text-blue-500" size={16} />
+                <span aria-hidden="true"><FiMessageCircle className="mr-2 text-blue-500" size={16} /></span>
                 <span>Open live chat support</span>
               </button>
               
@@ -111,7 +111,7 @@ export function AccessibilityToolbar() {
                 className="w-full flex items-center p-2 text-left text-sm bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                 onClick={() => {}}
               >
-                <FiHelpCircle className="mr-2 text-purple-500" size={16} />
+                <span aria-hidden="true"><FiHelpCircle className="mr-2 text-purple-500" size={16} /></span>
                 <span>View accessibility guide</span>
               </button>
             </div>
@@ -132,7 +132,7 @@ export function AccessibilityToolbar() {
         transition={{ duration: 0.3 }}
         aria-label="Toggle accessibility toolbar"
       >
-        <Glasses size={20} />
+        <span aria-hidden="true"><FiSettings size={20} /></span>
       </motion.button>
 
       {/* Accessibility Tip Tooltip */}
