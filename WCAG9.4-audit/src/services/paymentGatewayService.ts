@@ -9,8 +9,8 @@ let gateways: PaymentGateway[] = [
     isActive: true,
     config: {
       mode: 'test',
-      apiKey: getEnvVariable('VITE_STRIPE_PUBLISHABLE_KEY', 'pk_test_placeholder'),
-      secretKey: getEnvVariable('VITE_STRIPE_SECRET_KEY', 'sk_test_placeholder'),
+      apiKey: getEnvString('VITE_STRIPE_PUBLISHABLE_KEY', 'pk_test_placeholder'),
+      secretKey: getEnvString('VITE_STRIPE_SECRET_KEY', 'sk_test_placeholder'),
       webhookSecret: ''
     },
     lastUpdated: new Date().toISOString()

@@ -1,5 +1,5 @@
 import { storageService } from './storage';
-import { handleAPIError } from '../utils/errorHandler';
+import { handleApiError } from '../utils/errorHandler';
 import { toast } from 'react-hot-toast';
 import { queryClient } from '../providers/AppProvider';
 import type { 
