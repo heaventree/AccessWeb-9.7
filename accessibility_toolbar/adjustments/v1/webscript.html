@@ -1,0 +1,14 @@
+
+<!-- // START Accessibility integration, source: https://25space.com/business/accessibility/ -->
+  <script src="https://blobstorage.25space.com/api/accessibility/v1/acctoolbar/acctoolbar.js?source=cdnpublicV1&domain=yourdomain.com"></script>
+		<script>
+		  window.onload = function() {
+			window.micAccessTool = new MicAccessTool({
+			  link: 'https://blobstorage.25space.com/api/accessibility/customerstatements/YOUR-STATEMENT-FILE.html',
+			  contact: 'mailto:YOURCONTACT@on25space.com',
+			  buttonPosition: 'left', // default is 'left'
+			  forceLang: 'en-US' // default is 'en' may be 'he-IL', 'en-US'
+			});
+		  }
+		</script>
+<!-- // END Accessibility integration ------------------------------------------------------ -->  

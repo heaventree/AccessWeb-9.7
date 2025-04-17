@@ -1,0 +1,42 @@
+{
+  "name": "acc_toolbar",
+  "version": "1.0.0",
+  "description": "Accessibility Toolbar Plugin",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mickidum/acc_toolbar.git"
+  },
+  "keywords": [
+    "Accessibility",
+    "Toolbar",
+    "Toolbox",
+    "Plugin"
+  ],
+  "author": "mickidum",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^2.26.5",
+    "gulp": "^4.0.1",
+    "gulp-autoprefixer": "^6.1.0",
+    "gulp-cache": "^1.1.1",
+    "gulp-clean-css": "^4.2.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-file-include": "^2.0.1",
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-notify": "^3.2.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-uglify": "^3.0.2",
+    "gulp-util": "^3.0.8",
+    "rimraf": "^2.6.3"
+  },
+  "bugs": {
+    "url": "https://github.com/mickidum/acc_toolbar/issues"
+  },
+  "homepage": "https://github.com/mickidum/acc_toolbar#readme",
+  "dependencies": {}
+}

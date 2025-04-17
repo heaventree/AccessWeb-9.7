@@ -1,0 +1,49 @@
+[
+  {
+    "category_name": "Readabler",
+    "icons": [
+      {
+        "name": "Readabler",
+        "path": "_readabler/readabler.svg",
+        "keywords": [
+          "universal,access,readabler,man,human"
+        ]
+      },
+      {
+        "name": "Universal Access",
+        "path": "_readabler/universal-access.svg",
+        "keywords": [
+          "universal,access"
+        ]
+      },
+      {
+        "name": "Eye",
+        "path": "_readabler/eye.svg",
+        "keywords": [
+          "universal,access,eye,view"
+        ]
+      },
+      {
+        "name": "View",
+        "path": "_readabler/view.svg",
+        "keywords": [
+          "universal,access,eye,view"
+        ]
+      },
+      {
+        "name": "View in square",
+        "path": "_readabler/view-square.svg",
+        "keywords": [
+          "universal,access,eye,view"
+        ]
+      },
+      {
+        "name": "Wheelchair",
+        "path": "_readabler/wheelchair-accessible.svg",
+        "keywords": [
+          "universal,access,wheelchair"
+        ]
+      }
+    ]
+  }
+]
