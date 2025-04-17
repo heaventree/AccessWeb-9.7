@@ -158,16 +158,14 @@ export function AccessibilityToolbar() {
       </motion.div>
 
       {/* Toggle button */}
-      <motion.button
+      <button
         className="fixed right-0 top-24 bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-l-md shadow-lg z-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
         onClick={() => setIsOpen(!isOpen)}
-        initial={{ x: isOpen ? '100%' : 0 }}
-        animate={{ x: isOpen ? '100%' : 0 }}
-        transition={{ duration: 0.3 }}
         aria-label="Toggle accessibility toolbar"
+        style={{ display: isOpen ? 'none' : 'block' }}
       >
         <span aria-hidden="true"><FiSettings size={20} /></span>
-      </motion.button>
+      </button>
     </>
   );
 }
