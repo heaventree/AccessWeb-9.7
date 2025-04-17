@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  FiSun, FiMoon, FiZoomIn, FiZoomOut, FiType, 
-  FiLink, FiImage, FiAlignCenter, 
-  FiRefreshCw, FiEye, FiSettings, FiX,
-  FiBookOpen
-} from 'react-icons/fi';
+import { FiSun } from 'react-icons/fi';
+import { FiMoon } from 'react-icons/fi';
+import { FiZoomIn } from 'react-icons/fi';
+import { FiZoomOut } from 'react-icons/fi';
+import { FiType } from 'react-icons/fi';
+import { FiLink } from 'react-icons/fi';
+import { FiImage } from 'react-icons/fi';
+import { FiAlignCenter } from 'react-icons/fi';
+import { FiRefreshCw } from 'react-icons/fi';
+import { FiEye } from 'react-icons/fi';
+import { FiSettings } from 'react-icons/fi';
+import { FiX } from 'react-icons/fi';
+import { FiBookOpen } from 'react-icons/fi';
 import './WCAGToolbar.css';
 
 export interface WCAGToolbarProps {
