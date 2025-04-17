@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { FiUser, FiLock, FiMail, FiLogIn, FiUserPlus } from 'react-icons/fi';
@@ -16,9 +16,24 @@ export function AuthPage() {
   const [verificationSent, setVerificationSent] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, register } = useAuth();
+  const { login, register, isAuthenticated, isDevelopmentMode } = useAuth();
   const navigate = useNavigate();
-  const { redirect } = useParams<{ redirect?: string }>();
+  // Get the redirect value from the URL search parameters
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirect = searchParams.get('redirect') || undefined;
+  
+  // Auto-redirect if already authenticated or in development mode
+  useEffect(() => {
+    if (isAuthenticated) {
+      const redirectPath = redirect ? decodeURIComponent(redirect) : '/dashboard';
+      navigate(redirectPath, { replace: true });
+    } else if (isDevelopmentMode) {
+      // In development mode, automatically log in
+      console.info('🔓 Development mode: Auto-logging in user');
+      const redirectPath = redirect ? decodeURIComponent(redirect) : '/dashboard';
+      navigate(redirectPath, { replace: true });
+    }
+  }, [isAuthenticated, isDevelopmentMode, navigate, redirect]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -8,7 +8,6 @@
 import React, { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth, DEVELOPMENT_MODE } from '../hooks/useAuth';
-import { createError, ErrorType } from '../utils/errorHandler';
 
 // Props interface
 interface ProtectedRouteProps {

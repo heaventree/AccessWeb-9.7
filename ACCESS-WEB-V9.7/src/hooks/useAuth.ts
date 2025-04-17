@@ -34,8 +34,13 @@ export function useAuth() {
     // If in development mode, announce to console for clarity
     if (DEVELOPMENT_MODE) {
       console.info('🔓 Running in DEVELOPMENT MODE - Authentication is disabled');
-      setIsAuthenticated(true);
-      setUser({
+      
+      // Set up fake auth token and user in localStorage for persistence
+      if (!localStorage.getItem('auth_token')) {
+        localStorage.setItem('auth_token', 'dev-mode-token-access-web-v97');
+      }
+      
+      const devUser = {
         id: 'dev-admin-1',
         email: 'admin@accessweb.dev',
         name: 'Development Admin',
@@ -47,7 +52,15 @@ export function useAuth() {
           status: 'active',
           currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         }
-      });
+      };
+      
+      // Store user data in localStorage
+      if (!localStorage.getItem('user')) {
+        localStorage.setItem('user', JSON.stringify(devUser));
+      }
+      
+      setIsAuthenticated(true);
+      setUser(devUser);
       setLoading(false);
       
       // Create a notification in the UI that we're in dev mode
