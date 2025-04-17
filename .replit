@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "python-3.11"]
+modules = ["nodejs-20"]
 
 [nix]
 channel = "stable-24_05"
@@ -13,10 +13,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Development"
+args = "ACCESS-WEB-V9.7 Server"
 
 [[workflows.workflow]]
-name = "Development"
+name = "ACCESS-WEB-V9.7 Server"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -27,11 +27,11 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd WCAG9.4-audit && npm install && npm run dev"
+args = "cd ACCESS-WEB-V9.7 && npm run dev"
 waitForPort = 5000
 
 [deployment]
-run = ["sh", "-c", "python -m http.server 5000"]
+run = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run dev"]
 
 [[ports]]
 localPort = 5000

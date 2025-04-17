@@ -1,0 +1,89 @@
+[vite] connecting...
+[vite] connected.
+[error] secureSessionStorage.getItem: 
+Error {}
+ 
+Object {context: "secureSessionStorage.getItem", key: "auth_token", timestamp: 1744759844234, severity: "error", errorId: "2brkj6q1xd"}
+
+[error] secureSessionStorage.getItem: 
+Error {}
+ 
+Object {context: "secureSessionStorage.getItem", key: "refresh_token", timestamp: 1744759844235, severity: "error", errorId: "7qisa6vjct"}
+
+[error] secureSessionStorage.getItem: 
+Error {}
+ 
+Object {context: "secureSessionStorage.getItem", key: "auth_user", timestamp: 1744759844235, severity: "error", errorId: "q438a26sae"}
+
+[error] secureLocalStorage.getItem: 
+Error {}
+ 
+Object {context: "secureLocalStorage.getItem", key: "auth_token", timestamp: 1744759844236, severity: "error", errorId: "srbu7yun86"}
+
+[error] secureLocalStorage.getItem: 
+Error {}
+ 
+Object {context: "secureLocalStorage.getItem", key: "refresh_token", timestamp: 1744759844236, severity: "error", errorId: "hj13swopt3"}
+
+[error] secureLocalStorage.getItem: 
+Error {}
+ 
+Object {context: "secureLocalStorage.getItem", key: "auth_user", timestamp: 1744759844237, severity: "error", errorId: "ryi64nt7t8"}
+
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+[error] secureLocalStorage.getItem: 
+Error {}
+ 
+Object {context: "secureLocalStorage.getItem", key: "csrf_token", timestamp: 1744759844239, severity: "error", errorId: "1xdbcd54zw"}
+
+[error] secureLocalStorage.setItem: 
+Error {}
+ 
+Object {context: "secureLocalStorage.setItem", key: "csrf_token", timestamp: 1744759844240, severity: "error", errorId: "izjflxldxr"}
+context: "secureLocalStorage.setItem"
+errorId: "izjflxldxr"
+key: "csrf_token"
+severity: "error"
+timestamp: 1744759844240
+[[Prototype]]: Object
+
+[error] secureSessionStorage.getItem: 
+Error {}
+ 
+Object {context: "secureSessionStorage.getItem", key: "auth_token", timestamp: 1744759844242, severity: "error", errorId: "n4kgtpzkdn"}
+
+[error] secureSessionStorage.getItem: 
+Error {}
+ 
+Object {context: "secureSessionStorage.getItem", key: "refresh_token", timestamp: 1744759844243, severity: "error", errorId: "uq15wvteuj"}
+
+[error] secureSessionStorage.getItem: 
+Error {}
+ 
+Object {context: "secureSessionStorage.getItem", key: "auth_user", timestamp: 1744759844243, severity: "error", errorId: "devsvc52ak"}
+
+[error] secureLocalStorage.getItem: 
+Error {}
+ 
+Object {context: "secureLocalStorage.getItem", key: "auth_token", timestamp: 1744759844243, severity: "error", errorId: "2lrj6djpqg"}
+
+[error] secureLocalStorage.getItem: 
+Error {}
+ 
+Object {context: "secureLocalStorage.getItem", key: "refresh_token", timestamp: 1744759844244, severity: "error", errorId: "eatn5vy2ay"}
+
+[error] secureLocalStorage.getItem: 
+Error {}
+ 
+Object {context: "secureLocalStorage.getItem", key: "auth_user", timestamp: 1744759844244, severity: "error", errorId: "ui818oubv4"}
+
+[error] secureLocalStorage.getItem: 
+Error {}
+ 
+Object {context: "secureLocalStorage.getItem", key: "csrf_token", timestamp: 1744759844244, severity: "error", errorId: "vyfnaoji5j"}
+
+[error] secureLocalStorage.setItem: 
+Error {}
+ 
+Object {context: "secureLocalStorage.setItem", key: "csrf_token", timestamp: 1744759844245, severity: "error", errorId: "13fjoojxt5"}

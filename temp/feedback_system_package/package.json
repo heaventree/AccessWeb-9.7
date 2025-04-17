@@ -1,0 +1,33 @@
+{
+  "name": "feedback-admin-dashboard-system",
+  "version": "1.0.0",
+  "description": "A comprehensive system for collecting user feedback and managing debug, roadmap, and completion dashboards",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "feedback",
+    "admin",
+    "dashboard",
+    "debug",
+    "roadmap",
+    "completion",
+    "react"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0",
+    "react-router-dom": "^6.0.0"
+  },
+  "dependencies": {
+    "lucide-react": "^0.244.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "typescript": "^4.9.0"
+  }
+}
