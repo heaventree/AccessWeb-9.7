@@ -1,80 +1,31 @@
 /**
  * Main CSS Entry Point
  * 
- * Imports Tailwind CSS directives and includes accessibility
- * improvements for better user experience.
+ * Imports main CSS file that includes Tailwind CSS directives, Noble UI styling,
+ * theme variables, and accessibility enhancements.
  */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Import main styling file with all component styles and theme variables */
+@import './styles/main.css';
 
-/* Accessibility improvements */
-@layer base {
-  /* Focus outlines for accessibility */
-  *:focus-visible {
-    @apply outline-2 outline-offset-2 outline-blue-500;
-  }
-  
-  /* Improved focus ring for links */
-  a:focus-visible {
-    @apply outline-2 outline-offset-2 outline-blue-500 rounded;
-  }
-  
-  /* Skip to content link */
-  .skip-to-content {
-    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 
-      focus:px-4 focus:py-2 focus:bg-white focus:text-blue-700 focus:shadow-lg 
-      focus:rounded focus:outline-none;
-  }
-  
-  /* High contrast text for accessibility */
-  .high-contrast-text {
-    @apply text-gray-900 dark:text-white;
-  }
-  
-  /* Ensure proper button contrast */
-  button {
-    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2;
-  }
-  
-  /* Ensure proper form fields */
-  input, textarea, select {
-    @apply rounded border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500;
-  }
-  
-  /* Accessible error states */
-  .form-error {
-    @apply text-red-600 text-sm mt-1;
-  }
-  
-  /* Screen reader only text */
-  .sr-only {
-    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
-  }
-  
-  /* Reduced motion preference support */
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
+/* Any additional accessibility improvements that are not in main.css */
+.skip-to-content {
+  @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 
+    focus:px-4 focus:py-2 focus:bg-white focus:text-blue-700 focus:shadow-lg 
+    focus:rounded focus:outline-none;
 }
 
-/* Ensure good contrast for text elements */
-@layer utilities {
-  .text-accessible {
-    @apply text-gray-900 dark:text-gray-100;
-  }
-  
-  .text-accessible-secondary {
-    @apply text-gray-700 dark:text-gray-300;
-  }
-  
-  .focus-ring {
-    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2;
+/* Screen reader only text */
+.sr-only {
+  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+}
+
+/* Reduced motion preference support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
