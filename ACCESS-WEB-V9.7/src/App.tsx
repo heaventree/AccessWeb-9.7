@@ -52,6 +52,7 @@ import { NonDestructiveFixPage } from './pages/NonDestructiveFixPage';
 import { BackToTop } from './components/BackToTop';
 import { Toaster } from 'react-hot-toast';
 import { ScrollToTop } from './components/ScrollToTop';
+import { WCAGToolbar } from './components/WCAGToolbar';
 import { MonitoringPage } from './pages/MonitoringPage';
 import { RealTimeMonitorPage } from './pages/RealTimeMonitorPage';
 import { WordPressIntegrationPage } from './pages/WordPressIntegrationPage';
@@ -165,6 +166,7 @@ function App() {
               />
             } />
           </Routes>
+          <WCAGToolbar position="bottom-right" />
           <SupportChat />
         </div>
       </ErrorBoundary>

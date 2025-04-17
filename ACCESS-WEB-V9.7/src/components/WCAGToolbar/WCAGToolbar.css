@@ -1,0 +1,326 @@
+/* Root variables for WCAG toolbar */
+:root {
+  --wcag-font-scale: 100%;
+  --wcag-letter-spacing: 0px;
+  --wcag-line-height: normal;
+  
+  /* Theme colors */
+  --wcag-toolbar-bg: #ffffff;
+  --wcag-toolbar-text: #333333;
+  --wcag-toolbar-border: #e0e0e0;
+  --wcag-toolbar-primary: #2563eb;
+  --wcag-toolbar-primary-hover: #1d4ed8;
+  --wcag-toolbar-button-bg: #f3f4f6;
+  --wcag-toolbar-button-hover: #e5e7eb;
+  --wcag-toolbar-toggle-bg: #2563eb;
+  --wcag-toolbar-toggle-text: #ffffff;
+}
+
+/* Apply font scaling to everything */
+html {
+  font-size: var(--wcag-font-scale);
+}
+
+/* Letter spacing */
+body.wcag-increased-letter-spacing * {
+  letter-spacing: var(--wcag-letter-spacing) !important;
+}
+
+/* Line height */
+body.wcag-increased-line-height * {
+  line-height: var(--wcag-line-height) !important;
+}
+
+/* Contrast modes */
+body.wcag-contrast-high {
+  filter: contrast(150%) brightness(120%);
+}
+
+body.wcag-contrast-inverted {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+/* Grayscale mode */
+body.wcag-grayscale {
+  filter: grayscale(100%);
+}
+
+/* Combined filters */
+body.wcag-contrast-high.wcag-grayscale {
+  filter: contrast(150%) brightness(120%) grayscale(100%);
+}
+
+body.wcag-contrast-inverted.wcag-grayscale {
+  filter: invert(100%) hue-rotate(180deg) grayscale(100%);
+}
+
+/* Link highlighting */
+body.wcag-highlight-links a {
+  background-color: yellow !important;
+  color: black !important;
+  outline: 2px solid black !important;
+  text-decoration: underline !important;
+}
+
+/* Heading highlighting */
+body.wcag-highlight-headings h1,
+body.wcag-highlight-headings h2,
+body.wcag-highlight-headings h3,
+body.wcag-highlight-headings h4,
+body.wcag-highlight-headings h5,
+body.wcag-highlight-headings h6 {
+  background-color: lightblue !important;
+  border: 2px dashed #333 !important;
+  outline: 1px solid blue !important;
+}
+
+/* Show alt text for images */
+body.wcag-show-alt img {
+  position: relative;
+}
+
+body.wcag-show-alt img::after {
+  content: attr(alt);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  min-height: 24px;
+  padding: 4px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  z-index: 1;
+}
+
+body.wcag-show-alt img:not([alt]),
+body.wcag-show-alt img[alt=""] {
+  border: 3px solid red !important;
+}
+
+body.wcag-show-alt img:not([alt])::after,
+body.wcag-show-alt img[alt=""]::after {
+  content: "Missing alt text!";
+  background-color: red;
+}
+
+/* WCAG Toolbar Container */
+.wcag-toolbar {
+  position: fixed;
+  width: 320px;
+  max-width: 100%;
+  height: 100vh;
+  background-color: var(--wcag-toolbar-bg);
+  color: var(--wcag-toolbar-text);
+  z-index: 9999;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.wcag-toolbar.top-left, 
+.wcag-toolbar.bottom-left {
+  left: 0;
+  top: 0;
+}
+
+.wcag-toolbar.top-right, 
+.wcag-toolbar.bottom-right {
+  right: 0;
+  top: 0;
+}
+
+/* Toolbar Header */
+.wcag-toolbar-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--wcag-toolbar-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wcag-toolbar-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.wcag-toolbar-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--wcag-toolbar-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.wcag-toolbar-close:hover {
+  background-color: var(--wcag-toolbar-button-hover);
+}
+
+/* Toolbar Content */
+.wcag-toolbar-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+/* Toolbar Sections */
+.wcag-toolbar-section {
+  margin-bottom: 24px;
+}
+
+.wcag-toolbar-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.wcag-toolbar-subsection {
+  margin-bottom: 12px;
+}
+
+.wcag-toolbar-label {
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+}
+
+/* Controls */
+.wcag-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wcag-toolbar-buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.wcag-toolbar-value {
+  min-width: 50px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Buttons */
+.wcag-toolbar-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--wcag-toolbar-button-bg);
+  border: 1px solid var(--wcag-toolbar-border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.wcag-toolbar-button:hover:not(:disabled) {
+  background-color: var(--wcag-toolbar-button-hover);
+}
+
+.wcag-toolbar-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wcag-toolbar-button.active {
+  background-color: var(--wcag-toolbar-primary);
+  color: white;
+  border-color: var(--wcag-toolbar-primary);
+}
+
+.wcag-toolbar-button-sm {
+  padding: 4px 8px;
+}
+
+/* Reset button */
+.wcag-toolbar-reset {
+  width: 100%;
+  justify-content: center;
+  margin-top: 24px;
+  background-color: #f9fafb;
+}
+
+/* Footer */
+.wcag-toolbar-footer {
+  margin-top: 32px;
+}
+
+/* Toggle Button */
+.wcag-toolbar-toggle-button {
+  position: fixed;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--wcag-toolbar-toggle-bg);
+  color: var(--wcag-toolbar-toggle-text);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s;
+}
+
+.wcag-toolbar-toggle-button:hover {
+  background-color: var(--wcag-toolbar-primary-hover);
+}
+
+.wcag-toolbar-toggle-button.top-right {
+  top: 16px;
+  right: 16px;
+  border-radius: 4px;
+}
+
+.wcag-toolbar-toggle-button.top-left {
+  top: 16px;
+  left: 16px;
+  border-radius: 4px;
+}
+
+.wcag-toolbar-toggle-button.bottom-right {
+  bottom: 16px;
+  right: 16px;
+  border-radius: 4px;
+}
+
+.wcag-toolbar-toggle-button.bottom-left {
+  bottom: 16px;
+  left: 16px;
+  border-radius: 4px;
+}
+
+.wcag-toolbar-toggle-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive styles */
+@media (max-width: 640px) {
+  .wcag-toolbar {
+    width: 100%;
+  }
+  
+  .wcag-toolbar-toggle-button-text {
+    display: none;
+  }
+  
+  .wcag-toolbar-toggle-button {
+    padding: 8px;
+  }
+  
+  .wcag-toolbar-buttons-grid {
+    grid-template-columns: 1fr;
+  }
+}
