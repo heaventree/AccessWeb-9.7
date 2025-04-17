@@ -34,7 +34,7 @@ import { WordPressGuide } from './pages/docs/WordPressGuide';
 import { ShopifyGuide } from './pages/docs/ShopifyGuide';
 import { Documentation as DocumentationPage } from './pages/docs/Documentation';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { AccessibilityToolbar } from './components/AccessibilityToolbar';
+
 import { WCAGCheckerPage } from './pages/WCAGCheckerPage';
 import { WCAGStandardsTable } from './pages/WCAGStandardsTable';
 import WCAGColorPalette from './pages/tools/WCAGColorPalette';
@@ -165,7 +165,6 @@ function App() {
               />
             } />
           </Routes>
-          <AccessibilityToolbar />
           <SupportChat />
         </div>
       </ErrorBoundary>
