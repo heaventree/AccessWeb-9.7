@@ -1,0 +1,580 @@
+Bolt.DIY: Remediation & Refactoring BlueprintDocument Version: 2.1 (Incorporates v2.1 structure, table, Mermaid chart)Target Audience: AI Coding Agent / Dev TeamObjective: Comprehensive guide to refactor the bolt.diy codebase for stability, efficiency, and scalability, combining a clear architectural vision with detailed implementation steps.Based On: bolt_diy_analysis_strategy_v1 and user feedback (v2.0/v2.1 concepts).Core Principles for Implementation:✅ Modularity: Isolate components (State, Prompts, Memory, Tools) with clear interfaces. Use dependency injection for testability and flexibility.✅ Error Robustness: Implement a global ErrorHandler with Sentry/Datadog integration. Use targeted try...catch blocks at critical points.✅ Validation: Apply strict input sanitization and validation at all external interfaces and data exchange points (e.g., tool outputs).✅ Testing: Establish a comprehensive test suite (e.g., Jest/Pytest) targeting 80%+ code coverage.✅ Efficiency: Prioritize lean code, efficient algorithms, and optimized resource usage (especially LLM tokens and vector DB performance).✅ Configuration: Externalize all configuration parameters (API keys, model names, thresholds, prompts) via environment variables or config files.✅ Logging & Monitoring: Implement detailed logging throughout and integrate performance/error monitoring with an Analytics SDK.Section 1: Foundational Refactoring & Stability EnhancementObjective: Restructure the codebase for modularity using dependency injection, implement robust error handling integrated with monitoring, add input validation, and establish a comprehensive testing framework.1.1. Problem Statement:Monolithic architecture, inconsistent error handling, minimal input validation, and lack of tests hinder stability, maintainability, and testability. Tightly coupled code makes debugging difficult, unhandled errors lead to crashes, and lack of validation allows data corruption.1.2. Solution Design:Decompose the core logic into distinct, injectable classes/modules. Implement a global ErrorHandler integrated with monitoring. Use try...catch consistently. Validate all external inputs rigorously. Set up Jest/Pytest aiming for >80% coverage.1.3. Implementation Examples (Illustrative Code - TypeScript):ErrorHandler Implementation:// src/core/error-handler.ts
+import { AnalyticsSDK, SentrySDK } from '../monitoring'; // Hypothetical monitoring SDKs
+
+export interface MonitoredError {
+  userFacingMessage: string;
+  internalDetails: string;
+  errorId?: string;
+}
+
+export class ErrorHandler {
+  handle(error: unknown, context: Record<string, any> = {}): MonitoredError {
+    let errorMessage = 'An unexpected error occurred.';
+    let internalDetails = 'Unknown error type';
+    let errorId: string | undefined;
+
+    // Basic error categorization and logging
+    if (error instanceof Error) {
+      errorMessage = `Error: ${error.message}`;
+      internalDetails = `Error: ${error.message}\nContext: ${JSON.stringify(context)}\nStack: ${error.stack}`;
+      console.error(`Error occurred: ${error.message}`, { stack: error.stack, context });
+      // Log to external monitoring (e.g., Sentry)
+      errorId = SentrySDK.captureException(error, { extra: context });
+    } else {
+      internalDetails = `Unknown error occurred: ${JSON.stringify(error)}\nContext: ${JSON.stringify(context)}`;
+      console.error('An unknown error occurred:', { error, context });
+      errorId = SentrySDK.captureMessage(`Unknown error: ${JSON.stringify(error)}`, { extra: context });
+    }
+
+    // Return structured error object
+    return {
+        userFacingMessage: `Sorry, I encountered an issue processing your request. ${errorId ? `(Ref: ${errorId})` : ''}`,
+        internalDetails: internalDetails,
+        errorId: errorId
+    };
+  }
+}
+Agent Class with Dependency Injection:// src/core/agent.ts
+import { ErrorHandler, MonitoredError } from './error-handler';
+import { IMemoryManager, IPromptManager, IToolExecutor, IStateManager } from './interfaces'; // Defined elsewhere
+import { InputValidationError } from './errors'; // Custom error type
+
+export class Agent {
+  // Dependencies injected via constructor
+  constructor(
+    private stateManager: IStateManager,
+    private memoryManager: IMemoryManager,
+    private promptManager: IPromptManager,
+    private toolExecutor: IToolExecutor,
+    private errorHandler: ErrorHandler
+  ) {}
+
+  async handleRequest(userInput: string, sessionId: string): Promise<string> {
+    // Monitoring and error handling wrapper
+    // const metrics = PerformanceMonitor.startRequest(sessionId); // See Section 4
+    let response: string | MonitoredError;
+    try {
+      // 1. Validate Input
+      if (!userInput || typeof userInput !== 'string' || userInput.trim().length === 0) {
+        throw new InputValidationError('Invalid user input received: Input is empty.');
+      }
+
+      // 2. Get State/Context
+      const currentState = await this.stateManager.getState(sessionId);
+      const context = await this.memoryManager.getContext(sessionId, userInput); // Example call
+
+      // 3. Build Optimized Prompt
+      const prompt = await this.promptManager.constructPrompt(userInput, context, currentState); // Example call
+
+      // 4. Execute LLM Call
+      const llmResponse = await this.callLLM(prompt); // Placeholder
+
+      // 5. Process Response / Execute Tools
+      const finalResponse = await this.toolExecutor.processResponse(llmResponse, sessionId); // Example call
+
+      // 6. Update State/Memory
+      await this.stateManager.updateState(sessionId, { lastResponse: finalResponse });
+      await this.memoryManager.storeInteraction(sessionId, { input: userInput, response: finalResponse }); // Example call
+
+      response = finalResponse; // Assign successful response
+      return finalResponse;
+
+    } catch (error: unknown) {
+      // metrics.errorOccurred = true; // Update metrics
+      const monitoredError = this.errorHandler.handle(error, { userInput, sessionId });
+      // metrics.errorType = ... // Categorize error for metrics
+      response = monitoredError; // Assign error response object
+      return monitoredError.userFacingMessage; // Return user-friendly message
+    } finally {
+        // PerformanceMonitor.endRequest(metrics, response); // See Section 4
+    }
+  }
+
+  // Placeholder for LLM call logic (should be robust)
+  private async callLLM(prompt: string): Promise<string> {
+    console.log("Calling LLM with prompt snippet:", prompt.substring(0, 100) + "...");
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 50));
+      if (prompt.includes("error_trigger")) throw new Error("Simulated LLM API Error");
+      if (prompt.length > 8000) throw new Error("Simulated Context Length Exceeded Error");
+      return `LLM response to: ${prompt.substring(0, 50)}...`;
+    } catch (llmError) {
+      console.error("LLM Call failed:", llmError);
+      throw llmError; // Re-throw for central handler
+    }
+  }
+}
+1.4. Integration Steps:Define Interfaces: Create TypeScript interfaces (interfaces.ts or similar) for each core manager (IMemoryManager, IPromptManager, IToolExecutor, IStateManager) defining their public methods and data structures (e.g., MemoryContext, Interaction).// interfaces.ts Example
+export interface MemoryContext { history: any[]; memories: string[]; /* ... potentially summary ... */ }
+export interface Interaction { input: string; response: string; }
+export interface IMemoryManager {
+  getContext(sessionId: string, query: string): Promise<MemoryContext>;
+  storeInteraction(sessionId: string, interaction: Interaction): Promise<void>;
+}
+// Define other interfaces similarly...
+Refactor Managers: Ensure existing manager classes (or create new ones) correctly implement these defined interfaces.Dependency Injection Setup: Configure a DI container (e.g., tsyringe, inversifyJS) or implement manual injection at the application's entry point. Register implementations against their interfaces.// di-config.ts Example (using tsyringe)
+import { container } from "tsyringe";
+import { AdvancedMemoryManager } from "./managers/memory-manager"; // Example path
+import { PromptManager } from "./managers/prompt-manager";
+import { ErrorHandler } from "./core/error-handler";
+// ... import others
+
+container.register<IMemoryManager>('IMemoryManager', { useClass: AdvancedMemoryManager });
+container.register<IPromptManager>('IPromptManager', { useClass: PromptManager });
+container.registerSingleton(ErrorHandler); // Register ErrorHandler
+// ... register other dependencies ...
+
+export default container;
+Implement Error Handling: Implement the ErrorHandler class, integrate it with your chosen monitoring service (Sentry, etc.), and ensure the Agent uses it in the main try...catch block. Define and use custom error types (InputValidationError, ToolExecutionError) for better categorization.Add Validation: Implement rigorous input validation (e.g., using libraries like zod or manual checks) at the start of handleRequest and validate data received from external sources like tools.Setup Testing Framework: Configure Jest/Pytest. Create mock implementations for the manager interfaces.// agent.test.ts Example Setup
+import { Agent } from './agent';
+import { mock, instance, when, verify, anything } from 'ts-mockito'; // Or use jest.fn() mocks
+import { IMemoryManager, IPromptManager, IToolExecutor, IStateManager } from './interfaces';
+import { ErrorHandler } from './error-handler';
+
+describe('Agent', () => {
+  let agent: Agent;
+  let mockedMemoryManager: IMemoryManager;
+  let mockedPromptManager: IPromptManager;
+  // ... mock other dependencies
+
+  beforeEach(() => {
+    mockedMemoryManager = mock<IMemoryManager>();
+    mockedPromptManager = mock<IPromptManager>();
+    // ... instantiate other mocks
+    const errorHandler = new ErrorHandler(); // Use real or mocked ErrorHandler
+
+    agent = new Agent(
+      instance(mockStateManager), // Get instance from mock
+      instance(mockedMemoryManager),
+      instance(mockedPromptManager),
+      instance(mockedToolExecutor),
+      errorHandler
+    );
+  });
+
+  it('should handle valid requests', async () => {
+    // Setup mock behaviors using when()
+    when(mockedMemoryManager.getContext(anything(), anything())).thenResolve({ history: [], memories: [] });
+    when(mockedPromptManager.constructPrompt(anything(), anything(), anything())).thenResolve("Mocked Prompt");
+    // ... setup other mocks
+
+    await agent.handleRequest('Valid input', 'session1');
+
+    // Verify interactions using verify()
+    verify(mockedMemoryManager.storeInteraction('session1', anything())).once();
+    // ... verify other calls
+  });
+
+  it('should validate input and use error handler', async () => {
+     const response = await agent.handleRequest('', 'session-invalid'); // Empty input
+     expect(response).toContain('Sorry, I encountered an issue');
+     // Optionally verify SentrySDK was called if ErrorHandler is mocked too
+  });
+
+  // Add more tests targeting >80% coverage
+});
+1.5. Testing Considerations:Focus tests on the Agent's interaction logic with its dependencies (use mocks). Thoroughly test error handling paths for different error types (validation, dependency errors, LLM errors). Verify correct data flow between managers. Ensure user-facing error messages are appropriate.1.6. Efficiency Notes:DI frameworks add negligible overhead. Ensure error handling/monitoring calls are non-blocking or asynchronous where possible.Section 2: Advanced Memory ImplementationObjective: Replace primitive history tracking with a robust hybrid memory system (short-term buffer + long-term semantic vector store + summarization) to combat context loss and hallucinations.2.1. Problem Statement:Agent forgets context in long conversations, repeats itself, and hallucinates due to limited context windows and lack of persistent, searchable memory.2.2. Solution Design: Hybrid Memory ArchitectureComponentDescriptionImplementation NotesShort-Term BufferFixed-size queue of recent interaction turns per session.e.g., collections.deque(maxlen=10) in PythonLong-Term Vector StorePersistent storage using vector embeddings for semantic search (RAG).e.g., ChromaDB, FAISS, Pinecone, WeaviateSummarizationLLM-powered compression of older history turns.Trigger periodically/by token count; use cost-effective model (e.g., GPT-3.5-turbo). Store summary in vector DB.2.3. Implementation Example (Illustrative Code - Python):# managers/memory_manager.py (Conceptual Example)
+# Ensure this class implements the IMemoryManager interface methods
+
+import chromadb
+from sentence_transformers import SentenceTransformer
+import datetime
+import openai
+from collections import deque # For short-term buffer
+
+class AdvancedMemoryManager: # Implements IMemoryManager
+    def __init__(self,
+                 db_path="./chroma_db",
+                 collection_name="agent_memory",
+                 embedding_model_name='all-MiniLM-L6-v2',
+                 summarization_model_name='gpt-3.5-turbo',
+                 openai_api_key=None,
+                 max_short_term_turns=10,
+                 summarization_threshold_turns=15):
+        # ... (Initialization remains similar to previous version) ...
+        self.client = chromadb.PersistentClient(path=db_path)
+        self.collection = self.client.get_or_create_collection(name=collection_name)
+        self.embedding_model = SentenceTransformer(embedding_model_name)
+        self.summarization_model_name = summarization_model_name
+        self.llm_client_available = bool(openai_api_key)
+        if self.llm_client_available: openai.api_key = openai_api_key
+        else: print("Warning: OpenAI API key not provided. Summarization disabled.")
+        self.max_short_term_turns = max_short_term_turns
+        self.summarization_threshold_turns = summarization_threshold_turns
+        # Use deque for efficient fixed-size buffer
+        self.short_term_memory = {} # session_id -> deque(maxlen=max_short_term_turns)
+
+    def _get_embedding(self, text):
+        # ... (Embedding logic remains the same) ...
+        if not text or not isinstance(text, str): return None
+        try:
+            max_len = 512; truncated_text = text[:max_len]
+            return self.embedding_model.encode(truncated_text).tolist()
+        except Exception as e: print(f"Error generating embedding: {e}"); return None
+
+    # --- Core Interface Methods ---
+
+    def getContext(self, session_id: str, query_text: str, k_retrieval: int = 3) -> dict:
+        """Retrieves short-term history (as list) and relevant long-term memories."""
+        short_term_list = list(self.short_term_memory.get(session_id, deque())) # Convert deque to list
+        long_term = self.retrieve_relevant_memories(session_id, query_text, k=k_retrieval)
+        return {"history": short_term_list, "memories": long_term}
+
+    def storeInteraction(self, session_id: str, interaction: dict):
+        """Stores user input and agent response in short-term and long-term memory."""
+        user_input = interaction.get("input")
+        agent_response = interaction.get("response")
+        timestamp = datetime.datetime.now().isoformat()
+
+        if user_input:
+            self._add_turn(session_id, user_input, {"type": "user", "timestamp": timestamp})
+        if agent_response:
+            self._add_turn(session_id, agent_response, {"type": "agent", "timestamp": timestamp})
+
+        # Trigger summary check after storing new interaction
+        self.summarize_conversation_if_needed(session_id)
+
+    # --- Internal Helper Methods ---
+
+    def _add_turn(self, session_id: str, text_content: str, metadata: dict):
+        """Adds a turn to short-term deque and long-term vector store."""
+        if not text_content: return
+
+        # Add to short-term memory deque
+        if session_id not in self.short_term_memory:
+            self.short_term_memory[session_id] = deque(maxlen=self.max_short_term_turns)
+        turn_data = {"content": text_content, "metadata": metadata}
+        self.short_term_memory[session_id].append(turn_data)
+
+        # Add to long-term vector store
+        embedding = self._get_embedding(text_content)
+        if embedding:
+            doc_id = f"{session_id}_{metadata['timestamp']}_{metadata['type']}_{hash(text_content)%10000}"
+            full_metadata = {**metadata, "session_id": session_id} # Ensure session_id is in metadata
+            try:
+                self.collection.add(embeddings=[embedding], metadatas=[full_metadata], documents=[text_content], ids=[doc_id])
+            except Exception as e: print(f"Error adding to vector store: {e}")
+
+
+    def retrieve_relevant_memories(self, session_id: str, query_text: str, k: int = 3) -> list[str]:
+        # ... (Retrieval logic remains the same) ...
+        query_embedding = self._get_embedding(query_text)
+        if not query_embedding: return []
+        try:
+            results = self.collection.query(query_embeddings=[query_embedding], n_results=k, where={"session_id": session_id})
+            return results.get('documents', [[]])[0] if results else []
+        except Exception as e: print(f"Error querying vector store: {e}"); return []
+
+    def get_short_term_context(self, session_id: str) -> list[dict]:
+         # Helper to get deque content as list (already done in getContext)
+         return list(self.short_term_memory.get(session_id, deque()))
+
+    def summarize_conversation_if_needed(self, session_id: str, force_summary=False):
+        # ... (Summarization logic remains similar, ensure it uses the deque) ...
+        history_deque = self.short_term_memory.get(session_id)
+        if not self.llm_client_available or not history_deque: return None
+
+        # Trigger check
+        if force_summary or len(history_deque) >= self.summarization_threshold_turns:
+            print(f"Summarization check for session {session_id} (History length: {len(history_deque)})")
+            # Decide which turns to summarize (e.g., the oldest ones in the deque)
+            # Be careful not to summarize too frequently or if deque isn't full enough
+            num_to_summarize = len(history_deque) - (self.max_short_term_turns // 2) # Example: Summarize oldest turns beyond half capacity
+            if num_to_summarize <= 0: return None # Not enough to summarize
+
+            turns_to_summarize = [history_deque[i] for i in range(num_to_summarize)]
+            conversation_text = "\n".join([f"{turn['metadata'].get('type', 'user')}: {turn['content']}" for turn in turns_to_summarize])
+            summary_prompt = f"Concisely summarize the key points...:\n\n{conversation_text}\n\nSummary:"
+
+            try:
+                # ... (OpenAI API call as before) ...
+                response = openai.ChatCompletion.create(...)
+                summary = response.choices[0].message['content'].strip()
+                print(f"Generated summary for session {session_id}: {summary[:100]}...")
+
+                # Store summary in vector store
+                summary_meta = {"type": "summary", "timestamp": datetime.datetime.now().isoformat(), "summarized_turns": num_to_summarize}
+                self._add_turn(session_id, summary, summary_meta) # Add summary itself to memory
+
+                # CRITICAL: Remove summarized turns from the *front* of the deque
+                for _ in range(num_to_summarize):
+                    history_deque.popleft() # Remove oldest turns that were summarized
+
+                return summary
+            except Exception as e:
+                print(f"Error during summarization: {e}")
+                return None
+        return None
+
+2.4. Integration Steps:Choose & Install Libraries: Confirm/install required libraries (chromadb, sentence-transformers, openai, collections.deque is built-in).Implement AdvancedMemoryManager: Create the class, ensuring it implements the IMemoryManager interface. Configure API keys, paths, model names via external config.Inject Manager: Provide the configured instance to the Agent via DI.Update Agent.handleRequest: Ensure the agent calls memoryManager.getContext and memoryManager.storeInteraction correctly.Update PromptManager: Ensure it uses context['history'] (list of recent turns) and context['memories'] (list of retrieved docs) effectively.2.5. Testing Considerations: Test conversation continuity, recall of specific past details, summarization triggering and its effect on context/history length. Test vector DB search relevance. Measure latency of getContext and storeInteraction. Test edge cases (new session, DB errors, summarization failure).2.6. Efficiency Notes: Vector DB indexing and query optimization are crucial. Cache embeddings. Tune summarization frequency (summarization_threshold_turns) vs. cost/latency. Monitor DB size.Section 3: Prompt Engineering & Token OptimizationObjective: Systematically reduce LLM token consumption and improve response quality/consistency by optimizing prompt structure, dynamically managing context inclusion based on priority and token budgets, and handling edge cases gracefully.3.1. Problem Statement: Naive prompt construction leads to excessive token usage, exceeding context limits, high costs, slow responses, and potential LLM confusion.3.2. Solution Design: Token Budgeting Strategygraph LR
+    A[Max Context Tokens] --> B(System Prompt);
+    A --> C(Relevant Memories);
+    A --> D(Available Tools);
+    A --> E(Recent History);
+    A --> F(User Input);
+    subgraph Priority Order
+        direction LR
+        B --> C --> D --> E --> F
+    end
+    subgraph Allocation (Example)
+        direction TB
+        B --- P1[~10%];
+        C --- P2[~30%];
+        D --- P3[~10%];
+        E --- P4[~30%];
+        F --- P5[~20%];
+    end
+Note: Actual percentages vary based on available tokens and content length. Prioritize fitting higher priority items first.3.3. Implementation Example (Illustrative Code - Python):# managers/prompt_manager.py (Conceptual Example)
+# Ensure this class implements the IPromptManager interface
+
+# (Use tokenizer loading logic from previous version)
+try: import tiktoken
+except ImportError: tiktoken = None
+from transformers import AutoTokenizer
+
+class PromptManager: # Implements IPromptManager
+    def __init__(self,
+                 system_prompt: str,
+                 model_identifier: str,
+                 max_model_tokens: int = 4096,
+                 context_budget_ratio: float = 0.7):
+        # ... (Initialization with tokenizer loading as before) ...
+        self.system_prompt = system_prompt
+        self.model_identifier = model_identifier
+        self.max_model_tokens = max_model_tokens
+        self.max_context_tokens = int(max_model_tokens * context_budget_ratio)
+        self.tokenizer = self._load_tokenizer()
+        self.base_token_count = self._count_tokens(self.system_prompt) + 50 # Base overhead
+        self.last_prompt_token_count = 0 # To track usage for monitoring
+
+    def _load_tokenizer(self):
+        # ... (Tokenizer loading logic as before) ...
+        if tiktoken:
+            try: enc = tiktoken.encoding_for_model(self.model_identifier); return enc
+            except KeyError: pass
+        try: return AutoTokenizer.from_pretrained(self.model_identifier, use_fast=True)
+        except Exception as e: print(f"Tokenizer warning: {e}"); return AutoTokenizer.from_pretrained('gpt2', use_fast=True)
+
+    def _count_tokens(self, text: str) -> int:
+        # ... (Token counting logic as before) ...
+        if not text: return 0
+        try:
+            if hasattr(self.tokenizer, 'encode'): return len(self.tokenizer.encode(text))
+            else: return len(text.split()) # Fallback
+        except Exception as e:
+             print(f"Token counting error: {e}"); return len(text.split())
+
+    def constructPrompt(self, user_input: str, context: dict, current_state: dict = None, available_tools: list[dict] = None) -> str:
+        """Dynamically constructs the prompt respecting token limits and priority."""
+        # context = {"history": list[dict], "memories": list[str]}
+        prompt_components = {}
+        current_token_count = self.base_token_count
+
+        # --- Add components based on priority ---
+        # 1. System Prompt (Base)
+        prompt_components['system'] = f"<SYSTEM>{self.system_prompt}</SYSTEM>" # Use clear tags
+
+        # 2. Relevant Memories (High Priority)
+        # (Logic to iterate context['memories'], count tokens, add to prompt_components['memories'] if space allows)
+        memories_text = self._build_context_section(
+            context.get('memories', []),
+            current_token_count,
+            self.max_context_tokens * 0.4, # Allocate ~40% of remaining budget
+            "<MEMORIES>", "</MEMORIES>"
+        )
+        prompt_components['memories'] = memories_text
+        current_token_count += self._count_tokens(memories_text)
+
+        # 3. Available Tools (Medium-High Priority)
+        # (Logic to iterate available_tools, format, count tokens, add to prompt_components['tools'] if space allows)
+        tools_formatted = [f"- {t['name']}: {t['description']}" for t in available_tools or []]
+        tools_text = self._build_context_section(
+            tools_formatted,
+            current_token_count,
+            self.max_context_tokens * 0.2, # Allocate ~20% of remaining budget
+            "<AVAILABLE_TOOLS>", "</AVAILABLE_TOOLS>"
+        )
+        prompt_components['tools'] = tools_text
+        current_token_count += self._count_tokens(tools_text)
+
+        # 4. Recent History (Medium-Low Priority - Truncate oldest)
+        # (Logic to iterate reversed context['history'], format, count tokens, add to prompt_components['history'] if space allows)
+        history_formatted = [f"{t['metadata']['type']}: {t['content']}" for t in context.get('history', [])]
+        history_text = self._build_context_section(
+            reversed(history_formatted), # Process recent first
+            current_token_count,
+            self.max_context_tokens * 0.3, # Allocate ~30% of remaining budget
+            "<HISTORY>", "</HISTORY>",
+            reverse_final_order=True # Keep chronological order
+        )
+        prompt_components['history'] = history_text
+        current_token_count += self._count_tokens(history_text)
+
+        # 5. User Input (Highest Priority - Must Fit)
+        # (Logic to check remaining space, potentially truncate input, add to prompt_components['user_input'])
+        user_input_formatted = f"<USER_INPUT>{user_input}</USER_INPUT>"
+        user_input_tokens = self._count_tokens(user_input_formatted)
+        remaining_tokens = self.max_context_tokens - current_token_count
+        if user_input_tokens > remaining_tokens:
+            print(f"CRITICAL WARNING: Truncating user input due to token limits. Have {remaining_tokens}, Need {user_input_tokens}")
+            # Implement truncation logic carefully (as shown in previous version)
+            # For simplicity here, we'll assume it fits or error handling is elsewhere
+            if remaining_tokens < 50: # Arbitrary minimum
+                 raise ValueError("Insufficient token space for user input.")
+            # Truncate user_input string here if needed before formatting
+            # user_input = truncate_text(user_input, remaining_tokens - 20) # -20 for tags/buffer
+            user_input_formatted = f"<USER_INPUT>{user_input}</USER_INPUT>" # Re-format if truncated
+
+        prompt_components['user_input'] = user_input_formatted
+        current_token_count += self._count_tokens(user_input_formatted) # Update count
+
+
+        # --- Assemble Final Prompt ---
+        final_prompt_order = ['system', 'memories', 'tools', 'history', 'user_input']
+        final_prompt_parts = [prompt_components.get(key, "") for key in final_prompt_order if prompt_components.get(key)]
+        final_prompt_parts.append("<AGENT_RESPONSE>") # Signal for agent
+
+        final_prompt = "\n\n".join(final_prompt_parts)
+        self.last_prompt_token_count = self._count_tokens(final_prompt) # Store for monitoring
+
+        print(f"Constructed prompt: {self.last_prompt_token_count} tokens (Context Limit: {self.max_context_tokens})")
+        if self.last_prompt_token_count > self.max_model_tokens:
+             raise ValueError(f"Final prompt ({self.last_prompt_token_count}) exceeds model limit ({self.max_model_tokens})!")
+
+        return final_prompt
+
+    def _build_context_section(self, items: list, current_tokens: int, budget: int, start_tag: str, end_tag: str, reverse_final_order=False) -> str:
+        """Helper to build a section of the prompt within a token budget."""
+        section_content = []
+        section_token_count = 0
+        items_processed = list(items) # Process items (potentially reversed by caller)
+
+        for item in items_processed:
+            item_tokens = self._count_tokens(item) + 5 # Add buffer
+            if current_tokens + section_token_count + item_tokens <= self.max_context_tokens and section_token_count + item_tokens <= budget:
+                section_content.append(item)
+                section_token_count += item_tokens
+            else:
+                # print(f"Token budget reached for section {start_tag}")
+                break # Stop adding items to this section
+
+        if not section_content:
+            return ""
+
+        if reverse_final_order:
+            section_content.reverse() # Ensure chronological order if processed reversed
+
+        return f"{start_tag}\n" + "\n".join(section_content) + f"\n{end_tag}"
+
+    def get_last_token_count(self) -> int:
+        """Returns the token count of the last constructed prompt."""
+        return self.last_prompt_token_count
+
+3.4. Integration Steps:Install Tokenizer: Add tiktoken, transformers.Implement PromptManager: Create the class implementing IPromptManager. Configure via external settings. Add get_last_token_count method for monitoring.Inject Manager: Provide instance to Agent via DI.Update Agent.handleRequest: Call promptManager.constructPrompt passing all necessary context (input, memory context, tools).Configure: Externalize system_prompt, model_identifier, max_model_tokens, context_budget_ratio.Optimize Prompts/Descriptions: Review system prompt and tool descriptions for clarity and brevity.3.5. Testing Considerations: Test token limit enforcement rigorously with varying context sizes. Verify context prioritization logic. Check handling of long user inputs. Measure actual vs. estimated token counts. A/B test prompt structures if possible.3.6. Efficiency Notes: Accurate token counting is key. Prioritization ensures critical info is included. Caching tokenizer instances is important.Section 4: Performance & Monitoring IntegrationObjective: Establish KPIs, set targets, and integrate monitoring tools to track agent performance, resource usage, and error rates in real-time.4.1. Problem Statement: Lack of monitoring hinders identification of bottlenecks, cost tracking, and understanding production issues.4.2. Solution Design: Define critical metrics and targets. Integrate with analytics/monitoring SDKs. Implement a PerformanceMonitor utility.4.3. Critical Metrics & Targets:MetricTargetMeasurement MethodNotesRequest LatencyP95 < 3 secPerformanceMonitor start/end timingTrack overall request timeLLM Call LatencyP95 < 2 secTiming around callLLMVaries by model/loadToken Usage< 90% limitPromptManager.get_last_token_count() + Completion tokensMonitor prompt & completion separatelyMemory Recall> 85% relevantVector DB eval / Manual annotation / Task success proxyQualitative or proxy metricError Rate< 2% requestsErrorHandler logs / Sentry/Datadog exceptionsCategorize by type (Validation, LLM, Tool)Summarization Rate< 5% requestsMemoryManager logsTrack frequency and associated cost4.4. Implementation Example (Illustrative Code - TypeScript):// src/monitoring/index.ts (Conceptual SDK Wrappers)
+// (SDK Wrappers for AnalyticsSDK, SentrySDK remain the same as previous version)
+export class AnalyticsSDK { /* ... */ }
+export class SentrySDK { /* ... */ }
+
+// src/core/performance-monitor.ts
+import { AnalyticsSDK } from '../monitoring';
+import { MonitoredError } from './error-handler'; // Assumed interface from ErrorHandler
+
+export interface AgentRequestMetrics {
+    startTime: number;
+    sessionId?: string;
+    promptTokens?: number; // From PromptManager
+    completionTokens?: number; // From LLM response
+    llmCallDurationMs?: number;
+    memoryRetrievalDurationMs?: number;
+    toolExecutionDurationMs?: number; // Aggregate
+    errorOccurred: boolean; // Default to false
+    errorType?: string; // e.g., 'Validation', 'LLM', 'Tool', 'Memory', 'Unknown'
+    errorId?: string; // From ErrorHandler
+}
+
+export class PerformanceMonitor {
+    static startRequest(sessionId?: string): AgentRequestMetrics {
+        // Initialize metrics with defaults
+        return { startTime: Date.now(), sessionId, errorOccurred: false };
+    }
+
+    static endRequest(metrics: AgentRequestMetrics) {
+        const endTime = Date.now();
+        const totalDurationMs = endTime - metrics.startTime;
+
+        // Prepare tags for monitoring system
+        const tags: Record<string, string> = { };
+        if (metrics.sessionId) tags['sessionId'] = metrics.sessionId;
+        if (metrics.errorOccurred && metrics.errorType) tags['errorType'] = metrics.errorType;
+
+        // Log core metrics
+        AnalyticsSDK.timing('agent.request.duration', totalDurationMs, tags);
+        AnalyticsSDK.increment(metrics.errorOccurred ? 'agent.request.errors' : 'agent.request.success', 1, tags);
+
+        // Log optional detailed metrics if captured
+        if (metrics.llmCallDurationMs !== undefined) AnalyticsSDK.timing('agent.llm.duration', metrics.llmCallDurationMs, tags);
+        if (metrics.memoryRetrievalDurationMs !== undefined) AnalyticsSDK.timing('agent.memory.retrieval.duration', metrics.memoryRetrievalDurationMs, tags);
+        if (metrics.toolExecutionDurationMs !== undefined) AnalyticsSDK.timing('agent.tool.execution.duration', metrics.toolExecutionDurationMs, tags);
+        if (metrics.promptTokens !== undefined) AnalyticsSDK.increment('agent.prompt.tokens', metrics.promptTokens, tags);
+        if (metrics.completionTokens !== undefined) AnalyticsSDK.increment('agent.completion.tokens', metrics.completionTokens, tags);
+
+        // Log detailed event (optional, can be verbose)
+        AnalyticsSDK.log('AgentRequestCompleted', { ...metrics, totalDurationMs });
+    }
+
+     // Helper to update metrics during request handling
+     static updateMetrics(metrics: AgentRequestMetrics, updates: Partial<AgentRequestMetrics>) {
+        Object.assign(metrics, updates);
+    }
+}
+
+// --- Integration into Agent.handleRequest ---
+// import { PerformanceMonitor, AgentRequestMetrics } from './performance-monitor';
+
+// async handleRequest(userInput: string, sessionId: string): Promise<string> {
+//    const metrics = PerformanceMonitor.startRequest(sessionId); // Start timing
+//    let response: string | MonitoredError; // To hold final result for logging if needed
+//    try {
+//        // ... Validation ...
+//
+//        // Time Memory Call
+//        const memStartTime = Date.now();
+//        const context = await this.memoryManager.getContext(sessionId, userInput);
+//        PerformanceMonitor.updateMetrics(metrics, { memoryRetrievalDurationMs: Date.now() - memStartTime });
+//
+//        // Construct Prompt & Get Token Count
+//        const prompt = await this.promptManager.constructPrompt(userInput, context, ...);
+//        PerformanceMonitor.updateMetrics(metrics, { promptTokens: this.promptManager.get_last_token_count() }); // Assumes method exists
+//
+//        // Time LLM Call
+//        const llmStartTime = Date.now();
+//        const llmResponse = await this.callLLM(prompt);
+//        PerformanceMonitor.updateMetrics(metrics, { llmCallDurationMs: Date.now() - llmStartTime });
+//        // metrics.completionTokens = parseLlmResponseForTokens(llmResponse); // Add helper if possible
+//
+//        // Time Tool Execution (if applicable)
+//        const toolStartTime = Date.now();
+//        const finalResponse = await this.toolExecutor.processResponse(llmResponse, sessionId);
+//        PerformanceMonitor.updateMetrics(metrics, { toolExecutionDurationMs: Date.now() - toolStartTime });
+//
+//        // ... Update State/Memory ...
+//
+//        response = finalResponse; // Assign success response
+//        return finalResponse;
+//
+//    } catch (error: unknown) {
+//        const monitoredError = this.errorHandler.handle(error, { userInput, sessionId });
+//        // Update metrics with error info
+//        PerformanceMonitor.updateMetrics(metrics, {
+//            errorOccurred: true,
+//            errorType: error instanceof InputValidationError ? 'Validation' : (error as any)?.type || 'Unknown', // Categorize
+//            errorId: monitoredError.errorId
+//        });
+//        response = monitoredError; // Assign error response
+//        return monitoredError.userFacingMessage;
+//    } finally {
+//        PerformanceMonitor.endRequest(metrics); // Log metrics
+//    }
+// }
+4.5. Integration Steps:Choose & Configure Tools: Set up accounts and configurations for chosen monitoring/analytics services.Implement SDK Wrappers: Create wrappers (AnalyticsSDK, SentrySDK) to abstract specific vendor calls.Implement PerformanceMonitor: Create the utility class with startRequest, endRequest, and potentially updateMetrics helpers.Integrate into Agent.handleRequest:Call startRequest at the beginning.Wrap key operations (memory, LLM, tools) in timing logic and update metrics using updateMetrics.Retrieve prompt token count from PromptManager. Attempt to parse completion tokens.In the catch block, update metrics with errorOccurred, errorType, errorId.Call endRequest in the finally block.4.6. Testing Considerations:Verify metrics are logged accurately for success and various error paths. Check tags (sessionId, errorType). Ensure monitoring code itself is performant. Mock SDKs during unit tests.4.7. Efficiency Notes:Use asynchronous logging/batching for monitoring SDK calls if possible. Sample detailed logs if volume/cost is a concern.Section 5: Phased Rollout & Future WorkObjective: Provide a structured plan for implementing these changes and outline potential areas for future enhancement.5.1. Proposed Phased Rollout:Phase 1: Core Refactoring & Stability (Est. 4 weeks)Deliverables: Modular architecture with DI, basic ErrorHandler + Sentry integration, validation framework, initial test setup (Jest/Pytest), basic CI pipeline.Goal: Stable, testable foundation with basic error visibility. Achieve ~60% test coverage.Phase 2: Memory System Implementation (Est. 3 weeks)Deliverables: AdvancedMemoryManager (short-term buffer + vector store), integration into Agent, basic context usage in PromptManager.Goal: Agent demonstrates long-term memory recall; basic RAG pipeline functional.Phase 3: Prompt Optimization & Summarization (Est. 2 weeks)Deliverables: Advanced PromptManager (token counting, budgeting, prioritization), summarization logic in MemoryManager.Goal: Improved token efficiency, better handling of long conversations, reduced hallucinations.Phase 4: Monitoring & Performance Tuning (Est. 2 weeks)Deliverables: PerformanceMonitor integration, analytics dashboards, automated alerting for key metrics (errors, latency), performance optimizations (caching, async).Goal: Measurable performance, cost control, high reliability. Achieve >85% test coverage.5.2. Key Expansion Areas (Future Work):Automated Regression Test Suite: Comprehensive end-to-end tests simulating conversations and tool usage.Dynamic Context Window Adaptation: Task-specific context strategies.Advanced Reasoning Modules: ReAct, Chain-of-Thought, Self-Critique patterns.Tool Ecosystem: Enhanced tool discovery, error handling, learning capabilities.A/B Testing Framework: Infrastructure for comparing prompts, models, memory strategies.User Feedback Loop: Mechanisms for incorporating explicit/implicit user feedback.Code Execution & Validation: Secure sandboxing and self-correction loops for coding tasks.This blueprint (v2.1) provides a detailed roadmap, integrating strategic planning with actionable implementation guidance for refactoring the bolt.diy agent.

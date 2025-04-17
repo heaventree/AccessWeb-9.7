@@ -12,6 +12,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '../contexts/AuthContext';
 import { SecurityProvider } from './SecurityProvider';
 import { ThemeProvider } from './ThemeProvider';
+import { AccessibilityTipsProvider } from '../contexts/AccessibilityTipsContext';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { isDevelopment } from '../utils/environment';
 
@@ -51,9 +52,11 @@ export function AppProvider({ children }: AppProviderProps): JSX.Element {
           <SecurityProvider>
             <BrowserRouter>
               <AuthProvider>
-                <ThemeProvider>
-                  {children}
-                </ThemeProvider>
+                <AccessibilityTipsProvider>
+                  <ThemeProvider>
+                    {children}
+                  </ThemeProvider>
+                </AccessibilityTipsProvider>
               </AuthProvider>
             </BrowserRouter>
           </SecurityProvider>
