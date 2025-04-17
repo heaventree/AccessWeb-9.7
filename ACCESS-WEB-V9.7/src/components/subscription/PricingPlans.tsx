@@ -109,15 +109,10 @@ export function PricingPlans({ onSubscribe }: PricingPlansProps) {
   }
   
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto">
       <div className="sm:flex sm:flex-col sm:align-center">
-        <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Pricing Plans</h2>
-        <p className="mt-5 text-xl text-gray-500">
-          Choose the plan that suits your needs
-        </p>
-        
         {/* Billing interval toggle */}
-        <div className="relative mt-6 bg-gray-100 rounded-lg p-0.5 flex self-center">
+        <div className="relative mt-2 bg-gray-100 rounded-lg p-0.5 flex self-center">
           <button
             type="button"
             className={`relative py-2 px-6 border-0 rounded-md text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:w-auto sm:px-8 ${

@@ -165,7 +165,7 @@ function App() {
               />
             } />
           </Routes>
-          <AccessibilityToolbar />
+          {/* <AccessibilityToolbar /> */}
           <SupportChat />
         </div>
       </ErrorBoundary>
