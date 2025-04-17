@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiEye, FiX, FiMessageCircle, FiAlertCircle, FiHelpCircle, FiSettings } from 'react-icons/fi';
-import { useAccessibilityTips } from '../contexts/AccessibilityTipsContext';
-import { AccessibilityTipTooltip } from './accessibility/AccessibilityTipTooltip';
+import { FiX, FiMessageCircle, FiAlertCircle, FiHelpCircle, FiSettings, FiZoomIn, FiZoomOut, FiSun } from 'react-icons/fi';
 
 export function AccessibilityToolbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isEnabled, setIsEnabled, tips } = useAccessibilityTips();
+  const [fontSize, setFontSize] = useState(100);
+  const [highContrast, setHighContrast] = useState(false);
   const [hidePosition, setHidePosition] = useState(false);
 
   // Handle toolbar position to be completly offscreen when hidden
@@ -22,9 +21,28 @@ export function AccessibilityToolbar() {
     }
   }, [isOpen]);
 
-  // Toggle tips and store in preferences
-  const handleToggleTips = () => {
-    setIsEnabled(!isEnabled);
+  // Increase font size
+  const increaseFontSize = () => {
+    if (fontSize < 150) {
+      const newSize = fontSize + 10;
+      setFontSize(newSize);
+      document.documentElement.style.fontSize = `${newSize}%`;
+    }
+  };
+
+  // Decrease font size
+  const decreaseFontSize = () => {
+    if (fontSize > 80) {
+      const newSize = fontSize - 10;
+      setFontSize(newSize);
+      document.documentElement.style.fontSize = `${newSize}%`;
+    }
+  };
+
+  // Toggle high contrast
+  const toggleHighContrast = () => {
+    setHighContrast(!highContrast);
+    document.body.classList.toggle('high-contrast');
   };
 
   // Keyboard shortcut to toggle toolbar
@@ -64,28 +82,44 @@ export function AccessibilityToolbar() {
           </div>
 
           <div className="space-y-4">
-            {/* Quick Tips Toggle */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <span aria-hidden="true"><FiEye className="mr-2 text-primary-600" size={18} /></span>
-                <span className="text-sm font-medium text-gray-700">Accessibility Tips</span>
+            {/* Font Size Controls */}
+            <div className="bg-gray-50 p-3 rounded-md">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Font Size</h3>
+              <div className="flex items-center justify-between">
+                <button 
+                  onClick={decreaseFontSize}
+                  className="p-2 bg-white rounded-md border border-gray-200 hover:bg-gray-100"
+                  aria-label="Decrease font size"
+                >
+                  <FiZoomOut size={18} />
+                </button>
+                <span className="text-sm font-medium">{fontSize}%</span>
+                <button 
+                  onClick={increaseFontSize}
+                  className="p-2 bg-white rounded-md border border-gray-200 hover:bg-gray-100"
+                  aria-label="Increase font size"
+                >
+                  <FiZoomIn size={18} />
+                </button>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={isEnabled}
-                  onChange={handleToggleTips}
-                  className="sr-only peer" 
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-              </label>
             </div>
 
-            {/* Tip stats */}
+            {/* High Contrast Toggle */}
             <div className="bg-gray-50 p-3 rounded-md">
-              <div className="flex items-center justify-between text-sm text-gray-600">
-                <span>Active tips:</span>
-                <span className="font-semibold">{tips.length}</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <FiSun className="mr-2 text-yellow-500" size={18} />
+                  <span className="text-sm font-medium text-gray-700">High Contrast</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={highContrast}
+                    onChange={toggleHighContrast}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
               </div>
             </div>
 
@@ -134,9 +168,6 @@ export function AccessibilityToolbar() {
       >
         <span aria-hidden="true"><FiSettings size={20} /></span>
       </motion.button>
-
-      {/* Accessibility Tip Tooltip */}
-      <AccessibilityTipTooltip />
     </>
   );
 }
