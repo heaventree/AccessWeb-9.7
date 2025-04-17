@@ -7,7 +7,7 @@
 
 import React, { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, DEVELOPMENT_MODE } from '../hooks/useAuth';
 import { createError, ErrorType } from '../utils/errorHandler';
 
 // Props interface
@@ -50,8 +50,19 @@ export function ProtectedRoute({
   authOnly = false,
   loadingComponent = <div className="p-4">Loading...</div>
 }: ProtectedRouteProps): JSX.Element {
+  // In development mode, bypass all protections
+  if (DEVELOPMENT_MODE) {
+    console.info('🔓 Development mode: Bypassing authentication checks for protected route');
+    return <>{children}</>;
+  }
+  
   // Get authentication context
-  const { user, isAuthenticated, isLoading, hasRole } = useAuth();
+  const { user, isAuthenticated, loading: isLoading } = useAuth();
+  
+  // Simple role check function
+  const hasRole = (role: string) => {
+    return user?.role === role;
+  };
   
   // Get current location for redirection
   const location = useLocation();
@@ -77,14 +88,7 @@ export function ProtectedRoute({
     }
     
     // Throw authorization error
-    throw createError(
-      ErrorType.AUTHORIZATION,
-      'insufficient_permissions',
-      `User does not have the required role: ${requiredRole}`,
-      { requiredRole, userRole: user.role },
-      'You do not have permission to access this page.',
-      'Access to this page requires additional permissions. Please contact your administrator if you need access.'
-    );
+    throw new Error(`User does not have the required role: ${requiredRole}. Access to this page requires additional permissions.`);
   }
   
   // User is authenticated and has required role, render children
