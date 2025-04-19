@@ -75,11 +75,38 @@ import { AltTextGuide } from './pages/help/AltTextGuide';
 import { ErrorPage } from './components/ErrorPage';
 import AccessibilityTipsPage from './pages/help/AccessibilityTipsPage';
 import { AccessibilityTipsDemo } from './components/demo/AccessibilityTipsDemo';
+import React, { useEffect, useState } from 'react';
+import { ErrorBoundary as CustomErrorBoundary } from './components/ErrorBoundary'; //Renamed to avoid conflict
+import { registerErrorHandler, unregisterErrorHandler, StructuredError } from './utils/errorHandler';
+import { initSecureStorage } from './utils/secureStorage';
+
 
 function App() {
+  const [errorLog, setErrorLog] = useState<StructuredError[]>([]);
+
+  // Initialize secure storage and register error handler
+  useEffect(() => {
+    // Initialize secure storage
+    initSecureStorage().catch(err => {
+      console.error('Failed to initialize secure storage:', err);
+    });
+
+    // Register global error handler
+    const errorCallback = (error: StructuredError) => {
+      setErrorLog(prev => [...prev, error]);
+    };
+
+    registerErrorHandler(errorCallback);
+
+    // Cleanup on unmount
+    return () => {
+      unregisterErrorHandler(errorCallback);
+    };
+  }, []);
+
   return (
     <AppProvider>
-      <ErrorBoundary>
+      <CustomErrorBoundary> {/*Using renamed ErrorBoundary*/}
         <ScrollToTop />
         <Toaster position="top-center" />
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -169,7 +196,7 @@ function App() {
           <WCAGToolbar position="bottom-right" />
           <SupportChat />
         </div>
-      </ErrorBoundary>
+      </CustomErrorBoundary>
     </AppProvider>
   );
 }

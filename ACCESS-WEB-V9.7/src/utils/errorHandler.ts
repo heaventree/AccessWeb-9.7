@@ -408,3 +408,184 @@ export default {
   createError,
   handleApiError
 };
+/**
+ * Error Handler Utility
+ * 
+ * Provides a centralized error handling system for consistent
+ * error management across the application.
+ */
+
+// Define error severity levels
+export enum ErrorSeverity {
+  INFO = 'info',
+  WARNING = 'warning',
+  ERROR = 'error',
+  CRITICAL = 'critical'
+}
+
+// Define error categories for better organization
+export enum ErrorCategory {
+  NETWORK = 'network',
+  API = 'api',
+  AUTH = 'authentication',
+  VALIDATION = 'validation',
+  RENDER = 'rendering',
+  STORAGE = 'storage',
+  UNKNOWN = 'unknown'
+}
+
+// Interface for structured error data
+export interface StructuredError {
+  message: string;
+  context?: Record<string, any>;
+  data?: any;
+  timestamp: number;
+  severity: ErrorSeverity;
+  errorId: string;
+  category: ErrorCategory;
+  stack?: string;
+  originalError?: Error;
+}
+
+// Error callback function type
+type ErrorCallback = (error: StructuredError) => void;
+
+// Maintain a list of error handlers
+const errorHandlers: ErrorCallback[] = [];
+
+// Generate a unique ID for each error
+const generateErrorId = (): string => {
+  return Math.random().toString(36).substring(2, 10);
+};
+
+/**
+ * Register an error handler callback
+ */
+export const registerErrorHandler = (callback: ErrorCallback): void => {
+  errorHandlers.push(callback);
+};
+
+/**
+ * Unregister an error handler callback
+ */
+export const unregisterErrorHandler = (callback: ErrorCallback): void => {
+  const index = errorHandlers.indexOf(callback);
+  if (index !== -1) {
+    errorHandlers.splice(index, 1);
+  }
+};
+
+/**
+ * Process an error and notify all registered handlers
+ */
+export const handleError = (
+  error: Error | string,
+  options: {
+    severity?: ErrorSeverity;
+    category?: ErrorCategory;
+    context?: Record<string, any>;
+    data?: any;
+  } = {}
+): StructuredError => {
+  const {
+    severity = ErrorSeverity.ERROR,
+    category = ErrorCategory.UNKNOWN,
+    context = {},
+    data = undefined
+  } = options;
+
+  // Create structured error object
+  const structuredError: StructuredError = {
+    message: typeof error === 'string' ? error : error.message,
+    context,
+    data,
+    timestamp: Date.now(),
+    severity,
+    errorId: generateErrorId(),
+    category,
+    stack: typeof error === 'string' ? new Error().stack : error.stack,
+    originalError: typeof error === 'string' ? undefined : error
+  };
+
+  // Log to console based on severity
+  switch (severity) {
+    case ErrorSeverity.INFO:
+      console.log('[info]', structuredError.message, context, structuredError);
+      break;
+    case ErrorSeverity.WARNING:
+      console.warn('[warning]', structuredError.message, context, structuredError);
+      break;
+    case ErrorSeverity.ERROR:
+    case ErrorSeverity.CRITICAL:
+      console.error(`[${severity}]`, structuredError.message, context, structuredError);
+      break;
+  }
+
+  // Notify all registered handlers
+  errorHandlers.forEach(handler => {
+    try {
+      handler(structuredError);
+    } catch (handlerError) {
+      console.error('Error in error handler:', handlerError);
+    }
+  });
+
+  return structuredError;
+};
+
+/**
+ * Create a specialized error handler for API errors
+ */
+export const handleApiError = (
+  error: Error | string,
+  apiContext: { endpoint: string; method: string; requestData?: any },
+  severity: ErrorSeverity = ErrorSeverity.ERROR
+): StructuredError => {
+  return handleError(error, {
+    severity,
+    category: ErrorCategory.API,
+    context: {
+      api: apiContext
+    }
+  });
+};
+
+/**
+ * Create a specialized error handler for network errors
+ */
+export const handleNetworkError = (
+  error: Error | string,
+  networkContext: { url: string; status?: number; statusText?: string },
+  severity: ErrorSeverity = ErrorSeverity.ERROR
+): StructuredError => {
+  return handleError(error, {
+    severity,
+    category: ErrorCategory.NETWORK,
+    context: {
+      network: networkContext
+    }
+  });
+};
+
+/**
+ * Error helper for try/catch blocks
+ */
+export const tryCatch = async <T>(
+  fn: () => Promise<T>,
+  errorMessage: string,
+  options: {
+    severity?: ErrorSeverity;
+    category?: ErrorCategory;
+    context?: Record<string, any>;
+  } = {}
+): Promise<T> => {
+  try {
+    return await fn();
+  } catch (error) {
+    handleError(
+      error instanceof Error ? error : new Error(errorMessage),
+      options
+    );
+    throw error;
+  }
+};

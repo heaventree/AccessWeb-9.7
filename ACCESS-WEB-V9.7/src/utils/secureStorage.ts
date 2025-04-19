@@ -332,3 +332,166 @@ export default {
   setupSecureStorage,
   isSecureStorageInitialized
 };
+/**
+ * Secure Storage Utility
+ * 
+ * Provides encrypted local storage for sensitive information with proper error handling
+ */
+
+// Encryption key handling would ideally use a more robust key derivation in production
+let encryptionKey: CryptoKey | null = null;
+
+/**
+ * Initialize the secure storage system
+ */
+export const initSecureStorage = async (): Promise<boolean> => {
+  try {
+    // Generate a new encryption key or load from a secure source
+    encryptionKey = await window.crypto.subtle.generateKey(
+      {
+        name: 'AES-GCM',
+        length: 256
+      },
+      true,
+      ['encrypt', 'decrypt']
+    );
+    
+    console.log('Secure storage initialized');
+    return true;
+  } catch (error) {
+    console.error('Failed to initialize secure storage:', error);
+    return false;
+  }
+};
+
+/**
+ * Encrypt a string value
+ */
+const encrypt = async (value: string): Promise<string> => {
+  if (!encryptionKey) {
+    throw new Error('Secure storage not initialized');
+  }
+  
+  try {
+    // Create initialization vector for AES-GCM
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    
+    // Convert string to bytes
+    const encoder = new TextEncoder();
+    const data = encoder.encode(value);
+    
+    // Encrypt the data
+    const encryptedData = await window.crypto.subtle.encrypt(
+      {
+        name: 'AES-GCM',
+        iv
+      },
+      encryptionKey,
+      data
+    );
+    
+    // Combine IV and encrypted data
+    const combined = new Uint8Array(iv.length + encryptedData.byteLength);
+    combined.set(iv);
+    combined.set(new Uint8Array(encryptedData), iv.length);
+    
+    // Convert to base64 string for storage
+    return btoa(String.fromCharCode(...combined));
+  } catch (error) {
+    console.error('Encryption error:', error);
+    throw new Error('Failed to encrypt data');
+  }
+};
+
+/**
+ * Decrypt a previously encrypted value
+ */
+const decrypt = async (encryptedValue: string): Promise<string> => {
+  if (!encryptionKey) {
+    throw new Error('Secure storage not initialized');
+  }
+  
+  try {
+    // Convert from base64
+    const binaryString = atob(encryptedValue);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    
+    // Extract IV and encrypted data
+    const iv = bytes.slice(0, 12);
+    const encryptedData = bytes.slice(12);
+    
+    // Decrypt the data
+    const decryptedData = await window.crypto.subtle.decrypt(
+      {
+        name: 'AES-GCM',
+        iv
+      },
+      encryptionKey,
+      encryptedData
+    );
+    
+    // Convert bytes to string
+    const decoder = new TextDecoder();
+    return decoder.decode(decryptedData);
+  } catch (error) {
+    console.error('Decryption error:', error);
+    throw new Error('Failed to decrypt data');
+  }
+};
+
+/**
+ * Securely store a value
+ */
+export const secureSessionStorage = {
+  setItem: async (key: string, value: string): Promise<void> => {
+    try {
+      const encryptedValue = await encrypt(value);
+      sessionStorage.setItem(`secure_${key}`, encryptedValue);
+    } catch (error) {
+      console.error(`Error storing secure item ${key}:`, error);
+      throw error;
+    }
+  },
+  
+  getItem: async (key: string): Promise<string | null> => {
+    try {
+      const encryptedValue = sessionStorage.getItem(`secure_${key}`);
+      if (!encryptedValue) return null;
+      return await decrypt(encryptedValue);
+    } catch (error) {
+      console.error(`Error retrieving secure item ${key}:`, error);
+      throw error;
+    }
+  },
+  
+  removeItem: (key: string): void => {
+    try {
+      sessionStorage.removeItem(`secure_${key}`);
+    } catch (error) {
+      console.error(`Error removing secure item ${key}:`, error);
+      throw error;
+    }
+  },
+  
+  clear: (): void => {
+    try {
+      // Only clear secure items, not all of sessionStorage
+      Object.keys(sessionStorage)
+        .filter(key => key.startsWith('secure_'))
+        .forEach(key => sessionStorage.removeItem(key));
+    } catch (error) {
+      console.error('Error clearing secure storage:', error);
+      throw error;
+    }
+  }
+};
+
+// Initialize secure storage when module is loaded
+if (typeof window !== 'undefined') {
+  initSecureStorage().catch(err => {
+    console.error('Failed to initialize secure storage system:', err);
+  });
+}

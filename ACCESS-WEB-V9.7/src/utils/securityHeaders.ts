@@ -137,3 +137,50 @@ export default {
   createSecurityHeaderMetaTags,
   initSecurityHeaders
 };
+/**
+ * Security Headers Utility
+ * Provides centralized management of security headers including Content Security Policy
+ */
+
+/**
+ * Generates a Content Security Policy with appropriate frame-src directives
+ * Addresses the CSP violations for Stripe integration
+ */
+export const generateContentSecurityPolicy = () => {
+  return {
+    'Content-Security-Policy': 
+      "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://js.stripe.com; " +
+      "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://fonts.googleapis.com; " +
+      "font-src 'self' https://fonts.gstatic.com; " +
+      "img-src 'self' data: https:; " +
+      "connect-src 'self' https://api.accessibility-checker.org https://api.stripe.com; " +
+      "frame-src 'self' https://js.stripe.com https://hooks.stripe.com; " +
+      "media-src 'self'; " +
+      "object-src 'none'; " +
+      "base-uri 'self'; " +
+      "form-action 'self'; " +
+      "frame-ancestors 'self'; " +
+      "block-all-mixed-content;"
+  };
+};
+
+/**
+ * Applies security headers to a response object
+ * @param res - Response object to apply headers to
+ */
+export const applySecurityHeaders = (res: any) => {
+  const headers = generateContentSecurityPolicy();
+  
+  // Apply CSP headers
+  Object.entries(headers).forEach(([key, value]) => {
+    res.setHeader(key, value);
+  });
+  
+  // Apply additional security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+};
