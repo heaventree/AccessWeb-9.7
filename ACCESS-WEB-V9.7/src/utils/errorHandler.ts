@@ -1,536 +1,179 @@
 /**
- * Error Handler Utilities
+ * Error Handler Module
  * 
- * Provides centralized error handling, logging, and recovery mechanisms
- * for consistent and accessible error management.
+ * Provides centralized error handling, logging, and reporting functionality
+ * for the application.
  */
 
-import { getEnvBoolean, getEnvString } from './environment';
+import { logError } from './logging'; 
+import { isDevelopment } from './environment';
 
-// Define standard error types for consistent handling
-export enum ErrorSeverity {
-  CRITICAL = 'critical',
-  ERROR = 'error',
-  WARNING = 'warning',
-  INFO = 'info'
-}
-
-// Define specific error types for error classification
-export enum ErrorType {
-  INTERNAL = 'internal',
-  NETWORK = 'network',
-  API = 'api',
-  VALIDATION = 'validation',
-  AUTHENTICATION = 'authentication',
-  AUTHORIZATION = 'authorization',
-  NOT_FOUND = 'not_found',
-  RATE_LIMIT = 'rate_limit',
-  TIMEOUT = 'timeout',
-  SECURITY = 'security',
-  UNKNOWN = 'unknown'
-}
-
-// Error context data for additional debug information
-export interface ErrorContext {
+// Types for error handling
+export interface ErrorOptions {
   context?: string;
   data?: Record<string, any>;
-  source?: string;
-  errorId?: string;
-  severity?: ErrorSeverity;
-  userId?: string;
+  isFatal?: boolean;
+  notify?: boolean;
   timestamp?: number;
+  userId?: string;
+  sessionId?: string;
 }
 
-// In-memory log of recent errors
-const errorLog: Array<{
-  error: Error;
-  context: ErrorContext;
-  timestamp: number;
-}> = [];
-
-// Maximum number of errors to keep in memory
-const MAX_ERROR_LOG_SIZE = 50;
-
-/**
- * Log error with context
- * @param error Error to log
- * @param context Additional context for the error
- */
-export function logError(error: unknown, context: ErrorContext = {}): void {
-  try {
-    // Ensure error is an Error object
-    const errorObj = error instanceof Error ? error : new Error(String(error));
-    
-    // Add timestamp if not provided
-    if (!context.timestamp) {
-      context.timestamp = Date.now();
-    }
-    
-    // Add severity if not provided
-    if (!context.severity) {
-      context.severity = ErrorSeverity.ERROR;
-    }
-    
-    // Add error ID if not provided
-    if (!context.errorId) {
-      context.errorId = generateErrorId();
-    }
-    
-    // Log to console in development
-    if (getEnvBoolean('VITE_DEBUG_MODE', true)) {
-      console.error(
-        `[${context.severity}] ${context.context || 'Application Error'}:`,
-        errorObj,
-        context
-      );
-    }
-    
-    // Add to in-memory log
-    errorLog.unshift({
-      error: errorObj,
-      context,
-      timestamp: context.timestamp
-    });
-    
-    // Limit log size
-    if (errorLog.length > MAX_ERROR_LOG_SIZE) {
-      errorLog.pop();
-    }
-    
-    // Send to error monitoring service in production
-    if (getEnvBoolean('VITE_ENABLE_ERROR_REPORTING', false)) {
-      sendErrorToMonitoring(errorObj, context);
-    }
-    
-    // Store in session for debugging
-    storeErrorInSession(errorObj, context);
-  } catch (loggingError) {
-    // Fallback console error if our error handler fails
-    console.error('Error in error handler:', loggingError);
-    console.error('Original error:', error);
-  }
-}
-
-/**
- * Get recent errors
- * @param limit Maximum number of errors to return
- * @returns Recent errors
- */
-export function getRecentErrors(limit: number = 10): Array<{
-  error: Error;
-  context: ErrorContext;
-  timestamp: number;
-}> {
-  return errorLog.slice(0, limit);
-}
-
-/**
- * Clear error log
- */
-export function clearErrorLog(): void {
-  errorLog.length = 0;
-}
-
-/**
- * Generate a unique error ID
- * @returns Unique error ID
- */
-function generateErrorId(): string {
-  return Math.random().toString(36).substring(2, 12);
-}
-
-/**
- * Send error to monitoring service
- * @param error Error to send
- * @param context Error context
- */
-function sendErrorToMonitoring(error: Error, context: ErrorContext): void {
-  // Get monitoring service URL from environment
-  const monitoringUrl = getEnvString('VITE_ERROR_MONITORING_URL', '');
-  
-  // Skip if no monitoring URL
-  if (!monitoringUrl) {
-    return;
-  }
-  
-  try {
-    // Send error to monitoring service
-    fetch(monitoringUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-        context: context,
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        timestamp: context.timestamp || Date.now()
-      })
-    }).catch(e => {
-      console.error('Failed to send error to monitoring service:', e);
-    });
-  } catch (e) {
-    console.error('Failed to send error to monitoring service:', e);
-  }
-}
-
-/**
- * Store error in session for debugging
- * @param error Error to store
- * @param context Error context
- */
-function storeErrorInSession(error: Error, context: ErrorContext): void {
-  try {
-    // Get existing errors from session
-    const storedErrors = sessionStorage.getItem('app_errors');
-    const errors = storedErrors ? JSON.parse(storedErrors) : [];
-    
-    // Add new error
-    errors.unshift({
-      name: error.name,
-      message: error.message,
-      context: context,
-      timestamp: context.timestamp || Date.now()
-    });
-    
-    // Limit number of stored errors
-    const maxStoredErrors = 20;
-    if (errors.length > maxStoredErrors) {
-      errors.length = maxStoredErrors;
-    }
-    
-    // Save back to session
-    sessionStorage.setItem('app_errors', JSON.stringify(errors));
-  } catch (e) {
-    console.error('Failed to store error in session:', e);
-  }
-}
-
-/**
- * Format error message for display
- * @param error Error to format
- * @param includeStack Whether to include stack trace
- * @returns Formatted error message
- */
-export function formatErrorMessage(error: Error | unknown, includeStack: boolean = false): string {
-  if (!(error instanceof Error)) {
-    return String(error);
-  }
-  
-  const message = `${error.name}: ${error.message}`;
-  
-  if (includeStack && error.stack) {
-    return `${message}\n\n${error.stack}`;
-  }
-  
-  return message;
-}
-
-/**
- * Check if an error is of a specific type
- * @param error Error to check
- * @param errorType Error type to check for
- * @returns Whether error is of the specified type
- */
-export function isErrorType(error: unknown, errorType: any): boolean {
-  return error instanceof errorType;
-}
-
-/**
- * Create a custom error with type and additional data
- * @param message Error message
- * @param type Error type
- * @param data Additional error data
- * @returns Custom error
- */
-export function createError(message: string, type: ErrorType, data: Record<string, any> = {}): Error {
-  const error = new Error(message);
-  (error as any).type = type;
-  (error as any).data = data;
-  (error as any).timestamp = Date.now();
-  
-  return error;
-}
-
-/**
- * Handle API errors consistently
- * @param error Original error 
- * @param context Error context
- * @returns Properly formatted error
- */
-export function handleApiError(error: unknown, context: ErrorContext = {}): Error {
-  // Default to API error type
-  let errorType = ErrorType.API;
-  let errorMessage = "An unexpected API error occurred";
-  
-  // Extract response details if available
-  if (error instanceof Response || (error && typeof error === 'object' && 'status' in error)) {
-    const response = error as Response;
-    
-    // Map HTTP status codes to error types
-    switch (response.status) {
-      case 400:
-        errorType = ErrorType.VALIDATION;
-        errorMessage = "The request was invalid";
-        break;
-      case 401:
-      case 403:
-        errorType = ErrorType.AUTHENTICATION;
-        errorMessage = "You don't have permission to access this resource";
-        break;
-      case 404:
-        errorType = ErrorType.NOT_FOUND;
-        errorMessage = "The requested resource was not found";
-        break;
-      case 429:
-        errorType = ErrorType.RATE_LIMIT;
-        errorMessage = "Too many requests, please try again later";
-        break;
-      case 500:
-      case 502:
-      case 503:
-      case 504:
-        errorType = ErrorType.API;
-        errorMessage = "The server encountered an error";
-        break;
-    }
-  } else if (error instanceof Error) {
-    errorMessage = error.message;
-    
-    // Check for network errors
-    if (
-      error.name === 'NetworkError' || 
-      error.message.includes('network') ||
-      error.message.includes('connection')
-    ) {
-      errorType = ErrorType.NETWORK;
-      errorMessage = "Network error occurred. Please check your connection.";
-    }
-  }
-  
-  // Create standardized error
-  const standardError = createError(errorMessage, errorType, { 
-    originalError: error,
-    ...context
-  });
-  
-  // Log the error
-  logError(standardError, {
-    context: context.context || 'API',
-    severity: ErrorSeverity.ERROR,
-    ...context
-  });
-  
-  return standardError;
-}
-
-/**
- * Get user-friendly error message
- * @param error Error to get message for
- * @returns User-friendly error message
- */
-export function getUserFriendlyErrorMessage(error: unknown): string {
-  // Default generic message
-  let friendlyMessage = "Something went wrong. Please try again later.";
-  
-  if (error instanceof Error) {
-    // Handle specific error types
-    switch (error.name) {
-      case 'NetworkError':
-        friendlyMessage = "We're having trouble connecting to the server. Please check your internet connection and try again.";
-        break;
-      
-      case 'ValidationError':
-        friendlyMessage = "There was a problem with the information you provided. Please check your entries and try again.";
-        break;
-      
-      case 'AuthenticationError':
-        friendlyMessage = "Your session may have expired. Please sign in again to continue.";
-        break;
-      
-      case 'AuthorizationError':
-        friendlyMessage = "You don't have permission to perform this action.";
-        break;
-      
-      case 'NotFoundError':
-        friendlyMessage = "The requested resource was not found.";
-        break;
-      
-      case 'TimeoutError':
-        friendlyMessage = "The request timed out. Please try again.";
-        break;
-      
-      case 'RateLimitError':
-        friendlyMessage = "You've made too many requests. Please wait a moment and try again.";
-        break;
-      
-      default:
-        // Use actual message if available and in development
-        if (getEnvBoolean('VITE_DEBUG_MODE', false) && error.message) {
-          friendlyMessage = error.message;
-        }
-    }
-  }
-  
-  return friendlyMessage;
-}
-
-/**
- * Create error message properties for accessibility
- * @param message Error message
- * @returns Accessible properties for error display
- */
-export function getAccessibleErrorProps(message: string): {
-  role: string; 
-  'aria-live': string;
-  'aria-atomic'?: string;
-} {
-  return {
-    role: 'alert',
-    'aria-live': 'assertive',
-    'aria-atomic': 'true'
-  };
-}
-
-export default {
-  logError,
-  getRecentErrors,
-  clearErrorLog,
-  formatErrorMessage,
-  isErrorType,
-  getUserFriendlyErrorMessage,
-  getAccessibleErrorProps,
-  ErrorSeverity,
-  ErrorType,
-  createError,
-  handleApiError
-};
-/**
- * Error Handler Utility
- * 
- * Provides a centralized error handling system for consistent
- * error management across the application.
- */
-
-// Define error severity levels
-export enum ErrorSeverity {
-  INFO = 'info',
-  WARNING = 'warning',
-  ERROR = 'error',
-  CRITICAL = 'critical'
-}
-
-// Define error categories for better organization
-export enum ErrorCategory {
-  NETWORK = 'network',
-  API = 'api',
-  AUTH = 'authentication',
-  VALIDATION = 'validation',
-  RENDER = 'rendering',
-  STORAGE = 'storage',
-  UNKNOWN = 'unknown'
-}
-
-// Interface for structured error data
-export interface StructuredError {
+export interface ErrorReport {
   message: string;
-  context?: Record<string, any>;
-  data?: any;
-  timestamp: number;
-  severity: ErrorSeverity;
-  errorId: string;
-  category: ErrorCategory;
   stack?: string;
-  originalError?: Error;
+  context?: string;
+  data?: Record<string, any>;
+  timestamp: number;
+  severity: 'error' | 'warning' | 'info';
+  errorId: string;
 }
 
-// Error callback function type
-type ErrorCallback = (error: StructuredError) => void;
+// Used for tracking and deduplicating errors
+const errorCache = new Map<string, { count: number, lastReported: number }>();
+const ERROR_REPORTING_THROTTLE = 60000; // 1 minute
+const MAX_ERROR_COUNT = 5; // Report same error max 5 times
 
-// Maintain a list of error handlers
-const errorHandlers: ErrorCallback[] = [];
-
-// Generate a unique ID for each error
+/**
+ * Generate a unique ID for each error
+ */
 const generateErrorId = (): string => {
   return Math.random().toString(36).substring(2, 10);
 };
 
 /**
- * Register an error handler callback
+ * Normalize error to string message
  */
-export const registerErrorHandler = (callback: ErrorCallback): void => {
-  errorHandlers.push(callback);
-};
-
-/**
- * Unregister an error handler callback
- */
-export const unregisterErrorHandler = (callback: ErrorCallback): void => {
-  const index = errorHandlers.indexOf(callback);
-  if (index !== -1) {
-    errorHandlers.splice(index, 1);
+const normalizeError = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message;
+  } else if (typeof error === 'string') {
+    return error;
+  } else if (error === null) {
+    return 'Null error';
+  } else if (error === undefined) {
+    return 'Undefined error';
+  } else {
+    try {
+      return JSON.stringify(error);
+    } catch (e) {
+      return 'Unserializable error object';
+    }
   }
 };
 
 /**
- * Process an error and notify all registered handlers
+ * Get stack trace from error
+ */
+const getErrorStack = (error: unknown): string | undefined => {
+  if (error instanceof Error) {
+    return error.stack;
+  }
+  return undefined;
+};
+
+/**
+ * Check if error should be reported (deduplication logic)
+ */
+const shouldReportError = (errorHash: string): boolean => {
+  const now = Date.now();
+  const cachedError = errorCache.get(errorHash);
+
+  if (!cachedError) {
+    // First time seeing this error
+    errorCache.set(errorHash, { count: 1, lastReported: now });
+    return true;
+  }
+
+  // Check time threshold and count
+  if (now - cachedError.lastReported > ERROR_REPORTING_THROTTLE) {
+    // Reset if time threshold passed
+    errorCache.set(errorHash, { count: 1, lastReported: now });
+    return true;
+  }
+
+  if (cachedError.count < MAX_ERROR_COUNT) {
+    // Increment count and update time
+    errorCache.set(errorHash, { 
+      count: cachedError.count + 1, 
+      lastReported: now 
+    });
+    return true;
+  }
+
+  return false;
+};
+
+/**
+ * Create standardized error report
+ */
+const createErrorReport = (
+  error: unknown,
+  options: ErrorOptions = {}
+): ErrorReport => {
+  const message = normalizeError(error);
+  const stack = getErrorStack(error);
+
+  return {
+    message,
+    stack,
+    context: options.context || 'unknown',
+    data: options.data,
+    timestamp: options.timestamp || Date.now(),
+    severity: options.isFatal ? 'error' : 'warning',
+    errorId: generateErrorId()
+  };
+};
+
+/**
+ * Main error handler function
+ * Use this as the primary way to handle and log errors
  */
 export const handleError = (
-  error: Error | string,
-  options: {
-    severity?: ErrorSeverity;
-    category?: ErrorCategory;
-    context?: Record<string, any>;
-    data?: any;
-  } = {}
-): StructuredError => {
-  const {
-    severity = ErrorSeverity.ERROR,
-    category = ErrorCategory.UNKNOWN,
-    context = {},
-    data = undefined
-  } = options;
+  error: unknown,
+  options: ErrorOptions = {}
+): ErrorReport => {
+  const errorReport = createErrorReport(error, options);
 
-  // Create structured error object
-  const structuredError: StructuredError = {
-    message: typeof error === 'string' ? error : error.message,
-    context,
-    data,
-    timestamp: Date.now(),
-    severity,
-    errorId: generateErrorId(),
-    category,
-    stack: typeof error === 'string' ? new Error().stack : error.stack,
-    originalError: typeof error === 'string' ? undefined : error
-  };
+  // Hash for deduplication - using context and message
+  const errorHash = `${errorReport.context}:${errorReport.message}`;
 
-  // Log to console based on severity
-  switch (severity) {
-    case ErrorSeverity.INFO:
-      console.log('[info]', structuredError.message, context, structuredError);
-      break;
-    case ErrorSeverity.WARNING:
-      console.warn('[warning]', structuredError.message, context, structuredError);
-      break;
-    case ErrorSeverity.ERROR:
-    case ErrorSeverity.CRITICAL:
-      console.error(`[${severity}]`, structuredError.message, context, structuredError);
-      break;
+  if (shouldReportError(errorHash)) {
+    // Log error locally
+    console.error(
+      `[error] ${errorReport.context}:`, 
+      errorReport.message,
+      options.data || {},
+      errorReport
+    );
+
+    // Send to monitoring service if notification enabled
+    if (options.notify !== false) {
+      // In development, just log
+      if (isDevelopment()) {
+        console.info('[Dev] Error would be reported to monitoring service:', errorReport);
+      } else {
+        // In production this would send to an error monitoring service
+        // Example: sendToErrorMonitoring(errorReport);
+      }
+    }
   }
 
-  // Notify all registered handlers
-  errorHandlers.forEach(handler => {
-    try {
-      handler(structuredError);
-    } catch (handlerError) {
-      console.error('Error in error handler:', handlerError);
-    }
-  });
+  return errorReport;
+};
 
-  return structuredError;
+/**
+ * Handle unexpected exceptions
+ */
+export const handleUnexpectedException = (
+  error: Error, 
+  componentName?: string
+): void => {
+  handleError(error, {
+    context: `Unexpected exception${componentName ? ` in ${componentName}` : ''}`,
+    isFatal: true,
+    notify: true
+  });
 };
 
 /**
@@ -539,53 +182,51 @@ export const handleError = (
 export const handleApiError = (
   error: Error | string,
   apiContext: { endpoint: string; method: string; requestData?: any },
-  severity: ErrorSeverity = ErrorSeverity.ERROR
-): StructuredError => {
+  options: Omit<ErrorOptions, 'context'> = {}
+): ErrorReport => {
   return handleError(error, {
-    severity,
-    category: ErrorCategory.API,
-    context: {
-      api: apiContext
+    ...options,
+    context: `API Error: ${apiContext.method} ${apiContext.endpoint}`,
+    data: {
+      ...options.data,
+      requestData: apiContext.requestData,
+      endpoint: apiContext.endpoint,
+      method: apiContext.method
     }
   });
 };
 
 /**
- * Create a specialized error handler for network errors
+ * Register global error handlers
  */
-export const handleNetworkError = (
-  error: Error | string,
-  networkContext: { url: string; status?: number; statusText?: string },
-  severity: ErrorSeverity = ErrorSeverity.ERROR
-): StructuredError => {
-  return handleError(error, {
-    severity,
-    category: ErrorCategory.NETWORK,
-    context: {
-      network: networkContext
-    }
+export const registerGlobalErrorHandlers = (): void => {
+  // Handle unhandled promise rejections
+  window.addEventListener('unhandledrejection', (event) => {
+    handleError(event.reason, {
+      context: 'Unhandled Promise Rejection',
+      isFatal: true,
+      notify: true
+    });
+  });
+
+  // Handle global errors
+  window.addEventListener('error', (event) => {
+    handleError(event.error || event.message, {
+      context: 'Global Error Handler',
+      data: {
+        fileName: event.filename,
+        lineNumber: event.lineno,
+        colNumber: event.colno
+      },
+      isFatal: true,
+      notify: true
+    });
   });
 };
 
-/**
- * Error helper for try/catch blocks
- */
-export const tryCatch = async <T>(
-  fn: () => Promise<T>,
-  errorMessage: string,
-  options: {
-    severity?: ErrorSeverity;
-    category?: ErrorCategory;
-    context?: Record<string, any>;
-  } = {}
-): Promise<T> => {
-  try {
-    return await fn();
-  } catch (error) {
-    handleError(
-      error instanceof Error ? error : new Error(errorMessage),
-      options
-    );
-    throw error;
-  }
+export default {
+  handleError,
+  handleApiError,
+  handleUnexpectedException,
+  registerGlobalErrorHandlers
 };
