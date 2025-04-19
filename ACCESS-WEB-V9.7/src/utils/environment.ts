@@ -210,7 +210,7 @@ export function getEnvJson<T>(key: string, defaultValue: T): T {
     // Parse JSON
     return JSON.parse(stringValue) as T;
   } catch (error) {
-    logError(error, { context: 'getEnvJson', data: { key } });
+    handleError(error, { context: 'getEnvJson', key });
     return defaultValue;
   }
 }

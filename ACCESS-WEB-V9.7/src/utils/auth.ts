@@ -6,7 +6,7 @@
  */
 
 import * as jose from 'jose';
-import { createError, ErrorType, logError } from './errorHandler';
+import { createError, ErrorType, handleError } from './errorHandler';
 import { secureLocalStorage, secureSessionStorage } from './secureStorage';
 import { 
   getEnvNumber, 
@@ -91,9 +91,9 @@ class JwtKeyManager {
         this.keys[0].isActive = true;
       }
     } catch (error) {
-      logError(error, { 
+      handleError(error, { 
         context: 'JwtKeyManager.initialize', 
-        data: { keysCount: this.keys.length }
+        keysCount: this.keys.length 
       });
       throw error;
     } finally {
@@ -176,12 +176,10 @@ class JwtKeyManager {
           this.keys = this.keys.slice(0, this.maxKeys);
         }
       } catch (error) {
-        logError(error, { 
+        handleError(error, { 
           context: 'JwtKeyManager.rotateKeysIfNeeded',
-          data: { 
-            keysCount: this.keys.length,
-            hasActiveKey: activeKeyIndex !== -1
-          }
+          keysCount: this.keys.length,
+          hasActiveKey: activeKeyIndex !== -1
         });
         
         // If we failed to create a new key but have an existing one, keep using it
@@ -270,7 +268,7 @@ export async function generateToken(
     
     return token;
   } catch (error) {
-    logError(error, { context: 'auth.generateToken' });
+    handleError(error, { context: 'auth.generateToken' });
     // Create error with proper type and message
     const authError = createError(
       'Failed to generate authentication token',
@@ -316,7 +314,7 @@ export async function generateRefreshToken(
     
     return token;
   } catch (error) {
-    logError(error, { context: 'auth.generateRefreshToken' });
+    handleError(error, { context: 'auth.generateRefreshToken' });
     // Create error with proper type and message
     const authError = createError(
       'Failed to generate refresh token',
@@ -441,7 +439,7 @@ export function storeAuth(
     storage.setItem(REFRESH_PERSISTENCE_KEY, refreshToken);
     storage.setItem(USER_PERSISTENCE_KEY, JSON.stringify(user));
   } catch (error) {
-    logError(error, { context: 'auth.storeAuth' });
+    handleError(error, { context: 'auth.storeAuth' });
     // Don't throw here to avoid breaking authentication flow
   }
 }
