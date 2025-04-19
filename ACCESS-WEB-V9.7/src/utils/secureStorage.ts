@@ -55,7 +55,7 @@ export async function setupSecureStorage(): Promise<void> {
       console.info('Secure storage initialized');
     }
   } catch (error) {
-    logError(error, { context: 'secureStorage.setupSecureStorage' });
+    logError(error as Error, { context: 'secureStorage.setupSecureStorage' });
   }
 }
 
@@ -96,17 +96,17 @@ export const secureLocalStorage = {
         const encryptedValue = encrypt(value, encryptionKey);
         localStorage.setItem(`${STORAGE_PREFIX}${key}`, encryptedValue);
       } catch (encryptError) {
-        logError(encryptError, { context: 'secureLocalStorage.setItem.encrypt', key });
+        logError(encryptError as Error, { context: 'secureLocalStorage.setItem.encrypt', key });
         localStorage.setItem(key, value);
       }
     } catch (error) {
-      logError(error, { context: 'secureLocalStorage.setItem', key });
+      logError(error as Error, { context: 'secureLocalStorage.setItem', key });
 
       // Fallback to regular storage in case of error
       try {
         localStorage.setItem(key, value);
       } catch (fallbackError) {
-        logError(fallbackError, { context: 'secureLocalStorage.setItem.fallback', key });
+        logError(fallbackError as Error, { context: 'secureLocalStorage.setItem.fallback', key });
       }
     }
   },
