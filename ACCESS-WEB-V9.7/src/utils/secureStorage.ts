@@ -12,8 +12,10 @@ import { isDevelopment } from './environment';
 // Security configuration
 const STORAGE_PREFIX = 'wcag_sec_';
 const ENCRYPTION_KEY = 'WCAG_APP_ENCRYPTION_KEY';
-const SALT_LENGTH = 16; // bytes
-const ITERATION_COUNT = 100000;
+// Constants below are kept for documentation purposes but not currently used
+// They would be used if we switch to a more complex encryption approach
+// const SALT_LENGTH = 16; // bytes
+// const ITERATION_COUNT = 100000;
 
 // Get encryption key from environment or generate a device-specific one
 async function getEncryptionKey(): Promise<string> {

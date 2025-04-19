@@ -26,7 +26,6 @@ const DEFAULT_SANITIZE_CONFIG: DOMPurify.Config = {
   ALLOW_ARIA_ATTR: true,
   ALLOW_DATA_ATTR: true,
   SAFE_FOR_TEMPLATES: true,
-  SAFE_FOR_JQUERY: true,
   SANITIZE_DOM: true,
   ADD_ATTR: ['target']
 };
@@ -95,7 +94,9 @@ export function sanitizeHtml(html: string, config?: DOMPurify.Config): string {
       ...(config || {})
     };
     
-    return DOMPurify.sanitize(html, mergedConfig);
+    const result = DOMPurify.sanitize(html, mergedConfig);
+    // Ensure we always return a string, regardless of DOMPurify's return type
+    return typeof result === 'string' ? result : String(result);
   } catch (error) {
     handleError(error, { context: 'sanitizeHtml' });
     return '';
@@ -118,7 +119,9 @@ export function sanitizeText(text: string): string {
       KEEP_CONTENT: true
     };
     
-    return DOMPurify.sanitize(text, config);
+    const result = DOMPurify.sanitize(text, config);
+    // Ensure we always return a string, regardless of DOMPurify's return type
+    return typeof result === 'string' ? result : String(result);
   } catch (error) {
     handleError(error, { context: 'sanitizeText' });
     return '';
@@ -245,7 +248,7 @@ export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
     }
 
     // Create a copy of the object to avoid modifying the original
-    const result = { ...obj };
+    const result = { ...obj } as Record<string, any>;
 
     // Process each property
     Object.keys(result).forEach(key => {
@@ -272,7 +275,7 @@ export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
       // Leave other types unchanged
     });
 
-    return result;
+    return result as T;
   } catch (error) {
     handleError(error, { context: 'sanitizeObject' });
     return obj;

@@ -302,6 +302,8 @@ export const formatErrorMessage = (error: any): string => {
 export const registerErrorHandler = (handler: (error: any) => void): number => {
   // Implementation would register a custom handler
   console.log('Custom error handler registered');
+  // Note: handler is stored in closure but not used in this implementation
+  // In a real implementation, we would add it to a list of handlers
   return Date.now(); // return a unique ID for this handler
 };
 
