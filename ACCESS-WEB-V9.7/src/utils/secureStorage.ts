@@ -97,17 +97,17 @@ export const secureLocalStorage = {
         const encryptedValue = encrypt(value, encryptionKey);
         localStorage.setItem(`${STORAGE_PREFIX}${key}`, encryptedValue);
       } catch (encryptError) {
-        handleError(encryptError, { context: 'secureLocalStorage.setItem.encrypt', data: { key } });
+        handleError(encryptError, { context: 'secureLocalStorage.setItem.encrypt', key });
         localStorage.setItem(key, value);
       }
     } catch (error) {
-      handleError(error, { context: 'secureLocalStorage.setItem', data: { key } });
+      handleError(error, { context: 'secureLocalStorage.setItem', key });
 
       // Fallback to regular storage in case of error
       try {
         localStorage.setItem(key, value);
       } catch (fallbackError) {
-        handleError(fallbackError, { context: 'secureLocalStorage.setItem.fallback', data: { key } });
+        handleError(fallbackError, { context: 'secureLocalStorage.setItem.fallback', key });
       }
     }
   },
@@ -196,7 +196,7 @@ export const secureLocalStorage = {
     try {
       return localStorage.getItem(`${STORAGE_PREFIX}${key}`) !== null || localStorage.getItem(key) !== null;
     } catch (error) {
-      handleError(error, { context: 'secureLocalStorage.hasItem', data: { key } });
+      handleError(error, { context: 'secureLocalStorage.hasItem', key });
       return false;
     }
   }
@@ -297,7 +297,7 @@ export const secureSessionStorage = {
       // Also remove from regular storage as fallback
       sessionStorage.removeItem(key);
     } catch (error) {
-      logError(error, { context: 'secureSessionStorage.removeItem', key });
+      handleError(error, { context: 'secureSessionStorage.removeItem', data: { key } });
     }
   },
 
@@ -313,7 +313,7 @@ export const secureSessionStorage = {
         }
       });
     } catch (error) {
-      logError(error, { context: 'secureSessionStorage.clear' });
+      handleError(error, { context: 'secureSessionStorage.clear' });
     }
   },
 
@@ -326,7 +326,7 @@ export const secureSessionStorage = {
     try {
       return sessionStorage.getItem(`${STORAGE_PREFIX}${key}`) !== null || sessionStorage.getItem(key) !== null;
     } catch (error) {
-      logError(error, { context: 'secureSessionStorage.hasItem', key });
+      handleError(error, { context: 'secureSessionStorage.hasItem', data: { key } });
       return false;
     }
   }
