@@ -1,0 +1,66 @@
+# CODEOWNERS file for ACCESS-WEB-V9.7
+# Each line is a file pattern followed by one or more owners.
+# Order is important; the last matching pattern takes precedence.
+
+# Default owners for everything in the repo
+* @project-lead
+
+# Configuration files
+*.json @project-lead
+*.ts @project-lead
+vite.config.ts @project-lead @frontend-lead
+tsconfig.json @frontend-lead
+tailwind.config.js @frontend-lead
+
+# Documentation
+/docs/ @documentation-lead
+/docs/technical/ @technical-lead @documentation-lead
+/docs/api/ @api-lead @documentation-lead
+
+# Core application structure
+/src/ @frontend-lead
+/src/pages/ @frontend-lead
+/src/components/ @component-lead
+
+# Component areas
+/src/components/accessibility/ @accessibility-lead
+/src/components/admin/ @admin-lead
+/src/components/analytics/ @analytics-lead
+/src/components/api/ @api-lead
+/src/components/auth/ @security-lead
+/src/components/blog/ @content-lead
+/src/components/common/ @component-lead
+/src/components/compliance/ @compliance-lead
+/src/components/feedback/ @ux-lead
+/src/components/integrations/ @integration-lead
+/src/components/payment/ @payment-lead
+/src/components/settings/ @settings-lead
+/src/components/subscription/ @subscription-lead
+/src/components/support/ @support-lead
+/src/components/team/ @team-lead
+/src/components/tools/ @tools-lead
+/src/components/ui/ @ui-lead
+/src/components/WCAGToolbar/ @accessibility-lead
+
+# Key utilities
+/src/utils/ @utils-lead
+/src/utils/accessibility-compliance.ts @accessibility-lead
+/src/utils/accessibilityTester.ts @accessibility-lead
+/src/utils/aiRecommendations.ts @ai-lead
+/src/utils/auth.ts @security-lead
+/src/utils/contentSecurity.ts @security-lead
+/src/utils/csrfProtection.ts @security-lead
+/src/utils/errorHandler.ts @error-lead
+/src/utils/secureStorage.ts @security-lead
+/src/utils/securityHeaders.ts @security-lead
+/src/utils/apiClient.ts @api-lead
+/src/utils/stripe.ts @payment-lead
+
+# Services
+/src/services/ @services-lead
+
+# Types
+/src/types/ @types-lead
+
+# Hooks
+/src/hooks/ @hooks-lead
