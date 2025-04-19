@@ -8,12 +8,24 @@
 import * as jose from 'jose';
 import { createError, ErrorType, logError } from './errorHandler';
 import { secureLocalStorage, secureSessionStorage } from './secureStorage';
-import { getEnvNumber, getEnvString } from './environment';
+import { 
+  getEnvNumber, 
+  getEnvString, 
+  requireEnvVariable, 
+  isDevelopment 
+} from './environment';
 
 // Configuration constants
-const JWT_SECRET = getEnvString('VITE_JWT_SECRET', 'wcag_secure_jwt_secret_key_please_change_in_production');
+// Use requireEnvVariable for production but allow development fallback
+const JWT_SECRET = isDevelopment() 
+  ? getEnvString('VITE_JWT_SECRET', 'wcag_secure_jwt_secret_key_for_development_only')
+  : requireEnvVariable('VITE_JWT_SECRET', 'wcag_secure_jwt_secret_key_for_development_only');
+
+// Expiry settings
 const JWT_EXPIRY = getEnvNumber('VITE_JWT_EXPIRY', 60 * 60); // 1 hour in seconds
 const REFRESH_TOKEN_EXPIRY = getEnvNumber('VITE_REFRESH_TOKEN_EXPIRY', 7 * 24 * 60 * 60); // 7 days in seconds
+
+// Storage keys
 const AUTH_PERSISTENCE_KEY = 'auth_token';
 const REFRESH_PERSISTENCE_KEY = 'refresh_token';
 const USER_PERSISTENCE_KEY = 'auth_user';
@@ -29,6 +41,8 @@ interface TokenPayload {
   iss?: string;      // Issuer
   aud?: string;      // Audience
   jti?: string;      // JWT ID (for blacklisting)
+  type?: string;     // Token type (e.g., 'refresh')
+  [key: string]: any; // Index signature for compatibility with JWTPayload
 }
 
 // User data interface
@@ -40,35 +54,90 @@ export interface UserData {
   [key: string]: any;
 }
 
-// Rotated key manager for JWT signing and verification
+// Key interface for advanced rotation
+interface JwtKey {
+  id: string;     // Unique key identifier
+  key: CryptoKey; // Actual crypto key
+  createdAt: number; // Timestamp when key was created
+  isActive: boolean; // Whether this is the current active key
+}
+
+// Enhanced key manager for JWT signing and verification with proper rotation
 class JwtKeyManager {
-  private currentKey: CryptoKey | null = null;
-  private previousKey: CryptoKey | null = null;
-  private keyGeneratedAt: number = 0;
+  private keys: JwtKey[] = []; // Store multiple keys for rotation
   private readonly keyRotationInterval: number = 24 * 60 * 60 * 1000; // 24 hours in ms
+  private readonly maxKeys: number = 2; // Maximum number of keys to keep (current + previous)
+  private initializing: Promise<void> | null = null;
+  
+  constructor() {
+    // Initialize keys on first use
+    this.initializing = this.initialize();
+  }
+  
+  /**
+   * Initialize the key manager
+   */
+  private async initialize(): Promise<void> {
+    try {
+      // Generate initial key if none exist
+      if (this.keys.length === 0) {
+        const initialKey = await this.createNewKey();
+        this.keys.push(initialKey);
+      }
+      
+      // Ensure we have an active key
+      const hasActiveKey = this.keys.some(k => k.isActive);
+      if (!hasActiveKey && this.keys.length > 0) {
+        this.keys[0].isActive = true;
+      }
+    } catch (error) {
+      logError(error, { 
+        context: 'JwtKeyManager.initialize', 
+        data: { keysCount: this.keys.length }
+      });
+      throw error;
+    } finally {
+      this.initializing = null;
+    }
+  }
   
   /**
    * Get current signing key, generating if needed
    * @returns Current signing key
    */
   async getCurrentSigningKey(): Promise<CryptoKey> {
+    // Wait for initialization if it's in progress
+    if (this.initializing) {
+      await this.initializing;
+    }
+    
+    // Check if keys need rotation
     await this.rotateKeysIfNeeded();
-    return this.currentKey!;
+    
+    // Find active key
+    const activeKey = this.keys.find(k => k.isActive);
+    if (!activeKey) {
+      throw new Error('No active signing key available');
+    }
+    
+    return activeKey.key;
   }
   
   /**
-   * Get verification keys (current and previous)
+   * Get all verification keys
    * @returns Array of verification keys
    */
   async getVerificationKeys(): Promise<CryptoKey[]> {
-    await this.rotateKeysIfNeeded();
-    const keys: CryptoKey[] = [this.currentKey!];
-    
-    if (this.previousKey) {
-      keys.push(this.previousKey);
+    // Wait for initialization if it's in progress
+    if (this.initializing) {
+      await this.initializing;
     }
     
-    return keys;
+    // Check if keys need rotation
+    await this.rotateKeysIfNeeded();
+    
+    // Return all keys for verification
+    return this.keys.map(k => k.key);
   }
   
   /**
@@ -77,49 +146,88 @@ class JwtKeyManager {
   private async rotateKeysIfNeeded(): Promise<void> {
     const now = Date.now();
     
-    // Generate key if no current key or rotation interval has passed
+    // Find the active key
+    const activeKeyIndex = this.keys.findIndex(k => k.isActive);
+    
+    // If no active key or rotation interval has passed, generate a new key
     if (
-      !this.currentKey ||
-      now - this.keyGeneratedAt >= this.keyRotationInterval
+      activeKeyIndex === -1 || // No active key
+      this.keys.length === 0 || // No keys at all
+      now - this.keys[activeKeyIndex].createdAt >= this.keyRotationInterval // Time to rotate
     ) {
-      // Move current key to previous
-      if (this.currentKey) {
-        this.previousKey = this.currentKey;
-      }
-      
-      // Generate new current key
       try {
-        this.currentKey = await this.generateKey();
-        this.keyGeneratedAt = now;
-      } catch (error) {
-        logError(error, { context: 'JwtKeyManager.rotateKeysIfNeeded' });
+        // Create new key
+        const newKey = await this.createNewKey();
         
-        // If key generation fails, keep using old key
-        if (!this.currentKey && this.previousKey) {
-          this.currentKey = this.previousKey;
-          this.previousKey = null;
+        // Deactivate current active key
+        if (activeKeyIndex !== -1) {
+          this.keys[activeKeyIndex].isActive = false;
+        }
+        
+        // Add new key
+        this.keys.push(newKey);
+        
+        // Prune old keys if we have too many
+        if (this.keys.length > this.maxKeys) {
+          // Sort by creation time (newest first)
+          this.keys.sort((a, b) => b.createdAt - a.createdAt);
+          
+          // Keep only the newest maxKeys
+          this.keys = this.keys.slice(0, this.maxKeys);
+        }
+      } catch (error) {
+        logError(error, { 
+          context: 'JwtKeyManager.rotateKeysIfNeeded',
+          data: { 
+            keysCount: this.keys.length,
+            hasActiveKey: activeKeyIndex !== -1
+          }
+        });
+        
+        // If we failed to create a new key but have an existing one, keep using it
+        if (activeKeyIndex === -1 && this.keys.length > 0) {
+          // Activate the newest key
+          this.keys.sort((a, b) => b.createdAt - a.createdAt);
+          this.keys[0].isActive = true;
         }
       }
     }
   }
   
   /**
-   * Generate a new HMAC key for JWT signing
-   * @returns Generated crypto key
+   * Create a new JWT key
+   * @returns New JwtKey object
    */
-  private async generateKey(): Promise<CryptoKey> {
+  private async createNewKey(): Promise<JwtKey> {
     // Convert JWT secret to bytes
     const encoder = new TextEncoder();
     const secretBytes = encoder.encode(JWT_SECRET);
     
+    // Add some entropy to make each key unique even with same secret
+    const entropy = new Uint8Array(8);
+    crypto.getRandomValues(entropy);
+    
+    // Combine secret with entropy
+    const combinedSecret = new Uint8Array(secretBytes.length + entropy.length);
+    combinedSecret.set(secretBytes);
+    combinedSecret.set(entropy, secretBytes.length);
+    
     // Import as HMAC key
-    return crypto.subtle.importKey(
+    const cryptoKey = await crypto.subtle.importKey(
       'raw',
-      secretBytes,
+      combinedSecret,
       { name: 'HMAC', hash: 'SHA-256' },
       false, // Non-extractable
       ['sign', 'verify'] // Key usage
     );
+    
+    // Return as JwtKey object
+    return {
+      id: crypto.randomUUID(), // Unique ID for this key
+      key: cryptoKey,
+      createdAt: Date.now(),
+      isActive: true // New keys are active by default
+    };
   }
 }
 
@@ -163,12 +271,17 @@ export async function generateToken(
     return token;
   } catch (error) {
     logError(error, { context: 'auth.generateToken' });
-    throw createError(
-      ErrorType.INTERNAL,
-      'token_generation_failed',
+    // Create error with proper type and message
+    const authError = createError(
       'Failed to generate authentication token',
-      { originalError: error }
+      ErrorType.INTERNAL
     );
+    // Attach additional details
+    (authError as any).details = { 
+      code: 'token_generation_failed',
+      originalError: error 
+    };
+    throw authError;
   }
 }
 
@@ -204,12 +317,17 @@ export async function generateRefreshToken(
     return token;
   } catch (error) {
     logError(error, { context: 'auth.generateRefreshToken' });
-    throw createError(
-      ErrorType.INTERNAL,
-      'refresh_token_generation_failed',
+    // Create error with proper type and message
+    const authError = createError(
       'Failed to generate refresh token',
-      { originalError: error }
+      ErrorType.INTERNAL
     );
+    // Attach additional details
+    (authError as any).details = { 
+      code: 'refresh_token_generation_failed',
+      originalError: error 
+    };
+    throw authError;
   }
 }
 
@@ -242,21 +360,30 @@ export async function verifyToken(token: string): Promise<TokenPayload> {
   } catch (error) {
     // Check if token expired
     if (error instanceof Error && error.message.includes('expired')) {
-      throw createError(
-        ErrorType.AUTHENTICATION,
-        'token_expired',
+      // Create error with proper type and message
+      const authError = createError(
         'Authentication token has expired',
-        { originalError: error }
+        ErrorType.AUTHENTICATION
       );
+      // Attach additional details
+      (authError as any).details = { 
+        code: 'token_expired',
+        originalError: error 
+      };
+      throw authError;
     }
     
     // General verification error
-    throw createError(
-      ErrorType.AUTHENTICATION,
-      'token_invalid',
+    const authError = createError(
       'Invalid authentication token',
-      { originalError: error }
+      ErrorType.AUTHENTICATION
     );
+    // Attach additional details
+    (authError as any).details = { 
+      code: 'token_invalid',
+      originalError: error 
+    };
+    throw authError;
   }
 }
 
@@ -278,12 +405,17 @@ export async function verifyRefreshToken(token: string): Promise<string> {
     // Return user ID
     return payload.sub;
   } catch (error) {
-    throw createError(
-      ErrorType.AUTHENTICATION,
-      'refresh_token_invalid',
+    // Create error with proper type and message
+    const authError = createError(
       'Invalid refresh token',
-      { originalError: error }
+      ErrorType.AUTHENTICATION
     );
+    // Attach additional details
+    (authError as any).details = { 
+      code: 'refresh_token_invalid',
+      originalError: error 
+    };
+    throw authError;
   }
 }
 

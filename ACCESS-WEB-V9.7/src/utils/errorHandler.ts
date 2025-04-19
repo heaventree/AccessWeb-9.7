@@ -19,7 +19,8 @@ export enum ErrorType {
   TIMEOUT = 'timeout_error',
   SERVER = 'server_error',
   CLIENT = 'client_error',
-  CONFIGURATION = 'configuration_error' // Added for environment configuration errors
+  CONFIGURATION = 'configuration_error', // Added for environment configuration errors
+  INTERNAL = 'internal_error'            // Added for internal system errors
 }
 
 export enum ErrorSeverity {
