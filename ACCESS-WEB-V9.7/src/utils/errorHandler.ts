@@ -18,7 +18,8 @@ export enum ErrorType {
   NOT_FOUND = 'not_found_error',
   TIMEOUT = 'timeout_error',
   SERVER = 'server_error',
-  CLIENT = 'client_error'
+  CLIENT = 'client_error',
+  CONFIGURATION = 'configuration_error' // Added for environment configuration errors
 }
 
 export enum ErrorSeverity {

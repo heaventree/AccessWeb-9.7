@@ -6,6 +6,7 @@
  */
 
 import { logError } from './errorHandler';
+import { createError, ErrorType } from './errorHandler';
 
 // Cache for environment variables
 const envCache: Record<string, string> = {};
@@ -44,6 +45,47 @@ export function loadEnvVariables(): void {
  * @param defaultValue Default value if environment variable is not set
  * @returns Environment variable value or default
  */
+/**
+ * Require an environment variable - throws error in production if not set
+ * @param key Environment variable key
+ * @param devFallback Optional fallback value for development
+ * @returns Environment variable value 
+ * @throws Error if variable not set in production
+ */
+export function requireEnvVariable(key: string, devFallback?: string): string {
+  // Get the value
+  const value = getEnvString(key, '');
+  
+  // Check if we have a value
+  if (!value) {
+    if (isProduction()) {
+      // In production, this is a critical error
+      const errorMessage = `Required environment variable ${key} is not set`;
+      console.error(`[ERROR] ${errorMessage}`);
+      
+      // Create and throw a standard error
+      const error = new Error(errorMessage);
+      (error as any).type = ErrorType.CONFIGURATION;
+      (error as any).code = 'missing_env_variable';
+      
+      // Log the error using our error handler
+      logError(errorMessage, { 
+        context: 'requireEnvVariable', 
+        data: { key } 
+      });
+      
+      throw error;
+    } else if (devFallback) {
+      // In development, use fallback but log a warning
+      const message = `Environment variable ${key} not set, using development fallback. This would fail in production.`;
+      console.warn(message);
+      return devFallback;
+    }
+  }
+  
+  return value;
+}
+
 export function getEnvVariable(key: string, defaultValue: string = ''): string {
   return getEnvString(key, defaultValue);
 }
@@ -221,6 +263,7 @@ export default {
   getEnvBoolean,
   getEnvArray,
   getEnvJson,
+  requireEnvVariable,
   isDevelopment,
   isProduction,
   isTest,
