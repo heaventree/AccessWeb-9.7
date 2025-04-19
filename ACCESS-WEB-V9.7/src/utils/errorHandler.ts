@@ -21,6 +21,17 @@ export enum ErrorType {
   CLIENT = 'client_error'
 }
 
+export enum ErrorSeverity {
+  ERROR = 'error',
+  WARNING = 'warning',
+  INFO = 'info'
+}
+
+export interface StructuredError extends Error {
+  type: ErrorType;
+  details?: Record<string, any>;
+}
+
 // Create our own logging function if it's not available from external module
 const logError = (message: string, error: any, data?: any) => {
   console.error(`[ERROR] ${message}`, error, data || {});
@@ -54,6 +65,20 @@ export interface ErrorReport {
   severity: 'error' | 'warning' | 'info';
   errorId: string;
 }
+
+/**
+ * Create a structured error object with specific error type
+ */
+export const createError = (
+  message: string, 
+  errorType: ErrorType = ErrorType.UNEXPECTED, 
+  details?: Record<string, any>
+): Error => {
+  const error = new Error(message);
+  (error as any).type = errorType;
+  (error as any).details = details;
+  return error;
+};
 
 // Used for tracking and deduplicating errors
 const errorCache = new Map<string, { count: number, lastReported: number }>();
@@ -246,7 +271,41 @@ export const registerGlobalErrorHandlers = (): void => {
   });
 };
 
-// Export logError as a named export as well
+// Add the missing functions for imports in other files
+export const getUserFriendlyErrorMessage = (error: any): string => {
+  if (!error) return 'An unknown error occurred';
+  
+  if (error instanceof Error) {
+    return error.message;
+  }
+  
+  if (typeof error === 'string') {
+    return error;
+  }
+  
+  try {
+    return JSON.stringify(error);
+  } catch (e) {
+    return 'An error occurred';
+  }
+};
+
+export const formatErrorMessage = (error: any): string => {
+  return getUserFriendlyErrorMessage(error);
+};
+
+export const registerErrorHandler = (handler: (error: any) => void): number => {
+  // Implementation would register a custom handler
+  console.log('Custom error handler registered');
+  return Date.now(); // return a unique ID for this handler
+};
+
+export const unregisterErrorHandler = (handlerId: number): void => {
+  // Implementation would unregister a handler by ID
+  console.log('Custom error handler unregistered:', handlerId);
+};
+
+// Export logError as a named export
 export { logError };
 
 export default {
@@ -254,5 +313,6 @@ export default {
   handleApiError: handleApiErrorWithContext, // Use the renamed function
   handleUnexpectedException,
   registerGlobalErrorHandlers,
-  logError // Export the local logError function
+  logError, // Export the local logError function
+  createError // Export the createError function
 };
