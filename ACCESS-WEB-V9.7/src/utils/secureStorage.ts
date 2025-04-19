@@ -6,7 +6,7 @@
  */
 
 import { encrypt, decrypt, sha256Hash } from './crypto';
-import { handleError } from './errorHandler';
+import { handleError, logError } from './errorHandler';
 import { isDevelopment } from './environment';
 
 // Security configuration
@@ -55,6 +55,7 @@ export async function setupSecureStorage(): Promise<void> {
       console.info('Secure storage initialized');
     }
   } catch (error) {
+    // Use handleError with proper context
     handleError(error, { context: 'secureStorage.setupSecureStorage' });
   }
 }
@@ -96,17 +97,17 @@ export const secureLocalStorage = {
         const encryptedValue = encrypt(value, encryptionKey);
         localStorage.setItem(`${STORAGE_PREFIX}${key}`, encryptedValue);
       } catch (encryptError) {
-        logError(encryptError as Error, { context: 'secureLocalStorage.setItem.encrypt', key });
+        handleError(encryptError, { context: 'secureLocalStorage.setItem.encrypt', data: { key } });
         localStorage.setItem(key, value);
       }
     } catch (error) {
-      logError(error as Error, { context: 'secureLocalStorage.setItem', key });
+      handleError(error, { context: 'secureLocalStorage.setItem', data: { key } });
 
       // Fallback to regular storage in case of error
       try {
         localStorage.setItem(key, value);
       } catch (fallbackError) {
-        logError(fallbackError as Error, { context: 'secureLocalStorage.setItem.fallback', key });
+        handleError(fallbackError, { context: 'secureLocalStorage.setItem.fallback', data: { key } });
       }
     }
   },
@@ -138,17 +139,17 @@ export const secureLocalStorage = {
       try {
         return decrypt(encryptedValue, encryptionKey);
       } catch (decryptError) {
-        logError(decryptError, { context: 'secureLocalStorage.getItem.decrypt', key });
+        handleError(decryptError, { context: 'secureLocalStorage.getItem.decrypt', data: { key } });
         return localStorage.getItem(key);
       }
     } catch (error) {
-      logError(error, { context: 'secureLocalStorage.getItem', key });
+      handleError(error, { context: 'secureLocalStorage.getItem', data: { key } });
 
       // Fallback to regular storage in case of error
       try {
         return localStorage.getItem(key);
       } catch (fallbackError) {
-        logError(fallbackError, { context: 'secureLocalStorage.getItem.fallback', key });
+        handleError(fallbackError, { context: 'secureLocalStorage.getItem.fallback', data: { key } });
         return null;
       }
     }
@@ -166,7 +167,7 @@ export const secureLocalStorage = {
       // Also remove from regular storage as fallback
       localStorage.removeItem(key);
     } catch (error) {
-      logError(error, { context: 'secureLocalStorage.removeItem', key });
+      handleError(error, { context: 'secureLocalStorage.removeItem', data: { key } });
     }
   },
 
@@ -182,7 +183,7 @@ export const secureLocalStorage = {
         }
       });
     } catch (error) {
-      logError(error, { context: 'secureLocalStorage.clear' });
+      handleError(error, { context: 'secureLocalStorage.clear' });
     }
   },
 
@@ -195,7 +196,7 @@ export const secureLocalStorage = {
     try {
       return localStorage.getItem(`${STORAGE_PREFIX}${key}`) !== null || localStorage.getItem(key) !== null;
     } catch (error) {
-      logError(error, { context: 'secureLocalStorage.hasItem', key });
+      handleError(error, { context: 'secureLocalStorage.hasItem', data: { key } });
       return false;
     }
   }
@@ -226,17 +227,17 @@ export const secureSessionStorage = {
         const encryptedValue = encrypt(value, encryptionKey);
         sessionStorage.setItem(`${STORAGE_PREFIX}${key}`, encryptedValue);
       } catch (encryptError) {
-        logError(encryptError, { context: 'secureSessionStorage.setItem.encrypt', key });
+        handleError(encryptError, { context: 'secureSessionStorage.setItem.encrypt', data: { key } });
         sessionStorage.setItem(key, value);
       }
     } catch (error) {
-      logError(error, { context: 'secureSessionStorage.setItem', key });
+      handleError(error, { context: 'secureSessionStorage.setItem', data: { key } });
 
       // Fallback to regular storage in case of error
       try {
         sessionStorage.setItem(key, value);
       } catch (fallbackError) {
-        logError(fallbackError, { context: 'secureSessionStorage.setItem.fallback', key });
+        handleError(fallbackError, { context: 'secureSessionStorage.setItem.fallback', data: { key } });
       }
     }
   },
@@ -268,17 +269,17 @@ export const secureSessionStorage = {
       try {
         return decrypt(encryptedValue, encryptionKey);
       } catch (decryptError) {
-        logError(decryptError, { context: 'secureSessionStorage.getItem.decrypt', key });
+        handleError(decryptError, { context: 'secureSessionStorage.getItem.decrypt', data: { key } });
         return sessionStorage.getItem(key);
       }
     } catch (error) {
-      logError(error, { context: 'secureSessionStorage.getItem', key });
+      handleError(error, { context: 'secureSessionStorage.getItem', data: { key } });
 
       // Fallback to regular storage in case of error
       try {
         return sessionStorage.getItem(key);
       } catch (fallbackError) {
-        logError(fallbackError, { context: 'secureSessionStorage.getItem.fallback', key });
+        handleError(fallbackError, { context: 'secureSessionStorage.getItem.fallback', data: { key } });
         return null;
       }
     }
