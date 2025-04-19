@@ -130,7 +130,7 @@ export function buildCSPContent(): string {
       `connect-src 'self' https://api.accessibility-checker.org`,
       
       // Frame sources
-      `frame-src 'self'`,
+      `frame-src 'self' https://js.stripe.com`,
       
       // Media sources
       `media-src 'self'`,
