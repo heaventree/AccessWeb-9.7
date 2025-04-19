@@ -6,7 +6,7 @@ import { getWCAGInfo } from './wcagHelper';
 import { testPDFAccessibility } from './pdfAccessibilityTester';
 import { analyzeMediaAccessibility } from './mediaAccessibilityTester';
 import { testDocumentAccessibility, checkDocumentLinks } from './documentFormatTester';
-import { analyzeHtmlStructure, analyzeURL } from './htmlStructureAnalyzer';
+import { analyzeHtmlStructure } from './htmlStructureAnalyzer';
 import { analyzeResponsiveDesign } from './responsiveDesignAnalyzer';
 import Color from 'color';
 
@@ -54,6 +54,9 @@ function getAxeConfig(_region: string): RunOptions {
 }
 
 // Color contrast utilities
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// Note: These utilities are currently used in the commented-out checkColorContrast function
+// and are kept for future implementation of client-side contrast checking
 function getLuminance(r: number, g: number, b: number): number {
   const [rs, gs, bs] = [r, g, b].map(value => {
     value /= 255;
@@ -64,6 +67,7 @@ function getLuminance(r: number, g: number, b: number): number {
   return rs * 0.2126 + gs * 0.7152 + bs * 0.0722;
 }
 
+// Used in the commented-out checkColorContrast function below
 function getContrastRatio(color1: string, color2: string): number {
   // Convert hex/rgb colors to RGB values
   const getRGB = (color: string) => {
@@ -87,6 +91,7 @@ function getContrastRatio(color1: string, color2: string): number {
 }
 
 // Get effective background color considering opacity and parent elements
+// Used in the commented-out checkColorContrast function below
 function getEffectiveBackground(element: HTMLElement): string {
   let background = getComputedStyle(element).backgroundColor;
   let currentElement: HTMLElement | null = element;

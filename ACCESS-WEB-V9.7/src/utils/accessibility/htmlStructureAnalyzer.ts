@@ -7,7 +7,7 @@
  * more detailed structural analysis that impacts both accessibility and SEO.
  */
 
-import type { AccessibilityIssue } from '../types';
+import type { AccessibilityIssue } from '../../types';
 
 interface StructureAnalysisOptions {
   checkMultipleH1: boolean;

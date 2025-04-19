@@ -9,8 +9,7 @@ import { StructureAnalysisPanel } from '../components/StructureAnalysisPanel';
 import { ResponsiveAnalysisPanel } from '../components/ResponsiveAnalysisPanel';
 import { MediaAnalysisPanel } from '../components/MediaAnalysisPanel';
 import { testAccessibility } from '../utils/accessibility/accessibilityTester';
-import { analyzeResponsiveDesign } from '../utils/accessibility/responsiveDesignAnalyzer';
-import type { TestResult } from '../types';
+import type { TestResult, AccessibilityIssue } from '../types';
 import { exportToPDF } from '../utils/formats/pdfExport';
 import { 
   Download, 
@@ -68,26 +67,26 @@ export function WCAGCheckerPage() {
       setResults(testResults);
       
       // Check for document-specific issues
-      const hasPDFIssues = testResults.issues.some(issue => 
+      const hasPDFIssues = testResults.issues.some((issue: AccessibilityIssue) => 
         issue.documentType === 'pdf'
       );
       
-      const hasOfficeDocIssues = testResults.issues.some(issue => 
+      const hasOfficeDocIssues = testResults.issues.some((issue: AccessibilityIssue) => 
         issue.documentType === 'word' || issue.documentType === 'excel' || issue.documentType === 'powerpoint'
       );
       
       // Check for media-specific issues
-      const hasMediaIssues = testResults.issues.some(issue => 
+      const hasMediaIssues = testResults.issues.some((issue: AccessibilityIssue) => 
         issue.mediaType === 'audio' || issue.mediaType === 'video' || issue.mediaType === 'embedded'
       );
       
       // Check if there are color contrast issues
-      const hasContrastIssues = testResults.issues.some(issue => 
+      const hasContrastIssues = testResults.issues.some((issue: AccessibilityIssue) => 
         issue.id === 'color-contrast' || issue.wcagCriteria.includes('1.4.3')
       );
       
       // Check for HTML structure and URL design issues
-      const hasStructureIssues = testResults.issues.some(issue => 
+      const hasStructureIssues = testResults.issues.some((issue: AccessibilityIssue) => 
         issue.structureType || 
         issue.id.includes('heading') || 
         issue.id.includes('landmark') || 
@@ -133,14 +132,14 @@ export function WCAGCheckerPage() {
 
   const getContrastIssues = () => {
     if (!results) return [];
-    return results.issues.filter(issue => 
+    return results.issues.filter((issue: AccessibilityIssue) => 
       issue.id === 'color-contrast' || issue.wcagCriteria.includes('1.4.3')
     );
   };
 
   const getNonContrastIssues = () => {
     if (!results) return [];
-    return results.issues.filter(issue => 
+    return results.issues.filter((issue: AccessibilityIssue) => 
       issue.id !== 'color-contrast' && !issue.wcagCriteria.includes('1.4.3')
     );
   };
@@ -173,7 +172,7 @@ export function WCAGCheckerPage() {
   
   const getStructureIssues = () => {
     if (!results) return [];
-    return results.issues.filter(issue => 
+    return results.issues.filter((issue: AccessibilityIssue) => 
       issue.structureType || 
       issue.id.includes('heading') || 
       issue.id.includes('landmark') || 
@@ -188,7 +187,7 @@ export function WCAGCheckerPage() {
   
   const getResponsiveIssues = () => {
     if (!results) return [];
-    return results.issues.filter(issue => 
+    return results.issues.filter((issue: AccessibilityIssue) => 
       issue.structureType === 'responsive' || 
       issue.id.includes('responsive') ||
       issue.id.includes('viewport') ||
@@ -203,7 +202,7 @@ export function WCAGCheckerPage() {
   
   const getMediaIssues = () => {
     if (!results) return [];
-    return results.issues.filter(issue => 
+    return results.issues.filter((issue: AccessibilityIssue) => 
       issue.mediaType === 'audio' || 
       issue.mediaType === 'video' || 
       issue.mediaType === 'embedded' ||
