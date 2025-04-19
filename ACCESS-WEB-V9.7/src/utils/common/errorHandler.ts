@@ -20,7 +20,8 @@ export enum ErrorType {
   SERVER = 'server_error',
   CLIENT = 'client_error',
   CONFIGURATION = 'configuration_error', // Added for environment configuration errors
-  INTERNAL = 'internal_error'            // Added for internal system errors
+  INTERNAL = 'internal_error',           // Added for internal system errors
+  RATE_LIMIT = 'rate_limit_error'        // Added for rate limiting errors
 }
 
 export enum ErrorSeverity {
@@ -176,6 +177,9 @@ const createErrorReport = (
   };
 };
 
+// Store registered error handlers
+const errorHandlers = new Map<number, (error: ErrorReport) => void>();
+
 /**
  * Main error handler function
  * Use this as the primary way to handle and log errors
@@ -309,10 +313,7 @@ export const formatErrorMessage = (error: any): string => {
   return getUserFriendlyErrorMessage(error);
 };
 
-// Store registered error handlers
-const errorHandlers: Map<number, (error: any) => void> = new Map();
-
-export const registerErrorHandler = (handler: (error: any) => void): number => {
+export const registerErrorHandler = (handler: (error: ErrorReport) => void): number => {
   // Generate unique handler ID
   const handlerId = Date.now();
   

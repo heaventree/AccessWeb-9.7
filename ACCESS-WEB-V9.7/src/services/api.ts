@@ -6,9 +6,9 @@
  */
 
 import { apiClient } from '../utils/api/apiClient';
-import { ErrorType, createError, handleApiError } from '../utils/errorHandler';
-import { sanitizeObject } from '../utils/sanitization';
-import { API_BASE_URL, API_VERSION } from '../utils/environment';
+import { ErrorType, createError, handleApiError } from '../utils/common/errorHandler';
+import { sanitizeObject } from '../utils/common/sanitization';
+import { API_BASE_URL, API_VERSION } from '../utils/common/environment';
 import authApi from './authApi';
 import accessibilityApi from './accessibilityApi';
 

@@ -6,8 +6,8 @@
  */
 
 import { apiClient } from '../utils/api/apiClient';
-import { AccountLockoutManager } from '../utils/passwordPolicy';
-import { ErrorType, createError } from '../utils/errorHandler';
+import { AccountLockoutManager } from '../utils/security/passwordPolicy';
+import { ErrorType, createError } from '../utils/common/errorHandler';
 
 // Auth API endpoints
 const AUTH_ENDPOINTS = {
