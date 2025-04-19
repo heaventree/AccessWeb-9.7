@@ -5,7 +5,11 @@
  * for the application.
  */
 
-import { logError } from './logging'; 
+// Create our own logging function if it's not available from external module
+const logError = (message: string, error: any, data?: any) => {
+  console.error(`[ERROR] ${message}`, error, data || {});
+};
+
 import { isDevelopment } from './environment';
 
 // Types for error handling
@@ -34,12 +38,7 @@ const errorCache = new Map<string, { count: number, lastReported: number }>();
 const ERROR_REPORTING_THROTTLE = 60000; // 1 minute
 const MAX_ERROR_COUNT = 5; // Report same error max 5 times
 
-/**
- * Generate a unique ID for each error
- */
-const generateErrorId = (): string => {
-  return Math.random().toString(36).substring(2, 10);
-};
+// Note: Only keeping one instance of generateErrorId function
 
 /**
  * Normalize error to string message
@@ -179,7 +178,8 @@ export const handleUnexpectedException = (
 /**
  * Create a specialized error handler for API errors
  */
-export const handleApiError = (
+// Renamed to avoid duplicate declaration
+export const handleApiErrorWithContext = (
   error: Error | string,
   apiContext: { endpoint: string; method: string; requestData?: any },
   options: Omit<ErrorOptions, 'context'> = {}
@@ -226,7 +226,8 @@ export const registerGlobalErrorHandlers = (): void => {
 
 export default {
   handleError,
-  handleApiError,
+  handleApiError: handleApiErrorWithContext, // Use the renamed function
   handleUnexpectedException,
-  registerGlobalErrorHandlers
+  registerGlobalErrorHandlers,
+  logError // Export the local logError function
 };
