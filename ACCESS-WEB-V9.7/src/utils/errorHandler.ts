@@ -56,6 +56,7 @@ export interface ErrorOptions {
   timestamp?: number;
   userId?: string;
   sessionId?: string;
+  key?: string; // Added for compatibility with updated error handling
 }
 
 export interface ErrorReport {

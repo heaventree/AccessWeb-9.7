@@ -39,7 +39,7 @@ export interface ErrorFallbackProps {
   /**
    * Error stack trace
    */
-  errorStack?: string;
+  errorStack?: string | null;
   
   /**
    * Whether to show detailed error information

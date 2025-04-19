@@ -105,23 +105,35 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     });
 
     // Log error
-    logError(error, {
-      context: `ErrorBoundary${this.props.label ? ` (${this.props.label})` : ''}`,
-      data: {
-        componentStack: errorInfo.componentStack
-      },
-      severity: ErrorSeverity.ERROR
-    });
+    logError(
+      error.message || 'Error in ErrorBoundary',
+      error,
+      {
+        context: `ErrorBoundary${this.props.label ? ` (${this.props.label})` : ''}`,
+        data: {
+          componentStack: errorInfo.componentStack
+        },
+        severity: ErrorSeverity.ERROR
+      }
+    );
 
     // Call onError prop if provided
     if (this.props.onError) {
       try {
         this.props.onError(error, errorInfo);
       } catch (callbackError) {
-        logError(callbackError, {
-          context: 'ErrorBoundary.onError callback',
-          severity: ErrorSeverity.WARNING
-        });
+        const errorMessage = callbackError instanceof Error 
+          ? callbackError.message 
+          : 'Error in ErrorBoundary.onError callback';
+        
+        logError(
+          errorMessage,
+          callbackError,
+          {
+            context: 'ErrorBoundary.onError callback',
+            severity: ErrorSeverity.WARNING
+          }
+        );
       }
     }
   }
@@ -170,7 +182,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
           errorInfo={this.state.errorInfo}
           resetErrorBoundary={this.resetErrorState}
           errorMessage={errorMessage}
-          errorStack={errorStack}
+          errorStack={errorStack || undefined}
           showDetails={showDetails}
         />
       );
