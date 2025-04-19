@@ -48,10 +48,9 @@ export async function apiGet<T>(endpoint: string, params?: Record<string, any>):
     // Handle response
     if (!response.success) {
       throw createError(
-        ErrorType.API,
-        response.error?.code || 'api_error',
         response.error?.message || 'API request failed',
-        response.error?.details
+        ErrorType.API,
+        { code: response.error?.code || 'api_error', ...(response.error?.details || {}) }
       );
     }
     
@@ -59,7 +58,11 @@ export async function apiGet<T>(endpoint: string, params?: Record<string, any>):
     return response.data as T;
   } catch (error) {
     // Transform error to AppError
-    throw handleApiError(error, `Failed to get data from ${endpoint}`);
+    handleApiError(error, {
+      endpoint: endpoint,
+      method: 'GET'
+    });
+    throw error;
   }
 }
 
@@ -78,10 +81,9 @@ export async function apiPost<T>(endpoint: string, data?: Record<string, any>): 
     // Handle response
     if (!response.success) {
       throw createError(
-        ErrorType.API,
-        response.error?.code || 'api_error',
         response.error?.message || 'API request failed',
-        response.error?.details
+        ErrorType.API,
+        { code: response.error?.code || 'api_error', ...(response.error?.details || {}) }
       );
     }
     
@@ -89,7 +91,12 @@ export async function apiPost<T>(endpoint: string, data?: Record<string, any>): 
     return response.data as T;
   } catch (error) {
     // Transform error to AppError
-    throw handleApiError(error, `Failed to post data to ${endpoint}`);
+    handleApiError(error, {
+      endpoint: endpoint,
+      method: 'POST',
+      requestData: data
+    });
+    throw error;
   }
 }
 
@@ -108,10 +115,9 @@ export async function apiPut<T>(endpoint: string, data?: Record<string, any>): P
     // Handle response
     if (!response.success) {
       throw createError(
-        ErrorType.API,
-        response.error?.code || 'api_error',
         response.error?.message || 'API request failed',
-        response.error?.details
+        ErrorType.API,
+        { code: response.error?.code || 'api_error', ...(response.error?.details || {}) }
       );
     }
     
@@ -119,7 +125,12 @@ export async function apiPut<T>(endpoint: string, data?: Record<string, any>): P
     return response.data as T;
   } catch (error) {
     // Transform error to AppError
-    throw handleApiError(error, `Failed to update data at ${endpoint}`);
+    handleApiError(error, {
+      endpoint: endpoint,
+      method: 'PUT',
+      requestData: data
+    });
+    throw error;
   }
 }
 
@@ -136,10 +147,9 @@ export async function apiDelete<T>(endpoint: string): Promise<T> {
     // Handle response
     if (!response.success) {
       throw createError(
-        ErrorType.API,
-        response.error?.code || 'api_error',
         response.error?.message || 'API request failed',
-        response.error?.details
+        ErrorType.API,
+        { code: response.error?.code || 'api_error', ...(response.error?.details || {}) }
       );
     }
     
@@ -147,7 +157,11 @@ export async function apiDelete<T>(endpoint: string): Promise<T> {
     return response.data as T;
   } catch (error) {
     // Transform error to AppError
-    throw handleApiError(error, `Failed to delete resource at ${endpoint}`);
+    handleApiError(error, {
+      endpoint: endpoint,
+      method: 'DELETE'
+    });
+    throw error;
   }
 }
 

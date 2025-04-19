@@ -5,8 +5,8 @@
  * functionality to prevent brute force attacks.
  */
 
-import { secureLocalStorage } from '../common/secureStorage';
-import { getEnvNumber } from '../common/environment';
+import { secureLocalStorage } from '../../utils/common/secureStorage';
+import { getEnvNumber } from '../../utils/common/environment';
 
 // Config constants - get from environment or use secure defaults
 const MAX_FAILED_LOGIN_ATTEMPTS = getEnvNumber('VITE_MAX_FAILED_LOGIN_ATTEMPTS', 5);
