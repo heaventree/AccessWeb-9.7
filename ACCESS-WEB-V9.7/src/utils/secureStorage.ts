@@ -6,7 +6,7 @@
  */
 
 import { encrypt, decrypt, sha256Hash } from './crypto';
-import { logError } from './errorHandler';
+import { handleError } from './errorHandler';
 import { isDevelopment } from './environment';
 
 // Security configuration
@@ -55,7 +55,7 @@ export async function setupSecureStorage(): Promise<void> {
       console.info('Secure storage initialized');
     }
   } catch (error) {
-    logError(error as Error, { context: 'secureStorage.setupSecureStorage' });
+    handleError(error, { context: 'secureStorage.setupSecureStorage' });
   }
 }
 
