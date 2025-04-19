@@ -2,7 +2,7 @@
  * Authentication Utilities
  * 
  * This module exports functions and utilities for authentication,
- * user management, and other auth-related operations.
+ * authorization, and other auth-related operations.
  */
 
 // Re-export utilities from this domain
