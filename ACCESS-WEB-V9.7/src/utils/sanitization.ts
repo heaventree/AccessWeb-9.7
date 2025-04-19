@@ -151,10 +151,13 @@ export function sanitizeUrl(url: string): string {
       }
       
       // Sanitize URL components
-      return DOMPurify.sanitize(url, {
+      const result = DOMPurify.sanitize(url, {
         ALLOWED_TAGS: [],
         ALLOWED_ATTR: []
       });
+      
+      // Ensure we always return a string
+      return typeof result === 'string' ? result : String(result);
     } catch (error) {
       // Not a valid URL
       return '#';

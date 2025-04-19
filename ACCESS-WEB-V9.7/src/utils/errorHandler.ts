@@ -198,6 +198,16 @@ export const handleError = (
       errorReport
     );
 
+    // Notify all registered error handlers
+    errorHandlers.forEach((handler) => {
+      try {
+        handler(errorReport);
+      } catch (handlerError) {
+        // Prevent handler errors from breaking error handling
+        console.error('Error in custom error handler:', handlerError);
+      }
+    });
+
     // Send to monitoring service if notification enabled
     if (options.notify !== false) {
       // In development, just log
@@ -299,17 +309,28 @@ export const formatErrorMessage = (error: any): string => {
   return getUserFriendlyErrorMessage(error);
 };
 
+// Store registered error handlers
+const errorHandlers: Map<number, (error: any) => void> = new Map();
+
 export const registerErrorHandler = (handler: (error: any) => void): number => {
-  // Implementation would register a custom handler
+  // Generate unique handler ID
+  const handlerId = Date.now();
+  
+  // Store the handler in our Map
+  errorHandlers.set(handlerId, handler);
+  
   console.log('Custom error handler registered');
-  // Note: handler is stored in closure but not used in this implementation
-  // In a real implementation, we would add it to a list of handlers
-  return Date.now(); // return a unique ID for this handler
+  return handlerId; // return the ID for this handler for later unregistration
 };
 
 export const unregisterErrorHandler = (handlerId: number): void => {
-  // Implementation would unregister a handler by ID
-  console.log('Custom error handler unregistered:', handlerId);
+  // Remove the handler from our Map
+  if (errorHandlers.has(handlerId)) {
+    errorHandlers.delete(handlerId);
+    console.log('Custom error handler unregistered:', handlerId);
+  } else {
+    console.log('Custom error handler not found:', handlerId);
+  }
 };
 
 // Export the necessary functions
