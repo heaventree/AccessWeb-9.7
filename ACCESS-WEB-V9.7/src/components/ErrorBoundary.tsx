@@ -6,7 +6,10 @@
  */
 
 import { Component, ReactNode, ErrorInfo } from 'react';
-import { logError, ErrorSeverity, formatErrorMessage } from '../utils/errorHandler';
+import { 
+  handleError,
+  formatErrorMessage
+} from '../utils/errorHandler';
 import ErrorFallback from './ErrorFallback';
 import { isDevelopment } from '../utils/environment';
 
@@ -104,36 +107,28 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       errorInfo
     });
 
-    // Log error
-    logError(
-      error.message || 'Error in ErrorBoundary',
-      error,
-      {
-        context: `ErrorBoundary${this.props.label ? ` (${this.props.label})` : ''}`,
-        data: {
-          componentStack: errorInfo.componentStack
-        },
-        severity: ErrorSeverity.ERROR
-      }
-    );
+    // Log error using the improved error handler
+    handleError(error, {
+      context: `ErrorBoundary${this.props.label ? ` (${this.props.label})` : ''}`,
+      data: {
+        componentStack: errorInfo.componentStack
+      },
+      isFatal: true,
+      key: 'component_error',
+      notify: true
+    });
 
     // Call onError prop if provided
     if (this.props.onError) {
       try {
         this.props.onError(error, errorInfo);
       } catch (callbackError) {
-        const errorMessage = callbackError instanceof Error 
-          ? callbackError.message 
-          : 'Error in ErrorBoundary.onError callback';
-        
-        logError(
-          errorMessage,
-          callbackError,
-          {
-            context: 'ErrorBoundary.onError callback',
-            severity: ErrorSeverity.WARNING
-          }
-        );
+        // Log error in the error handler callback
+        handleError(callbackError, {
+          context: 'ErrorBoundary.onError callback',
+          key: 'error_boundary_callback',
+          isFatal: false
+        });
       }
     }
   }
