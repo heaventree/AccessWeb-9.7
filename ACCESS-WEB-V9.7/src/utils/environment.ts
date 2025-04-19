@@ -5,8 +5,7 @@
  * and configuration.
  */
 
-import { logError } from './errorHandler';
-import { createError, ErrorType } from './errorHandler';
+import { handleError, ErrorType } from './errorHandler';
 
 // Cache for environment variables
 const envCache: Record<string, string> = {};
@@ -35,7 +34,7 @@ export function loadEnvVariables(): void {
       });
     }
   } catch (error) {
-    logError(error, { context: 'loadEnvVariables' });
+    handleError(error, { context: 'loadEnvVariables' });
   }
 }
 
@@ -69,9 +68,9 @@ export function requireEnvVariable(key: string, devFallback?: string): string {
       (error as any).code = 'missing_env_variable';
       
       // Log the error using our error handler
-      logError(errorMessage, { 
+      handleError(errorMessage, { 
         context: 'requireEnvVariable', 
-        data: { key } 
+        key
       });
       
       throw error;
@@ -128,7 +127,7 @@ export function getEnvString(key: string, defaultValue: string = ''): string {
     // Return default value if not found
     return defaultValue;
   } catch (error) {
-    logError(error, { context: 'getEnvString', data: { key } });
+    handleError(error, { context: 'getEnvString', key });
     return defaultValue;
   }
 }
@@ -147,7 +146,7 @@ export function getEnvNumber(key: string, defaultValue: number = 0): number {
     // Return default if not a valid number
     return isNaN(numberValue) ? defaultValue : numberValue;
   } catch (error) {
-    logError(error, { context: 'getEnvNumber', data: { key } });
+    handleError(error, { context: 'getEnvNumber', key });
     return defaultValue;
   }
 }
@@ -165,7 +164,7 @@ export function getEnvBoolean(key: string, defaultValue: boolean = false): boole
     // Check for truthy values
     return ['true', 'yes', '1'].includes(stringValue.toLowerCase());
   } catch (error) {
-    logError(error, { context: 'getEnvBoolean', data: { key } });
+    handleError(error, { context: 'getEnvBoolean', key });
     return defaultValue;
   }
 }
@@ -188,7 +187,7 @@ export function getEnvArray(key: string, defaultValue: string[] = []): string[] 
     // Split by comma and trim each value
     return stringValue.split(',').map(item => item.trim());
   } catch (error) {
-    logError(error, { context: 'getEnvArray', data: { key } });
+    handleError(error, { context: 'getEnvArray', key });
     return defaultValue;
   }
 }
