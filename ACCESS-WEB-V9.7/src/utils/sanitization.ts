@@ -6,7 +6,7 @@
  */
 
 import DOMPurify from 'dompurify';
-import { logError } from './errorHandler';
+import { handleError } from './errorHandler';
 
 /**
  * Default DOMPurify configuration
@@ -78,7 +78,7 @@ export function configureSanitizerDefaults(): void {
       }
     });
   } catch (error) {
-    logError(error, { context: 'configureSanitizerDefaults' });
+    handleError(error, { context: 'configureSanitizerDefaults' });
   }
 }
 
@@ -97,7 +97,7 @@ export function sanitizeHtml(html: string, config?: DOMPurify.Config): string {
     
     return DOMPurify.sanitize(html, mergedConfig);
   } catch (error) {
-    logError(error, { context: 'sanitizeHtml' });
+    handleError(error, { context: 'sanitizeHtml' });
     return '';
   }
 }
@@ -120,7 +120,7 @@ export function sanitizeText(text: string): string {
     
     return DOMPurify.sanitize(text, config);
   } catch (error) {
-    logError(error, { context: 'sanitizeText' });
+    handleError(error, { context: 'sanitizeText' });
     return '';
   }
 }
@@ -157,7 +157,7 @@ export function sanitizeUrl(url: string): string {
       return '#';
     }
   } catch (error) {
-    logError(error, { context: 'sanitizeUrl' });
+    handleError(error, { context: 'sanitizeUrl' });
     return '#';
   }
 }
@@ -205,7 +205,7 @@ export function sanitizeStyles(styles: string): string {
     
     return sanitizedProperties.join('; ');
   } catch (error) {
-    logError(error, { context: 'sanitizeStyles' });
+    handleError(error, { context: 'sanitizeStyles' });
     return '';
   }
 }
@@ -226,7 +226,7 @@ export function sanitizeFilename(filename: string): string {
     
     return sanitized || 'file';
   } catch (error) {
-    logError(error, { context: 'sanitizeFilename' });
+    handleError(error, { context: 'sanitizeFilename' });
     return 'file';
   }
 }
@@ -274,7 +274,7 @@ export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
 
     return result;
   } catch (error) {
-    logError(error, { context: 'sanitizeObject' });
+    handleError(error, { context: 'sanitizeObject' });
     return obj;
   }
 }

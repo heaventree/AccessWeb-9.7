@@ -6,7 +6,7 @@
  */
 
 import { encrypt, decrypt, sha256Hash } from './crypto';
-import { handleError, logError } from './errorHandler';
+import { handleError } from './errorHandler';
 import { isDevelopment } from './environment';
 
 // Security configuration

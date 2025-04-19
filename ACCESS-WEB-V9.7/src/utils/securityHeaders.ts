@@ -5,7 +5,7 @@
  * by restricting how browsers interact with the application.
  */
 
-import { logError } from './errorHandler';
+import { handleError } from './errorHandler';
 import { isDevelopment } from './environment';
 import contentSecurity from './contentSecurity';
 
@@ -80,7 +80,7 @@ export function createSecurityHeaderMetaTags(): void {
     // Add nonce meta tag
     addMetaTag('csp-nonce', contentSecurity.getNonce());
   } catch (error) {
-    logError(error, { context: 'securityHeaders.createSecurityHeaderMetaTags' });
+    handleError(error, { context: 'securityHeaders.createSecurityHeaderMetaTags' });
   }
 }
 
@@ -127,7 +127,7 @@ export function initSecurityHeaders(): void {
       console.info('Security headers initialized');
     }
   } catch (error) {
-    logError(error, { context: 'securityHeaders.initSecurityHeaders' });
+    handleError(error, { context: 'securityHeaders.initSecurityHeaders' });
   }
 }
 

@@ -6,7 +6,7 @@
  */
 
 import { getEnvNumber } from './environment';
-import { ErrorType, createError, logError } from './errorHandler';
+import { ErrorType, createError, handleError } from './errorHandler';
 import { secureLocalStorage } from './secureStorage';
 
 // Constants
@@ -106,7 +106,7 @@ export function isRateLimited(
     // Not rate limited
     return false;
   } catch (error) {
-    logError(error, { context: 'isRateLimited' });
+    handleError(error, { context: 'isRateLimited' });
     return false; // Don't block if there's an error
   }
 }
@@ -165,7 +165,7 @@ export function incrementRateLimitCounter(
     // Return whether the action is now rate limited
     return data.blocked;
   } catch (error) {
-    logError(error, { context: 'incrementRateLimitCounter' });
+    handleError(error, { context: 'incrementRateLimitCounter' });
     return false; // Don't block if there's an error
   }
 }
@@ -182,7 +182,7 @@ export function resetRateLimit(key: string): void {
     // Remove rate limit data
     secureLocalStorage.removeItem(storageKey);
   } catch (error) {
-    logError(error, { context: 'resetRateLimit' });
+    handleError(error, { context: 'resetRateLimit' });
   }
 }
 
@@ -217,7 +217,7 @@ export function getRateLimitRemainingTime(key: string): number {
     // Return 0 if already expired
     return Math.max(0, remainingTime);
   } catch (error) {
-    logError(error, { context: 'getRateLimitRemainingTime' });
+    handleError(error, { context: 'getRateLimitRemainingTime' });
     return 0;
   }
 }
@@ -259,7 +259,7 @@ export function getRateLimitRemainingAttempts(
     // Calculate remaining attempts
     return Math.max(0, maxAttempts - data.attempts);
   } catch (error) {
-    logError(error, { context: 'getRateLimitRemainingAttempts' });
+    handleError(error, { context: 'getRateLimitRemainingAttempts' });
     return maxAttempts; // Return max attempts if there's an error
   }
 }
