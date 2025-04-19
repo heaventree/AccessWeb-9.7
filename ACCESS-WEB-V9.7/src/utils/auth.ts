@@ -178,8 +178,10 @@ class JwtKeyManager {
       } catch (error) {
         handleError(error, { 
           context: 'JwtKeyManager.rotateKeysIfNeeded',
-          keysCount: this.keys.length,
-          hasActiveKey: activeKeyIndex !== -1
+          data: {
+            keysCount: this.keys.length,
+            hasActiveKey: activeKeyIndex !== -1
+          }
         });
         
         // If we failed to create a new key but have an existing one, keep using it
