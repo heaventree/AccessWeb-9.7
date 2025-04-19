@@ -6,7 +6,7 @@
  */
 
 import { FC } from 'react';
-import { ErrorBoundary, ErrorBoundaryProps } from './ErrorBoundary';
+import { ErrorBoundary, ErrorBoundaryProps } from './errorBoundaries/ErrorBoundary';
 
 interface FeatureErrorBoundaryProps extends Omit<ErrorBoundaryProps, 'label'> {
   /**
@@ -50,7 +50,8 @@ const FeatureErrorBoundary: FC<FeatureErrorBoundaryProps> = ({
           Retry
         </button>
       )}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .feature-error-minimal {
           padding: 12px;
           border-radius: 6px;
@@ -73,7 +74,8 @@ const FeatureErrorBoundary: FC<FeatureErrorBoundaryProps> = ({
         .feature-error-retry-button:hover {
           background-color: #d0d0d0;
         }
-      `}</style>
+        `
+      }} />
     </div>
   ) : undefined;
   
