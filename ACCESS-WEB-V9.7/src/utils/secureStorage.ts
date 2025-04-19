@@ -139,17 +139,17 @@ export const secureLocalStorage = {
       try {
         return decrypt(encryptedValue, encryptionKey);
       } catch (decryptError) {
-        handleError(decryptError, { context: 'secureLocalStorage.getItem.decrypt', data: { key } });
+        handleError(decryptError, { context: 'secureLocalStorage.getItem.decrypt', key });
         return localStorage.getItem(key);
       }
     } catch (error) {
-      handleError(error, { context: 'secureLocalStorage.getItem', data: { key } });
+      handleError(error, { context: 'secureLocalStorage.getItem', key });
 
       // Fallback to regular storage in case of error
       try {
         return localStorage.getItem(key);
       } catch (fallbackError) {
-        handleError(fallbackError, { context: 'secureLocalStorage.getItem.fallback', data: { key } });
+        handleError(fallbackError, { context: 'secureLocalStorage.getItem.fallback', key });
         return null;
       }
     }
@@ -167,7 +167,7 @@ export const secureLocalStorage = {
       // Also remove from regular storage as fallback
       localStorage.removeItem(key);
     } catch (error) {
-      handleError(error, { context: 'secureLocalStorage.removeItem', data: { key } });
+      handleError(error, { context: 'secureLocalStorage.removeItem', key });
     }
   },
 
@@ -227,17 +227,17 @@ export const secureSessionStorage = {
         const encryptedValue = encrypt(value, encryptionKey);
         sessionStorage.setItem(`${STORAGE_PREFIX}${key}`, encryptedValue);
       } catch (encryptError) {
-        handleError(encryptError, { context: 'secureSessionStorage.setItem.encrypt', data: { key } });
+        handleError(encryptError, { context: 'secureSessionStorage.setItem.encrypt', key });
         sessionStorage.setItem(key, value);
       }
     } catch (error) {
-      handleError(error, { context: 'secureSessionStorage.setItem', data: { key } });
+      handleError(error, { context: 'secureSessionStorage.setItem', key });
 
       // Fallback to regular storage in case of error
       try {
         sessionStorage.setItem(key, value);
       } catch (fallbackError) {
-        handleError(fallbackError, { context: 'secureSessionStorage.setItem.fallback', data: { key } });
+        handleError(fallbackError, { context: 'secureSessionStorage.setItem.fallback', key });
       }
     }
   },
@@ -269,17 +269,17 @@ export const secureSessionStorage = {
       try {
         return decrypt(encryptedValue, encryptionKey);
       } catch (decryptError) {
-        handleError(decryptError, { context: 'secureSessionStorage.getItem.decrypt', data: { key } });
+        handleError(decryptError, { context: 'secureSessionStorage.getItem.decrypt', key });
         return sessionStorage.getItem(key);
       }
     } catch (error) {
-      handleError(error, { context: 'secureSessionStorage.getItem', data: { key } });
+      handleError(error, { context: 'secureSessionStorage.getItem', key });
 
       // Fallback to regular storage in case of error
       try {
         return sessionStorage.getItem(key);
       } catch (fallbackError) {
-        handleError(fallbackError, { context: 'secureSessionStorage.getItem.fallback', data: { key } });
+        handleError(fallbackError, { context: 'secureSessionStorage.getItem.fallback', key });
         return null;
       }
     }
@@ -297,7 +297,7 @@ export const secureSessionStorage = {
       // Also remove from regular storage as fallback
       sessionStorage.removeItem(key);
     } catch (error) {
-      handleError(error, { context: 'secureSessionStorage.removeItem', data: { key } });
+      handleError(error, { context: 'secureSessionStorage.removeItem', key });
     }
   },
 
@@ -326,7 +326,7 @@ export const secureSessionStorage = {
     try {
       return sessionStorage.getItem(`${STORAGE_PREFIX}${key}`) !== null || sessionStorage.getItem(key) !== null;
     } catch (error) {
-      handleError(error, { context: 'secureSessionStorage.hasItem', data: { key } });
+      handleError(error, { context: 'secureSessionStorage.hasItem', key });
       return false;
     }
   }
