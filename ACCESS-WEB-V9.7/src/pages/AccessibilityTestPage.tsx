@@ -186,6 +186,12 @@ function AccessibilityTestPage(): JSX.Element {
       <Helmet>
         <title>WCAG Accessibility Audit - Run Test</title>
         <meta name="description" content="Run accessibility tests on your website" />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="WCAG Accessibility Audit - Run Test" />
+        <meta property="og:description" content="Run accessibility tests on your website" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="WCAG Accessibility Audit - Run Test" />
       </Helmet>
       
       <div className="min-h-screen bg-gray-50">

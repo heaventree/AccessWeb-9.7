@@ -45,9 +45,12 @@ export const queryClient = new QueryClient({
  * Top-level provider that wraps the entire application
  */
 export function AppProvider({ children }: AppProviderProps): JSX.Element {
+  // Create HelmetProvider context with proper initialization for React 18
+  const helmetContext = {};
+
   return (
     <ErrorBoundary>
-      <HelmetProvider>
+      <HelmetProvider context={helmetContext}>
         <QueryClientProvider client={queryClient}>
           <SecurityProvider>
             <BrowserRouter>
