@@ -69,7 +69,7 @@ export interface ErrorReport {
 /**
  * Create a structured error object with specific error type
  */
-export const createError = (
+const createErrorInternal = (
   message: string, 
   errorType: ErrorType = ErrorType.UNEXPECTED, 
   details?: Record<string, any>
@@ -79,6 +79,8 @@ export const createError = (
   (error as any).details = details;
   return error;
 };
+
+export const createError = createErrorInternal;
 
 // Used for tracking and deduplicating errors
 const errorCache = new Map<string, { count: number, lastReported: number }>();
@@ -305,8 +307,9 @@ export const unregisterErrorHandler = (handlerId: number): void => {
   console.log('Custom error handler unregistered:', handlerId);
 };
 
-// Export logError as a named export
+// Export the necessary functions
 export { logError };
+export const handleApiError = handleApiErrorWithContext;
 
 export default {
   handleError,
