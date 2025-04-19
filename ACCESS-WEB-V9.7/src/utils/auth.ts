@@ -93,7 +93,7 @@ class JwtKeyManager {
     } catch (error) {
       handleError(error, { 
         context: 'JwtKeyManager.initialize', 
-        keysCount: this.keys.length 
+        data: { keysCount: this.keys.length }
       });
       throw error;
     } finally {
@@ -477,7 +477,7 @@ export function getStoredAuth(): {
     // Return authenticated data
     return { token, refreshToken, user };
   } catch (error) {
-    logError(error, { context: 'auth.getStoredAuth' });
+    handleError(error, { context: 'auth.getStoredAuth' });
     return null;
   }
 }
@@ -496,7 +496,7 @@ export function clearAuth(): void {
     secureLocalStorage.removeItem(REFRESH_PERSISTENCE_KEY);
     secureLocalStorage.removeItem(USER_PERSISTENCE_KEY);
   } catch (error) {
-    logError(error, { context: 'auth.clearAuth' });
+    handleError(error, { context: 'auth.clearAuth' });
     // Don't throw here to ensure logout completes even with errors
   }
 }
@@ -535,7 +535,7 @@ export async function needsTokenRefresh(token: string): Promise<boolean> {
     return !decoded.exp || decoded.exp < now + expiryBuffer;
   } catch (error) {
     // If decoding fails, assume token needs refresh
-    logError(error, { context: 'auth.needsTokenRefresh' });
+    handleError(error, { context: 'auth.needsTokenRefresh' });
     return true;
   }
 }
