@@ -5,12 +5,34 @@
  * for the application.
  */
 
+import { isDevelopment } from './environment';
+
+// Define ErrorType enum for categorizing errors
+export enum ErrorType {
+  API = 'api_error',
+  AUTHENTICATION = 'auth_error',
+  NETWORK = 'network_error',
+  VALIDATION = 'validation_error',
+  UNEXPECTED = 'unexpected_error',
+  PERMISSION = 'permission_error',
+  NOT_FOUND = 'not_found_error',
+  TIMEOUT = 'timeout_error',
+  SERVER = 'server_error',
+  CLIENT = 'client_error'
+}
+
 // Create our own logging function if it's not available from external module
 const logError = (message: string, error: any, data?: any) => {
   console.error(`[ERROR] ${message}`, error, data || {});
 };
 
-import { isDevelopment } from './environment';
+/**
+ * Generate a unique error ID for tracking errors
+ */
+const generateErrorId = (): string => {
+  return Math.random().toString(36).substring(2, 15) + 
+         Math.random().toString(36).substring(2, 15);
+};
 
 // Types for error handling
 export interface ErrorOptions {
