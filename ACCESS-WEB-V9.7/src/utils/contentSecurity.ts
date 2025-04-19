@@ -6,7 +6,7 @@
  */
 
 import { getEnvString } from './environment';
-import { logError } from './errorHandler';
+import { handleError } from './errorHandler';
 
 // CSP nonce for inline scripts
 let nonce = generateNonce();
@@ -25,7 +25,7 @@ export function initCSP(): void {
     // Set up event handlers to detect CSP violations
     setupCSPViolationReporting();
   } catch (error) {
-    logError(error, { context: 'initCSP' });
+    handleError(error, { context: 'initCSP' });
   }
 }
 
@@ -45,7 +45,7 @@ export function generateNonce(): string {
       .replace(/\//g, '_')
       .replace(/=/g, '');
   } catch (error) {
-    logError(error, { context: 'generateNonce' });
+    handleError(error, { context: 'generateNonce' });
     
     // Fallback to simpler method
     return `nonce-${Math.random().toString(36).substring(2, 15)}${Date.now().toString(36)}`;
@@ -63,7 +63,7 @@ export function updateCSPNonce(): void {
     // Update CSP meta tag with new nonce
     applyCSPMetaTag();
   } catch (error) {
-    logError(error, { context: 'updateCSPNonce' });
+    handleError(error, { context: 'updateCSPNonce' });
   }
 }
 
@@ -95,7 +95,7 @@ function applyCSPMetaTag(): void {
     // Add to head
     document.head.appendChild(metaTag);
   } catch (error) {
-    logError(error, { context: 'applyCSPMetaTag' });
+    handleError(error, { context: 'applyCSPMetaTag' });
   }
 }
 
@@ -159,7 +159,7 @@ export function buildCSPContent(): string {
     
     return cspString;
   } catch (error) {
-    logError(error, { context: 'buildCSPContent' });
+    handleError(error, { context: 'buildCSPContent' });
     
     // Fallback to basic CSP
     return `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'unsafe-inline';`;
@@ -174,7 +174,7 @@ function setupCSPViolationReporting(): void {
     // Listen for CSP violation reports
     document.addEventListener('securitypolicyviolation', (e) => {
       // Log CSP violations
-      logError(new Error(`CSP Violation: ${e.violatedDirective}`), {
+      handleError(new Error(`CSP Violation: ${e.violatedDirective}`), {
         context: 'CSP Violation',
         data: {
           blockedURI: e.blockedURI,
@@ -190,7 +190,7 @@ function setupCSPViolationReporting(): void {
       });
     });
   } catch (error) {
-    logError(error, { context: 'setupCSPViolationReporting' });
+    handleError(error, { context: 'setupCSPViolationReporting' });
   }
 }
 
@@ -220,7 +220,7 @@ export function validateCSP(): boolean {
     
     return true;
   } catch (error) {
-    logError(error, { context: 'validateCSP' });
+    handleError(error, { context: 'validateCSP' });
     return false;
   }
 }
@@ -233,7 +233,7 @@ export function addNonceToScript(script: HTMLScriptElement): void {
   try {
     script.nonce = nonce;
   } catch (error) {
-    logError(error, { context: 'addNonceToScript' });
+    handleError(error, { context: 'addNonceToScript' });
   }
 }
 

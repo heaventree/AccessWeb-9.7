@@ -6,7 +6,7 @@
  */
 
 import { getEnvString } from './environment';
-import { logError } from './errorHandler';
+import { handleError } from './errorHandler';
 import { secureLocalStorage } from './secureStorage';
 
 // CSRF token storage key
@@ -31,7 +31,7 @@ export function initCsrfProtection(): void {
     // Set up CSRF token for AJAX requests
     setupCsrfForAjax();
   } catch (error) {
-    logError(error, { context: 'initCsrfProtection' });
+    handleError(error, { context: 'initCsrfProtection' });
   }
 }
 
@@ -54,7 +54,7 @@ export function generateCsrfToken(): string {
     
     return token;
   } catch (error) {
-    logError(error, { context: 'generateCsrfToken' });
+    handleError(error, { context: 'generateCsrfToken' });
     
     // Fallback to simpler method if Web Crypto API fails
     return Math.random().toString(36).substring(2, 15) + 
@@ -72,7 +72,7 @@ export function getCsrfToken(): string | null {
     // Try to get from storage
     return secureLocalStorage.getItem(CSRF_TOKEN_KEY);
   } catch (error) {
-    logError(error, { context: 'getCsrfToken' });
+    handleError(error, { context: 'getCsrfToken' });
     return null;
   }
 }
@@ -89,7 +89,7 @@ function storeCsrfToken(token: string): void {
     // Also store in a cookie for form submissions
     document.cookie = `${CSRF_COOKIE_NAME}=${token}; path=/; SameSite=Strict; Secure`;
   } catch (error) {
-    logError(error, { context: 'storeCsrfToken' });
+    handleError(error, { context: 'storeCsrfToken' });
   }
 }
 
@@ -137,7 +137,7 @@ function setupCsrfForAjax(): void {
       };
     }
   } catch (error) {
-    logError(error, { context: 'setupCsrfForAjax' });
+    handleError(error, { context: 'setupCsrfForAjax' });
   }
 }
 
@@ -153,7 +153,7 @@ export function validateCsrfToken(token: string): boolean {
     // Check if token exists and matches stored token
     return !!storedToken && token === storedToken;
   } catch (error) {
-    logError(error, { context: 'validateCsrfToken' });
+    handleError(error, { context: 'validateCsrfToken' });
     return false;
   }
 }
@@ -166,7 +166,7 @@ export function refreshCsrfToken(): void {
     const newToken = generateCsrfToken();
     storeCsrfToken(newToken);
   } catch (error) {
-    logError(error, { context: 'refreshCsrfToken' });
+    handleError(error, { context: 'refreshCsrfToken' });
   }
 }
 
@@ -184,7 +184,7 @@ export function createCsrfInputField(): string {
     
     return `<input type="hidden" name="_csrf" value="${token}" />`;
   } catch (error) {
-    logError(error, { context: 'createCsrfInputField' });
+    handleError(error, { context: 'createCsrfInputField' });
     return '';
   }
 }
@@ -210,7 +210,7 @@ export function addCsrfToUrl(url: string): string {
     
     return urlObj.toString();
   } catch (error) {
-    logError(error, { context: 'addCsrfToUrl' });
+    handleError(error, { context: 'addCsrfToUrl' });
     return url;
   }
 }
@@ -227,7 +227,7 @@ export function appendCsrfHeader(headers: Headers): void {
       headers.set(CSRF_HEADER_NAME, token);
     }
   } catch (error) {
-    logError(error, { context: 'appendCsrfHeader' });
+    handleError(error, { context: 'appendCsrfHeader' });
   }
 }
 
