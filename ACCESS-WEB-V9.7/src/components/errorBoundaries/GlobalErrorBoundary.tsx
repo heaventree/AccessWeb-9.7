@@ -38,7 +38,7 @@ const GlobalErrorBoundary: FC<GlobalErrorBoundaryProps> = ({
   const handleGlobalError = (error: Error, componentStack: string) => {
     // Log the error with our centralized error handler
     handleError(error, {
-      context: `GlobalErrorBoundary: ${label}`,
+      context: `GlobalErrorBoundary: ${label || 'unnamed'}`,
       data: {
         componentStack,
         url: window.location.href,
@@ -60,7 +60,7 @@ const GlobalErrorBoundary: FC<GlobalErrorBoundaryProps> = ({
     <ErrorBoundary
       {...props}
       label={label}
-      onError={(error, errorInfo) => handleGlobalError(error, errorInfo.componentStack)}
+      onError={(error, errorInfo) => handleGlobalError(error, errorInfo.componentStack || '')}
     >
       {children}
     </ErrorBoundary>

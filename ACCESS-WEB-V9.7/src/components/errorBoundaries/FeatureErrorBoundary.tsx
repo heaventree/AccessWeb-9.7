@@ -5,7 +5,7 @@
  * or functional components to prevent errors from affecting other parts of the UI.
  */
 
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { ErrorBoundary, ErrorBoundaryProps } from './ErrorBoundary';
 
 interface FeatureErrorBoundaryProps extends Omit<ErrorBoundaryProps, 'label'> {
@@ -35,13 +35,14 @@ const FeatureErrorBoundary: FC<FeatureErrorBoundaryProps> = ({
   featureName,
   minimal = false,
   fallbackMessage,
-  fallback,
   ...props
 }) => {
-  // If minimal is true and no custom fallback is provided, use a minimal fallback
-  const minimalFallback = minimal && !fallback ? (
-    <div className="feature-error-minimal" role="alert">
-      <p>{fallbackMessage || `${featureName} is currently unavailable.`}</p>
+  // Create minimal fallback UI if requested
+  const minimalFallback: ReactNode = minimal ? (
+    <div className="feature-error-minimal">
+      <p>
+        {fallbackMessage || `The ${featureName} feature is temporarily unavailable.`}
+      </p>
       {props.onError && (
         <button 
           onClick={() => window.location.reload()}
@@ -50,7 +51,8 @@ const FeatureErrorBoundary: FC<FeatureErrorBoundaryProps> = ({
           Retry
         </button>
       )}
-      <style jsx>{`
+      <style>
+        {`
         .feature-error-minimal {
           padding: 12px;
           border-radius: 6px;
@@ -73,7 +75,8 @@ const FeatureErrorBoundary: FC<FeatureErrorBoundaryProps> = ({
         .feature-error-retry-button:hover {
           background-color: #d0d0d0;
         }
-      `}</style>
+        `}
+      </style>
     </div>
   ) : undefined;
   
@@ -81,7 +84,7 @@ const FeatureErrorBoundary: FC<FeatureErrorBoundaryProps> = ({
     <ErrorBoundary
       {...props}
       label={`Feature: ${featureName}`}
-      fallback={minimalFallback || fallback}
+      fallback={minimalFallback || props.fallback}
     >
       {children}
     </ErrorBoundary>

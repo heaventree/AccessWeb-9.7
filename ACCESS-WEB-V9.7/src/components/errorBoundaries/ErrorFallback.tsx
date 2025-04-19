@@ -6,8 +6,8 @@
  */
 
 import { FC, ErrorInfo } from 'react';
-import { getUserFriendlyErrorMessage } from '../utils/errorHandler';
-import { isDevelopment } from '../utils/environment';
+import { getUserFriendlyErrorMessage } from '../../utils/errorHandler';
+import { isDevelopment } from '../../utils/environment';
 
 // Props for ErrorFallback component
 export interface ErrorFallbackProps {
