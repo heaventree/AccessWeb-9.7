@@ -60,6 +60,11 @@ export async function setupSecureStorage(): Promise<void> {
 }
 
 /**
+ * Alias for setupSecureStorage to maintain compatibility with imports
+ */
+export const initSecureStorage = setupSecureStorage;
+
+/**
  * Check if secure storage is initialized
  */
 export function isSecureStorageInitialized(): boolean {
@@ -330,5 +335,6 @@ export default {
   secureLocalStorage,
   secureSessionStorage,
   setupSecureStorage,
-  isSecureStorageInitialized
+  isSecureStorageInitialized,
+  initSecureStorage
 };
