@@ -16,7 +16,7 @@ import {
 import toast from 'react-hot-toast';
 import type { AccessibilityIssue, WCAGInfo } from '../types';
 import { Modal } from './Modal';
-import { getWCAGInfo } from '../utils/wcagHelper';
+import { getWCAGInfo } from '../utils/accessibility/wcagHelper';
 import { AIRecommendations } from './AIRecommendations'; 
 import { EmptyState } from './EmptyState';
 import { fixEngine } from '../lib/accessibility-fixes';

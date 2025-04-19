@@ -1,4 +1,4 @@
-import { accessibilityImplementation, accessibilityCompliancePercentage } from '../../utils/accessibility-compliance';
+import { accessibilityImplementation, accessibilityCompliancePercentage } from '../../utils/accessibility/accessibility-compliance';
 import { Card } from './Card';
 
 interface AccessibilityStatusProps {

@@ -1,6 +1,6 @@
 import { OpenAI } from 'openai';
 import type { AccessibilityIssue } from '../types';
-import { getWCAGInfo } from './wcagHelper';
+import { getWCAGInfo } from './accessibility/wcagHelper';
 
 const API_KEY_ERROR = 'OpenAI API key not configured or invalid';
 const RATE_LIMIT_ERROR = 'Too many requests. Please try again later.';

@@ -1,6 +1,6 @@
 import axe, { Result, RunOptions } from 'axe-core';
 import { parse } from 'node-html-parser';
-import type { TestResult, AccessibilityIssue } from '../types';
+import type { TestResult, AccessibilityIssue } from '../../types';
 import { addLegislationRefs } from './legislationMapper';
 import { getWCAGInfo } from './wcagHelper';
 import { testPDFAccessibility } from './pdfAccessibilityTester';

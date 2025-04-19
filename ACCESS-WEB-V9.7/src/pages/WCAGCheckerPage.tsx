@@ -8,10 +8,10 @@ import { EmbedBadge } from '../components/EmbedBadge';
 import { StructureAnalysisPanel } from '../components/StructureAnalysisPanel';
 import { ResponsiveAnalysisPanel } from '../components/ResponsiveAnalysisPanel';
 import { MediaAnalysisPanel } from '../components/MediaAnalysisPanel';
-import { testAccessibility } from '../utils/accessibilityTester';
-import { analyzeResponsiveDesign } from '../utils/responsiveDesignAnalyzer';
+import { testAccessibility } from '../utils/accessibility/accessibilityTester';
+import { analyzeResponsiveDesign } from '../utils/accessibility/responsiveDesignAnalyzer';
 import type { TestResult } from '../types';
-import { exportToPDF } from '../utils/pdfExport';
+import { exportToPDF } from '../utils/formats/pdfExport';
 import { 
   Download, 
   AlertTriangle, 
