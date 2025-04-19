@@ -224,6 +224,9 @@ export const registerGlobalErrorHandlers = (): void => {
   });
 };
 
+// Export logError as a named export as well
+export { logError };
+
 export default {
   handleError,
   handleApiError: handleApiErrorWithContext, // Use the renamed function
