@@ -1,0 +1,38 @@
+Transform failed with 3 errors:
+/home/runner/workspace/ACCESS-WEB-V9.7/src/utils/errorHandler.ts:457:6: ERROR: The symbol "generateErrorId" has already been declared
+/home/runner/workspace/ACCESS-WEB-V9.7/src/utils/errorHandler.ts:539:13: ERROR: Multiple exports with the same name "handleApiError"
+/home/runner/workspace/ACCESS-WEB-V9.7/src/utils/errorHandler.ts:539:13: ERROR: The symbol "handleApiError" has already been declared
+/home/runner/workspace/ACCESS-WEB-V9.7/src/utils/errorHandler.ts:457:6
+The symbol "generateErrorId" has already been declared
+455|  
+456|  // Generate a unique ID for each error
+457|  const generateErrorId = (): string => {
+   |        ^
+458|    return Math.random().toString(36).substring(2, 10);
+459|  };
+
+Multiple exports with the same name "handleApiError"
+537|   * Create a specialized error handler for API errors
+538|   */
+539|  export const handleApiError = (
+   |               ^
+540|    error: Error | string,
+541|    apiContext: { endpoint: string; method: string; requestData?: any },
+
+The symbol "handleApiError" has already been declared
+537|   * Create a specialized error handler for API errors
+538|   */
+539|  export const handleApiError = (
+   |               ^
+540|    error: Error | string,
+541|    apiContext: { endpoint: string; method: string; requestData?: any },
+    at failureErrorWithLog (/home/runner/workspace/node_modules/esbuild/lib/main.js:1651:15)
+    at /home/runner/workspace/node_modules/esbuild/lib/main.js:849:29
+    at responseCallbacks.<computed> (/home/runner/workspace/node_modules/esbuild/lib/main.js:704:9)
+    at handleIncomingPacket (/home/runner/workspace/node_modules/esbuild/lib/main.js:764:9)
+    at Socket.readFromStdout (/home/runner/workspace/node_modules/esbuild/lib/main.js:680:7)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:191:23
