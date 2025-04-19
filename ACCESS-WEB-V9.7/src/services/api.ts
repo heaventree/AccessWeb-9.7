@@ -5,7 +5,7 @@
  * error handling, and standardized response processing.
  */
 
-import { apiClient } from '../utils/apiClient';
+import { apiClient } from '../utils/api/apiClient';
 import { ErrorType, createError, handleApiError } from '../utils/errorHandler';
 import { sanitizeObject } from '../utils/sanitization';
 import { API_BASE_URL, API_VERSION } from '../utils/environment';

@@ -5,11 +5,11 @@
  * error handling, retry logic, and security features.
  */
 
-import { appendCsrfHeader } from './csrfProtection';
-import { ErrorType, createError } from './errorHandler';
-import { applySecurityHeadersToRequest } from './securityHeaders';
-import { checkRateLimit } from './rateLimiting';
-import { API_TIMEOUT } from './environment';
+import { appendCsrfHeader } from '../security/csrfProtection';
+import { ErrorType, createError } from '../common/errorHandler';
+import { applySecurityHeadersToRequest } from '../security/securityHeaders';
+import { checkRateLimit } from '../security/rateLimiting';
+import { API_TIMEOUT } from '../common/environment';
 
 /**
  * Base configuration for API requests

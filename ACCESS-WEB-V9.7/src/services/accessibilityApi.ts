@@ -5,7 +5,7 @@
  * with secure error handling and data validation.
  */
 
-import { apiClient } from '../utils/apiClient';
+import { apiClient } from '../utils/api/apiClient';
 import { sanitizeObject, sanitizeUrl } from '../utils/sanitization';
 
 // Base endpoints

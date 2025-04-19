@@ -5,8 +5,8 @@
  * by restricting how browsers interact with the application.
  */
 
-import { handleError } from './errorHandler';
-import { isDevelopment } from './environment';
+import { handleError } from '../common/errorHandler';
+import { isDevelopment } from '../common/environment';
 import contentSecurity from './contentSecurity';
 
 // Security headers configuration

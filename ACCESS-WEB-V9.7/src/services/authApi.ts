@@ -5,7 +5,7 @@
  * specialized handling for auth-related operations.
  */
 
-import { apiClient } from '../utils/apiClient';
+import { apiClient } from '../utils/api/apiClient';
 import { AccountLockoutManager } from '../utils/passwordPolicy';
 import { ErrorType, createError } from '../utils/errorHandler';
 

@@ -5,8 +5,8 @@
  * to protect against XSS and other code injection attacks.
  */
 
-import { getEnvString } from './environment';
-import { handleError } from './errorHandler';
+import { getEnvString } from '../common/environment';
+import { handleError } from '../common/errorHandler';
 
 // CSP nonce for inline scripts
 let nonce = generateNonce();

@@ -2,9 +2,9 @@
  * Custom API Client for AccessWeb API
  */
 
-import ApiClient, { RequestOptions } from '../../utils/apiClient';
+import ApiClient, { RequestOptions } from '../../utils/api/apiClient';
 import { CustomAPISettings, CustomAPIResponse, ScanResult } from '../../types/integrations';
-import { ValidationError } from '../../utils/apiErrors';
+import { ValidationError } from '../../utils/api/apiErrors';
 
 export default class CustomApiClient extends ApiClient {
   private apiKey: string;

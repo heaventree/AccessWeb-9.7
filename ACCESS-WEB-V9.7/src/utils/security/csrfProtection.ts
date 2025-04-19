@@ -5,9 +5,9 @@
  * to prevent unauthorized requests.
  */
 
-import { getEnvString } from './environment';
-import { handleError } from './errorHandler';
-import { secureLocalStorage } from './secureStorage';
+import { getEnvString } from '../common/environment';
+import { handleError } from '../common/errorHandler';
+import { secureLocalStorage } from '../storage/secureStorage';
 
 // CSRF token storage key
 const CSRF_TOKEN_KEY = 'csrf_token';

@@ -5,9 +5,9 @@
  * to prevent abuse and brute force attacks.
  */
 
-import { getEnvNumber } from './environment';
-import { ErrorType, createError, handleError } from './errorHandler';
-import { secureLocalStorage } from './secureStorage';
+import { getEnvNumber } from '../common/environment';
+import { ErrorType, createError, handleError } from '../common/errorHandler';
+import { secureLocalStorage } from '../storage/secureStorage';
 
 // Constants
 const RATE_LIMIT_PREFIX = 'rate_limit_';

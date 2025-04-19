@@ -2,9 +2,9 @@
  * Shopify API Client
  */
 
-import ApiClient, { RequestOptions } from '../../utils/apiClient';
+import ApiClient, { RequestOptions } from '../../utils/api/apiClient';
 import { ShopifySettings, ShopifyAppResponse, ScanResult } from '../../types/integrations';
-import { ValidationError } from '../../utils/apiErrors';
+import { ValidationError } from '../../utils/api/apiErrors';
 
 export default class ShopifyApiClient extends ApiClient {
   private accessToken: string;

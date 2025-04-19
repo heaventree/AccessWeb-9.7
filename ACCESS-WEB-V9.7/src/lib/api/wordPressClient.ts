@@ -2,9 +2,9 @@
  * WordPress API Client
  */
 
-import ApiClient, { RequestOptions } from '../../utils/apiClient';
+import ApiClient, { RequestOptions } from '../../utils/api/apiClient';
 import { WordPressSettings, WordPressPluginResponse, ScanResult } from '../../types/integrations';
-import { ValidationError } from '../../utils/apiErrors';
+import { ValidationError } from '../../utils/api/apiErrors';
 
 export default class WordPressApiClient extends ApiClient {
   private apiKey: string;
