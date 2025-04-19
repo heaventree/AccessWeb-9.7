@@ -68,6 +68,7 @@ function getLuminance(r: number, g: number, b: number): number {
 }
 
 // Used in the commented-out checkColorContrast function below
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 function getContrastRatio(color1: string, color2: string): number {
   // Convert hex/rgb colors to RGB values
   const getRGB = (color: string) => {
@@ -92,6 +93,7 @@ function getContrastRatio(color1: string, color2: string): number {
 
 // Get effective background color considering opacity and parent elements
 // Used in the commented-out checkColorContrast function below
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 function getEffectiveBackground(element: HTMLElement): string {
   let background = getComputedStyle(element).backgroundColor;
   let currentElement: HTMLElement | null = element;
