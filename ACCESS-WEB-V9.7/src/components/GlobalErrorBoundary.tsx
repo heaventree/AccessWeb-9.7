@@ -6,8 +6,8 @@
  */
 
 import { FC } from 'react';
-import { ErrorBoundary, ErrorBoundaryProps } from './ErrorBoundary';
-import { handleError } from '../utils/errorHandler';
+import { ErrorBoundary, ErrorBoundaryProps } from './errorBoundaries/ErrorBoundary';
+import { handleError } from '../utils/common/errorHandler';
 
 interface GlobalErrorBoundaryProps extends Omit<ErrorBoundaryProps, 'onError' | 'label'> {
   /**
@@ -35,12 +35,12 @@ const GlobalErrorBoundary: FC<GlobalErrorBoundaryProps> = ({
   /**
    * Handle errors by reporting to analytics and logging
    */
-  const handleGlobalError = (error: Error, componentStack: string) => {
+  const handleGlobalError = (error: Error, componentStack: string | null | undefined) => {
     // Log the error with our centralized error handler
     handleError(error, {
       context: `GlobalErrorBoundary: ${label}`,
       data: {
-        componentStack,
+        componentStack: componentStack || 'No component stack available',
         url: window.location.href,
         userAgent: navigator.userAgent
       },

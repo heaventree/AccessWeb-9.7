@@ -9,9 +9,9 @@ import { Component, ReactNode, ErrorInfo } from 'react';
 import { 
   handleError,
   formatErrorMessage
-} from '../../utils/errorHandler';
+} from '../../utils/common/errorHandler';
 import ErrorFallback from './ErrorFallback';
-import { isDevelopment } from '../../utils/environment';
+import { isDevelopment } from '../../utils/common/environment';
 
 // Standard error types for consistent handling
 export type ErrorType = 'network' | 'auth' | 'validation' | 'unknown';

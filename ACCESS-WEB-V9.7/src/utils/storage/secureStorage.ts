@@ -5,9 +5,9 @@
  * automatic key derivation and security best practices.
  */
 
-import { encrypt, decrypt, sha256Hash } from '../security/crypto';
-import { handleError } from '../common/errorHandler';
-import { isDevelopment } from '../common/environment';
+import { encrypt, decrypt, sha256Hash } from './crypto';
+import { handleError } from './errorHandler';
+import { isDevelopment } from './environment';
 
 // Security configuration
 const STORAGE_PREFIX = 'wcag_sec_';
