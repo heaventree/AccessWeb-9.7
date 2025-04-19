@@ -33,10 +33,11 @@ This document outlines the plan for unifying multiple repositories into a single
    - Apply consistent folder structure
    - Update imports and references
 
-2. ⬜ Organize utilities following standardization template
-   - Group by domain (accessibility, api, auth, common, etc.)
-   - Apply consistent structure
-   - Update imports and references
+2. 🔄 Organize utilities following standardization template (40% complete)
+   - ✅ Created domain-specific directories (accessibility, api, auth, security, storage, common, formats, etc.)
+   - ✅ Moved utility files to appropriate subdirectories
+   - ✅ Updated import paths in components referencing these utilities
+   - ⬜ Complete remaining utility reorganization
 
 3. ⬜ Standardize configuration files
    - Ensure consistent formatting and options
