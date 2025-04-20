@@ -11,7 +11,7 @@ import {
   Shuffle, 
   Palette, 
   Lock, 
-  Unlock 
+  Unlock
 } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
@@ -621,6 +621,12 @@ export function WCAGColorPalette() {
   const [colorHarmony, setColorHarmony] = useState<ColorHarmony>('all');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const paletteRef = useRef<HTMLDivElement>(null);
+  
+  // Function to clear/reset the generator
+  const clearGenerator = () => {
+    setGeneratedPalette([]);
+    setBaseColor('#1a365d');
+  };
 
   // Initialize palette when component mounts
   useEffect(() => {
@@ -931,20 +937,29 @@ export function WCAGColorPalette() {
                   onChange={handleBaseColorChange}
                   className="h-12 w-20 rounded border border-gray-300"
                 />
-                <input
-                  type="text"
-                  value={baseColor}
-                  onChange={(e) => {
-                    const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
-                    if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
-                      setBaseColor(newColor);
-                      const newPalette = generateAccessiblePalette(newColor, colorHarmony);
-                      setGeneratedPalette(newPalette);
-                    }
-                  }}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="#000000"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={baseColor}
+                    onChange={(e) => {
+                      const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
+                      if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
+                        setBaseColor(newColor);
+                        const newPalette = generateAccessiblePalette(newColor, colorHarmony);
+                        setGeneratedPalette(newPalette);
+                      }
+                    }}
+                    className="px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="#000000"
+                  />
+                  <button
+                    onClick={clearGenerator}
+                    className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 hover:text-gray-700"
+                    aria-label="Clear color palette"
+                  >
+                    <span className="h-4 w-4 flex items-center justify-center font-bold">×</span>
+                  </button>
+                </div>
               </div>
             </div>
             
