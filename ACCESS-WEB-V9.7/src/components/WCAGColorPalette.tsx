@@ -1334,34 +1334,38 @@ export function WCAGColorPalette() {
                 
                 <button
                   onClick={() => {
+                    console.log("Checking lock status before shuffle:");
+                    generatedPalette.forEach((color, idx) => {
+                      console.log(`Color ${idx}: ${color.background} - locked: ${color.isLocked} - base: ${color.isBaseColor}`);
+                    });
+                    
                     setIsGenerating(true);
-                    setTimeout(() => {
-                      // Generate a completely new palette, but keep the same base color
-                      const newPalette = generateAccessiblePalette(baseColor, colorHarmony);
-                      
-                      // Now process the new palette:
-                      // 1. Keep any locked colors from the current palette
-                      // 2. Replace all unlocked colors with the new ones
-                      const result = newPalette.map((newColor, index) => {
-                        const currentColor = generatedPalette[index];
-                        
-                        // For the main color (index 0), always keep it and make sure it's locked
-                        if (index === 0) {
-                          return { ...currentColor, isLocked: true };
-                        }
-                        
-                        // For other colors, keep them if they're locked, otherwise use the new color
-                        if (currentColor && currentColor.isLocked) {
-                          return currentColor; // Keep locked colors
-                        } else {
-                          return newColor; // Use new colors for unlocked positions
-                        }
-                      });
-                      
-                      // Set the result as our new palette
-                      setGeneratedPalette(result);
-                      setIsGenerating(false);
-                    }, 500);
+                    
+                    // Create a fresh palette with the same base color
+                    const freshColors = generateAccessiblePalette(baseColor, colorHarmony);
+                    console.log("Generated fresh palette:", freshColors);
+                    
+                    // Create a COPY of our current palette to work with
+                    const result = [...generatedPalette];
+                    
+                    // Apply changes ONLY to unlocked colors
+                    for (let i = 1; i < result.length; i++) { // Start at 1 to skip main color
+                      // Only replace colors that aren't locked
+                      if (!result[i].isLocked) {
+                        result[i] = freshColors[i];
+                      }
+                    }
+                    
+                    // Log the final result for debugging
+                    console.log("After shuffle, updated palette:", result);
+                    console.log("Lock status after processing:");
+                    result.forEach((color, idx) => {
+                      console.log(`Color ${idx}: ${color.background} - locked: ${color.isLocked}`);
+                    });
+                    
+                    // Set the result as our new palette
+                    setGeneratedPalette(result);
+                    setIsGenerating(false);
                   }}
                   disabled={isGenerating}
                   aria-label="Shuffle colors"
