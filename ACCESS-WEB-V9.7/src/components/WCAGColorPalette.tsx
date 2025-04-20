@@ -961,31 +961,6 @@ export function WCAGColorPalette() {
           </div>
         </div>
 
-        {/* Top controls for generated palette */}
-        {generatedPalette.length > 0 && (
-          <div className="flex justify-end mb-3">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={toggleDarkMode}
-                aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
-              >
-                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
-              
-              <button
-                onClick={shufflePalette}
-                disabled={isGenerating}
-                aria-label="Shuffle colors"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                <Shuffle className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
-                Shuffle
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Generated Palette */}
         {generatedPalette.length > 0 && (
           <div className="border-2 border-dashed border-secondary-100 rounded-lg p-6 mb-8 bg-white shadow-md relative">
@@ -993,23 +968,47 @@ export function WCAGColorPalette() {
               <span className="text-xs font-medium text-secondary-600 uppercase tracking-wider">Generated Palette</span>
             </div>
             
-            <div className="flex justify-end gap-4 mb-6">
-              <button
-                onClick={exportToText}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <FileText className="w-5 h-5 mr-2" />
-                Export as Text
-                <span className={proPillStyle}>PRO</span>
-              </button>
-              <button
-                onClick={exportToPDF}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <FileDown className="w-5 h-5 mr-2" />
-                Export as PDF
-                <span className={proPillStyle}>PRO</span>
-              </button>
+            <div className="flex justify-between items-center gap-4 mb-6">
+              {/* Left side - Control buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={toggleDarkMode}
+                  aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
+                >
+                  {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </button>
+                
+                <button
+                  onClick={shufflePalette}
+                  disabled={isGenerating}
+                  aria-label="Shuffle colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  <Shuffle className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                  Shuffle
+                </button>
+              </div>
+              
+              {/* Right side - Export buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={exportToText}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  <FileText className="w-5 h-5 mr-2" />
+                  Export as Text
+                  <span className={proPillStyle}>PRO</span>
+                </button>
+                <button
+                  onClick={exportToPDF}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  <FileDown className="w-5 h-5 mr-2" />
+                  Export as PDF
+                  <span className={proPillStyle}>PRO</span>
+                </button>
+              </div>
             </div>
             <div ref={paletteRef}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
