@@ -961,26 +961,28 @@ export function WCAGColorPalette() {
           </div>
         </div>
 
-        {/* Controls that appear when palette is generated */}
+        {/* Top controls for generated palette */}
         {generatedPalette.length > 0 && (
-          <div className="flex items-center justify-end gap-2 mb-4">
-            <button
-              onClick={toggleDarkMode}
-              aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
-            >
-              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-            
-            <button
-              onClick={shufflePalette}
-              disabled={isGenerating}
-              aria-label="Shuffle colors"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <Shuffle className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
-              Shuffle
-            </button>
+          <div className="flex justify-end mb-3">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleDarkMode}
+                aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
+              >
+                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+              
+              <button
+                onClick={shufflePalette}
+                disabled={isGenerating}
+                aria-label="Shuffle colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <Shuffle className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                Shuffle
+              </button>
+            </div>
           </div>
         )}
 
@@ -990,6 +992,7 @@ export function WCAGColorPalette() {
             <div className="absolute -top-3 left-4 bg-white px-2">
               <span className="text-xs font-medium text-secondary-600 uppercase tracking-wider">Generated Palette</span>
             </div>
+            
             <div className="flex justify-end gap-4 mb-6">
               <button
                 onClick={exportToText}
