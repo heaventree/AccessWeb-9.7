@@ -1259,15 +1259,12 @@ export function WCAGColorPalette() {
                       style={{ backgroundColor: combo.background }}
                       className="h-full rounded-lg overflow-hidden"
                     >
-                      {/* Color name at the top */}
-                      <div className="p-4">
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center">
-                            <h3 className="font-medium text-base" style={{ color: combo.text }}>
-                              {/* Use the color name function instead of the old name */}
-                              {findClosestNamedColor(combo.background)}
-                            </h3>
-                            
+                      {/* Layout exactly matching the reference image */}
+                      <div className="p-4 flex flex-col h-full">
+                        {/* Top section with name and lock button on same line */}
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="font-medium text-base" style={{ color: combo.text }}>
+                            {findClosestNamedColor(combo.background)}
                             {combo.isBaseColor && 
                               <span 
                                 className="ml-2 text-xs font-bold px-2 py-0.5 rounded" 
@@ -1282,52 +1279,48 @@ export function WCAGColorPalette() {
                                 MAIN
                               </span>
                             }
-                          </div>
+                          </h3>
                           
-                          <button
-                            onClick={() => toggleLock(index)}
-                            className={`p-2 rounded-full ${combo.isLocked ? 'bg-white bg-opacity-30' : 'opacity-70 hover:opacity-100 hover:bg-white hover:bg-opacity-10'}`}
-                            style={{ color: combo.text }}
-                            aria-label={combo.isLocked ? "Unlock this color" : "Lock this color"}
-                          >
-                            {combo.isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
-                          </button>
-                        </div>
-                      </div>
-                      
-                      {/* Hex Value */}
-                      <div className="p-4 mt-auto">
-                        <div className="flex justify-between items-center">
-                          <span className="text-lg font-bold" style={{ color: combo.text }}>{combo.background.toUpperCase()}</span>
-                          <button
-                            onClick={() => copyToClipboard(combo.background)}
-                            className="p-2 rounded-full hover:bg-white hover:bg-opacity-10"
-                            style={{ color: combo.text }}
-                            aria-label="Copy color hex code"
-                          >
-                            {copiedColor === combo.background ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                          </button>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => copyToClipboard(combo.background)}
+                              className="p-2 rounded-full hover:bg-white hover:bg-opacity-10"
+                              style={{ color: combo.text }}
+                              aria-label="Copy color hex code"
+                            >
+                              {copiedColor === combo.background ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                            </button>
+                            <button
+                              onClick={() => toggleLock(index)}
+                              className={`p-2 rounded-full ${combo.isLocked ? 'bg-white bg-opacity-20' : 'opacity-70 hover:opacity-100'}`}
+                              style={{ color: combo.text }}
+                              aria-label={combo.isLocked ? "Unlock this color" : "Lock this color"}
+                            >
+                              {combo.isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                            </button>
+                          </div>
                         </div>
                         
-                        {/* Color Shade Slider (visual only in this version) */}
-                        <div className="mt-6 mb-2">
+                        {/* Hex code display */}
+                        <div className="mb-4">
+                          <span className="text-lg font-bold" style={{ color: combo.text }}>{combo.background.toUpperCase()}</span>
+                        </div>
+                        
+                        {/* Color Shade Slider */}
+                        <div className="my-5">
                           <div className="w-full h-2 bg-gradient-to-r from-white via-black to-black rounded-full relative opacity-50">
                             <div className="absolute w-4 h-4 border rounded-full -mt-1 -ml-2" 
                               style={{left: '30%', color: combo.text, borderColor: combo.text}}></div>
                           </div>
                         </div>
                         
-                        {/* WCAG Contrast Ratio Display */}
-                        <div className="flex items-center justify-between mt-4">
+                        {/* Bottom section with WCAG tag and ratio */}
+                        <div className="flex items-center justify-between mt-auto">
                           <span
-                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+                            className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium"
                             style={{ 
-                              backgroundColor: combo.wcagLevel === 'AAA' ? 'rgba(34, 197, 94, 0.2)' : 
-                                            combo.wcagLevel === 'AA' ? 'rgba(234, 179, 8, 0.2)' : 
-                                            'rgba(239, 68, 68, 0.2)',
-                              color: combo.wcagLevel === 'AAA' ? '#15803d' : 
-                                     combo.wcagLevel === 'AA' ? '#a16207' : 
-                                     '#b91c1c'
+                              backgroundColor: combo.wcagLevel === 'AAA' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                              color: combo.wcagLevel === 'AAA' ? 'rgb(4, 120, 87)' : 'rgb(180, 83, 9)'
                             }}
                           >
                             {combo.wcagLevel}
