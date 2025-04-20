@@ -854,7 +854,19 @@ export function WCAGColorPalette() {
   useEffect(() => {
     if (generatedPalette.length === 0) {
       const initialPalette = generateAccessiblePalette(baseColor, colorHarmony);
-      setGeneratedPalette(initialPalette);
+      
+      // Make sure the base color (index 0) is locked by default
+      const updatedInitialPalette = initialPalette.map((combo, index) => {
+        if (index === 0) {
+          return {
+            ...combo,
+            isLocked: true // Main color is locked by default
+          };
+        }
+        return combo;
+      });
+      
+      setGeneratedPalette(updatedInitialPalette);
     }
   }, []);
 
@@ -870,7 +882,19 @@ export function WCAGColorPalette() {
       const newBaseColor = generateRandomColor();
       setBaseColor(newBaseColor);
       const newPalette = generateAccessiblePalette(newBaseColor, colorHarmony);
-      setGeneratedPalette(newPalette);
+      
+      // Ensure the main color is locked in the new palette
+      const updatedPalette = newPalette.map((combo, index) => {
+        if (index === 0) {
+          return {
+            ...combo,
+            isLocked: true // Main color is always locked
+          };
+        }
+        return combo;
+      });
+      
+      setGeneratedPalette(updatedPalette);
       setIsGenerating(false);
     }, 500);
   };
@@ -882,18 +906,28 @@ export function WCAGColorPalette() {
       // Generate a new palette with the same base color
       const newPalette = generateAccessiblePalette(baseColor, colorHarmony);
       
-      // Preserve locked colors from the previous palette
+      // Preserve the main color (first item) and any other locked colors
       const updatedPalette = newPalette.map((combo, index) => {
-        // Keep locked colors from the previous palette
         const previousCombo = generatedPalette[index];
+        
+        // Always keep the main color (index 0)
+        if (index === 0) {
+          return {
+            ...previousCombo,
+            isLocked: true // Ensure main color is always locked
+          };
+        }
+        
+        // Keep any other manually locked colors
         if (previousCombo && previousCombo.isLocked) {
           return {
             ...previousCombo,
-            // Recalculate contrast ratio and WCAG level in case text color changed
             ratio: previousCombo.ratio,
             wcagLevel: previousCombo.wcagLevel
           };
         }
+        
+        // Allow other colors to be shuffled
         return combo;
       });
       
@@ -1048,7 +1082,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('all');
                   const newPalette = generateAccessiblePalette(baseColor, 'all');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'all' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
