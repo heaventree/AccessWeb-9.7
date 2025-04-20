@@ -1334,38 +1334,88 @@ export function WCAGColorPalette() {
                 
                 <button
                   onClick={() => {
-                    console.log("Checking lock status before shuffle:");
-                    generatedPalette.forEach((color, idx) => {
-                      console.log(`Color ${idx}: ${color.background} - locked: ${color.isLocked} - base: ${color.isBaseColor}`);
-                    });
-                    
                     setIsGenerating(true);
-                    
-                    // Create a fresh palette with the same base color
-                    const freshColors = generateAccessiblePalette(baseColor, colorHarmony);
-                    console.log("Generated fresh palette:", freshColors);
-                    
-                    // Create a COPY of our current palette to work with
-                    const result = [...generatedPalette];
-                    
-                    // Apply changes ONLY to unlocked colors
-                    for (let i = 1; i < result.length; i++) { // Start at 1 to skip main color
-                      // Only replace colors that aren't locked
-                      if (!result[i].isLocked) {
-                        result[i] = freshColors[i];
+                    setTimeout(() => {
+                      // Create a new palette but with truly randomized colors
+                      try {
+                        // Get current palette colors
+                        const currentPalette = [...generatedPalette];
+                        
+                        // Create a result array for the shuffled palette
+                        const result = [...currentPalette];
+                        
+                        // For each position (except main color), if unlocked, create a brand new random color
+                        for (let i = 1; i < result.length; i++) {
+                          // Skip locked colors
+                          if (result[i].isLocked) continue;
+                          
+                          // Generate a truly random color for this position
+                          const randomHue = Math.floor(Math.random() * 360);
+                          const randomSaturation = 70 + Math.floor(Math.random() * 30); // 70-100%
+                          const randomLightness = 40 + Math.floor(Math.random() * 40); // 40-80%
+                          
+                          // Convert to hex
+                          const randomHex = hslToHexString(randomHue, randomSaturation, randomLightness);
+                          
+                          // Create accessible text color
+                          // Convert the random hex to RGB
+                          const randomRgb = hexToRgb(randomHex);
+                          // Get luminance values for the random color and black/white text
+                          const randomLuminance = getLuminance(randomRgb.r, randomRgb.g, randomRgb.b);
+                          const blackLuminance = getLuminance(0, 0, 0); // Black is rgb(0,0,0)
+                          const whiteLuminance = getLuminance(255, 255, 255); // White is rgb(255,255,255)
+                          
+                          // Calculate contrast ratios with black and white text
+                          const blackContrast = getContrastRatio(randomLuminance, blackLuminance);
+                          const whiteContrast = getContrastRatio(randomLuminance, whiteLuminance);
+                          
+                          // Choose the better contrast
+                          const textColor = blackContrast > whiteContrast ? '#000000' : '#ffffff';
+                          
+                          // Calculate WCAG level based on the better contrast
+                          const contrastRatio = Math.max(blackContrast, whiteContrast);
+                          let wcagLevel: 'AAA' | 'AA' | 'Fail' = 'Fail';
+                          if (contrastRatio >= 7) wcagLevel = 'AAA';
+                          else if (contrastRatio >= 4.5) wcagLevel = 'AA';
+                          
+                          // Create relationship name
+                          let relationshipName = "Random";
+                          
+                          // Convert baseColor to HSL using existing functions
+                          const baseRgb = hexToRgb(baseColor);
+                          const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+                          
+                          if (Math.abs(randomHue - baseHsl.h) < 30 || 
+                              Math.abs(randomHue - baseHsl.h) > 330) {
+                            relationshipName = "Analogous";
+                          } else if (Math.abs(randomHue - baseHsl.h) > 150 &&
+                                     Math.abs(randomHue - baseHsl.h) < 210) {
+                            relationshipName = "Complementary";
+                          } else if (Math.abs(randomHue - baseHsl.h - 120) < 30 ||
+                                     Math.abs(randomHue - baseHsl.h - 240) < 30) {
+                            relationshipName = "Triadic";
+                          }
+                          
+                          // Add to result
+                          result[i] = {
+                            background: randomHex,
+                            text: textColor,
+                            name: relationshipName,
+                            ratio: contrastRatio,
+                            wcagLevel: wcagLevel,
+                            isBaseColor: false,
+                            isLocked: false
+                          };
+                        }
+                        
+                        // Set the final palette
+                        setGeneratedPalette(result);
+                      } catch (error) {
+                        console.error("Error in shuffle:", error);
+                      } finally {
+                        setIsGenerating(false);
                       }
-                    }
-                    
-                    // Log the final result for debugging
-                    console.log("After shuffle, updated palette:", result);
-                    console.log("Lock status after processing:");
-                    result.forEach((color, idx) => {
-                      console.log(`Color ${idx}: ${color.background} - locked: ${color.isLocked}`);
-                    });
-                    
-                    // Set the result as our new palette
-                    setGeneratedPalette(result);
-                    setIsGenerating(false);
+                    }, 500);
                   }}
                   disabled={isGenerating}
                   aria-label="Shuffle colors"
