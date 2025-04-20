@@ -526,16 +526,20 @@ function generateAccessiblePalette(baseColor: string, harmonyType: ColorHarmony 
     // If it's the first one (index 0), always mark it as "Base" regardless of other factors
     let name = i === 0 ? "Base" : determineColorName(baseHsl, bgHsl, harmonyType);
     
-    // Add to combinations
-    combinations.push({
-      background: bgColor,
-      text: textColor,
-      name,
-      ratio,
-      wcagLevel,
-      // Flag to indicate this is the base color (for highlighting in UI)
-      isBaseColor: i === 0
-    });
+    // Add to combinations - only if it meets WCAG standards or is the base color
+    if (wcagLevel !== 'Fail' || i === 0) {
+      combinations.push({
+        background: bgColor,
+        text: textColor,
+        name,
+        ratio,
+        wcagLevel,
+        // Flag to indicate this is the base color (for highlighting in UI)
+        isBaseColor: i === 0,
+        // Lock the base color by default
+        isLocked: i === 0
+      });
+    }
   }
   
   // First, make sure the base color is always at the front of the array, 
@@ -1258,22 +1262,35 @@ export function WCAGColorPalette() {
                       {/* Color name at the top */}
                       <div className="p-4">
                         <div className="flex justify-between items-center">
-                          <h3 className="font-medium text-base" style={{ color: combo.text }}>
-                            {/* Use the color name function instead of the old name */}
-                            {findClosestNamedColor(combo.background)}
-                          </h3>
-                          
-                          {combo.isBaseColor && 
-                            <span className="ml-2 text-xs bg-white bg-opacity-20 px-2 py-0.5 rounded" style={{ color: combo.text }}>Main</span>
-                          }
+                          <div className="flex items-center">
+                            <h3 className="font-medium text-base" style={{ color: combo.text }}>
+                              {/* Use the color name function instead of the old name */}
+                              {findClosestNamedColor(combo.background)}
+                            </h3>
+                            
+                            {combo.isBaseColor && 
+                              <span 
+                                className="ml-2 text-xs font-bold px-2 py-0.5 rounded" 
+                                style={{ 
+                                  color: combo.text,
+                                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                                  borderWidth: '1px',
+                                  borderStyle: 'solid',
+                                  borderColor: combo.text
+                                }}
+                              >
+                                MAIN
+                              </span>
+                            }
+                          </div>
                           
                           <button
                             onClick={() => toggleLock(index)}
-                            className={`p-1.5 rounded-full ${combo.isLocked ? 'bg-white bg-opacity-20' : 'opacity-60 hover:opacity-100'}`}
+                            className={`p-2 rounded-full ${combo.isLocked ? 'bg-white bg-opacity-30' : 'opacity-70 hover:opacity-100 hover:bg-white hover:bg-opacity-10'}`}
                             style={{ color: combo.text }}
                             aria-label={combo.isLocked ? "Unlock this color" : "Lock this color"}
                           >
-                            {combo.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                            {combo.isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
                           </button>
                         </div>
                       </div>
@@ -1284,11 +1301,11 @@ export function WCAGColorPalette() {
                           <span className="text-lg font-bold" style={{ color: combo.text }}>{combo.background.toUpperCase()}</span>
                           <button
                             onClick={() => copyToClipboard(combo.background)}
-                            className="p-1.5 rounded-full hover:bg-white hover:bg-opacity-10"
+                            className="p-2 rounded-full hover:bg-white hover:bg-opacity-10"
                             style={{ color: combo.text }}
                             aria-label="Copy color hex code"
                           >
-                            {copiedColor === combo.background ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                            {copiedColor === combo.background ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                           </button>
                         </div>
                         
