@@ -9,11 +9,12 @@
 @import './styles/main.css';
 
 /* Any additional accessibility improvements that are not in main.css */
-/* Screen reader only - visible only on focus for accessibility */
-.skip-to-main {
+/* Skip links - visible only on focus for accessibility */
+.skip-to-main,
+.skip-link {
   @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 
     focus:px-4 focus:py-2 focus:bg-white focus:text-blue-700 focus:shadow-lg 
-    focus:rounded focus:outline-none;
+    focus:rounded focus:outline-2 focus:outline-blue-700 focus:no-underline focus:font-medium;
 }
 
 /* Screen reader only text - completely hidden visually */
@@ -30,5 +31,119 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode */
+.high-contrast-mode {
+  /* Override default colors for better contrast */
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --link-color: #0000EE;
+  --visited-link-color: #551A8B;
+  --button-background: #000000;
+  --button-text: #ffffff;
+  --input-border: #000000;
+  --input-background: #ffffff;
+  --input-text: #000000;
+  --focus-outline-color: #FF4500; /* High-visibility outline color */
+  --error-color: #E50000;
+  --success-color: #008000;
+  --info-color: #0000FF;
+  --warning-color: #FF8C00;
+  
+  /* Apply high contrast styles */
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+}
+
+/* High contrast mode text and links */
+.high-contrast-mode h1, 
+.high-contrast-mode h2, 
+.high-contrast-mode h3, 
+.high-contrast-mode h4, 
+.high-contrast-mode h5, 
+.high-contrast-mode h6, 
+.high-contrast-mode p, 
+.high-contrast-mode span, 
+.high-contrast-mode div {
+  color: var(--text-color) !important;
+}
+
+.high-contrast-mode a {
+  color: var(--link-color) !important;
+  text-decoration: underline !important;
+}
+
+.high-contrast-mode a:visited {
+  color: var(--visited-link-color) !important;
+}
+
+/* High contrast mode buttons */
+.high-contrast-mode button, 
+.high-contrast-mode .btn {
+  background-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+  border: 2px solid var(--button-text) !important;
+}
+
+/* High contrast mode form elements */
+.high-contrast-mode input, 
+.high-contrast-mode select, 
+.high-contrast-mode textarea {
+  background-color: var(--input-background) !important;
+  color: var(--input-text) !important;
+  border: 2px solid var(--input-border) !important;
+}
+
+/* Enhanced focus indicators */
+.high-contrast-mode *:focus {
+  outline: 3px solid var(--focus-outline-color) !important;
+  outline-offset: 2px !important;
+}
+
+/* Status colors with improved contrast */
+.high-contrast-mode .error, 
+.high-contrast-mode .text-error {
+  color: var(--error-color) !important;
+}
+
+.high-contrast-mode .success, 
+.high-contrast-mode .text-success {
+  color: var(--success-color) !important;
+}
+
+.high-contrast-mode .info, 
+.high-contrast-mode .text-info {
+  color: var(--info-color) !important;
+}
+
+.high-contrast-mode .warning, 
+.high-contrast-mode .text-warning {
+  color: var(--warning-color) !important;
+}
+
+/* High contrast mode also works with prefers-contrast media query */
+@media (prefers-contrast: more) {
+  body:not(.force-normal-contrast) {
+    /* Same variables as high-contrast-mode class */
+    --background-color: #ffffff;
+    --text-color: #000000;
+    --link-color: #0000EE;
+    --visited-link-color: #551A8B;
+    --button-background: #000000;
+    --button-text: #ffffff;
+    --input-border: #000000;
+    --input-background: #ffffff;
+    --input-text: #000000;
+    --focus-outline-color: #FF4500;
+    --error-color: #E50000;
+    --success-color: #008000;
+    --info-color: #0000FF;
+    --warning-color: #FF8C00;
+    
+    /* Apply same rules as the class */
+    background-color: var(--background-color) !important;
+    color: var(--text-color) !important;
   }
 }
