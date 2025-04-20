@@ -1248,16 +1248,16 @@ export function WCAGColorPalette() {
               </div>
             </div>
             <div ref={paletteRef}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
                 {generatedPalette.map((combo, index) => (
                   <div
                     key={`${combo.background}-${combo.text}-${index}`}
-                    className="overflow-hidden"
+                    className={`overflow-hidden ${combo.isBaseColor ? 'md:col-span-2 md:row-span-2' : ''}`}
                   >
                     {/* Color Card - styled like the reference image */}
                     <div
                       style={{ backgroundColor: combo.background }}
-                      className="h-full rounded-lg overflow-hidden"
+                      className="h-full rounded-lg overflow-hidden min-h-[180px]"
                     >
                       {/* Layout exactly matching the reference image */}
                       <div className="p-4 flex flex-col h-full">
