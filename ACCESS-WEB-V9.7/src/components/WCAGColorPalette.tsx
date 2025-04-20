@@ -899,66 +899,36 @@ export function WCAGColorPalette() {
     }, 500);
   };
 
-  // Shuffle colors while keeping the base color and any locked colors
+  // Simplified shuffle function - just regenerate unlocked colors
   const shufflePalette = () => {
     setIsGenerating(true);
+    
     setTimeout(() => {
       try {
-        // Step 1: Keep the existing main color (index 0) for sure
-        const mainColor = generatedPalette[0];
-        if (!mainColor) {
-          console.error("No main color found in the palette");
-          setIsGenerating(false);
-          return;
-        }
+        // Make a clone of the current palette to work with
+        const shuffledPalette = [...generatedPalette];
         
-        // Step 2: Save all the locked colors from the current palette
-        const lockedColors = generatedPalette.filter(combo => combo.isLocked);
-        const lockedColorBackgrounds = lockedColors.map(combo => combo.background);
-        
-        // Step 3: Generate a completely new palette
+        // Generate a brand new palette with the same base color
         const newPalette = generateAccessiblePalette(baseColor, colorHarmony);
         
-        // Step 4: Create the final palette by using this strategy:
-        // - Always use the current main color
-        // - Keep all other locked colors
-        // - Fill remaining slots with new colors from the new palette
-        
-        // Start with a copy of the new palette
-        let finalPalette = [...newPalette];
-        
-        // Always ensure index 0 is the main color and it's locked
-        finalPalette[0] = {
-          ...mainColor,
-          isLocked: true // Force the main color to be locked
-        };
-        
-        // For each locked color (except the main which we already handled)
-        lockedColors.forEach(lockedColor => {
-          // Skip the main color since we already handled it
-          if (lockedColor.background === mainColor.background) {
-            return;
+        // Go through each position in the palette
+        for (let i = 0; i < shuffledPalette.length; i++) {
+          // If this color is NOT locked (and exists in both palettes)
+          if (shuffledPalette[i] && !shuffledPalette[i].isLocked && newPalette[i]) {
+            // Replace it with the corresponding color from the new palette
+            shuffledPalette[i] = newPalette[i];
           }
           
-          // Find this color's current position in the palette
-          const originalIndex = generatedPalette.findIndex(
-            combo => combo.background === lockedColor.background
-          );
-          
-          // If we found it and it's not the main color
-          if (originalIndex > 0) {
-            // Keep it at its original position
-            finalPalette[originalIndex] = {
-              ...lockedColor,
-              isLocked: true // Ensure it stays locked
-            };
+          // Special case: ALWAYS lock the main color (index 0)
+          if (i === 0 && shuffledPalette[i]) {
+            shuffledPalette[i].isLocked = true;
           }
-        });
+        }
         
-        // Set the final palette
-        setGeneratedPalette(finalPalette);
+        // Update the palette state with our modified version
+        setGeneratedPalette(shuffledPalette);
       } catch (error) {
-        console.error("Error in shufflePalette:", error);
+        console.error("Error while shuffling palette:", error);
       } finally {
         setIsGenerating(false);
       }
@@ -1363,37 +1333,7 @@ export function WCAGColorPalette() {
                 </button>
                 
                 <button
-                  onClick={() => {
-                    setIsGenerating(true);
-                    setTimeout(() => {
-                      try {
-                        // Create a new palette with the same base color
-                        const newColors = generateAccessiblePalette(baseColor, colorHarmony);
-                        
-                        // Create a result array that will have our final palette
-                        const result = [...newColors];
-                        
-                        // First, ensure the main color (index 0) is always locked and kept
-                        result[0] = { ...generatedPalette[0], isLocked: true };
-                        
-                        // For each position after the main color
-                        for (let i = 1; i < generatedPalette.length; i++) {
-                          // If the color at this position is locked, keep it
-                          if (generatedPalette[i] && generatedPalette[i].isLocked) {
-                            result[i] = generatedPalette[i];
-                          }
-                          // Otherwise use the new color from the newly generated palette
-                        }
-                        
-                        // Set the final palette
-                        setGeneratedPalette(result);
-                      } catch (error) {
-                        console.error("Error in shuffle:", error);
-                      } finally {
-                        setIsGenerating(false);
-                      }
-                    }, 500);
-                  }}
+                  onClick={shufflePalette}
                   disabled={isGenerating}
                   aria-label="Shuffle colors"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
