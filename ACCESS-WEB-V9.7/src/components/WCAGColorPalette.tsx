@@ -1314,10 +1314,11 @@ export function WCAGColorPalette() {
                         {/* Bottom section with WCAG tag and ratio */}
                         <div className="flex items-center justify-between mt-auto">
                           <span
-                            className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-extrabold"
+                            className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium"
                             style={{ 
-                              backgroundColor: '#00E676',
-                              color: '#000000'
+                              backgroundColor: 'rgba(0, 230, 118, 0.2)',
+                              color: 'rgba(255, 255, 255, 0.9)',
+                              border: '1px solid rgba(0, 230, 118, 0.4)'
                             }}
                           >
                             {combo.wcagLevel}
