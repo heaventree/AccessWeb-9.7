@@ -1333,7 +1333,47 @@ export function WCAGColorPalette() {
                 </button>
                 
                 <button
-                  onClick={shufflePalette}
+                  onClick={() => {
+                    // Start with loading state
+                    setIsGenerating(true);
+                    
+                    // Create a copy of our current palette for modification
+                    let newPalette = [...generatedPalette];
+                    
+                    try {
+                      // We'll create a whole new palette of the same type
+                      const freshPalette = generateAccessiblePalette(baseColor, colorHarmony);
+                      
+                      // Loop through all positions
+                      for (let i = 0; i < newPalette.length; i++) {
+                        // Skip any positions that are locked
+                        // Check if this color is locked (including main color which must stay locked)
+                        const currentColor = newPalette[i];
+                        if (currentColor && (currentColor.isLocked || currentColor.isBaseColor || i === 0)) {
+                          // Keep this color (it's locked or it's the main color)
+                          continue;
+                        }
+                        
+                        // Replace unlocked colors with new ones
+                        if (freshPalette[i]) {
+                          newPalette[i] = freshPalette[i];
+                        }
+                      }
+                      
+                      // Double check that the main color is always locked
+                      if (newPalette[0]) {
+                        newPalette[0].isLocked = true;
+                      }
+                      
+                      // Update the palette state
+                      setGeneratedPalette(newPalette);
+                    } catch (error) {
+                      console.error('Error during shuffle:', error);
+                    } finally {
+                      // Always end the loading state
+                      setTimeout(() => setIsGenerating(false), 300);
+                    }
+                  }}
                   disabled={isGenerating}
                   aria-label="Shuffle colors"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
