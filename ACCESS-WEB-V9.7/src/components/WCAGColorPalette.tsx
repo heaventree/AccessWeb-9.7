@@ -31,6 +31,224 @@ interface ColorCombination {
 // Color harmony type
 type ColorHarmony = 'complementary' | 'analogous' | 'triadic' | 'split-complementary' | 'monochromatic' | 'tetradic' | 'square' | 'all';
 
+// Color name database - common colors with their names
+const colorNameDatabase = {
+  // Reds
+  '#FF0000': 'Red',
+  '#DC143C': 'Crimson',
+  '#CD5C5C': 'Indian Red',
+  '#F08080': 'Light Coral',
+  '#FA8072': 'Salmon',
+  '#E9967A': 'Dark Salmon',
+  '#FFA07A': 'Light Salmon',
+  '#B22222': 'Fire Brick',
+  '#8B0000': 'Dark Red',
+  '#FF6347': 'Tomato',
+  
+  // Pinks
+  '#FFC0CB': 'Pink',
+  '#FFB6C1': 'Light Pink',
+  '#FF69B4': 'Hot Pink',
+  '#FF1493': 'Deep Pink',
+  '#DB7093': 'Pale Violet Red',
+  '#C71585': 'Medium Violet Red',
+  
+  // Oranges
+  '#FFA500': 'Orange',
+  '#FF8C00': 'Dark Orange',
+  '#FF7F50': 'Coral',
+  '#FF4500': 'Orange Red',
+  
+  // Yellows
+  '#FFFF00': 'Yellow',
+  '#FFFFE0': 'Light Yellow',
+  '#FFFACD': 'Lemon Chiffon',
+  '#FAFAD2': 'Light Goldenrod',
+  '#FFEFD5': 'Papaya Whip',
+  '#FFE4B5': 'Moccasin',
+  '#FFDAB9': 'Peach Puff',
+  '#EEE8AA': 'Pale Goldenrod',
+  '#F0E68C': 'Khaki',
+  '#BDB76B': 'Dark Khaki',
+  '#FFD700': 'Gold',
+  
+  // Purples
+  '#800080': 'Purple',
+  '#9370DB': 'Medium Purple',
+  '#7B68EE': 'Medium Slate Blue',
+  '#6A5ACD': 'Slate Blue',
+  '#483D8B': 'Dark Slate Blue',
+  '#663399': 'Rebecca Purple',
+  '#4B0082': 'Indigo',
+  '#8A2BE2': 'Blue Violet',
+  '#9932CC': 'Dark Orchid',
+  '#9400D3': 'Dark Violet',
+  '#8B008B': 'Dark Magenta',
+  '#BA55D3': 'Medium Orchid',
+  '#DA70D6': 'Orchid',
+  '#EE82EE': 'Violet',
+  '#DDA0DD': 'Plum',
+  '#D8BFD8': 'Thistle',
+  '#E6E6FA': 'Lavender',
+  
+  // Greens
+  '#008000': 'Green',
+  '#006400': 'Dark Green',
+  '#228B22': 'Forest Green',
+  '#2E8B57': 'Sea Green',
+  '#3CB371': 'Medium Sea Green',
+  '#66CDAA': 'Medium Aquamarine',
+  '#8FBC8F': 'Dark Sea Green',
+  '#90EE90': 'Light Green',
+  '#98FB98': 'Pale Green',
+  '#7CFC00': 'Lawn Green',
+  '#7FFF00': 'Chartreuse',
+  '#ADFF2F': 'Green Yellow',
+  '#00FF00': 'Lime',
+  '#32CD32': 'Lime Green',
+  '#9ACD32': 'Yellow Green',
+  '#556B2F': 'Dark Olive Green',
+  '#6B8E23': 'Olive Drab',
+  '#808000': 'Olive',
+  
+  // Blues
+  '#0000FF': 'Blue',
+  '#000080': 'Navy',
+  '#00008B': 'Dark Blue',
+  '#0000CD': 'Medium Blue',
+  '#4169E1': 'Royal Blue',
+  '#1E90FF': 'Dodger Blue',
+  '#00BFFF': 'Deep Sky Blue',
+  '#87CEEB': 'Sky Blue',
+  '#87CEFA': 'Light Sky Blue',
+  '#ADD8E6': 'Light Blue',
+  '#B0E0E6': 'Powder Blue',
+  '#B0C4DE': 'Light Steel Blue',
+  '#4682B4': 'Steel Blue',
+  '#5F9EA0': 'Cadet Blue',
+  
+  // Cyans
+  '#00FFFF': 'Cyan',
+  '#00CED1': 'Dark Turquoise',
+  '#40E0D0': 'Turquoise',
+  '#48D1CC': 'Medium Turquoise',
+  '#20B2AA': 'Light Sea Green',
+  '#008B8B': 'Dark Cyan',
+  '#008080': 'Teal',
+  '#7FFFD4': 'Aquamarine',
+  '#AFEEEE': 'Pale Turquoise',
+  '#E0FFFF': 'Light Cyan',
+  
+  // Browns
+  '#A52A2A': 'Brown',
+  '#8B4513': 'Saddle Brown',
+  '#A0522D': 'Sienna',
+  '#D2691E': 'Chocolate',
+  '#CD853F': 'Peru',
+  '#DEB887': 'Burlywood',
+  '#F4A460': 'Sandy Brown',
+  '#DAA520': 'Goldenrod',
+  '#B8860B': 'Dark Goldenrod',
+  
+  // Whites
+  '#FFFFFF': 'White',
+  '#FFFAFA': 'Snow',
+  '#F0FFF0': 'Honeydew',
+  '#F5FFFA': 'Mint Cream',
+  '#F0FFFF': 'Azure',
+  '#F0F8FF': 'Alice Blue',
+  '#F8F8FF': 'Ghost White',
+  '#F5F5F5': 'White Smoke',
+  '#FFF5EE': 'Seashell',
+  '#FFFAF0': 'Floral White',
+  '#F5F5DC': 'Beige',
+  '#FDF5E6': 'Old Lace',
+  '#FFFFF0': 'Ivory',
+  '#FAF0E6': 'Linen',
+  '#FFF0F5': 'Lavender Blush',
+  '#FFE4E1': 'Misty Rose',
+  
+  // Grays and blacks
+  '#808080': 'Gray',
+  '#A9A9A9': 'Dark Gray',
+  '#696969': 'Dim Gray',
+  '#778899': 'Light Slate Gray',
+  '#708090': 'Slate Gray',
+  '#2F4F4F': 'Dark Slate Gray',
+  '#000000': 'Black',
+  '#D3D3D3': 'Light Gray',
+  '#DCDCDC': 'Gainsboro',
+  '#EFEFEF': 'White Smoke'
+};
+
+// Function to find the closest named color in our database
+function findClosestNamedColor(hex: string): string {
+  // First, check if there's an exact match in our database
+  const normalizedHex = hex.toUpperCase();
+  const database = colorNameDatabase as Record<string, string>;
+  if (database[normalizedHex]) {
+    return database[normalizedHex];
+  }
+  
+  // If no exact match, find the closest color (by RGB distance)
+  const targetRgb = hexToRgb(hex);
+  let closestName = "Custom";
+  let minDistance = Number.MAX_VALUE;
+  
+  for (const [colorHex, colorName] of Object.entries(database)) {
+    const currentRgb = hexToRgb(colorHex);
+    
+    // Calculate the Euclidean distance between the RGB values
+    const distance = Math.sqrt(
+      Math.pow(targetRgb.r - currentRgb.r, 2) +
+      Math.pow(targetRgb.g - currentRgb.g, 2) +
+      Math.pow(targetRgb.b - currentRgb.b, 2)
+    );
+    
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestName = colorName;
+    }
+  }
+  
+  // If the distance is too large, create a descriptive name based on HSL
+  if (minDistance > 80) {
+    const hsl = rgbToHsl(targetRgb.r, targetRgb.g, targetRgb.b);
+    
+    // Extract hue name
+    let hueName = "Custom";
+    if (hsl.h >= 0 && hsl.h < 30) hueName = "Red";
+    else if (hsl.h < 60) hueName = "Orange";
+    else if (hsl.h < 90) hueName = "Yellow";
+    else if (hsl.h < 150) hueName = "Green";
+    else if (hsl.h < 210) hueName = "Cyan";
+    else if (hsl.h < 270) hueName = "Blue";
+    else if (hsl.h < 330) hueName = "Purple";
+    else hueName = "Red";
+    
+    // Add lightness/darkness modifier
+    let lightnessModifier = "";
+    if (hsl.l < 20) lightnessModifier = "Dark ";
+    else if (hsl.l > 80) lightnessModifier = "Light ";
+    
+    // Add saturation modifier
+    let saturationModifier = "";
+    if (hsl.s < 20) {
+      if (hsl.l < 30) return "Dark Gray";
+      else if (hsl.l > 80) return "White";
+      else return "Gray";
+    } else if (hsl.s < 40) {
+      saturationModifier = "Grayish ";
+    } else if (hsl.s > 80) {
+      saturationModifier = "Vibrant ";
+    }
+    
+    return `${lightnessModifier}${saturationModifier}${hueName}`;
+  }
+  
+  return closestName;
+}
+
 // Color utility functions
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -1030,70 +1248,54 @@ export function WCAGColorPalette() {
                 {generatedPalette.map((combo, index) => (
                   <div
                     key={`${combo.background}-${combo.text}-${index}`}
-                    className={`bg-white rounded-lg shadow-sm overflow-hidden ${
-                      combo.isBaseColor ? 'ring-2 ring-blue-500' : ''
-                    }`}
+                    className={`overflow-hidden ${combo.isBaseColor ? 'ring-2 ring-blue-500' : ''}`}
                   >
-                    {/* Color Header with name and lock button */}
-                    <div className="p-3 flex items-center justify-between border-b">
-                      <h3 className={`font-medium ${combo.isBaseColor ? 'text-blue-600 font-semibold' : 'text-gray-900'}`}>
-                        {combo.name}
-                        {combo.isBaseColor && <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">Main</span>}
-                      </h3>
-                      
-                      <button
-                        onClick={() => toggleLock(index)}
-                        className={`p-1.5 rounded-full ${combo.isLocked ? 'bg-blue-100 text-blue-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
-                        aria-label={combo.isLocked ? "Unlock this color" : "Lock this color"}
-                      >
-                        {combo.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-                      </button>
-                    </div>
-                    
-                    {/* Color Display */}
+                    {/* Color Card - styled like the reference image */}
                     <div
                       style={{ backgroundColor: combo.background }}
-                      className="h-32 p-4 flex items-center justify-center"
+                      className="h-full rounded-lg overflow-hidden"
                     >
-                      <p style={{ color: combo.text }} className="text-lg font-medium">
-                        Sample Text
-                      </p>
-                    </div>
-
-                    {/* Color Information */}
-                    <div className="p-4">
-                      {/* Hex Value and Copy Button */}
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-lg font-bold">{combo.background}</span>
-                        <button
-                          onClick={() => copyToClipboard(combo.background)}
-                          className="p-1.5 rounded-full hover:bg-gray-100"
-                          aria-label="Copy color hex code"
-                        >
-                          {copiedColor === combo.background ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                        </button>
-                      </div>
-                      
-                      {/* Color Shade Slider (visual only in this version) */}
-                      <div className="mb-4">
-                        <div className="w-full h-2 bg-gradient-to-r from-white via-gray-300 to-black rounded-full relative">
-                          <div className="absolute w-3 h-3 bg-white border-2 border-gray-400 rounded-full -mt-0.5" style={{left: '50%'}}></div>
+                      {/* Color name at the top */}
+                      <div className="p-4">
+                        <div className="flex justify-between items-center">
+                          <h3 className={`font-medium text-base ${combo.text}`}>
+                            {/* Use the color name function instead of the old name */}
+                            {findClosestNamedColor(combo.background)}
+                          </h3>
+                          
+                          {combo.isBaseColor && 
+                            <span className="ml-2 text-xs bg-white bg-opacity-20 text-white px-2 py-0.5 rounded">Main</span>
+                          }
+                          
+                          <button
+                            onClick={() => toggleLock(index)}
+                            className={`p-1.5 rounded-full ${combo.isLocked ? 'bg-white bg-opacity-20 text-white' : 'text-white text-opacity-60 hover:text-opacity-100'}`}
+                            aria-label={combo.isLocked ? "Unlock this color" : "Lock this color"}
+                          >
+                            {combo.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          </button>
                         </div>
                       </div>
-
-                      {/* WCAG Information */}
-                      <div className="flex items-center justify-between mt-2">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getLevelBadgeColor(
-                            combo.wcagLevel
-                          )}`}
-                        >
-                          {combo.wcagLevel}
-                        </span>
-                        <span className="text-sm text-gray-900 font-medium flex items-center">
-                          <Info className="w-4 h-4 mr-1 text-gray-400" />
-                          {combo.ratio.toFixed(2)}:1
-                        </span>
+                      
+                      {/* Hex Value */}
+                      <div className="p-4 mt-auto">
+                        <div className="flex justify-between items-center">
+                          <span className={`text-lg font-bold ${combo.text}`}>{combo.background.toUpperCase()}</span>
+                          <button
+                            onClick={() => copyToClipboard(combo.background)}
+                            className={`p-1.5 rounded-full hover:bg-white hover:bg-opacity-10 ${combo.text}`}
+                            aria-label="Copy color hex code"
+                          >
+                            {copiedColor === combo.background ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                          </button>
+                        </div>
+                        
+                        {/* Color Shade Slider (visual only in this version) */}
+                        <div className="mt-6 mb-2">
+                          <div className={`w-full h-2 ${combo.text === '#FFFFFF' ? 'bg-gradient-to-r from-white via-black to-white' : 'bg-gradient-to-r from-white via-black to-black'} rounded-full relative opacity-50`}>
+                            <div className={`absolute w-4 h-4 ${combo.text} border border-current rounded-full -mt-1 -ml-2`} style={{left: '30%'}}></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
