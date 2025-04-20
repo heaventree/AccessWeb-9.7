@@ -1316,8 +1316,8 @@ export function WCAGColorPalette() {
                           <span
                             className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-bold"
                             style={{ 
-                              backgroundColor: combo.wcagLevel === 'AAA' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)',
-                              color: combo.wcagLevel === 'AAA' ? 'rgb(0, 100, 80)' : 'rgb(180, 83, 9)'
+                              backgroundColor: combo.wcagLevel === 'AAA' ? 'rgba(20, 240, 160, 0.5)' : 'rgba(255, 180, 40, 0.5)',
+                              color: combo.wcagLevel === 'AAA' ? 'rgb(0, 80, 60)' : 'rgb(150, 60, 0)'
                             }}
                           >
                             {combo.wcagLevel}
