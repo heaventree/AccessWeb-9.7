@@ -1101,7 +1101,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('complementary');
                   const newPalette = generateAccessiblePalette(baseColor, 'complementary');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -1113,7 +1120,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('analogous');
                   const newPalette = generateAccessiblePalette(baseColor, 'analogous');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'analogous' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -1125,7 +1139,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('triadic');
                   const newPalette = generateAccessiblePalette(baseColor, 'triadic');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'triadic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -1137,7 +1158,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('split-complementary');
                   const newPalette = generateAccessiblePalette(baseColor, 'split-complementary');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'split-complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -1149,7 +1177,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('monochromatic');
                   const newPalette = generateAccessiblePalette(baseColor, 'monochromatic');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'monochromatic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -1161,7 +1196,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('tetradic');
                   const newPalette = generateAccessiblePalette(baseColor, 'tetradic');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'tetradic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -1173,7 +1215,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('square');
                   const newPalette = generateAccessiblePalette(baseColor, 'square');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'square' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -1209,7 +1258,16 @@ export function WCAGColorPalette() {
                       if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
                         setBaseColor(newColor);
                         const newPalette = generateAccessiblePalette(newColor, colorHarmony);
-                        setGeneratedPalette(newPalette);
+                        
+                        // Ensure main color is locked
+                        const updatedPalette = newPalette.map((combo, index) => {
+                          if (index === 0) {
+                            return { ...combo, isLocked: true };
+                          }
+                          return combo;
+                        });
+                        
+                        setGeneratedPalette(updatedPalette);
                       }
                     }}
                     className="px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-1"
