@@ -1268,22 +1268,20 @@ export function WCAGColorPalette() {
                         }`}
                       >
                         <div className="p-4 flex flex-col h-full">
-                          {/* Top section with name and buttons */}
+                          {/* Top section with MAIN tag and buttons */}
                           <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-medium text-base" style={{ color: combo.text }}>
-                              {findClosestNamedColor(combo.background)}
-                              {combo.isBaseColor && (
-                                <span 
-                                  className="ml-2 text-xs font-bold px-2 py-0.5 rounded" 
-                                  style={{ 
-                                    color: combo.text,
-                                    backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                                  }}
-                                >
-                                  MAIN
-                                </span>
-                              )}
-                            </h3>
+                            {combo.isBaseColor && (
+                              <span 
+                                className="text-xs font-bold px-2 py-0.5 rounded" 
+                                style={{ 
+                                  color: combo.text,
+                                  backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                                }}
+                              >
+                                MAIN
+                              </span>
+                            )}
+                            {!combo.isBaseColor && <div></div>}
                             
                             <div className="flex items-center space-x-2">
                               <button
@@ -1305,25 +1303,25 @@ export function WCAGColorPalette() {
                             </div>
                           </div>
                           
-                          {/* Hex code display */}
+                          {/* Name moved down a couple rows */}
+                          <div className="mt-6 mb-6">
+                            <h3 className="font-medium text-base" style={{ color: combo.text }}>
+                              {findClosestNamedColor(combo.background)}
+                            </h3>
+                          </div>
+                          
+                          {/* Empty space in the middle */}
+                          <div className="flex-grow"></div>
+                          
+                          {/* Hex code display moved closer to bottom */}
                           <div className="mb-4">
                             <span className="text-lg font-bold" style={{ color: combo.text }}>
                               {combo.background.toUpperCase()}
                             </span>
                           </div>
                           
-                          {/* Color Shade Slider */}
-                          <div className="my-5">
-                            <div className="w-full h-2 bg-gradient-to-r from-white via-black to-black rounded-full relative opacity-50">
-                              <div 
-                                className="absolute w-4 h-4 border rounded-full -mt-1 -ml-2" 
-                                style={{left: '30%', color: combo.text, borderColor: combo.text}}
-                              ></div>
-                            </div>
-                          </div>
-                          
                           {/* Bottom section with WCAG tag and ratio */}
-                          <div className="flex items-center justify-between mt-auto">
+                          <div className="flex items-center justify-between">
                             <span
                               className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium"
                               style={{ 
