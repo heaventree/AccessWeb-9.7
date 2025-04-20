@@ -815,23 +815,6 @@ export function WCAGColorPalette() {
                 <Shuffle className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
                 Shuffle
               </button>
-
-              <button
-                onClick={exportToText}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <FileText className="w-5 h-5 mr-2" />
-                Export as Text
-                <span className={proPillStyle}>PRO</span>
-              </button>
-              <button
-                onClick={exportToPDF}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <FileDown className="w-5 h-5 mr-2" />
-                Export as PDF
-                <span className={proPillStyle}>PRO</span>
-              </button>
             </div>
           </div>
           
@@ -1000,7 +983,7 @@ export function WCAGColorPalette() {
             </div>
             
             <div className="flex justify-between items-center gap-4 mb-6">
-              {/* Left side - Control buttons */}
+              {/* Left side - Simple controls */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={toggleDarkMode}
@@ -1021,7 +1004,7 @@ export function WCAGColorPalette() {
                 </button>
               </div>
               
-              {/* Right side - Export buttons */}
+              {/* Right side - Export buttons only in this section */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={exportToText}
