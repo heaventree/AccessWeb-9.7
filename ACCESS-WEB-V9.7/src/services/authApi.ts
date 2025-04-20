@@ -7,7 +7,7 @@
 
 import { apiClient } from '../utils/api/apiClient';
 import { AccountLockoutManager } from '../utils/security/passwordPolicy';
-import { ErrorType, createError } from '../utils/common/errorHandler';
+import { ErrorType, createError } from '../utils/errorHandler';
 
 // Auth API endpoints
 const AUTH_ENDPOINTS = {
@@ -58,10 +58,9 @@ export async function login(email: string, password: string): Promise<LoginRespo
     if (AccountLockoutManager.isAccountLocked(email)) {
       const timeRemaining = AccountLockoutManager.getLockoutTimeRemaining(email);
       throw createError(
-        ErrorType.AUTHENTICATION,
-        'account_locked',
         `Account is temporarily locked. Please try again in ${Math.ceil(timeRemaining / 60)} minutes`,
-        { timeRemaining }
+        ErrorType.AUTHENTICATION,
+        { code: 'account_locked', timeRemaining }
       );
     }
     

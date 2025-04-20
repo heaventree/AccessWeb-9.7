@@ -1,16 +1,16 @@
 /**
  * Common Utilities
  * 
- * This module exports general-purpose utility functions that are used
- * across the application and don't fit into more specific categories.
+ * Re-exports all common utilities for easy importing.
  */
 
-// Re-export utilities from this domain
-export * from './aiRecommendations';
-export * from './commandHandler';
-export * from './commandRunner';
-export * from './diffManager';
+export * from './crypto';
 export * from './environment';
 export * from './errorHandler';
-export * from './phaseManager';
-export * from './tokenOptimizer';
+export * from './sanitization';
+export * from './secureStorage';
+
+// Re-export other common utilities as they are created
+// export * from './logger';
+// export * from './validator';
+// etc.
