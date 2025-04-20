@@ -351,11 +351,98 @@ export const a11yHelpers = {
   }
 };
 
+/**
+ * Test accessibility of a URL
+ * 
+ * This function is specifically for the WCAG Checker page
+ * to test external URLs for accessibility issues.
+ * 
+ * @param url URL to test
+ * @param region Region standard to apply (e.g., 'eu', 'us')
+ * @param options Additional testing options
+ * @returns Test results
+ */
+export async function testAccessibility(
+  url: string,
+  region: string = 'global',
+  options: any = {}
+): Promise<any> {
+  // This is a mock implementation that would normally call an API
+  // In a real implementation, this would make an API call to the 
+  // server-side testing service that can crawl and test external URLs
+  
+  // For demo purposes, return mock test results
+  return {
+    url,
+    timestamp: new Date(),
+    score: 72,
+    passCount: 18,
+    warningCount: 5,
+    issueCount: 12,
+    region,
+    standards: {
+      wcag21: true,
+      wcag22: true,
+      section508: region === 'us',
+      eaa: region === 'eu'
+    },
+    issues: [
+      {
+        id: 'color-contrast',
+        impact: 'serious',
+        description: 'Elements must have sufficient color contrast',
+        wcagCriteria: ['1.4.3'],
+        nodes: [
+          {
+            html: '<button class="btn-primary">Submit</button>',
+            selector: '#login-form .btn-primary',
+            colorPairs: [
+              { foreground: '#ffffff', background: '#6c757d', ratio: '3.1:1', required: '4.5:1' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'image-alt',
+        impact: 'critical',
+        description: 'Images must have alternative text',
+        wcagCriteria: ['1.1.1'],
+        nodes: [
+          { html: '<img src="/logo.png">', selector: 'header img' }
+        ]
+      }
+    ],
+    warnings: [
+      {
+        id: 'heading-order',
+        impact: 'moderate',
+        description: 'Heading levels should only increase by one',
+        wcagCriteria: ['1.3.1'],
+        nodes: [
+          { html: '<h3>Section Title</h3>', selector: 'main > h3' }
+        ]
+      }
+    ],
+    passes: [
+      {
+        id: 'html-lang',
+        impact: 'serious',
+        description: 'HTML element must have lang attribute',
+        wcagCriteria: ['3.1.1'],
+        nodes: [
+          { html: '<html lang="en">', selector: 'html' }
+        ]
+      }
+    ]
+  };
+}
+
 // Export everything
 export default {
   testElement,
   testPage,
   getRecommendedFixes,
   generateAccessibilityReport,
+  testAccessibility,
   a11yHelpers
 };
