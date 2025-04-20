@@ -1252,12 +1252,12 @@ export function WCAGColorPalette() {
                 {generatedPalette.map((combo, index) => (
                   <div
                     key={`${combo.background}-${combo.text}-${index}`}
-                    className={`overflow-hidden ${combo.isBaseColor ? 'md:col-span-2 md:row-span-2' : ''}`}
+                    className={`overflow-hidden ${combo.isBaseColor ? 'md:row-span-2' : ''}`}
                   >
                     {/* Color Card - styled like the reference image */}
                     <div
                       style={{ backgroundColor: combo.background }}
-                      className="h-full rounded-lg overflow-hidden min-h-[180px]"
+                      className={`h-full rounded-lg overflow-hidden ${combo.isBaseColor ? 'min-h-[380px]' : 'min-h-[180px]'}`}
                     >
                       {/* Layout exactly matching the reference image */}
                       <div className="p-4 flex flex-col h-full">
