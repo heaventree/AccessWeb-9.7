@@ -1252,7 +1252,7 @@ export function WCAGColorPalette() {
                 {generatedPalette.map((combo, index) => (
                   <div
                     key={`${combo.background}-${combo.text}-${index}`}
-                    className={`overflow-hidden ${combo.isBaseColor ? 'ring-2 ring-blue-500' : ''}`}
+                    className="overflow-hidden"
                   >
                     {/* Color Card - styled like the reference image */}
                     <div
@@ -1270,10 +1270,7 @@ export function WCAGColorPalette() {
                                 className="ml-2 text-xs font-bold px-2 py-0.5 rounded" 
                                 style={{ 
                                   color: combo.text,
-                                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                                  borderWidth: '1px',
-                                  borderStyle: 'solid',
-                                  borderColor: combo.text
+                                  backgroundColor: 'rgba(255, 255, 255, 0.3)'
                                 }}
                               >
                                 MAIN
@@ -1317,10 +1314,10 @@ export function WCAGColorPalette() {
                         {/* Bottom section with WCAG tag and ratio */}
                         <div className="flex items-center justify-between mt-auto">
                           <span
-                            className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium"
+                            className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-bold"
                             style={{ 
-                              backgroundColor: combo.wcagLevel === 'AAA' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                              color: combo.wcagLevel === 'AAA' ? 'rgb(4, 120, 87)' : 'rgb(180, 83, 9)'
+                              backgroundColor: combo.wcagLevel === 'AAA' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)',
+                              color: combo.wcagLevel === 'AAA' ? 'rgb(0, 100, 80)' : 'rgb(180, 83, 9)'
                             }}
                           >
                             {combo.wcagLevel}
