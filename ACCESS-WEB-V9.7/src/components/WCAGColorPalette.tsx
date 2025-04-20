@@ -1139,7 +1139,7 @@ export function WCAGColorPalette() {
             </div>
           </div>
           
-          <div className="flex items-center mb-6">
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1">
               <div className="flex items-center mb-2">
                 <Palette className="w-5 h-5 mr-2 text-primary-600" />
@@ -1155,7 +1155,7 @@ export function WCAGColorPalette() {
                   onChange={handleBaseColorChange}
                   className="h-12 w-20 rounded border border-gray-300"
                 />
-                <div className="flex">
+                <div className="flex flex-1">
                   <input
                     type="text"
                     value={baseColor}
@@ -1167,7 +1167,7 @@ export function WCAGColorPalette() {
                         setGeneratedPalette(newPalette);
                       }
                     }}
-                    className="px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-1"
                     placeholder="#000000"
                   />
                   <button
@@ -1181,7 +1181,7 @@ export function WCAGColorPalette() {
               </div>
             </div>
             
-            <div className="flex items-center">
+            <div className="flex items-end gap-2">
               <button
                 onClick={generateNewPalette}
                 disabled={isGenerating}
@@ -1258,18 +1258,19 @@ export function WCAGColorPalette() {
                       {/* Color name at the top */}
                       <div className="p-4">
                         <div className="flex justify-between items-center">
-                          <h3 className={`font-medium text-base ${combo.text}`}>
+                          <h3 className="font-medium text-base" style={{ color: combo.text }}>
                             {/* Use the color name function instead of the old name */}
                             {findClosestNamedColor(combo.background)}
                           </h3>
                           
                           {combo.isBaseColor && 
-                            <span className="ml-2 text-xs bg-white bg-opacity-20 text-white px-2 py-0.5 rounded">Main</span>
+                            <span className="ml-2 text-xs bg-white bg-opacity-20 px-2 py-0.5 rounded" style={{ color: combo.text }}>Main</span>
                           }
                           
                           <button
                             onClick={() => toggleLock(index)}
-                            className={`p-1.5 rounded-full ${combo.isLocked ? 'bg-white bg-opacity-20 text-white' : 'text-white text-opacity-60 hover:text-opacity-100'}`}
+                            className={`p-1.5 rounded-full ${combo.isLocked ? 'bg-white bg-opacity-20' : 'opacity-60 hover:opacity-100'}`}
+                            style={{ color: combo.text }}
                             aria-label={combo.isLocked ? "Unlock this color" : "Lock this color"}
                           >
                             {combo.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
@@ -1280,10 +1281,11 @@ export function WCAGColorPalette() {
                       {/* Hex Value */}
                       <div className="p-4 mt-auto">
                         <div className="flex justify-between items-center">
-                          <span className={`text-lg font-bold ${combo.text}`}>{combo.background.toUpperCase()}</span>
+                          <span className="text-lg font-bold" style={{ color: combo.text }}>{combo.background.toUpperCase()}</span>
                           <button
                             onClick={() => copyToClipboard(combo.background)}
-                            className={`p-1.5 rounded-full hover:bg-white hover:bg-opacity-10 ${combo.text}`}
+                            className="p-1.5 rounded-full hover:bg-white hover:bg-opacity-10"
+                            style={{ color: combo.text }}
                             aria-label="Copy color hex code"
                           >
                             {copiedColor === combo.background ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -1292,9 +1294,30 @@ export function WCAGColorPalette() {
                         
                         {/* Color Shade Slider (visual only in this version) */}
                         <div className="mt-6 mb-2">
-                          <div className={`w-full h-2 ${combo.text === '#FFFFFF' ? 'bg-gradient-to-r from-white via-black to-white' : 'bg-gradient-to-r from-white via-black to-black'} rounded-full relative opacity-50`}>
-                            <div className={`absolute w-4 h-4 ${combo.text} border border-current rounded-full -mt-1 -ml-2`} style={{left: '30%'}}></div>
+                          <div className="w-full h-2 bg-gradient-to-r from-white via-black to-black rounded-full relative opacity-50">
+                            <div className="absolute w-4 h-4 border rounded-full -mt-1 -ml-2" 
+                              style={{left: '30%', color: combo.text, borderColor: combo.text}}></div>
                           </div>
+                        </div>
+                        
+                        {/* WCAG Contrast Ratio Display */}
+                        <div className="flex items-center justify-between mt-4">
+                          <span
+                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+                            style={{ 
+                              backgroundColor: combo.wcagLevel === 'AAA' ? 'rgba(34, 197, 94, 0.2)' : 
+                                            combo.wcagLevel === 'AA' ? 'rgba(234, 179, 8, 0.2)' : 
+                                            'rgba(239, 68, 68, 0.2)',
+                              color: combo.wcagLevel === 'AAA' ? '#15803d' : 
+                                     combo.wcagLevel === 'AA' ? '#a16207' : 
+                                     '#b91c1c'
+                            }}
+                          >
+                            {combo.wcagLevel}
+                          </span>
+                          <span className="text-sm font-medium" style={{ color: combo.text }}>
+                            {combo.ratio.toFixed(2)}:1
+                          </span>
                         </div>
                       </div>
                     </div>
