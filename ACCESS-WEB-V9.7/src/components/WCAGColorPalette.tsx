@@ -1,5 +1,18 @@
-import React, { useState, useRef } from 'react';
-import { RefreshCw, Copy, Info, Check, FileText, FileDown } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { 
+  RefreshCw, 
+  Copy, 
+  Info, 
+  Check, 
+  FileText, 
+  FileDown, 
+  Sun, 
+  Moon, 
+  Shuffle, 
+  Palette, 
+  Lock, 
+  Unlock 
+} from 'lucide-react';
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -12,6 +25,7 @@ interface ColorCombination {
   ratio: number;
   wcagLevel: 'AAA' | 'AA' | 'Fail';
   isBaseColor?: boolean;
+  isLocked?: boolean;
 }
 
 // Color harmony type
@@ -605,7 +619,16 @@ export function WCAGColorPalette() {
   const [generatedPalette, setGeneratedPalette] = useState<ColorCombination[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [colorHarmony, setColorHarmony] = useState<ColorHarmony>('all');
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const paletteRef = useRef<HTMLDivElement>(null);
+
+  // Initialize palette when component mounts
+  useEffect(() => {
+    if (generatedPalette.length === 0) {
+      const initialPalette = generateAccessiblePalette(baseColor, colorHarmony);
+      setGeneratedPalette(initialPalette);
+    }
+  }, []);
 
   const copyToClipboard = (color: string) => {
     navigator.clipboard.writeText(color);
@@ -624,11 +647,73 @@ export function WCAGColorPalette() {
     }, 500);
   };
 
+  // Shuffle colors while keeping the base color and any locked colors
+  const shufflePalette = () => {
+    setIsGenerating(true);
+    setTimeout(() => {
+      // Generate a new palette with the same base color
+      const newPalette = generateAccessiblePalette(baseColor, colorHarmony);
+      
+      // Preserve locked colors from the previous palette
+      const updatedPalette = newPalette.map((combo, index) => {
+        // Keep locked colors from the previous palette
+        const previousCombo = generatedPalette[index];
+        if (previousCombo && previousCombo.isLocked) {
+          return {
+            ...previousCombo,
+            // Recalculate contrast ratio and WCAG level in case text color changed
+            ratio: previousCombo.ratio,
+            wcagLevel: previousCombo.wcagLevel
+          };
+        }
+        return combo;
+      });
+      
+      setGeneratedPalette(updatedPalette);
+      setIsGenerating(false);
+    }, 500);
+  };
+
   const handleBaseColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = e.target.value;
     setBaseColor(newColor);
+    
+    // Keep locked colors when changing base color
     const newPalette = generateAccessiblePalette(newColor, colorHarmony);
-    setGeneratedPalette(newPalette);
+    
+    const updatedPalette = newPalette.map((combo, index) => {
+      // Keep locked colors except for the base color (index 0)
+      const previousCombo = generatedPalette[index];
+      if (index > 0 && previousCombo && previousCombo.isLocked) {
+        return {
+          ...previousCombo,
+          ratio: previousCombo.ratio,
+          wcagLevel: previousCombo.wcagLevel
+        };
+      }
+      return combo;
+    });
+    
+    setGeneratedPalette(updatedPalette);
+  };
+
+  // Toggle lock for a specific color in the palette
+  const toggleLock = (index: number) => {
+    const updatedPalette = generatedPalette.map((combo, i) => {
+      if (i === index) {
+        return {
+          ...combo,
+          isLocked: !combo.isLocked
+        };
+      }
+      return combo;
+    });
+    
+    setGeneratedPalette(updatedPalette);
+  };
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
   };
 
   const getLevelBadgeColor = (level: 'AAA' | 'AA' | 'Fail') => {
@@ -830,18 +915,21 @@ export function WCAGColorPalette() {
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex-1">
-              <label htmlFor="baseColor" className="block text-sm font-medium text-gray-700 mb-2">
-                Base Color
-              </label>
+              <div className="flex items-center mb-2">
+                <Palette className="w-5 h-5 mr-2 text-primary-600" />
+                <label htmlFor="baseColor" className="block text-sm font-medium text-gray-700">
+                  Base Color
+                </label>
+              </div>
               <div className="flex items-center gap-4">
                 <input
                   type="color"
                   id="baseColor"
                   value={baseColor}
                   onChange={handleBaseColorChange}
-                  className="h-10 w-20 rounded border border-gray-300"
+                  className="h-12 w-20 rounded border border-gray-300"
                 />
                 <input
                   type="text"
@@ -859,14 +947,35 @@ export function WCAGColorPalette() {
                 />
               </div>
             </div>
-            <button
-              onClick={generateNewPalette}
-              disabled={isGenerating}
-              className="inline-flex items-center px-4 py-2 border-none rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
-              Generate Random
-            </button>
+            
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleDarkMode}
+                aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
+              >
+                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+              
+              <button
+                onClick={shufflePalette}
+                disabled={isGenerating}
+                aria-label="Shuffle colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <Shuffle className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                Shuffle
+              </button>
+              
+              <button
+                onClick={generateNewPalette}
+                disabled={isGenerating}
+                className="inline-flex items-center gap-2 px-4 py-2 border-none rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                Generate New
+              </button>
+            </div>
           </div>
         </div>
 
@@ -903,6 +1012,23 @@ export function WCAGColorPalette() {
                       combo.isBaseColor ? 'ring-2 ring-blue-500' : ''
                     }`}
                   >
+                    {/* Color Header with name and lock button */}
+                    <div className="p-3 flex items-center justify-between border-b">
+                      <h3 className={`font-medium ${combo.isBaseColor ? 'text-blue-600 font-semibold' : 'text-gray-900'}`}>
+                        {combo.name}
+                        {combo.isBaseColor && <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">Main</span>}
+                      </h3>
+                      
+                      <button
+                        onClick={() => toggleLock(index)}
+                        className={`p-1.5 rounded-full ${combo.isLocked ? 'bg-blue-100 text-blue-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
+                        aria-label={combo.isLocked ? "Unlock this color" : "Lock this color"}
+                      >
+                        {combo.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    
+                    {/* Color Display */}
                     <div
                       style={{ backgroundColor: combo.background }}
                       className="h-32 p-4 flex items-center justify-center"
@@ -912,78 +1038,40 @@ export function WCAGColorPalette() {
                       </p>
                     </div>
 
+                    {/* Color Information */}
                     <div className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className={`font-medium ${combo.isBaseColor ? 'text-blue-600 font-bold' : 'text-gray-900'}`}>
-                          {combo.isBaseColor ? (
-                            <div className="flex items-center">
-                              <span className="mr-1">🔍</span> {combo.name} Color
-                            </div>
-                          ) : (
-                            combo.name
-                          )}
-                        </h3>
+                      {/* Hex Value and Copy Button */}
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-lg font-bold">{combo.background}</span>
+                        <button
+                          onClick={() => copyToClipboard(combo.background)}
+                          className="p-1.5 rounded-full hover:bg-gray-100"
+                          aria-label="Copy color hex code"
+                        >
+                          {copiedColor === combo.background ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      
+                      {/* Color Shade Slider (visual only in this version) */}
+                      <div className="mb-4">
+                        <div className="w-full h-2 bg-gradient-to-r from-white via-gray-300 to-black rounded-full relative">
+                          <div className="absolute w-3 h-3 bg-white border-2 border-gray-400 rounded-full -mt-0.5" style={{left: '50%'}}></div>
+                        </div>
+                      </div>
+
+                      {/* WCAG Information */}
+                      <div className="flex items-center justify-between mt-2">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLevelBadgeColor(
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getLevelBadgeColor(
                             combo.wcagLevel
                           )}`}
                         >
                           {combo.wcagLevel}
                         </span>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div
-                              className="w-4 h-4 rounded mr-2"
-                              style={{ backgroundColor: combo.background }}
-                            />
-                            <span className="text-sm text-gray-600">Background</span>
-                          </div>
-                          <button
-                            onClick={() => copyToClipboard(combo.background)}
-                            className="flex items-center text-sm text-gray-500 hover:text-gray-700"
-                          >
-                            {copiedColor === combo.background ? (
-                              <Check className="w-4 h-4 mr-1" />
-                            ) : (
-                              <Copy className="w-4 h-4 mr-1" />
-                            )}
-                            {combo.background}
-                          </button>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div
-                              className="w-4 h-4 rounded mr-2"
-                              style={{ backgroundColor: combo.text }}
-                            />
-                            <span className="text-sm text-gray-600">Text</span>
-                          </div>
-                          <button
-                            onClick={() => copyToClipboard(combo.text)}
-                            className="flex items-center text-sm text-gray-500 hover:text-gray-700"
-                          >
-                            {copiedColor === combo.text ? (
-                              <Check className="w-4 h-4 mr-1" />
-                            ) : (
-                              <Copy className="w-4 h-4 mr-1" />
-                            )}
-                            {combo.text}
-                          </button>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <Info className="w-4 h-4 mr-2 text-gray-400" />
-                            <span className="text-sm text-gray-600">Contrast</span>
-                          </div>
-                          <span className="text-sm text-gray-900 font-medium">
-                            {combo.ratio.toFixed(2)}:1
-                          </span>
-                        </div>
+                        <span className="text-sm text-gray-900 font-medium flex items-center">
+                          <Info className="w-4 h-4 mr-1 text-gray-400" />
+                          {combo.ratio.toFixed(2)}:1
+                        </span>
                       </div>
                     </div>
                   </div>
