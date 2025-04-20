@@ -1248,89 +1248,101 @@ export function WCAGColorPalette() {
               </div>
             </div>
             <div ref={paletteRef}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
-                {generatedPalette.map((combo, index) => (
-                  <div
-                    key={`${combo.background}-${combo.text}-${index}`}
-                    className={`overflow-hidden ${combo.isBaseColor ? 'md:row-span-2' : ''}`}
-                  >
-                    {/* Color Card - styled like the reference image */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {generatedPalette.map((combo, index) => {
+                  // If main color, takes column 1 and spans 2 rows
+                  // If not main, takes normal position in grid
+                  return (
                     <div
-                      style={{ backgroundColor: combo.background }}
-                      className={`h-full rounded-lg overflow-hidden ${combo.isBaseColor ? 'min-h-[380px]' : 'min-h-[180px]'}`}
+                      key={`${combo.background}-${combo.text}-${index}`}
+                      className={`rounded-lg overflow-hidden ${
+                        combo.isBaseColor 
+                          ? 'md:col-start-1 md:row-span-2' 
+                          : ''
+                      }`}
                     >
-                      {/* Layout exactly matching the reference image */}
-                      <div className="p-4 flex flex-col h-full">
-                        {/* Top section with name and lock button on same line */}
-                        <div className="flex justify-between items-center mb-4">
-                          <h3 className="font-medium text-base" style={{ color: combo.text }}>
-                            {findClosestNamedColor(combo.background)}
-                            {combo.isBaseColor && 
-                              <span 
-                                className="ml-2 text-xs font-bold px-2 py-0.5 rounded" 
-                                style={{ 
-                                  color: combo.text,
-                                  backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                                }}
+                      <div
+                        style={{ backgroundColor: combo.background }}
+                        className={`h-full rounded-lg overflow-hidden ${
+                          combo.isBaseColor ? 'min-h-[380px]' : 'min-h-[180px]'
+                        }`}
+                      >
+                        <div className="p-4 flex flex-col h-full">
+                          {/* Top section with name and buttons */}
+                          <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-medium text-base" style={{ color: combo.text }}>
+                              {findClosestNamedColor(combo.background)}
+                              {combo.isBaseColor && (
+                                <span 
+                                  className="ml-2 text-xs font-bold px-2 py-0.5 rounded" 
+                                  style={{ 
+                                    color: combo.text,
+                                    backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                                  }}
+                                >
+                                  MAIN
+                                </span>
+                              )}
+                            </h3>
+                            
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => copyToClipboard(combo.background)}
+                                className="p-2 rounded-full hover:bg-white hover:bg-opacity-10"
+                                style={{ color: combo.text }}
+                                aria-label="Copy color hex code"
                               >
-                                MAIN
-                              </span>
-                            }
-                          </h3>
+                                {copiedColor === combo.background ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                              </button>
+                              <button
+                                onClick={() => toggleLock(index)}
+                                className={`p-2 rounded-full ${combo.isLocked ? 'bg-white bg-opacity-20' : 'opacity-70 hover:opacity-100'}`}
+                                style={{ color: combo.text }}
+                                aria-label={combo.isLocked ? "Unlock this color" : "Lock this color"}
+                              >
+                                {combo.isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                              </button>
+                            </div>
+                          </div>
                           
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => copyToClipboard(combo.background)}
-                              className="p-2 rounded-full hover:bg-white hover:bg-opacity-10"
-                              style={{ color: combo.text }}
-                              aria-label="Copy color hex code"
-                            >
-                              {copiedColor === combo.background ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                            </button>
-                            <button
-                              onClick={() => toggleLock(index)}
-                              className={`p-2 rounded-full ${combo.isLocked ? 'bg-white bg-opacity-20' : 'opacity-70 hover:opacity-100'}`}
-                              style={{ color: combo.text }}
-                              aria-label={combo.isLocked ? "Unlock this color" : "Lock this color"}
-                            >
-                              {combo.isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
-                            </button>
+                          {/* Hex code display */}
+                          <div className="mb-4">
+                            <span className="text-lg font-bold" style={{ color: combo.text }}>
+                              {combo.background.toUpperCase()}
+                            </span>
                           </div>
-                        </div>
-                        
-                        {/* Hex code display */}
-                        <div className="mb-4">
-                          <span className="text-lg font-bold" style={{ color: combo.text }}>{combo.background.toUpperCase()}</span>
-                        </div>
-                        
-                        {/* Color Shade Slider */}
-                        <div className="my-5">
-                          <div className="w-full h-2 bg-gradient-to-r from-white via-black to-black rounded-full relative opacity-50">
-                            <div className="absolute w-4 h-4 border rounded-full -mt-1 -ml-2" 
-                              style={{left: '30%', color: combo.text, borderColor: combo.text}}></div>
+                          
+                          {/* Color Shade Slider */}
+                          <div className="my-5">
+                            <div className="w-full h-2 bg-gradient-to-r from-white via-black to-black rounded-full relative opacity-50">
+                              <div 
+                                className="absolute w-4 h-4 border rounded-full -mt-1 -ml-2" 
+                                style={{left: '30%', color: combo.text, borderColor: combo.text}}
+                              ></div>
+                            </div>
                           </div>
-                        </div>
-                        
-                        {/* Bottom section with WCAG tag and ratio */}
-                        <div className="flex items-center justify-between mt-auto">
-                          <span
-                            className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium"
-                            style={{ 
-                              backgroundColor: 'rgba(0, 230, 118, 0.2)',
-                              color: 'rgba(255, 255, 255, 0.9)',
-                              border: '1px solid rgba(0, 230, 118, 0.4)'
-                            }}
-                          >
-                            {combo.wcagLevel}
-                          </span>
-                          <span className="text-sm font-medium" style={{ color: combo.text }}>
-                            {combo.ratio.toFixed(2)}:1
-                          </span>
+                          
+                          {/* Bottom section with WCAG tag and ratio */}
+                          <div className="flex items-center justify-between mt-auto">
+                            <span
+                              className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium"
+                              style={{ 
+                                backgroundColor: 'rgba(0, 230, 118, 0.2)',
+                                color: 'rgba(255, 255, 255, 0.9)',
+                                border: '1px solid rgba(0, 230, 118, 0.4)'
+                              }}
+                            >
+                              {combo.wcagLevel}
+                            </span>
+                            <span className="text-sm font-medium" style={{ color: combo.text }}>
+                              {combo.ratio.toFixed(2)}:1
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
