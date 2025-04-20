@@ -1334,45 +1334,34 @@ export function WCAGColorPalette() {
                 
                 <button
                   onClick={() => {
-                    // Start with loading state
                     setIsGenerating(true);
-                    
-                    // Create a copy of our current palette for modification
-                    let newPalette = [...generatedPalette];
-                    
-                    try {
-                      // We'll create a whole new palette of the same type
-                      const freshPalette = generateAccessiblePalette(baseColor, colorHarmony);
+                    setTimeout(() => {
+                      // Generate a completely new palette, but keep the same base color
+                      const newPalette = generateAccessiblePalette(baseColor, colorHarmony);
                       
-                      // Loop through all positions
-                      for (let i = 0; i < newPalette.length; i++) {
-                        // Skip any positions that are locked
-                        // Check if this color is locked (including main color which must stay locked)
-                        const currentColor = newPalette[i];
-                        if (currentColor && (currentColor.isLocked || currentColor.isBaseColor || i === 0)) {
-                          // Keep this color (it's locked or it's the main color)
-                          continue;
+                      // Now process the new palette:
+                      // 1. Keep any locked colors from the current palette
+                      // 2. Replace all unlocked colors with the new ones
+                      const result = newPalette.map((newColor, index) => {
+                        const currentColor = generatedPalette[index];
+                        
+                        // For the main color (index 0), always keep it and make sure it's locked
+                        if (index === 0) {
+                          return { ...currentColor, isLocked: true };
                         }
                         
-                        // Replace unlocked colors with new ones
-                        if (freshPalette[i]) {
-                          newPalette[i] = freshPalette[i];
+                        // For other colors, keep them if they're locked, otherwise use the new color
+                        if (currentColor && currentColor.isLocked) {
+                          return currentColor; // Keep locked colors
+                        } else {
+                          return newColor; // Use new colors for unlocked positions
                         }
-                      }
+                      });
                       
-                      // Double check that the main color is always locked
-                      if (newPalette[0]) {
-                        newPalette[0].isLocked = true;
-                      }
-                      
-                      // Update the palette state
-                      setGeneratedPalette(newPalette);
-                    } catch (error) {
-                      console.error('Error during shuffle:', error);
-                    } finally {
-                      // Always end the loading state
-                      setTimeout(() => setIsGenerating(false), 300);
-                    }
+                      // Set the result as our new palette
+                      setGeneratedPalette(result);
+                      setIsGenerating(false);
+                    }, 500);
                   }}
                   disabled={isGenerating}
                   aria-label="Shuffle colors"
