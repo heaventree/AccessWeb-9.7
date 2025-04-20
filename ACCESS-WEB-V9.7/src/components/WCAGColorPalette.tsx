@@ -961,6 +961,24 @@ export function WCAGColorPalette() {
 
   // Toggle lock for a specific color in the palette
   const toggleLock = (index: number) => {
+    // If it's the main color (index 0), we don't allow unlocking
+    if (index === 0) {
+      // Always make sure the main color is locked - we can call this to ensure it
+      const updatedPalette = generatedPalette.map((combo, i) => {
+        if (i === 0) {
+          return {
+            ...combo,
+            isLocked: true // Always keep the main color locked
+          };
+        }
+        return combo;
+      });
+      
+      setGeneratedPalette(updatedPalette);
+      return; // Exit early - don't toggle the main color
+    }
+    
+    // For other colors, toggle normally
     const updatedPalette = generatedPalette.map((combo, i) => {
       if (i === index) {
         return {
@@ -1393,9 +1411,22 @@ export function WCAGColorPalette() {
                               </button>
                               <button
                                 onClick={() => toggleLock(index)}
-                                className={`p-2 rounded-full ${combo.isLocked ? 'bg-white bg-opacity-20' : 'opacity-70 hover:opacity-100'}`}
+                                className={`p-2 rounded-full ${
+                                  combo.isLocked 
+                                    ? 'bg-white bg-opacity-20' 
+                                    : 'opacity-70 hover:opacity-100'
+                                } ${
+                                  index === 0 
+                                    ? 'cursor-default' // Main color - not clickable
+                                    : ''
+                                }`}
                                 style={{ color: combo.text }}
-                                aria-label={combo.isLocked ? "Unlock this color" : "Lock this color"}
+                                aria-label={
+                                  index === 0 
+                                    ? "Main color is always locked" 
+                                    : (combo.isLocked ? "Unlock this color" : "Lock this color")
+                                }
+                                disabled={index === 0} // Disable the button for main color
                               >
                                 {combo.isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
                               </button>
