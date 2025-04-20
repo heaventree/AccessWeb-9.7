@@ -899,40 +899,83 @@ export function WCAGColorPalette() {
     }, 500);
   };
 
-  // Simplified shuffle function - just regenerate unlocked colors
+  // Shuffle function to randomize non-locked colors
   const shufflePalette = () => {
     setIsGenerating(true);
     
     setTimeout(() => {
-      try {
-        // Make a clone of the current palette to work with
-        const shuffledPalette = [...generatedPalette];
-        
-        // Generate a brand new palette with the same base color
-        const newPalette = generateAccessiblePalette(baseColor, colorHarmony);
-        
-        // Go through each position in the palette
-        for (let i = 0; i < shuffledPalette.length; i++) {
-          // If this color is NOT locked (and exists in both palettes)
-          if (shuffledPalette[i] && !shuffledPalette[i].isLocked && newPalette[i]) {
-            // Replace it with the corresponding color from the new palette
-            shuffledPalette[i] = newPalette[i];
+      // Start with a copy of the current palette
+      const currentPalette = [...generatedPalette];
+      
+      // For each unlocked color (except the main color), create a new HSL-based random color
+      const shuffledPalette = currentPalette.map((color, index) => {
+        // Always keep the main color (index 0) and any locked colors
+        if (index === 0 || color.isLocked) {
+          // For the main color, ensure it's always locked
+          if (index === 0) {
+            return { ...color, isLocked: true };
           }
-          
-          // Special case: ALWAYS lock the main color (index 0)
-          if (i === 0 && shuffledPalette[i]) {
-            shuffledPalette[i].isLocked = true;
-          }
+          return color;
         }
         
-        // Update the palette state with our modified version
-        setGeneratedPalette(shuffledPalette);
-      } catch (error) {
-        console.error("Error while shuffling palette:", error);
-      } finally {
-        setIsGenerating(false);
-      }
-    }, 500);
+        // For unlocked colors, generate new random vibrant colors
+        const h = Math.floor(Math.random() * 360); // Random hue (0-359)
+        const s = 70 + Math.floor(Math.random() * 30); // Saturation (70-100%)
+        const l = 40 + Math.floor(Math.random() * 30); // Lightness (40-70%)
+        
+        // Convert HSL to RGB
+        const rgb = hslToRgb(h, s, l);
+        
+        // Convert RGB to hex
+        const background = rgbToHex(rgb.r, rgb.g, rgb.b);
+        
+        // Calculate text contrast - choose black or white for best contrast
+        const colorLuminance = getLuminance(rgb.r, rgb.g, rgb.b);
+        const blackLuminance = getLuminance(0, 0, 0);
+        const whiteLuminance = getLuminance(255, 255, 255);
+        
+        const blackContrast = getContrastRatio(colorLuminance, blackLuminance);
+        const whiteContrast = getContrastRatio(colorLuminance, whiteLuminance);
+        
+        const text = blackContrast > whiteContrast ? '#000000' : '#ffffff';
+        const ratio = Math.max(blackContrast, whiteContrast);
+        
+        // Determine WCAG level based on contrast ratio
+        let wcagLevel: 'AAA' | 'AA' | 'Fail' = 'Fail';
+        if (ratio >= 7) wcagLevel = 'AAA';
+        else if (ratio >= 4.5) wcagLevel = 'AA';
+        
+        // Determine relationship to base color
+        let name = "Random";
+        const baseRgb = hexToRgb(baseColor);
+        const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+        
+        // Compare hues to determine relationship
+        const hueDiff = Math.abs(h - baseHsl.h);
+        if (hueDiff < 30 || hueDiff > 330) {
+          name = "Analogous";
+        } else if (hueDiff > 150 && hueDiff < 210) {
+          name = "Complementary";
+        } else if (Math.abs(hueDiff - 120) < 30 || Math.abs(hueDiff - 240) < 30) {
+          name = "Triadic";
+        }
+        
+        // Return the new color with all properties
+        return {
+          background,
+          text,
+          name,
+          ratio,
+          wcagLevel,
+          isBaseColor: false,
+          isLocked: false
+        };
+      });
+      
+      // Update the palette state
+      setGeneratedPalette(shuffledPalette);
+      setIsGenerating(false);
+    }, 300);
   };
 
   const handleBaseColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
