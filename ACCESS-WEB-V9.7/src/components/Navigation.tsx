@@ -75,6 +75,12 @@ export function Navigation() {
       path: '/tools/image-alt-scanner',
       icon: Image,
       description: 'Find and fix image accessibility issues'
+    },
+    { 
+      name: 'UI Kit Preview',
+      path: '/preview/ui-kit',
+      icon: Settings,
+      description: 'Preview the new UI design system (Beta)'
     }
   ];
 
