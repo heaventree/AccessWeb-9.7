@@ -7,6 +7,8 @@ export default {
       colors: {
         // Using CSS variables for colors from theme-variables.css
         primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
           50: 'rgb(var(--color-primary-50))',
           100: 'rgb(var(--color-primary-100))', 
           200: 'rgb(var(--color-primary-200))',
@@ -20,6 +22,8 @@ export default {
           950: 'rgb(var(--color-primary-950))'
         },
         secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
           50: 'rgb(var(--color-secondary-50))',
           100: 'rgb(var(--color-secondary-100))',
           200: 'rgb(var(--color-secondary-200))',
@@ -32,6 +36,34 @@ export default {
           900: 'rgb(var(--color-secondary-900))',
           950: 'rgb(var(--color-secondary-950))'
         },
+        // UI Kit Colors
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+          bg: 'rgb(var(--card-bg))',
+          'bg-secondary': 'rgb(var(--card-bg-secondary))'
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
         // Using CSS variables for semantic colors
         success: {
           50: 'rgb(var(--color-success-50))',
@@ -98,11 +130,6 @@ export default {
           800: 'rgb(var(--color-gray-800))',
           900: 'rgb(var(--color-gray-900))',
           950: 'rgb(var(--color-gray-950))'
-        },
-        // Card background colors (light/dark mode)
-        card: {
-          bg: 'rgb(var(--card-bg))',
-          'bg-secondary': 'rgb(var(--card-bg-secondary))'
         }
       },
       fontFamily: {
@@ -150,6 +177,28 @@ export default {
         'card-hover': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
         'dropdown': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
         'modal': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+      },
+      keyframes: {
+        "accordion-down": {
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
+        },
+        "accordion-up": {
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
       // Enhanced typography based on Noble UI design
       typography: (theme) => ({
