@@ -163,6 +163,35 @@
   --card-bg: 22, 30, 46;          /* #161e2e - Slightly blue-tinted dark background */
   --card-bg-secondary: 30, 41, 59; /* #1e293b - Slightly lighter for secondary elements */
   --container-bg: 15, 23, 42;      /* #0f172a - Dark background for main containers */
+  
+  /* shadcn UI Dark Mode Theme Variables */
+  --background: 222, 47%, 11%;
+  --foreground: 210, 40%, 98%;
+  
+  --card: 222, 47%, 17%;
+  --card-foreground: 210, 40%, 98%;
+  
+  --popover: 222, 47%, 17%;
+  --popover-foreground: 210, 40%, 98%;
+  
+  --primary: 171, 80%, 45%;
+  --primary-foreground: 0, 0%, 100%;
+  
+  --secondary: 215, 100%, 60%;
+  --secondary-foreground: 0, 0%, 100%;
+  
+  --muted: 217, 33%, 27%;
+  --muted-foreground: 214, 32%, 91%;
+  
+  --accent: 217, 33%, 27%;
+  --accent-foreground: 199, 89%, 86%;
+  
+  --destructive: 0, 90%, 60%;
+  --destructive-foreground: 0, 0%, 100%;
+  
+  --border: 217, 19%, 35%;
+  --input: 217, 19%, 35%;
+  --ring: 171, 80%, 55%;
 }
 
 /* Light mode defaults */
