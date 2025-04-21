@@ -5,10 +5,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Using CSS variables for colors from theme-variables.css
+        /* New AccessWebPro UI Kit Colors */
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
         primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
           50: 'rgb(var(--color-primary-50))',
-          100: 'rgb(var(--color-primary-100))', 
+          100: 'rgb(var(--color-primary-100))',
           200: 'rgb(var(--color-primary-200))',
           300: 'rgb(var(--color-primary-300))',
           400: 'rgb(var(--color-primary-400))',
@@ -20,6 +32,8 @@ export default {
           950: 'rgb(var(--color-primary-950))'
         },
         secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
           50: 'rgb(var(--color-secondary-50))',
           100: 'rgb(var(--color-secondary-100))',
           200: 'rgb(var(--color-secondary-200))',
@@ -32,7 +46,37 @@ export default {
           900: 'rgb(var(--color-secondary-900))',
           950: 'rgb(var(--color-secondary-950))'
         },
-        // Using CSS variables for semantic colors
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
+        },
+        /* Chart Colors */
+        chart: {
+          1: 'hsl(var(--chart-1))',
+          2: 'hsl(var(--chart-2))',
+          3: 'hsl(var(--chart-3))',
+          4: 'hsl(var(--chart-4))',
+          5: 'hsl(var(--chart-5))',
+        },
+        /* Sidebar Colors */
+        sidebar: {
+          background: 'hsl(var(--sidebar-background))',
+          foreground: 'hsl(var(--sidebar-foreground))',
+          primary: 'hsl(var(--sidebar-primary))',
+          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+          accent: 'hsl(var(--sidebar-accent))',
+          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+          border: 'hsl(var(--sidebar-border))',
+        },
+        /* Legacy support */
         success: {
           50: 'rgb(var(--color-success-50))',
           100: 'rgb(var(--color-success-100))',
@@ -85,7 +129,6 @@ export default {
           900: 'rgb(var(--color-info-900))',
           950: 'rgb(var(--color-info-950))'
         },
-        // Using CSS variables for grays
         gray: {
           50: 'rgb(var(--color-gray-50))',
           100: 'rgb(var(--color-gray-100))',
@@ -100,15 +143,25 @@ export default {
           950: 'rgb(var(--color-gray-950))'
         },
         // Card background colors (light/dark mode)
-        card: {
-          bg: 'rgb(var(--card-bg))',
-          'bg-secondary': 'rgb(var(--card-bg-secondary))'
+        'card-bg': {
+          DEFAULT: 'rgb(var(--card-bg))',
+          secondary: 'rgb(var(--card-bg-secondary))'
         }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         display: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+      },
+      // Using border-radius from theme variables
+      borderRadius: {
+        'sm': 'calc(var(--radius) - 4px)',
+        'DEFAULT': 'calc(var(--radius) - 2px)',
+        'md': 'calc(var(--radius) - 2px)',
+        'lg': 'var(--radius)',
+        'xl': 'calc(var(--radius) + 2px)',
+        '2xl': 'calc(var(--radius) + 4px)',
+        'full': '9999px'
       },
       spacing: {
         '18': '4.5rem',
@@ -119,7 +172,7 @@ export default {
         '8xl': '88rem',
         '9xl': '96rem'
       },
-      // Enhanced z-index scale based on Noble UI
+      // Enhanced z-index scale for consistent layers
       zIndex: {
         '60': '60',
         '70': '70',
@@ -134,24 +187,14 @@ export default {
         'popover': '1060',
         'tooltip': '1070'
       },
-      // Enhanced border radius similar to Noble UI
-      borderRadius: {
-        'sm': '0.25rem',
-        'DEFAULT': '0.375rem',
-        'md': '0.5rem',
-        'lg': '0.75rem',
-        'xl': '1rem',
-        '2xl': '1.5rem',
-        'card': '0.5rem'
-      },
-      // Box shadow based on Noble UI
+      // Box shadow based on UI kit
       boxShadow: {
         'card-light': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
         'card-hover': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
         'dropdown': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
         'modal': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
       },
-      // Enhanced typography based on Noble UI design
+      // Enhanced typography styling
       typography: (theme) => ({
         DEFAULT: {
           css: {
@@ -165,21 +208,21 @@ export default {
               fontFamily: theme('fontFamily.display').join(', '),
             },
             h2: {
-              color: theme('colors.primary.800'),
+              color: theme('colors.primary.DEFAULT'),
               fontWeight: '700',
               fontFamily: theme('fontFamily.display').join(', '),
               marginTop: '3rem',
               marginBottom: '1.5rem',
             },
             h3: {
-              color: theme('colors.secondary.700'),
+              color: theme('colors.secondary.DEFAULT'),
               fontWeight: '600',
               fontFamily: theme('fontFamily.display').join(', '),
               marginTop: '2.5rem',
               marginBottom: '1.25rem',
             },
             h4: {
-              color: theme('colors.gray.900'),
+              color: theme('colors.foreground'),
               fontWeight: '600',
               fontFamily: theme('fontFamily.display').join(', '),
             },
@@ -210,11 +253,11 @@ export default {
               },
             },
             a: {
-              color: theme('colors.primary.600'),
+              color: theme('colors.primary.DEFAULT'),
               textDecoration: 'none',
               fontWeight: '500',
               '&:hover': {
-                color: theme('colors.primary.700'),
+                color: theme('colors.primary.600'),
                 textDecoration: 'underline',
               },
             },
@@ -237,8 +280,8 @@ export default {
             blockquote: {
               fontStyle: 'italic',
               borderLeftWidth: '4px',
-              borderLeftColor: theme('colors.primary.500'),
-              backgroundColor: theme('colors.primary.50'),
+              borderLeftColor: theme('colors.primary.DEFAULT'),
+              backgroundColor: theme('colors.accent.DEFAULT'),
               quotes: '"\\201C""\\201D""\\2018""\\2019"',
               marginTop: '2rem',
               marginBottom: '2rem',
@@ -251,33 +294,33 @@ export default {
         },
         dark: {
           css: {
-            color: theme('colors.gray.300'),
+            color: theme('colors.foreground'),
             h1: {
-              color: theme('colors.gray.100'),
+              color: theme('colors.foreground'),
             },
             h2: {
-              color: theme('colors.primary.300'),
+              color: theme('colors.primary.DEFAULT'),
             },
             h3: {
-              color: theme('colors.secondary.300'),
+              color: theme('colors.secondary.DEFAULT'),
             },
             h4: {
-              color: theme('colors.gray.100'),
+              color: theme('colors.foreground'),
             },
             code: {
               color: theme('colors.gray.200'),
               backgroundColor: theme('colors.gray.800'),
             },
             a: {
-              color: theme('colors.primary.400'),
+              color: theme('colors.primary.DEFAULT'),
               '&:hover': {
-                color: theme('colors.primary.300'),
+                color: theme('colors.primary.500'),
               },
             },
             blockquote: {
-              borderLeftColor: theme('colors.primary.500'),
-              backgroundColor: theme('colors.primary.900'),
-              color: theme('colors.gray.300'),
+              borderLeftColor: theme('colors.primary.DEFAULT'),
+              backgroundColor: theme('colors.accent.DEFAULT'),
+              color: theme('colors.foreground'),
             },
             'ul > li::before': {
               backgroundColor: theme('colors.gray.700'),
