@@ -12,8 +12,8 @@ import {
 } from 'lucide-react';
 
 // Import UI components
-import { Card, CardContent } from '../components/ui/card';
-import { Button } from '../components/ui/button';
+import { Card, CardContent } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
 
 export function LandingPage() {
   const navigate = useNavigate();
