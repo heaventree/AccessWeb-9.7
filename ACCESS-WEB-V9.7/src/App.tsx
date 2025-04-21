@@ -73,6 +73,7 @@ import { UiDemo } from './pages/UiDemo';
 import { AltTextGuide } from './pages/help/AltTextGuide';
 import UIKitPreview from './pages/preview/UIKitPreview';
 import NewHomePage from './pages/preview/NewHomePage';
+import HomePreview from './pages/ui-preview/HomePreview';
 
 import { ErrorPage } from './components/ErrorPage';
 import AccessibilityTipsPage from './pages/help/AccessibilityTipsPage';
@@ -127,6 +128,7 @@ function App() {
             <Route path="/ui-demo" element={<><Navigation /><main id="main-content"><UiDemo /></main><Footer /><BackToTop /></>} />
             <Route path="/preview/ui-kit" element={<><Navigation /><main id="main-content"><UIKitPreview /></main><Footer /><BackToTop /></>} />
             <Route path="/preview/new-home" element={<main id="main-content"><NewHomePage /></main>} />
+            <Route path="/preview/ui-new" element={<main id="main-content"><HomePreview /></main>} />
             <Route path="/integrations" element={<><Navigation /><main id="main-content"><Integrations /></main><Footer /><BackToTop /></>} />
             {/* Account Routes with shared layout */}
             <Route path="/my-account" element={<ProtectedRoute><><Navigation /><AccountLayout /></></ProtectedRoute>}>
