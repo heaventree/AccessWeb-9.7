@@ -170,4 +170,35 @@
   --card-bg: 255, 255, 255;           /* #ffffff - White background */
   --card-bg-secondary: 249, 250, 251; /* #f9fafb - Very light gray for secondary elements */
   --container-bg: 249, 250, 251;      /* #f9fafb - Very light gray for main containers */
+  
+  /* ====== shadcn UI Theme Variables ====== */
+  --background: 210, 40%, 98%;
+  --foreground: 222, 47%, 11%;
+  
+  --card: 0, 0%, 100%;
+  --card-foreground: 222, 47%, 11%;
+  
+  --popover: 0, 0%, 100%;
+  --popover-foreground: 222, 47%, 11%;
+  
+  --primary: 171, 80%, 40%;
+  --primary-foreground: 0, 0%, 100%;
+  
+  --secondary: 215, 100%, 50%;
+  --secondary-foreground: 0, 0%, 100%;
+  
+  --muted: 220, 14%, 96%;
+  --muted-foreground: 215, 16%, 47%;
+  
+  --accent: 214, 95%, 93%;
+  --accent-foreground: 224, 76%, 48%;
+  
+  --destructive: 0, 84%, 60%;
+  --destructive-foreground: 0, 0%, 100%;
+  
+  --border: 220, 13%, 91%;
+  --input: 220, 13%, 91%;
+  --ring: 171, 80%, 40%;
+  
+  --radius: 0.75rem;
 }
