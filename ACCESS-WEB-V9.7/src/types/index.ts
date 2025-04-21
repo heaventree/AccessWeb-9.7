@@ -227,4 +227,17 @@ export interface LegislationMapping {
   };
 }
 
+export interface CmsConfig {
+  provider: 'in-memory' | 'strapi';
+  url?: string;
+}
+
 // Direct imports are used instead of re-exporting
+export * from './api';
+export * from './auth';
+export * from './blog';
+export * from './chat';
+export * from './help';
+export * from './integrations';
+export * from './responsive-design';
+export * from './supabase';
