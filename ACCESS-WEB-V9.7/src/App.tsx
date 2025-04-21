@@ -71,6 +71,7 @@ import { HelpArticle } from './pages/HelpArticle';
 import { KnowledgeBasePage } from './pages/KnowledgeBasePage';
 import { UiDemo } from './pages/UiDemo';
 import { AltTextGuide } from './pages/help/AltTextGuide';
+import UIKitPreview from './pages/preview/UIKitPreview';
 
 import { ErrorPage } from './components/ErrorPage';
 import AccessibilityTipsPage from './pages/help/AccessibilityTipsPage';
@@ -123,6 +124,7 @@ function App() {
             <Route path="/tools/realtime" element={<><Navigation /><main id="main-content"><RealTimeMonitorPage /></main><Footer /><BackToTop /></>} />
             <Route path="/tools/image-alt-scanner" element={<><Navigation /><main id="main-content"><ImageAltScannerPage /></main><Footer /><BackToTop /></>} />
             <Route path="/ui-demo" element={<><Navigation /><main id="main-content"><UiDemo /></main><Footer /><BackToTop /></>} />
+            <Route path="/preview/ui-kit" element={<><Navigation /><main id="main-content"><UIKitPreview /></main><Footer /><BackToTop /></>} />
             <Route path="/integrations" element={<><Navigation /><main id="main-content"><Integrations /></main><Footer /><BackToTop /></>} />
             {/* Account Routes with shared layout */}
             <Route path="/my-account" element={<ProtectedRoute><><Navigation /><AccountLayout /></></ProtectedRoute>}>
