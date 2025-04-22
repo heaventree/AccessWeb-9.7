@@ -11,7 +11,7 @@ interface HeroSectionProps {
 export default function HeroSection({ onTrialSignup, isSubmitting }: HeroSectionProps) {
   const navigate = useNavigate();
   return (
-    <section id="sectionID-26" className="pt-28 pb-16 md:pb-32 bg-white dark:bg-gray-900">
+    <section id="sectionID-26" className="pt-28 pb-16 md:pb-32 bg-[#f9fffc] dark:bg-gray-900">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.div
@@ -22,8 +22,8 @@ export default function HeroSection({ onTrialSignup, isSubmitting }: HeroSection
             <div className="inline-block px-4 py-1.5 bg-[#e0f5f1] text-[#0fae96] dark:bg-[#0fae96]/20 dark:text-[#5eead4] rounded-full font-medium text-sm mb-6">
               Introducing the industry standard for WCAG compliance
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-gray-900 dark:text-white">
-              Make Your Website<br /> Accessible to <span className="text-[#0fae96] dark:text-[#5eead4]">Everyone</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] mb-6 text-gray-900 dark:text-white">
+              Make Your Website<br />Accessible to <span className="text-[#0fae96] dark:text-[#5eead4]">Everyone</span>
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto">
               Automated WCAG compliance testing and monitoring to ensure your website is accessible to all users. Get detailed reports and fixes in minutes.
