@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
-import { Card } from "@/components/ui/card";
+import { Card } from "../../components/ui/card";
 import { Star, Quote } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "../../components/ui/badge";
 
 interface TestimonialProps {
   image: string;

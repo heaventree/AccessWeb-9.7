@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "../../components/ui/button";
 import { Check, ArrowRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "../../components/ui/badge";
 
 interface PlanFeature {
   text: string;
