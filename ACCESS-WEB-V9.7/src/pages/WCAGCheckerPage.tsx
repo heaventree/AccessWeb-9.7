@@ -270,8 +270,8 @@ export function WCAGCheckerPage() {
                   <span className={proPillStyle}>PRO</span>
                   <div className="ml-1 group relative">
                     <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
-                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
-                      <p className="font-semibold mb-1">Document Testing:</p>
+                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-300 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                      <p className="font-semibold mb-1 dark:text-white">Document Testing:</p>
                       <ul className="list-disc list-inside">
                         <li>Advanced testing for document formats beyond HTML</li>
                       </ul>
@@ -294,8 +294,8 @@ export function WCAGCheckerPage() {
                   <span className={proPillStyle}>PRO</span>
                   <div className="ml-1 group relative">
                     <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
-                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
-                      <p className="font-semibold mb-1">PDF Accessibility:</p>
+                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-300 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                      <p className="font-semibold mb-1 dark:text-white">PDF Accessibility:</p>
                       <ul className="list-disc list-inside">
                         <li>Analyzes PDF documents for accessibility issues</li>
                         <li>Checks tags, reading order, and alt text</li>
@@ -319,8 +319,8 @@ export function WCAGCheckerPage() {
                   <span className={proPillStyle}>PRO</span>
                   <div className="ml-1 group relative">
                     <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
-                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
-                      <p className="font-semibold mb-1">Office Document Testing:</p>
+                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-300 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                      <p className="font-semibold mb-1 dark:text-white">Office Document Testing:</p>
                       <ul className="list-disc list-inside">
                         <li>Analyzes Word, Excel, and PowerPoint documents</li>
                         <li>Checks for headings, alt text, and table headers</li>
@@ -344,8 +344,8 @@ export function WCAGCheckerPage() {
                   <span className={proPillStyle}>PRO</span>
                   <div className="ml-1 group relative">
                     <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
-                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
-                      <p className="font-semibold mb-1">Media Testing:</p>
+                    <div className="absolute hidden group-hover:block z-10 whitespace-nowrap p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-300 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                      <p className="font-semibold mb-1 dark:text-white">Media Testing:</p>
                       <ul className="list-disc list-inside">
                         <li>Checks audio, video, and embedded media elements</li>
                         <li>Verifies presence of captions and transcripts</li>
@@ -386,11 +386,11 @@ export function WCAGCheckerPage() {
             animate={{ opacity: 1 }}
             className="space-y-6"
           >
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">Test Results</h2>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Test Results</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                     <a href={results.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
                       {results.url}
                     </a>
@@ -579,22 +579,22 @@ export function WCAGCheckerPage() {
         {/* Features Section - Only show when no results */}
         {!results && (
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
               <FileSearch className="w-8 h-8 text-[#0fae96] mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Deep Analysis
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 Thorough scanning of HTML, ARIA, and dynamic content
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
               <Zap className="w-8 h-8 text-[#0fae96] mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 AI-Powered Fixes
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 Get instant suggestions with code examples
               </p>
             </div>
