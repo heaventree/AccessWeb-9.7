@@ -29,14 +29,14 @@ export function ImageAltScannerPage() {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-[130px] pb-[80px]">
-      <div className="content-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-[75px] pb-[60px]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
               Image Alt Text Scanner
             </h1>
-            <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-gray-300">
               Find and fix image accessibility issues to ensure WCAG 1.1.1 compliance
             </p>
           </div>
@@ -44,18 +44,18 @@ export function ImageAltScannerPage() {
           <div className="mt-4 md:mt-0 flex space-x-3">
             <Link 
               to="/help/alt-text-guide" 
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96]/80 dark:hover:bg-[#0fae96]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96]/50"
             >
-              <HelpCircle className="-ml-1 mr-2 h-5 w-5" />
+              <HelpCircle className="-ml-1 mr-2 h-4 w-4" />
               Alt Text Guide
             </Link>
             <a 
               href="https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="inline-flex items-center px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96]/50"
             >
-              <ExternalLink className="-ml-1 mr-2 h-5 w-5" />
+              <ExternalLink className="-ml-1 mr-2 h-4 w-4" />
               WCAG 1.1.1 Spec
             </a>
           </div>
