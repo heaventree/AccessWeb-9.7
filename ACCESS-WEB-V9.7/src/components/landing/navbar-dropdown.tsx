@@ -18,17 +18,13 @@ interface DropdownProps {
 
 const NavDropdownItem: React.FC<DropdownItemProps> = ({ icon: Icon, label, description, href }) => {
   return (
-    <div
-      className="flex flex-col cursor-pointer p-3 rounded-md transition-colors hover:bg-green-50 dark:hover:bg-green-900/20"
-      onClick={() => window.location.href = href}
-    >
-      <div className="flex items-center">
-        <div className="h-5 w-5 mr-2 flex-shrink-0 flex items-center justify-center text-emerald-500 dark:text-emerald-300">
-          <Icon className="w-[18px] h-[18px]" />
-        </div>
-        <span className="font-medium text-base text-gray-800 dark:text-white">{label}</span>
+    <div className="flex flex-col hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 cursor-pointer p-3 rounded-md transition-all duration-200" 
+         onClick={() => window.location.href = href}>
+      <div className="flex items-center mb-1">
+        <Icon className="h-5 w-5 text-[#0fae96] dark:text-[#5eead4] mr-2 flex-shrink-0" />
+        <span className="font-medium text-base dark:text-white">{label}</span>
       </div>
-      <div className="text-sm text-gray-500 dark:text-emerald-300/80 whitespace-nowrap text-ellipsis overflow-hidden">
+      <div className="text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden pl-7">
         {description}
       </div>
     </div>
@@ -56,13 +52,13 @@ export const NavDropdown: React.FC<DropdownProps> = ({ label, items }) => {
   return (
     <div ref={dropdownRef} className="relative inline-block">
       <button
-        className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-[15px] font-medium transition-colors"
+        className="flex items-center text-muted-foreground hover:text-foreground text-base font-medium transition-colors"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
         {label}
-        <ChevronDown className={`ml-1.5 h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       <AnimatePresence>
@@ -74,7 +70,7 @@ export const NavDropdown: React.FC<DropdownProps> = ({ label, items }) => {
             transition={{ duration: 0.15 }}
             className="absolute left-0 mt-2 z-50"
           >
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-border w-80 p-2 space-y-1">
+            <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-border dark:border-slate-800 w-96 p-2 space-y-1">
               {items.map((item, index) => (
                 <NavDropdownItem key={index} {...item} />
               ))}
