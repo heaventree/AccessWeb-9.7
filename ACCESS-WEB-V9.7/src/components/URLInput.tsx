@@ -36,13 +36,13 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
     return (
       <div className="w-full max-w-4xl mx-auto">
         <form onSubmit={handleSubmit} className="w-full">
-          <div className="flex items-stretch w-full bg-white p-2 rounded-xl shadow-sm border border-gray-100">
+          <div className="flex items-stretch w-full bg-white p-2 rounded-full shadow-sm border border-gray-100">
             <input
               type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Enter website URL (e.g., example.com)"
-              className="flex-1 px-4 py-2 text-base text-gray-700 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0fae96]/50 transition-all"
+              className="flex-1 px-4 py-2 text-base text-gray-700 bg-gray-50 rounded-full focus:outline-none focus:ring-2 focus:ring-[#0fae96]/50 transition-all"
               disabled={isLoading}
               required
               aria-invalid={!!error}
@@ -80,13 +80,13 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
     <div className="w-full max-w-4xl mx-auto">
       <form onSubmit={handleSubmit} className="w-full">
         <div className="flex flex-col items-center space-y-4">
-          <div className="flex items-stretch w-full bg-white p-3 rounded-2xl shadow-lg border border-gray-100">
+          <div className="flex items-stretch w-full bg-white p-3 rounded-full shadow-lg border border-gray-100">
             <input
               type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Enter website URL (e.g., example.com)"
-              className="flex-1 px-6 py-4 text-lg text-gray-700 bg-gray-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0fae96]/50 transition-all"
+              className="flex-1 px-6 py-4 text-lg text-gray-700 bg-gray-50 rounded-full focus:outline-none focus:ring-2 focus:ring-[#0fae96]/50 transition-all"
               disabled={isLoading}
               required
               aria-invalid={!!error}
