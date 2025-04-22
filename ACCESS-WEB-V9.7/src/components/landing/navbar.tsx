@@ -8,7 +8,8 @@ import {
   CheckCircle,
   ArrowRight,
   Sun,
-  Moon
+  Moon,
+  User
 } from "lucide-react";
 import NavDropdown from "./navbar-dropdown";
 import NavigationIcons from "../navigation/NavigationIconGuide";
@@ -191,6 +192,58 @@ export default function Navbar() {
       href: '/non-destructive-fixes'
     }
   ];
+  
+  // My Account dropdown items
+  const accountDropdownItems = [
+    {
+      icon: NavigationIcons.userDashboard.overview,
+      label: 'Account Dashboard',
+      description: 'View your account dashboard',
+      href: '/my-account'
+    },
+    {
+      icon: NavigationIcons.userDashboard.websites,
+      label: 'Monitoring & Compliance',
+      description: 'Real-time monitoring & compliance',
+      href: '/my-account/monitoring'
+    },
+    {
+      icon: NavigationIcons.adminDashboard.analytics,
+      label: 'Analytics',
+      description: 'Accessibility analytics and insights',
+      href: '/my-account/analytics'
+    },
+    {
+      icon: NavigationIcons.userDashboard.webhooks,
+      label: 'Alerts',
+      description: 'Configure accessibility alerts',
+      href: '/my-account/alerts'
+    },
+    {
+      icon: NavigationIcons.userDashboard.connectedServices,
+      label: 'Connections',
+      description: 'Manage API and platform connections',
+      href: '/my-account/connections'
+    },
+    {
+      icon: NavigationIcons.userDashboard.preferences,
+      label: 'Settings',
+      description: 'Manage account settings',
+      href: '/my-account/settings'
+    },
+    {
+      icon: NavigationIcons.userDashboard.billing,
+      label: 'Billing',
+      description: 'Manage billing and subscriptions',
+      href: '/my-account/billing'
+    },
+    {
+      icon: NavigationIcons.userDashboard.teamMembers,
+      label: 'Team',
+      description: 'Manage team members',
+      href: '/my-account/team'
+    }
+  ];
 
   const navItems = [
     { label: "Features", href: "#features" },
@@ -219,6 +272,13 @@ export default function Navbar() {
           
           {/* Resources Dropdown */}
           <NavDropdown label="Resources" items={resourcesDropdownItems} />
+          
+          {/* My Account Dropdown */}
+          <NavDropdown 
+            label="My Account" 
+            items={accountDropdownItems} 
+            icon={<User className="h-4 w-4 mr-1" />} 
+          />
           
           {/* Regular nav items */}
           {navItems.map((item, index) => (
@@ -320,6 +380,22 @@ export default function Navbar() {
             <div className="py-2 mb-2">
               <h3 className="font-medium text-base mb-2 dark:text-[#86e4d4]">Resources</h3>
               {resourcesDropdownItems.map((item, index) => (
+                <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
+                  <div className="flex items-center mb-1">
+                    <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
+                    <span className="dark:text-white">{item.label}</span>
+                  </div>
+                  <div className="pl-7 text-base text-muted-foreground dark:text-[#86e4d4] whitespace-nowrap text-ellipsis overflow-hidden">
+                    {item.description}
+                  </div>
+                </Link>
+              ))}
+            </div>
+            
+            {/* My Account Section */}
+            <div className="py-2 mb-2">
+              <h3 className="font-medium text-base mb-2 dark:text-[#86e4d4]">My Account</h3>
+              {accountDropdownItems.map((item, index) => (
                 <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
                   <div className="flex items-center mb-1">
                     <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
