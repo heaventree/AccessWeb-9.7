@@ -102,13 +102,13 @@ export default function Navbar() {
       icon: NavigationIcons.tools.wcagChecker, 
       label: 'WCAG Checker',
       description: 'Test your website against WCAG standards',
-      href: '/tools/wcag-checker'
+      href: '/checker'
     },
     { 
       icon: NavigationIcons.tools.colorPalette, 
       label: 'Color Palette',
       description: 'Create accessible color combinations',
-      href: '/tools/color-palette'
+      href: '/tools/colors'
     },
     { 
       icon: NavigationIcons.tools.colorSimulator, 
@@ -121,6 +121,12 @@ export default function Navbar() {
       label: 'WCAG Standards',
       description: 'Browse WCAG 2.1 standards',
       href: '/tools/wcag-standards'
+    },
+    { 
+      icon: NavigationIcons.tools.imageAltScanner, 
+      label: 'Image Alt Scanner',
+      description: 'Find and fix image accessibility issues',
+      href: '/tools/image-alt-scanner'
     }
   ];
 
@@ -129,31 +135,31 @@ export default function Navbar() {
     { 
       icon: NavigationIcons.integrations.shopify, 
       label: 'Shopify',
-      description: 'Integrate with your Shopify store',
+      description: 'Shopify theme accessibility',
       href: '/integrations/shopify'
     },
     { 
       icon: NavigationIcons.integrations.wordpress, 
       label: 'WordPress',
-      description: 'Add accessibility to your WordPress site',
-      href: '/integrations/wordpress'
+      description: 'WordPress site accessibility',
+      href: '/wordpressint'
     },
     { 
       icon: NavigationIcons.integrations.api, 
-      label: 'API',
-      description: 'Connect with our RESTful API',
+      label: 'Custom API',
+      description: 'API integration & webhooks',
       href: '/integrations/api'
     },
     { 
       icon: NavigationIcons.integrations.compliance, 
       label: 'Compliance',
-      description: 'Enterprise-grade compliance reports',
+      description: 'Compliance monitoring & reporting',
       href: '/integrations/compliance'
     },
     { 
       icon: NavigationIcons.integrations.enterprise, 
       label: 'Enterprise',
-      description: 'Custom solutions for large organizations',
+      description: 'Enterprise-grade solutions',
       href: '/integrations/enterprise'
     }
   ];
@@ -164,19 +170,25 @@ export default function Navbar() {
       icon: NavigationIcons.resources.documentation, 
       label: 'Documentation',
       description: 'Technical guides and API docs',
-      href: '/resources/documentation'
+      href: '/docs'
     },
     { 
       icon: NavigationIcons.resources.helpCenter, 
       label: 'Help Center',
       description: 'FAQs and troubleshooting',
-      href: '/resources/help-center'
+      href: '/help'
     },
     { 
       icon: NavigationIcons.resources.blog, 
       label: 'Blog',
-      description: 'Articles and accessibility updates',
-      href: '/resources/blog'
+      description: 'Articles and updates',
+      href: '/blog'
+    },
+    { 
+      icon: NavigationIcons.resources.nonDestructiveFixes, 
+      label: 'Non-Destructive Fixes',
+      description: 'CSS-based accessibility fixes',
+      href: '/non-destructive-fixes'
     }
   ];
 
@@ -221,14 +233,16 @@ export default function Navbar() {
         </nav>
         
         <div className="flex items-center space-x-5">
-          <a href="#" className="hidden md:inline-block text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium transition-colors">
+          <Link to="/login" className="hidden md:inline-block text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium transition-colors">
             Login
-          </a>
-          <Button 
-            className="bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-6 text-white"
-          >
-            Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+          </Link>
+          <Link to="/signup">
+            <Button 
+              className="bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-6 text-white"
+            >
+              Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
           
           {/* Dark Mode Toggle Button */}
           <button
@@ -331,13 +345,13 @@ export default function Navbar() {
             ))}
             <div className="pt-3 mt-3 border-t border-border">
               <div className="flex items-center justify-between py-3">
-                <a 
-                  href="#" 
+                <Link 
+                  to="/login" 
                   className="text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Login
-                </a>
+                </Link>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -349,12 +363,14 @@ export default function Navbar() {
                   {darkMode ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
               </div>
-              <Button 
-                className="w-full mt-3 bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-6 text-white"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link to="/signup" className="w-full">
+                <Button 
+                  className="w-full mt-3 bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-6 text-white"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </motion.div>
         )}
