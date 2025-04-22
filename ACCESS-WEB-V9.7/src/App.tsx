@@ -2,7 +2,6 @@ import { Routes, Route } from 'react-router-dom';
 import { AppProvider } from './providers/AppProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import { LandingPage } from './pages/LandingPage';
-import { AppShell } from './components/shell/AppShell';
 import PricingPage from './pages/PricingPage';
 import { SubscriptionDashboard } from './pages/SubscriptionDashboard';
 import { PaymentPage } from './pages/PaymentPage';
@@ -114,10 +113,10 @@ function App() {
           <a href="#main-content" className="skip-to-main">Skip to main content</a>
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<AppShell><LandingPage /></AppShell>} />
+            <Route path="/" element={<><Navigation /><main id="main-content"><LandingPage /></main><Footer /><BackToTop /></>} />
             <Route path="/pricing" element={<><Navigation /><main id="main-content"><PricingPage /></main><Footer /><BackToTop /></>} />
             <Route path="/wordpressint" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
-            <Route path="/checker" element={<AppShell><WCAGCheckerPage /></AppShell>} />
+            <Route path="/checker" element={<><Navigation /><main id="main-content"><WCAGCheckerPage /></main><Footer /><BackToTop /></>} />
             <Route path="/tools/wcag-standards" element={<><Navigation /><main id="main-content"><WCAGStandardsTable /></main><Footer /><BackToTop /></>} />
             <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
             <Route path="/tools/monitoring" element={<><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></>} />
