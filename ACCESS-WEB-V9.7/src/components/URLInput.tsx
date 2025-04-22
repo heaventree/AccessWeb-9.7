@@ -67,7 +67,7 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
             </button>
           </div>
           {error && (
-            <p id="url-error" className="mt-2 text-sm text-red-600" role="alert">
+            <p id="url-error" className="mt-2 text-sm text-red-600 dark:text-red-400" role="alert">
               {error}
             </p>
           )}
@@ -111,7 +111,7 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
             </button>
           </div>
           {error && (
-            <p id="url-error" className="mt-2 text-sm text-red-600" role="alert">
+            <p id="url-error" className="mt-2 text-sm text-red-600 dark:text-red-400" role="alert">
               {error}
             </p>
           )}
