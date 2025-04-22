@@ -1098,33 +1098,21 @@ export function WCAGColorPalette() {
 
   return (
     <div>
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            WCAG Color Palette Generator
-          </h2>
-          <p className="text-gray-600">
-            Generate accessible color combinations that meet WCAG 2.1 and 2.2 contrast requirements.
-            Our algorithm creates diverse palettes using multiple color harmonies including complementary, analogous, triadic, 
-            monochromatic, tetradic, square, and split-complementary.
-          </p>
-        </div>
-
-        {isGenerating && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <LoadingSpinner size="large" className="mb-4" />
-              <p className="text-gray-900 font-medium">Generating Color Palette...</p>
-            </div>
+      {isGenerating && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+            <LoadingSpinner size="large" className="mb-4" />
+            <p className="text-gray-900 dark:text-white font-medium">Generating Color Palette...</p>
           </div>
-        )}
+        </div>
+      )}
 
         {/* Generator Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 border-2 border-primary-100 relative">
-          <div className="absolute -top-3 left-4 bg-white px-2">
-            <span className="text-xs font-medium text-primary-600 uppercase tracking-wider">Palette Generator</span>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6 border border-gray-100 dark:border-gray-700 relative">
+          <div className="absolute -top-3 left-4 bg-white dark:bg-gray-800 px-2">
+            <span className="text-xs font-medium text-[#0fae96] dark:text-[#0fae96]/90 uppercase tracking-wider">Palette Generator</span>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 mt-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 mt-2">
             <div className="flex items-center justify-between">
               <span>Generate Custom Palette</span>
             </div>
@@ -1359,9 +1347,9 @@ export function WCAGColorPalette() {
 
         {/* Generated Palette */}
         {generatedPalette.length > 0 && (
-          <div className="border-2 border-dashed border-secondary-100 rounded-lg p-6 mb-8 bg-white shadow-md relative">
-            <div className="absolute -top-3 left-4 bg-white px-2">
-              <span className="text-xs font-medium text-secondary-600 uppercase tracking-wider">Generated Palette</span>
+          <div className="border border-gray-100 dark:border-gray-700 rounded-xl p-6 mb-6 bg-white dark:bg-gray-800 shadow-sm relative">
+            <div className="absolute -top-3 left-4 bg-white dark:bg-gray-800 px-2">
+              <span className="text-xs font-medium text-[#0fae96] dark:text-[#0fae96]/90 uppercase tracking-wider">Generated Palette</span>
             </div>
             
             <div className="flex justify-between items-center gap-4 mb-6">
