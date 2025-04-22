@@ -4,8 +4,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Gauge, Palette, FileText, Zap, Settings, Store, Globe, Activity, ActivitySquare, Book, HelpCircle, BarChart2, Bell, Shield, Building, LayoutDashboard, CreditCard, Users, User, Image } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { FeedbackToggle } from './FeedbackToggle';
+import Navbar from './landing/navbar';
 
 export function Navigation() {
+  // Use the new Navbar component instead
+  return <Navbar />;
+}
+
+// This is the original Navigation component, kept here for reference
+export function OldNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const location = useLocation();
