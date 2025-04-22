@@ -286,7 +286,7 @@ export default function Navbar() {
           >
             {/* Tools Section */}
             <div className="py-2 mb-2">
-              <h3 className="font-medium text-base mb-2 dark:text-[#5eead4]">Tools</h3>
+              <h3 className="font-medium text-base mb-2 dark:text-[#86e4d4]">Tools</h3>
               {toolsDropdownItems.map((item, index) => (
                 <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
                   <div className="flex items-center mb-1">
@@ -302,7 +302,7 @@ export default function Navbar() {
             
             {/* Integrations Section */}
             <div className="py-2 mb-2">
-              <h3 className="font-medium text-base mb-2 dark:text-[#5eead4]">Integrations</h3>
+              <h3 className="font-medium text-base mb-2 dark:text-[#86e4d4]">Integrations</h3>
               {integrationsDropdownItems.map((item, index) => (
                 <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
                   <div className="flex items-center mb-1">
@@ -318,7 +318,7 @@ export default function Navbar() {
             
             {/* Resources Section */}
             <div className="py-2 mb-2">
-              <h3 className="font-medium text-base mb-2 dark:text-[#5eead4]">Resources</h3>
+              <h3 className="font-medium text-base mb-2 dark:text-[#86e4d4]">Resources</h3>
               {resourcesDropdownItems.map((item, index) => (
                 <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
                   <div className="flex items-center mb-1">

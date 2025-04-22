@@ -23,7 +23,7 @@ const NavDropdownItem: React.FC<DropdownItemProps> = ({ icon: Icon, label, descr
         <Icon className="h-5 w-5 text-[#0fae96] dark:text-[#5eead4] mr-2 flex-shrink-0" />
         <span className="font-medium text-base dark:text-white">{label}</span>
       </div>
-      <div className="text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden pl-7">
+      <div className="text-base text-muted-foreground dark:text-[#86e4d4] whitespace-nowrap text-ellipsis overflow-hidden pl-7">
         {description}
       </div>
     </Link>
