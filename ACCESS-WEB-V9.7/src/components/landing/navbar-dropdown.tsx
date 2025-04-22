@@ -14,6 +14,7 @@ interface DropdownItemProps {
 interface DropdownProps {
   label: string;
   items: DropdownItemProps[];
+  icon?: React.ReactNode;
 }
 
 const NavDropdownItem: React.FC<DropdownItemProps> = ({ icon: Icon, label, description, href }) => {
@@ -30,7 +31,7 @@ const NavDropdownItem: React.FC<DropdownItemProps> = ({ icon: Icon, label, descr
   );
 };
 
-export const NavDropdown: React.FC<DropdownProps> = ({ label, items }) => {
+export const NavDropdown: React.FC<DropdownProps> = ({ label, items, icon }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -56,6 +57,7 @@ export const NavDropdown: React.FC<DropdownProps> = ({ label, items }) => {
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
+        {icon && <span className="mr-1">{icon}</span>}
         {label}
         <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
