@@ -18,13 +18,15 @@ interface DropdownProps {
 
 const NavDropdownItem: React.FC<DropdownItemProps> = ({ icon: Icon, label, description, href }) => {
   return (
-    <div className="flex flex-col hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 cursor-pointer py-2.5 px-3 rounded-lg transition-all duration-200" 
+    <div className="flex flex-col hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/20 cursor-pointer py-3 px-3.5 rounded-lg transition-all duration-200" 
          onClick={() => window.location.href = href}>
-      <div className="flex items-center mb-1">
-        <Icon className="h-4 w-4 text-[#0fae96] dark:text-[#5eead4] mr-2.5 flex-shrink-0" />
-        <span className="font-medium text-sm text-gray-900 dark:text-white">{label}</span>
+      <div className="flex items-center mb-1.5">
+        <div className="w-5 h-5 flex items-center justify-center mr-3 text-[#0fae96] dark:text-[#5eead4] flex-shrink-0">
+          <Icon className="w-[18px] h-[18px]" />
+        </div>
+        <span className="font-medium text-[15px] text-gray-800 dark:text-white leading-none">{label}</span>
       </div>
-      <div className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap text-ellipsis overflow-hidden pl-6.5">
+      <div className="text-[13px] text-gray-500 dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden pl-8 leading-relaxed opacity-80">
         {description}
       </div>
     </div>
@@ -52,13 +54,13 @@ export const NavDropdown: React.FC<DropdownProps> = ({ label, items }) => {
   return (
     <div ref={dropdownRef} className="relative inline-block">
       <button
-        className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm font-medium transition-colors"
+        className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-[15px] font-medium transition-colors"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
         {label}
-        <ChevronDown className={`ml-1 h-3.5 w-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`ml-1.5 h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       <AnimatePresence>
@@ -70,7 +72,12 @@ export const NavDropdown: React.FC<DropdownProps> = ({ label, items }) => {
             transition={{ duration: 0.15 }}
             className="absolute left-0 mt-2 z-50"
           >
-            <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 w-[280px] p-2 space-y-0.5" style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(16px)' }}>
+            <div className="bg-white/98 dark:bg-slate-900/98 backdrop-blur-lg rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 w-[320px] p-2.5 space-y-0.5" 
+                 style={{ 
+                   backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                   backdropFilter: 'blur(16px)', 
+                   boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.07)'
+                 }}>
               {items.map((item, index) => (
                 <NavDropdownItem key={index} {...item} />
               ))}
