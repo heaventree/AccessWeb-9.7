@@ -6,10 +6,10 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
+} from "../../components/ui/accordion";
+import { Badge } from "../../components/ui/badge";
 import { ArrowRight, Plus, Minus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "../../components/ui/button";
 
 interface FAQItemProps {
   question: string;

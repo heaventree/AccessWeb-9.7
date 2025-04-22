@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
 import { FormEvent } from "react";
 import { motion } from "framer-motion";
 import { PlayCircle, CheckCircle, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface HeroSectionProps {
   onTrialSignup: (e: FormEvent) => Promise<void>;
@@ -9,6 +9,7 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ onTrialSignup, isSubmitting }: HeroSectionProps) {
+  const navigate = useNavigate();
   return (
     <section className="pt-28 pb-16 md:pb-32 bg-gradient-to-b from-[#f9fdff] to-white dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4">
@@ -29,23 +30,21 @@ export default function HeroSection({ onTrialSignup, isSubmitting }: HeroSection
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <form onSubmit={onTrialSignup} className="flex-shrink-0">
-                <Button 
+                <button 
                   type="submit" 
-                  size="lg" 
                   disabled={isSubmitting}
                   className="w-full sm:w-auto bg-primary hover:bg-primary/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-8 py-6 text-white"
                 >
                   {isSubmitting ? "Starting..." : "Start Free Trial"} <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                </button>
               </form>
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-[#5eead4] transition-colors rounded-full px-8 py-6"
+              <button 
+                className="border border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-[#5eead4] transition-colors rounded-full px-8 py-6"
+                onClick={() => navigate('/demo')}
               >
                 <PlayCircle className="mr-2 h-5 w-5 text-primary dark:text-[#5eead4]" />
                 Watch Demo
-              </Button>
+              </button>
             </div>
           </motion.div>
         </div>

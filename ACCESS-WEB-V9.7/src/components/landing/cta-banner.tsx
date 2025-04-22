@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "../../components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, FormEvent } from "react";
@@ -11,6 +12,7 @@ interface CTABannerProps {
 export default function CTABanner({ onTrialSignup, isSubmitting }: CTABannerProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const navigate = useNavigate();
 
   return (
     <section className="py-16 md:py-20 bg-gradient-to-r from-primary to-indigo-500">
@@ -40,6 +42,7 @@ export default function CTABanner({ onTrialSignup, isSubmitting }: CTABannerProp
             <Button 
               variant="outline" 
               size="lg"
+              onClick={() => navigate('/pricing')}
               className="px-8 py-3.5 bg-transparent border border-white text-white hover:bg-white/10 transition-colors"
             >
               View pricing

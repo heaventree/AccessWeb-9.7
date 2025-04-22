@@ -9,7 +9,7 @@ import {
   Code2, 
   RefreshCw
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "../../components/ui/badge";
 
 interface FeatureProps {
   icon: React.ReactNode;
