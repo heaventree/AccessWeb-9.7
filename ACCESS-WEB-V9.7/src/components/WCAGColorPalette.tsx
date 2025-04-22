@@ -1,5 +1,18 @@
-import React, { useState, useRef } from 'react';
-import { RefreshCw, Copy, Info, Check, FileText, FileDown } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { 
+  RefreshCw, 
+  Copy, 
+  Info, 
+  Check, 
+  FileText, 
+  FileDown, 
+  Sun, 
+  Moon, 
+  Shuffle, 
+  Palette, 
+  Lock, 
+  Unlock
+} from 'lucide-react';
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -12,10 +25,229 @@ interface ColorCombination {
   ratio: number;
   wcagLevel: 'AAA' | 'AA' | 'Fail';
   isBaseColor?: boolean;
+  isLocked?: boolean;
 }
 
 // Color harmony type
 type ColorHarmony = 'complementary' | 'analogous' | 'triadic' | 'split-complementary' | 'monochromatic' | 'tetradic' | 'square' | 'all';
+
+// Color name database - common colors with their names
+const colorNameDatabase = {
+  // Reds
+  '#FF0000': 'Red',
+  '#DC143C': 'Crimson',
+  '#CD5C5C': 'Indian Red',
+  '#F08080': 'Light Coral',
+  '#FA8072': 'Salmon',
+  '#E9967A': 'Dark Salmon',
+  '#FFA07A': 'Light Salmon',
+  '#B22222': 'Fire Brick',
+  '#8B0000': 'Dark Red',
+  '#FF6347': 'Tomato',
+  
+  // Pinks
+  '#FFC0CB': 'Pink',
+  '#FFB6C1': 'Light Pink',
+  '#FF69B4': 'Hot Pink',
+  '#FF1493': 'Deep Pink',
+  '#DB7093': 'Pale Violet Red',
+  '#C71585': 'Medium Violet Red',
+  
+  // Oranges
+  '#FFA500': 'Orange',
+  '#FF8C00': 'Dark Orange',
+  '#FF7F50': 'Coral',
+  '#FF4500': 'Orange Red',
+  
+  // Yellows
+  '#FFFF00': 'Yellow',
+  '#FFFFE0': 'Light Yellow',
+  '#FFFACD': 'Lemon Chiffon',
+  '#FAFAD2': 'Light Goldenrod',
+  '#FFEFD5': 'Papaya Whip',
+  '#FFE4B5': 'Moccasin',
+  '#FFDAB9': 'Peach Puff',
+  '#EEE8AA': 'Pale Goldenrod',
+  '#F0E68C': 'Khaki',
+  '#BDB76B': 'Dark Khaki',
+  '#FFD700': 'Gold',
+  
+  // Purples
+  '#800080': 'Purple',
+  '#9370DB': 'Medium Purple',
+  '#7B68EE': 'Medium Slate Blue',
+  '#6A5ACD': 'Slate Blue',
+  '#483D8B': 'Dark Slate Blue',
+  '#663399': 'Rebecca Purple',
+  '#4B0082': 'Indigo',
+  '#8A2BE2': 'Blue Violet',
+  '#9932CC': 'Dark Orchid',
+  '#9400D3': 'Dark Violet',
+  '#8B008B': 'Dark Magenta',
+  '#BA55D3': 'Medium Orchid',
+  '#DA70D6': 'Orchid',
+  '#EE82EE': 'Violet',
+  '#DDA0DD': 'Plum',
+  '#D8BFD8': 'Thistle',
+  '#E6E6FA': 'Lavender',
+  
+  // Greens
+  '#008000': 'Green',
+  '#006400': 'Dark Green',
+  '#228B22': 'Forest Green',
+  '#2E8B57': 'Sea Green',
+  '#3CB371': 'Medium Sea Green',
+  '#66CDAA': 'Medium Aquamarine',
+  '#8FBC8F': 'Dark Sea Green',
+  '#90EE90': 'Light Green',
+  '#98FB98': 'Pale Green',
+  '#7CFC00': 'Lawn Green',
+  '#7FFF00': 'Chartreuse',
+  '#ADFF2F': 'Green Yellow',
+  '#00FF00': 'Lime',
+  '#32CD32': 'Lime Green',
+  '#9ACD32': 'Yellow Green',
+  '#556B2F': 'Dark Olive Green',
+  '#6B8E23': 'Olive Drab',
+  '#808000': 'Olive',
+  
+  // Blues
+  '#0000FF': 'Blue',
+  '#000080': 'Navy',
+  '#00008B': 'Dark Blue',
+  '#0000CD': 'Medium Blue',
+  '#4169E1': 'Royal Blue',
+  '#1E90FF': 'Dodger Blue',
+  '#00BFFF': 'Deep Sky Blue',
+  '#87CEEB': 'Sky Blue',
+  '#87CEFA': 'Light Sky Blue',
+  '#ADD8E6': 'Light Blue',
+  '#B0E0E6': 'Powder Blue',
+  '#B0C4DE': 'Light Steel Blue',
+  '#4682B4': 'Steel Blue',
+  '#5F9EA0': 'Cadet Blue',
+  
+  // Cyans
+  '#00FFFF': 'Cyan',
+  '#00CED1': 'Dark Turquoise',
+  '#40E0D0': 'Turquoise',
+  '#48D1CC': 'Medium Turquoise',
+  '#20B2AA': 'Light Sea Green',
+  '#008B8B': 'Dark Cyan',
+  '#008080': 'Teal',
+  '#7FFFD4': 'Aquamarine',
+  '#AFEEEE': 'Pale Turquoise',
+  '#E0FFFF': 'Light Cyan',
+  
+  // Browns
+  '#A52A2A': 'Brown',
+  '#8B4513': 'Saddle Brown',
+  '#A0522D': 'Sienna',
+  '#D2691E': 'Chocolate',
+  '#CD853F': 'Peru',
+  '#DEB887': 'Burlywood',
+  '#F4A460': 'Sandy Brown',
+  '#DAA520': 'Goldenrod',
+  '#B8860B': 'Dark Goldenrod',
+  
+  // Whites
+  '#FFFFFF': 'White',
+  '#FFFAFA': 'Snow',
+  '#F0FFF0': 'Honeydew',
+  '#F5FFFA': 'Mint Cream',
+  '#F0FFFF': 'Azure',
+  '#F0F8FF': 'Alice Blue',
+  '#F8F8FF': 'Ghost White',
+  '#F5F5F5': 'White Smoke',
+  '#FFF5EE': 'Seashell',
+  '#FFFAF0': 'Floral White',
+  '#F5F5DC': 'Beige',
+  '#FDF5E6': 'Old Lace',
+  '#FFFFF0': 'Ivory',
+  '#FAF0E6': 'Linen',
+  '#FFF0F5': 'Lavender Blush',
+  '#FFE4E1': 'Misty Rose',
+  
+  // Grays and blacks
+  '#808080': 'Gray',
+  '#A9A9A9': 'Dark Gray',
+  '#696969': 'Dim Gray',
+  '#778899': 'Light Slate Gray',
+  '#708090': 'Slate Gray',
+  '#2F4F4F': 'Dark Slate Gray',
+  '#000000': 'Black',
+  '#D3D3D3': 'Light Gray',
+  '#DCDCDC': 'Gainsboro',
+  '#EFEFEF': 'White Smoke'
+};
+
+// Function to find the closest named color in our database
+function findClosestNamedColor(hex: string): string {
+  // First, check if there's an exact match in our database
+  const normalizedHex = hex.toUpperCase();
+  const database = colorNameDatabase as Record<string, string>;
+  if (database[normalizedHex]) {
+    return database[normalizedHex];
+  }
+  
+  // If no exact match, find the closest color (by RGB distance)
+  const targetRgb = hexToRgb(hex);
+  let closestName = "Custom";
+  let minDistance = Number.MAX_VALUE;
+  
+  for (const [colorHex, colorName] of Object.entries(database)) {
+    const currentRgb = hexToRgb(colorHex);
+    
+    // Calculate the Euclidean distance between the RGB values
+    const distance = Math.sqrt(
+      Math.pow(targetRgb.r - currentRgb.r, 2) +
+      Math.pow(targetRgb.g - currentRgb.g, 2) +
+      Math.pow(targetRgb.b - currentRgb.b, 2)
+    );
+    
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestName = colorName;
+    }
+  }
+  
+  // If the distance is too large, create a descriptive name based on HSL
+  if (minDistance > 80) {
+    const hsl = rgbToHsl(targetRgb.r, targetRgb.g, targetRgb.b);
+    
+    // Extract hue name
+    let hueName = "Custom";
+    if (hsl.h >= 0 && hsl.h < 30) hueName = "Red";
+    else if (hsl.h < 60) hueName = "Orange";
+    else if (hsl.h < 90) hueName = "Yellow";
+    else if (hsl.h < 150) hueName = "Green";
+    else if (hsl.h < 210) hueName = "Cyan";
+    else if (hsl.h < 270) hueName = "Blue";
+    else if (hsl.h < 330) hueName = "Purple";
+    else hueName = "Red";
+    
+    // Add lightness/darkness modifier
+    let lightnessModifier = "";
+    if (hsl.l < 20) lightnessModifier = "Dark ";
+    else if (hsl.l > 80) lightnessModifier = "Light ";
+    
+    // Add saturation modifier
+    let saturationModifier = "";
+    if (hsl.s < 20) {
+      if (hsl.l < 30) return "Dark Gray";
+      else if (hsl.l > 80) return "White";
+      else return "Gray";
+    } else if (hsl.s < 40) {
+      saturationModifier = "Grayish ";
+    } else if (hsl.s > 80) {
+      saturationModifier = "Vibrant ";
+    }
+    
+    return `${lightnessModifier}${saturationModifier}${hueName}`;
+  }
+  
+  return closestName;
+}
 
 // Color utility functions
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
@@ -294,16 +526,20 @@ function generateAccessiblePalette(baseColor: string, harmonyType: ColorHarmony 
     // If it's the first one (index 0), always mark it as "Base" regardless of other factors
     let name = i === 0 ? "Base" : determineColorName(baseHsl, bgHsl, harmonyType);
     
-    // Add to combinations
-    combinations.push({
-      background: bgColor,
-      text: textColor,
-      name,
-      ratio,
-      wcagLevel,
-      // Flag to indicate this is the base color (for highlighting in UI)
-      isBaseColor: i === 0
-    });
+    // Add to combinations - only if it meets WCAG standards or is the base color
+    if (wcagLevel !== 'Fail' || i === 0) {
+      combinations.push({
+        background: bgColor,
+        text: textColor,
+        name,
+        ratio,
+        wcagLevel,
+        // Flag to indicate this is the base color (for highlighting in UI)
+        isBaseColor: i === 0,
+        // Lock the base color by default
+        isLocked: i === 0
+      });
+    }
   }
   
   // First, make sure the base color is always at the front of the array, 
@@ -605,7 +841,34 @@ export function WCAGColorPalette() {
   const [generatedPalette, setGeneratedPalette] = useState<ColorCombination[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [colorHarmony, setColorHarmony] = useState<ColorHarmony>('all');
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const paletteRef = useRef<HTMLDivElement>(null);
+  
+  // Function to clear/reset the generator
+  const clearGenerator = () => {
+    setGeneratedPalette([]);
+    setBaseColor('#1a365d');
+  };
+
+  // Initialize palette when component mounts
+  useEffect(() => {
+    if (generatedPalette.length === 0) {
+      const initialPalette = generateAccessiblePalette(baseColor, colorHarmony);
+      
+      // Make sure the base color (index 0) is locked by default
+      const updatedInitialPalette = initialPalette.map((combo, index) => {
+        if (index === 0) {
+          return {
+            ...combo,
+            isLocked: true // Main color is locked by default
+          };
+        }
+        return combo;
+      });
+      
+      setGeneratedPalette(updatedInitialPalette);
+    }
+  }, []);
 
   const copyToClipboard = (color: string) => {
     navigator.clipboard.writeText(color);
@@ -619,16 +882,160 @@ export function WCAGColorPalette() {
       const newBaseColor = generateRandomColor();
       setBaseColor(newBaseColor);
       const newPalette = generateAccessiblePalette(newBaseColor, colorHarmony);
-      setGeneratedPalette(newPalette);
+      
+      // Ensure the main color is locked in the new palette
+      const updatedPalette = newPalette.map((combo, index) => {
+        if (index === 0) {
+          return {
+            ...combo,
+            isLocked: true // Main color is always locked
+          };
+        }
+        return combo;
+      });
+      
+      setGeneratedPalette(updatedPalette);
       setIsGenerating(false);
     }, 500);
+  };
+
+  // Shuffle function to randomize non-locked colors
+  const shufflePalette = () => {
+    setIsGenerating(true);
+    
+    setTimeout(() => {
+      // Start with a copy of the current palette
+      const currentPalette = [...generatedPalette];
+      
+      // For each unlocked color (except the main color), create a new HSL-based random color
+      const shuffledPalette = currentPalette.map((color, index) => {
+        // Always keep the main color (index 0) and any locked colors
+        if (index === 0 || color.isLocked) {
+          // For the main color, ensure it's always locked
+          if (index === 0) {
+            return { ...color, isLocked: true };
+          }
+          return color;
+        }
+        
+        // For unlocked colors, generate new random vibrant colors
+        const h = Math.floor(Math.random() * 360); // Random hue (0-359)
+        const s = 70 + Math.floor(Math.random() * 30); // Saturation (70-100%)
+        const l = 40 + Math.floor(Math.random() * 30); // Lightness (40-70%)
+        
+        // Convert HSL to RGB
+        const rgb = hslToRgb(h, s, l);
+        
+        // Convert RGB to hex
+        const background = rgbToHex(rgb.r, rgb.g, rgb.b);
+        
+        // Calculate text contrast - choose black or white for best contrast
+        const colorLuminance = getLuminance(rgb.r, rgb.g, rgb.b);
+        const blackLuminance = getLuminance(0, 0, 0);
+        const whiteLuminance = getLuminance(255, 255, 255);
+        
+        const blackContrast = getContrastRatio(colorLuminance, blackLuminance);
+        const whiteContrast = getContrastRatio(colorLuminance, whiteLuminance);
+        
+        const text = blackContrast > whiteContrast ? '#000000' : '#ffffff';
+        const ratio = Math.max(blackContrast, whiteContrast);
+        
+        // Determine WCAG level based on contrast ratio
+        let wcagLevel: 'AAA' | 'AA' | 'Fail' = 'Fail';
+        if (ratio >= 7) wcagLevel = 'AAA';
+        else if (ratio >= 4.5) wcagLevel = 'AA';
+        
+        // Determine relationship to base color
+        let name = "Random";
+        const baseRgb = hexToRgb(baseColor);
+        const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+        
+        // Compare hues to determine relationship
+        const hueDiff = Math.abs(h - baseHsl.h);
+        if (hueDiff < 30 || hueDiff > 330) {
+          name = "Analogous";
+        } else if (hueDiff > 150 && hueDiff < 210) {
+          name = "Complementary";
+        } else if (Math.abs(hueDiff - 120) < 30 || Math.abs(hueDiff - 240) < 30) {
+          name = "Triadic";
+        }
+        
+        // Return the new color with all properties
+        return {
+          background,
+          text,
+          name,
+          ratio,
+          wcagLevel,
+          isBaseColor: false,
+          isLocked: false
+        };
+      });
+      
+      // Update the palette state
+      setGeneratedPalette(shuffledPalette);
+      setIsGenerating(false);
+    }, 300);
   };
 
   const handleBaseColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = e.target.value;
     setBaseColor(newColor);
+    
+    // Keep locked colors when changing base color
     const newPalette = generateAccessiblePalette(newColor, colorHarmony);
-    setGeneratedPalette(newPalette);
+    
+    const updatedPalette = newPalette.map((combo, index) => {
+      // Keep locked colors except for the base color (index 0)
+      const previousCombo = generatedPalette[index];
+      if (index > 0 && previousCombo && previousCombo.isLocked) {
+        return {
+          ...previousCombo,
+          ratio: previousCombo.ratio,
+          wcagLevel: previousCombo.wcagLevel
+        };
+      }
+      return combo;
+    });
+    
+    setGeneratedPalette(updatedPalette);
+  };
+
+  // Toggle lock for a specific color in the palette
+  const toggleLock = (index: number) => {
+    // If it's the main color (index 0), we don't allow unlocking
+    if (index === 0) {
+      // Always make sure the main color is locked - we can call this to ensure it
+      const updatedPalette = generatedPalette.map((combo, i) => {
+        if (i === 0) {
+          return {
+            ...combo,
+            isLocked: true // Always keep the main color locked
+          };
+        }
+        return combo;
+      });
+      
+      setGeneratedPalette(updatedPalette);
+      return; // Exit early - don't toggle the main color
+    }
+    
+    // For other colors, toggle normally
+    const updatedPalette = generatedPalette.map((combo, i) => {
+      if (i === index) {
+        return {
+          ...combo,
+          isLocked: !combo.isLocked
+        };
+      }
+      return combo;
+    });
+    
+    setGeneratedPalette(updatedPalette);
+  };
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
   };
 
   const getLevelBadgeColor = (level: 'AAA' | 'AA' | 'Fail') => {
@@ -735,7 +1142,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('all');
                   const newPalette = generateAccessiblePalette(baseColor, 'all');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'all' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -747,7 +1161,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('complementary');
                   const newPalette = generateAccessiblePalette(baseColor, 'complementary');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -759,7 +1180,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('analogous');
                   const newPalette = generateAccessiblePalette(baseColor, 'analogous');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'analogous' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -771,7 +1199,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('triadic');
                   const newPalette = generateAccessiblePalette(baseColor, 'triadic');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'triadic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -783,7 +1218,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('split-complementary');
                   const newPalette = generateAccessiblePalette(baseColor, 'split-complementary');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'split-complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -795,7 +1237,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('monochromatic');
                   const newPalette = generateAccessiblePalette(baseColor, 'monochromatic');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'monochromatic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -807,7 +1256,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('tetradic');
                   const newPalette = generateAccessiblePalette(baseColor, 'tetradic');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'tetradic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -819,7 +1275,14 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('square');
                   const newPalette = generateAccessiblePalette(baseColor, 'square');
-                  setGeneratedPalette(newPalette);
+                  // Ensure main color is locked
+                  const updatedPalette = newPalette.map((combo, index) => {
+                    if (index === 0) {
+                      return { ...combo, isLocked: true };
+                    }
+                    return combo;
+                  });
+                  setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'square' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -830,43 +1293,67 @@ export function WCAGColorPalette() {
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1">
-              <label htmlFor="baseColor" className="block text-sm font-medium text-gray-700 mb-2">
-                Base Color
-              </label>
+              <div className="flex items-center mb-2">
+                <Palette className="w-5 h-5 mr-2 text-primary-600" />
+                <label htmlFor="baseColor" className="block text-sm font-medium text-gray-700">
+                  Base Color
+                </label>
+              </div>
               <div className="flex items-center gap-4">
                 <input
                   type="color"
                   id="baseColor"
                   value={baseColor}
                   onChange={handleBaseColorChange}
-                  className="h-10 w-20 rounded border border-gray-300"
+                  className="h-12 w-20 rounded border border-gray-300"
                 />
-                <input
-                  type="text"
-                  value={baseColor}
-                  onChange={(e) => {
-                    const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
-                    if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
-                      setBaseColor(newColor);
-                      const newPalette = generateAccessiblePalette(newColor, colorHarmony);
-                      setGeneratedPalette(newPalette);
-                    }
-                  }}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="#000000"
-                />
+                <div className="flex flex-1">
+                  <input
+                    type="text"
+                    value={baseColor}
+                    onChange={(e) => {
+                      const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
+                      if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
+                        setBaseColor(newColor);
+                        const newPalette = generateAccessiblePalette(newColor, colorHarmony);
+                        
+                        // Ensure main color is locked
+                        const updatedPalette = newPalette.map((combo, index) => {
+                          if (index === 0) {
+                            return { ...combo, isLocked: true };
+                          }
+                          return combo;
+                        });
+                        
+                        setGeneratedPalette(updatedPalette);
+                      }
+                    }}
+                    className="px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-1"
+                    placeholder="#000000"
+                  />
+                  <button
+                    onClick={clearGenerator}
+                    className="px-3 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg text-sm text-gray-700 hover:bg-gray-200"
+                    aria-label="Clear color palette"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
             </div>
-            <button
-              onClick={generateNewPalette}
-              disabled={isGenerating}
-              className="inline-flex items-center px-4 py-2 border-none rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
-              Generate Random
-            </button>
+            
+            <div className="flex items-end gap-2">
+              <button
+                onClick={generateNewPalette}
+                disabled={isGenerating}
+                className="inline-flex items-center gap-2 px-4 py-2 border-none rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                Generate New
+              </button>
+            </div>
           </div>
         </div>
 
@@ -876,118 +1363,239 @@ export function WCAGColorPalette() {
             <div className="absolute -top-3 left-4 bg-white px-2">
               <span className="text-xs font-medium text-secondary-600 uppercase tracking-wider">Generated Palette</span>
             </div>
-            <div className="flex justify-end gap-4 mb-6">
-              <button
-                onClick={exportToText}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <FileText className="w-5 h-5 mr-2" />
-                Export as Text
-                <span className={proPillStyle}>PRO</span>
-              </button>
-              <button
-                onClick={exportToPDF}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <FileDown className="w-5 h-5 mr-2" />
-                Export as PDF
-                <span className={proPillStyle}>PRO</span>
-              </button>
+            
+            <div className="flex justify-between items-center gap-4 mb-6">
+              {/* Left side - Control buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={toggleDarkMode}
+                  aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
+                >
+                  {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setIsGenerating(true);
+                    setTimeout(() => {
+                      // Create a new palette but with truly randomized colors
+                      try {
+                        // Get current palette colors
+                        const currentPalette = [...generatedPalette];
+                        
+                        // Create a result array for the shuffled palette
+                        const result = [...currentPalette];
+                        
+                        // For each position (except main color), if unlocked, create a brand new random color
+                        for (let i = 1; i < result.length; i++) {
+                          // Skip locked colors
+                          if (result[i].isLocked) continue;
+                          
+                          // Generate a truly random color for this position
+                          const randomHue = Math.floor(Math.random() * 360);
+                          const randomSaturation = 70 + Math.floor(Math.random() * 30); // 70-100%
+                          const randomLightness = 40 + Math.floor(Math.random() * 40); // 40-80%
+                          
+                          // Convert to hex
+                          const randomHex = hslToHexString(randomHue, randomSaturation, randomLightness);
+                          
+                          // Create accessible text color
+                          // Convert the random hex to RGB
+                          const randomRgb = hexToRgb(randomHex);
+                          // Get luminance values for the random color and black/white text
+                          const randomLuminance = getLuminance(randomRgb.r, randomRgb.g, randomRgb.b);
+                          const blackLuminance = getLuminance(0, 0, 0); // Black is rgb(0,0,0)
+                          const whiteLuminance = getLuminance(255, 255, 255); // White is rgb(255,255,255)
+                          
+                          // Calculate contrast ratios with black and white text
+                          const blackContrast = getContrastRatio(randomLuminance, blackLuminance);
+                          const whiteContrast = getContrastRatio(randomLuminance, whiteLuminance);
+                          
+                          // Choose the better contrast
+                          const textColor = blackContrast > whiteContrast ? '#000000' : '#ffffff';
+                          
+                          // Calculate WCAG level based on the better contrast
+                          const contrastRatio = Math.max(blackContrast, whiteContrast);
+                          let wcagLevel: 'AAA' | 'AA' | 'Fail' = 'Fail';
+                          if (contrastRatio >= 7) wcagLevel = 'AAA';
+                          else if (contrastRatio >= 4.5) wcagLevel = 'AA';
+                          
+                          // Create relationship name
+                          let relationshipName = "Random";
+                          
+                          // Convert baseColor to HSL using existing functions
+                          const baseRgb = hexToRgb(baseColor);
+                          const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+                          
+                          if (Math.abs(randomHue - baseHsl.h) < 30 || 
+                              Math.abs(randomHue - baseHsl.h) > 330) {
+                            relationshipName = "Analogous";
+                          } else if (Math.abs(randomHue - baseHsl.h) > 150 &&
+                                     Math.abs(randomHue - baseHsl.h) < 210) {
+                            relationshipName = "Complementary";
+                          } else if (Math.abs(randomHue - baseHsl.h - 120) < 30 ||
+                                     Math.abs(randomHue - baseHsl.h - 240) < 30) {
+                            relationshipName = "Triadic";
+                          }
+                          
+                          // Add to result
+                          result[i] = {
+                            background: randomHex,
+                            text: textColor,
+                            name: relationshipName,
+                            ratio: contrastRatio,
+                            wcagLevel: wcagLevel,
+                            isBaseColor: false,
+                            isLocked: false
+                          };
+                        }
+                        
+                        // Set the final palette
+                        setGeneratedPalette(result);
+                      } catch (error) {
+                        console.error("Error in shuffle:", error);
+                      } finally {
+                        setIsGenerating(false);
+                      }
+                    }, 500);
+                  }}
+                  disabled={isGenerating}
+                  aria-label="Shuffle colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  <Shuffle className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                  Shuffle
+                </button>
+              </div>
+              
+              {/* Right side - Export buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={exportToText}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  <FileText className="w-5 h-5 mr-2" />
+                  Export as Text
+                  <span className={proPillStyle}>PRO</span>
+                </button>
+                <button
+                  onClick={exportToPDF}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  <FileDown className="w-5 h-5 mr-2" />
+                  Export as PDF
+                  <span className={proPillStyle}>PRO</span>
+                </button>
+              </div>
             </div>
             <div ref={paletteRef}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {generatedPalette.map((combo, index) => (
-                  <div
-                    key={`${combo.background}-${combo.text}-${index}`}
-                    className={`bg-white rounded-lg shadow-sm overflow-hidden ${
-                      combo.isBaseColor ? 'ring-2 ring-blue-500' : ''
-                    }`}
-                  >
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {generatedPalette.map((combo, index) => {
+                  // If main color, takes column 1 and spans 2 rows
+                  // If not main, takes normal position in grid
+                  return (
                     <div
-                      style={{ backgroundColor: combo.background }}
-                      className="h-32 p-4 flex items-center justify-center"
+                      key={`${combo.background}-${combo.text}-${index}`}
+                      className={`rounded-lg overflow-hidden ${
+                        combo.isBaseColor 
+                          ? 'md:col-start-1 md:row-span-2' 
+                          : ''
+                      }`}
                     >
-                      <p style={{ color: combo.text }} className="text-lg font-medium">
-                        Sample Text
-                      </p>
-                    </div>
-
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className={`font-medium ${combo.isBaseColor ? 'text-blue-600 font-bold' : 'text-gray-900'}`}>
-                          {combo.isBaseColor ? (
-                            <div className="flex items-center">
-                              <span className="mr-1">🔍</span> {combo.name} Color
+                      <div
+                        style={{ backgroundColor: combo.background }}
+                        className={`h-full rounded-lg overflow-hidden ${
+                          combo.isBaseColor ? 'min-h-[380px]' : 'min-h-[180px]'
+                        }`}
+                      >
+                        <div className="p-4 flex flex-col h-full">
+                          {/* Top section with MAIN tag and buttons */}
+                          <div className="flex justify-between items-center mb-4">
+                            {combo.isBaseColor && (
+                              <span 
+                                className="text-xs font-bold px-2 py-0.5 rounded" 
+                                style={{ 
+                                  color: combo.text,
+                                  backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                                }}
+                              >
+                                MAIN
+                              </span>
+                            )}
+                            {!combo.isBaseColor && <div></div>}
+                            
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => copyToClipboard(combo.background)}
+                                className="p-2 rounded-full hover:bg-white hover:bg-opacity-10"
+                                style={{ color: combo.text }}
+                                aria-label="Copy color hex code"
+                              >
+                                {copiedColor === combo.background ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                              </button>
+                              <button
+                                onClick={() => toggleLock(index)}
+                                className={`p-2 rounded-full ${
+                                  combo.isLocked 
+                                    ? 'bg-white bg-opacity-20' 
+                                    : 'opacity-70 hover:opacity-100'
+                                } ${
+                                  index === 0 
+                                    ? 'cursor-default' // Main color - not clickable
+                                    : ''
+                                }`}
+                                style={{ color: combo.text }}
+                                aria-label={
+                                  index === 0 
+                                    ? "Main color is always locked" 
+                                    : (combo.isLocked ? "Unlock this color" : "Lock this color")
+                                }
+                                disabled={index === 0} // Disable the button for main color
+                              >
+                                {combo.isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                              </button>
                             </div>
-                          ) : (
-                            combo.name
-                          )}
-                        </h3>
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLevelBadgeColor(
-                            combo.wcagLevel
-                          )}`}
-                        >
-                          {combo.wcagLevel}
-                        </span>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div
-                              className="w-4 h-4 rounded mr-2"
-                              style={{ backgroundColor: combo.background }}
-                            />
-                            <span className="text-sm text-gray-600">Background</span>
                           </div>
-                          <button
-                            onClick={() => copyToClipboard(combo.background)}
-                            className="flex items-center text-sm text-gray-500 hover:text-gray-700"
-                          >
-                            {copiedColor === combo.background ? (
-                              <Check className="w-4 h-4 mr-1" />
-                            ) : (
-                              <Copy className="w-4 h-4 mr-1" />
-                            )}
-                            {combo.background}
-                          </button>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div
-                              className="w-4 h-4 rounded mr-2"
-                              style={{ backgroundColor: combo.text }}
-                            />
-                            <span className="text-sm text-gray-600">Text</span>
+                          
+                          {/* Name moved down a couple rows */}
+                          <div className="mt-6 mb-6">
+                            <h3 className="font-medium text-base" style={{ color: combo.text }}>
+                              {findClosestNamedColor(combo.background)}
+                            </h3>
                           </div>
-                          <button
-                            onClick={() => copyToClipboard(combo.text)}
-                            className="flex items-center text-sm text-gray-500 hover:text-gray-700"
-                          >
-                            {copiedColor === combo.text ? (
-                              <Check className="w-4 h-4 mr-1" />
-                            ) : (
-                              <Copy className="w-4 h-4 mr-1" />
-                            )}
-                            {combo.text}
-                          </button>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <Info className="w-4 h-4 mr-2 text-gray-400" />
-                            <span className="text-sm text-gray-600">Contrast</span>
+                          
+                          {/* Empty space in the middle */}
+                          <div className="flex-grow"></div>
+                          
+                          {/* Hex code display moved closer to bottom */}
+                          <div className="mb-4">
+                            <span className="text-lg font-bold" style={{ color: combo.text }}>
+                              {combo.background.toUpperCase()}
+                            </span>
                           </div>
-                          <span className="text-sm text-gray-900 font-medium">
-                            {combo.ratio.toFixed(2)}:1
-                          </span>
+                          
+                          {/* Bottom section with WCAG tag and ratio */}
+                          <div className="flex items-center justify-between">
+                            <span
+                              className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium"
+                              style={{ 
+                                backgroundColor: 'rgba(0, 230, 118, 0.2)',
+                                color: 'rgba(255, 255, 255, 0.9)',
+                                border: '1px solid rgba(0, 230, 118, 0.4)'
+                              }}
+                            >
+                              {combo.wcagLevel}
+                            </span>
+                            <span className="text-sm font-medium" style={{ color: combo.text }}>
+                              {combo.ratio.toFixed(2)}:1
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

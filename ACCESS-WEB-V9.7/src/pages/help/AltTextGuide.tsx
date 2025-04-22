@@ -122,7 +122,7 @@ export function AltTextGuide() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-[130px] pb-[80px]">
-      <div className="content-container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
@@ -138,7 +138,7 @@ export function AltTextGuide() {
         <div className="mb-8">
           <div className="sm:hidden">
             <select
-              className="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-primary-500 focus:ring-primary-500"
+              className="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-[#0fae96] focus:ring-[#0fae96]"
               value={activeTab}
               onChange={(e) => setActiveTab(e.target.value as 'basics' | 'examples' | 'faq')}
             >
@@ -153,33 +153,33 @@ export function AltTextGuide() {
                 onClick={() => setActiveTab('basics')}
                 className={`px-3 py-2 text-sm font-medium ${
                   activeTab === 'basics'
-                    ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400'
+                    ? 'border-b-2 border-[#0fae96] text-[#0fae96] dark:text-[#5eead4] dark:border-[#5eead4]'
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                 }`}
               >
-                <Info className="w-4 h-4 mr-2 inline" />
+                <Info className={`w-4 h-4 mr-2 inline ${activeTab === 'basics' ? 'text-[#0fae96] dark:text-[#5eead4]' : ''}`} />
                 Basics
               </button>
               <button
                 onClick={() => setActiveTab('examples')}
                 className={`px-3 py-2 text-sm font-medium ${
                   activeTab === 'examples'
-                    ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400'
+                    ? 'border-b-2 border-[#0fae96] text-[#0fae96] dark:text-[#5eead4] dark:border-[#5eead4]'
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                 }`}
               >
-                <FileText className="w-4 h-4 mr-2 inline" />
+                <FileText className={`w-4 h-4 mr-2 inline ${activeTab === 'examples' ? 'text-[#0fae96] dark:text-[#5eead4]' : ''}`} />
                 Examples
               </button>
               <button
                 onClick={() => setActiveTab('faq')}
                 className={`px-3 py-2 text-sm font-medium ${
                   activeTab === 'faq'
-                    ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400'
+                    ? 'border-b-2 border-[#0fae96] text-[#0fae96] dark:text-[#5eead4] dark:border-[#5eead4]'
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                 }`}
               >
-                <HelpCircle className="w-4 h-4 mr-2 inline" />
+                <HelpCircle className={`w-4 h-4 mr-2 inline ${activeTab === 'faq' ? 'text-[#0fae96] dark:text-[#5eead4]' : ''}`} />
                 FAQs
               </button>
             </nav>

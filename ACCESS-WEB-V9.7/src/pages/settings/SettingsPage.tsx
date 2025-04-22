@@ -12,72 +12,72 @@ export function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('account');
   
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
           Account Settings
         </h1>
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-lg text-gray-600 dark:text-gray-400">
           Manage your account preferences and settings
         </p>
       </div>
       
       {/* Tab Navigation */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
-        <nav className="flex overflow-x-auto">
+      <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+        <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('account')}
-            className={`whitespace-nowrap py-3 px-4 font-medium text-sm flex items-center border-b-2 ${
+            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'account'
-                ? 'border-[#0fae96] text-[#0fae96] dark:text-[#5eead4] dark:border-[#5eead4]'
+                ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400'
                 : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
             }`}
           >
-            <Settings className="w-4 h-4 mr-2" />
+            <Settings className="w-5 h-5 inline-block mr-2" />
             General
           </button>
           <button
             onClick={() => setActiveTab('notifications')}
-            className={`whitespace-nowrap py-3 px-4 font-medium text-sm flex items-center border-b-2 ${
+            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'notifications'
-                ? 'border-[#0fae96] text-[#0fae96] dark:text-[#5eead4] dark:border-[#5eead4]'
+                ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400'
                 : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
             }`}
           >
-            <Bell className="w-4 h-4 mr-2" />
+            <Bell className="w-5 h-5 inline-block mr-2" />
             Notifications
           </button>
           <button
             onClick={() => setActiveTab('security')}
-            className={`whitespace-nowrap py-3 px-4 font-medium text-sm flex items-center border-b-2 ${
+            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'security'
-                ? 'border-[#0fae96] text-[#0fae96] dark:text-[#5eead4] dark:border-[#5eead4]'
+                ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400'
                 : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
             }`}
           >
-            <Lock className="w-4 h-4 mr-2" />
+            <Lock className="w-5 h-5 inline-block mr-2" />
             Security
           </button>
           <button
             onClick={() => setActiveTab('team')}
-            className={`whitespace-nowrap py-3 px-4 font-medium text-sm flex items-center border-b-2 ${
+            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'team'
-                ? 'border-[#0fae96] text-[#0fae96] dark:text-[#5eead4] dark:border-[#5eead4]'
+                ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400'
                 : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
             }`}
           >
-            <Users className="w-4 h-4 mr-2" />
+            <Users className="w-5 h-5 inline-block mr-2" />
             Team
           </button>
           <button
             onClick={() => setActiveTab('billing')}
-            className={`whitespace-nowrap py-3 px-4 font-medium text-sm flex items-center border-b-2 ${
+            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'billing'
-                ? 'border-[#0fae96] text-[#0fae96] dark:text-[#5eead4] dark:border-[#5eead4]'
+                ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400'
                 : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
             }`}
           >
-            <CreditCard className="w-4 h-4 mr-2" />
+            <CreditCard className="w-5 h-5 inline-block mr-2" />
             Billing
           </button>
         </nav>
