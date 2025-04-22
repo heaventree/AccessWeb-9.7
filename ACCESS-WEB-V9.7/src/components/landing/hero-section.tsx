@@ -11,7 +11,7 @@ interface HeroSectionProps {
 export default function HeroSection({ onTrialSignup, isSubmitting }: HeroSectionProps) {
   const navigate = useNavigate();
   return (
-    <section id="sectionID-26" className="pt-28 pb-16 md:pb-32 bg-[#f9fffc] dark:bg-gray-900">
+    <section id="sectionID-26" className="pt-28 pb-16 md:pb-32 bg-gradient-to-b from-[#f9fffc] to-white dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.div
