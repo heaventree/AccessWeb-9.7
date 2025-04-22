@@ -22,7 +22,7 @@ export default function HeroSection({ onTrialSignup, isSubmitting }: HeroSection
             <div className="inline-block px-4 py-1.5 bg-[#e0f5f1] text-[#0fae96] dark:bg-[#0fae96]/20 dark:text-[#5eead4] rounded-full font-medium text-sm mb-6">
               Introducing the industry standard for WCAG compliance
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] mb-6 text-gray-900 dark:text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1] mb-6 text-gray-900 dark:text-white">
               Make Your Website<br />Accessible to <span className="text-[#0fae96] dark:text-[#5eead4]">Everyone</span>
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto">
