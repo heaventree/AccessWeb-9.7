@@ -1,8 +1,7 @@
 /**
- * ACCESS-WEB UI Kit - Styles
+ * ACCESS-WEB UI Kit - Style Exports
  * 
- * This file exports all style utilities and helper functions.
+ * This file exports all styling utilities for easy importing.
  */
 
 export * from './utils';
-export * from './variants';

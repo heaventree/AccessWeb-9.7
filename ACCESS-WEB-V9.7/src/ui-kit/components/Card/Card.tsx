@@ -1,92 +1,80 @@
 /**
  * ACCESS-WEB UI Kit - Card Component
  * 
- * A versatile card component for displaying content in a contained, styled box.
- * Cards are essential UI elements used throughout the application for organizing content.
+ * A flexible card component with multiple variants.
  */
 
 import React, { forwardRef } from 'react';
-import { cn } from '../../styles/utils';
-import { cardVariants } from '../../styles/variants';
-import { createVariants } from '../../styles/utils';
+import { cn, variantClasses } from '../../styles/utils';
+
+type IconType = React.ElementType;
 
 /**
- * Card component props
+ * Card variants
  */
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** Custom class names */
-  className?: string;
-  /** Card style variants */
+const cardVariants = {
+  variant: {
+    primary: 'bg-white dark:bg-gray-800 shadow-sm',
+    secondary: 'bg-gray-50 dark:bg-gray-900',
+    outline: 'border border-gray-200 dark:border-gray-700',
+    elevated: 'bg-white dark:bg-gray-800 shadow-md',
+    flat: 'bg-white dark:bg-gray-800',
+    feature: 'bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-sm',
+  },
+  size: {
+    sm: 'p-3',
+    md: 'p-4 md:p-6',
+    lg: 'p-6 md:p-8',
+  },
+  radius: {
+    none: 'rounded-none',
+    sm: 'rounded-sm',
+    md: 'rounded-md',
+    lg: 'rounded-lg',
+    xl: 'rounded-xl',
+    full: 'rounded-full',
+  },
+};
+
+export type CardProps = React.HTMLAttributes<HTMLDivElement> & {
   variant?: {
-    /** The visual style variant */
     variant?: keyof typeof cardVariants.variant;
-    /** The size of the card padding */
     size?: keyof typeof cardVariants.size;
+    radius?: keyof typeof cardVariants.radius;
   };
-  /** Whether the card should have a hover effect */
   hoverable?: boolean;
-  /** Whether the card should be clickable (adds appropriate styling) */
-  clickable?: boolean;
-  /** Custom border radius */
-  borderRadius?: string;
-  /** Renders card with background transparent */
-  transparent?: boolean;
-  /** Full width card (100% width) */
-  fullWidth?: boolean;
-  /** Element ID for accessibility and testing */
-  id?: string;
-}
+  interactive?: boolean;
+  onClick?: () => void;
+};
 
 /**
- * Main Card component
+ * Card component
  * 
- * Used for content organization and grouping. Cards can be used for
- * panels, containers, or any content that needs a visual boundary.
+ * A multi-purpose container component with various styling options.
  */
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ 
-    className, 
-    variant = { 
-      variant: 'primary',
-      size: 'md'
-    }, 
-    hoverable = false,
-    clickable = false,
-    transparent = false,
-    fullWidth = false,
-    borderRadius,
-    children, 
-    ...props 
-  }, ref) => {
-    // Generate variant classes
-    const getVariantClasses = createVariants(cardVariants);
-    const variantClasses = getVariantClasses({ variant });
-    
-    // Combine all classes
-    const cardClasses = cn(
-      variantClasses,
-      {
-        'hover:shadow-md transition-shadow duration-200': hoverable && !clickable,
-        'cursor-pointer hover:shadow-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0fae96]': clickable,
-        'bg-transparent dark:bg-transparent': transparent,
-        'w-full': fullWidth,
-      },
-      className
-    );
-
-    // Style override for borderRadius if provided
-    const style = borderRadius 
-      ? { ...props.style, borderRadius } 
-      : props.style;
+  ({ className, children, variant = {}, hoverable, interactive, ...props }, ref) => {
+    const {
+      variant: variantType = 'primary',
+      size = 'md',
+      radius = 'lg',
+    } = variant;
 
     return (
       <div
         ref={ref}
-        className={cardClasses}
+        className={cn(
+          'relative',
+          variantClasses(cardVariants)({
+            variant: variantType,
+            size,
+            radius,
+          }),
+          hoverable && 'transition-all duration-200 hover:shadow-lg hover:-translate-y-1',
+          interactive && 'cursor-pointer',
+          className
+        )}
         {...props}
-        style={style}
-        tabIndex={clickable ? 0 : undefined}
-        role={clickable ? 'button' : undefined}
       >
         {children}
       </div>
@@ -96,78 +84,68 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
 
 Card.displayName = 'Card';
 
-/**
- * Card Header component props
- */
-export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-}
+export type CardHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
+  compact?: boolean;
+};
 
 /**
- * Card Header component for displaying title and actions
+ * CardHeader component
+ * 
+ * Container for the card's header content.
  */
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, compact, ...props }, ref) => {
     return (
       <div
         ref={ref}
         className={cn(
-          'flex flex-row justify-between items-center border-b border-gray-200 dark:border-gray-700 p-4',
+          'flex flex-col space-y-1.5',
+          compact ? 'pb-2' : 'pb-4',
           className
         )}
         {...props}
-      >
-        {children}
-      </div>
+      />
     );
   }
 );
 
 CardHeader.displayName = 'CardHeader';
 
-/**
- * Card Title component props
- */
-export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  className?: string;
+export type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-}
+};
 
 /**
- * Card Title component for card headings
+ * CardTitle component
+ * 
+ * Title element for the card.
  */
 export const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
-  ({ className, as = 'h3', children, ...props }, ref) => {
-    const Component = as;
+  ({ className, as: Component = 'h3', ...props }, ref) => {
     return (
       <Component
         ref={ref}
         className={cn(
-          'text-xl font-semibold text-gray-900 dark:text-white',
+          'font-semibold leading-tight text-gray-900 dark:text-white',
           className
         )}
         {...props}
-      >
-        {children}
-      </Component>
+      />
     );
   }
 );
 
 CardTitle.displayName = 'CardTitle';
 
-/**
- * Card Description component props
- */
-export interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
-  className?: string;
-}
+export type CardDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
 
 /**
- * Card Description component for secondary text
+ * CardDescription component
+ * 
+ * Description text for the card.
  */
 export const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, ...props }, ref) => {
     return (
       <p
         ref={ref}
@@ -176,124 +154,109 @@ export const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionP
           className
         )}
         {...props}
-      >
-        {children}
-      </p>
+      />
     );
   }
 );
 
 CardDescription.displayName = 'CardDescription';
 
-/**
- * Card Content component props
- */
-export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-  noPadding?: boolean;
-}
+export type CardContentProps = React.HTMLAttributes<HTMLDivElement> & {
+  padding?: 'none' | 'sm' | 'md' | 'lg';
+};
 
 /**
- * Card Content component for main content area
+ * CardContent component
+ * 
+ * Container for the card's main content.
  */
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
-  ({ className, noPadding = false, children, ...props }, ref) => {
+  ({ className, padding = 'md', ...props }, ref) => {
+    const paddingClass = {
+      none: '',
+      sm: 'py-2',
+      md: 'py-4',
+      lg: 'py-6',
+    }[padding];
+
     return (
       <div
         ref={ref}
-        className={cn(
-          { 'p-4': !noPadding },
-          className
-        )}
+        className={cn(paddingClass, className)}
         {...props}
-      >
-        {children}
-      </div>
+      />
     );
   }
 );
 
 CardContent.displayName = 'CardContent';
 
-/**
- * Card Footer component props
- */
-export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-}
+export type CardFooterProps = React.HTMLAttributes<HTMLDivElement> & {
+  compact?: boolean;
+};
 
 /**
- * Card Footer component for actions and footnotes
+ * CardFooter component
+ * 
+ * Container for the card's footer content.
  */
 export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, compact, ...props }, ref) => {
     return (
       <div
         ref={ref}
         className={cn(
-          'flex flex-row items-center justify-end border-t border-gray-200 dark:border-gray-700 p-4',
+          'flex items-center',
+          compact ? 'pt-2' : 'pt-4',
           className
         )}
         {...props}
-      >
-        {children}
-      </div>
+      />
     );
   }
 );
 
 CardFooter.displayName = 'CardFooter';
 
-/**
- * Card Image component props
- */
-export interface CardImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
-  className?: string;
-  aspectRatio?: '1:1' | '4:3' | '16:9' | '21:9';
+export type CardImageProps = React.HTMLAttributes<HTMLDivElement> & {
+  src: string;
+  alt: string;
   position?: 'top' | 'bottom';
-  overlay?: React.ReactNode;
-}
+  height?: number | string;
+  objectFit?: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
+  blurDataURL?: string;
+};
 
 /**
- * Card Image component for media in cards
+ * CardImage component
+ * 
+ * Image component for the card.
  */
 export const CardImage = forwardRef<HTMLDivElement, CardImageProps>(
-  ({ className, src, alt, aspectRatio = '16:9', position = 'top', overlay, ...props }, ref) => {
-    // Calculate aspect ratio
-    const aspectRatioClass = {
-      '1:1': 'aspect-square',
-      '4:3': 'aspect-[4/3]',
-      '16:9': 'aspect-[16/9]',
-      '21:9': 'aspect-[21/9]',
-    }[aspectRatio];
-    
-    // Border radius classes based on position
-    const borderRadiusClass = {
-      'top': 'rounded-t-xl',
-      'bottom': 'rounded-b-xl',
-    }[position];
-    
+  ({ className, src, alt, position = 'top', height = 200, objectFit = 'cover', ...props }, ref) => {
+    const positionClassNames = {
+      top: 'rounded-t-lg overflow-hidden -mt-6 -mx-6 mb-6',
+      bottom: 'rounded-b-lg overflow-hidden -mb-6 -mx-6 mt-6',
+    };
+
     return (
       <div
         ref={ref}
         className={cn(
-          'relative overflow-hidden w-full', 
-          aspectRatioClass,
-          borderRadiusClass,
+          positionClassNames[position],
           className
         )}
+        {...props}
       >
         <img
           src={src}
           alt={alt}
-          className="object-cover w-full h-full"
-          {...props}
+          className={cn(
+            'w-full',
+            typeof height === 'number' ? `h-[${height}px]` : `h-[${height}]`,
+            `object-${objectFit}`
+          )}
         />
-        {overlay && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-            <div className="p-4 w-full">{overlay}</div>
-          </div>
-        )}
       </div>
     );
   }
@@ -301,42 +264,48 @@ export const CardImage = forwardRef<HTMLDivElement, CardImageProps>(
 
 CardImage.displayName = 'CardImage';
 
-/**
- * Card.FeatureIcon component props
- */
-export interface CardFeatureIconProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-  icon: React.ReactNode;
-  iconClassName?: string;
-  background?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
-}
+export type CardFeatureIconProps = React.SVGAttributes<SVGElement> & {
+  icon: IconType;
+  background?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'none';
+  size?: 'sm' | 'md' | 'lg';
+  rounded?: 'none' | 'sm' | 'md' | 'lg' | 'full';
+};
 
 /**
- * Card.FeatureIcon component for feature cards with icon
+ * CardFeatureIcon component
+ * 
+ * Icon display for feature cards.
  */
-export const CardFeatureIcon = forwardRef<HTMLDivElement, CardFeatureIconProps>(
-  ({ className, icon, iconClassName, background = 'default', ...props }, ref) => {
-    const backgroundClasses = {
-      default: 'bg-gray-100 dark:bg-gray-800',
-      primary: 'bg-[#0fae96]/10 dark:bg-[#0fae96]/20',
-      secondary: 'bg-gray-100 dark:bg-gray-800',
-      success: 'bg-green-100 dark:bg-green-900/30',
-      warning: 'bg-amber-100 dark:bg-amber-900/30',
-      error: 'bg-red-100 dark:bg-red-900/30',
-      info: 'bg-blue-100 dark:bg-blue-900/30',
+export const CardFeatureIcon = forwardRef<SVGSVGElement, CardFeatureIconProps>(
+  ({ className, icon: Icon, background = 'default', size = 'md', rounded = 'md', ...props }, ref) => {
+    const backgroundClass = {
+      default: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100',
+      primary: 'bg-[#0fae96]/10 dark:bg-[#0fae96]/20 text-[#0fae96]',
+      secondary: 'bg-indigo-100 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400',
+      success: 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400',
+      warning: 'bg-amber-100 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400',
+      error: 'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400',
+      info: 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
+      none: '',
     }[background];
-    
+
+    const sizeClass = {
+      sm: 'p-2 w-8 h-8',
+      md: 'p-3 w-10 h-10',
+      lg: 'p-4 w-12 h-12',
+    }[size];
+
+    const roundedClass = {
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      md: 'rounded-md',
+      lg: 'rounded-lg',
+      full: 'rounded-full',
+    }[rounded];
+
     return (
-      <div
-        ref={ref}
-        className={cn(
-          'w-12 h-12 rounded-lg flex items-center justify-center mb-4',
-          backgroundClasses,
-          className
-        )}
-        {...props}
-      >
-        <div className={cn('text-[#0fae96] w-6 h-6', iconClassName)}>{icon}</div>
+      <div className={cn('inline-flex', backgroundClass, sizeClass, roundedClass, className)}>
+        <Icon ref={ref} {...props} className={cn('w-full h-full', props.className)} />
       </div>
     );
   }
@@ -344,14 +313,13 @@ export const CardFeatureIcon = forwardRef<HTMLDivElement, CardFeatureIconProps>(
 
 CardFeatureIcon.displayName = 'CardFeatureIcon';
 
-// Export all components
 export { 
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent, 
+  CardFooter, 
   CardImage,
   CardFeatureIcon
 };

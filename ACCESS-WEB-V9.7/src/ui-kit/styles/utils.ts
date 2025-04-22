@@ -1,84 +1,92 @@
 /**
- * ACCESS-WEB UI Kit - Style Utility Functions
+ * ACCESS-WEB UI Kit - Style Utilities
+ */
+
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+/**
+ * Merges class names and handles Tailwind conflicts with twMerge
  * 
- * This file contains utility functions for handling CSS classes and styles.
+ * This utility merges multiple class names, similar to clsx/classnames,
+ * but also properly handles Tailwind CSS class conflicts.
+ * 
+ * @example
+ * // Returns 'mt-4 text-blue-500' (no conflict resolution needed)
+ * cn('mt-4', 'text-blue-500')
+ * 
+ * @example
+ * // Returns 'p-4' (resolves conflict between padding utilities)
+ * cn('p-2', 'p-4')
+ * 
+ * @example
+ * // Returns 'mt-4 text-blue-500' (conditional class application)
+ * cn('mt-4', isActive && 'text-blue-500')
  */
-
-import { twMerge } from 'tailwind-merge';
-import { clsx, type ClassValue } from 'clsx';
-
-/**
- * Combines multiple class names and removes duplicates using TailwindCSS
- * @param inputs Array of class values, objects, or arrays
- * @returns Merged class string with duplicates removed
- */
-export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(inputs));
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
 
 /**
- * Creates a variant-based class selector function for components
- * @param variants Record of variant classes
- * @param defaultVariant Default variant to use
- * @returns Function that selects classes based on variant
+ * Creates a conditional class string based on a condition
+ * 
+ * @example
+ * // Returns 'bg-red-500' if isError is true, otherwise returns ''
+ * classIf(isError, 'bg-red-500')
+ * 
+ * @example
+ * // Returns 'bg-red-500' if isError is true, otherwise returns 'bg-gray-200'
+ * classIf(isError, 'bg-red-500', 'bg-gray-200')
  */
-export function createVariants<T extends Record<string, Record<string, string>>>(
-  variants: T,
-  defaultVariant: Partial<{
-    [K in keyof T]: keyof T[K];
-  }> = {},
-) {
-  return (props: {
-    className?: string;
-    variant?: {
-      [K in keyof T]?: keyof T[K];
-    }
-  }) => {
-    const variantClasses = Object.keys(variants).map((variantType) => {
-      const variantTypeKey = variantType as keyof T;
-      const variantKey = props.variant?.[variantTypeKey] || defaultVariant[variantTypeKey];
-      const variantSelector = variantKey as keyof T[keyof T] | undefined;
-      
-      if (!variantSelector) return '';
-      return variants[variantTypeKey][variantSelector] || '';
-    });
-
-    return cn(...variantClasses, props.className || '');
-  };
+export function classIf(condition: boolean, trueClass: string, falseClass: string = '') {
+  return condition ? trueClass : falseClass
 }
 
 /**
- * Helper function to ensure consistent dark mode handling
- * @param lightModeClass - Class to apply in light mode
- * @param darkModeClass - Class to apply in dark mode
- * @returns Combined class string with proper dark mode handling
+ * Creates a variant selector for component styling
+ * 
+ * This allows components to define multiple variant types with their own classes
+ * and then merge them all together.
+ * 
+ * @example
+ * const buttonVariants = variantClasses({
+ *   variant: {
+ *     primary: 'bg-blue-500 text-white',
+ *     secondary: 'bg-gray-200 text-gray-800',
+ *   },
+ *   size: {
+ *     sm: 'text-sm py-1 px-2',
+ *     md: 'text-base py-2 px-4',
+ *     lg: 'text-lg py-3 px-6',
+ *   },
+ * })
+ * 
+ * // Use it like this:
+ * buttonVariants({ variant: 'primary', size: 'md' })
+ * // Returns: 'bg-blue-500 text-white text-base py-2 px-4'
  */
-export function darkMode(lightModeClass: string, darkModeClass: string): string {
-  return `${lightModeClass} dark:${darkModeClass}`;
+export type VariantOptions<T extends Record<string, Record<string, string>>> = {
+  [K in keyof T]?: keyof T[K]
 }
 
-/**
- * Helper function for focus ring styles
- * @param color Optional custom color (defaults to primary brand color)
- * @returns Class string for focus rings
- */
-export function focusRing(color?: string): string {
-  return `focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 focus-visible:ring-${color || 'brand-primary'}`;
+export const variantClasses = <T extends Record<string, Record<string, string>>>(
+  variants: T
+) => {
+  return (options: VariantOptions<T> = {}) => {
+    const classes: string[] = []
+    
+    Object.entries(options).forEach(([key, value]) => {
+      if (value && variants[key] && variants[key][value as string]) {
+        classes.push(variants[key][value as string])
+      }
+    })
+    
+    return classes.join(' ')
+  }
 }
 
-/**
- * Helper function for state-based class generation
- * @param baseClasses Base classes applied always
- * @param stateClasses Object with conditional classes
- * @returns Merged class string
- */
-export function stateClasses(
-  baseClasses: string,
-  stateClasses: Record<string, { condition: boolean; classes: string }>,
-): string {
-  const activeStateClasses = Object.values(stateClasses)
-    .filter(({ condition }) => condition)
-    .map(({ classes }) => classes);
-  
-  return cn(baseClasses, ...activeStateClasses);
+export default {
+  cn,
+  classIf,
+  variantClasses,
 }

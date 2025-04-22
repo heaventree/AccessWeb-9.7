@@ -1,8 +1,8 @@
 /**
  * ACCESS-WEB UI Kit - Typography Tokens
  * 
- * This is the single source of truth for all typography values used in the application.
- * Always reference these tokens instead of hardcoding values in components.
+ * These are the official typography tokens for the UI Kit.
+ * Use these values for consistent text styling throughout the application.
  */
 
 export const typography = {
@@ -12,21 +12,21 @@ export const typography = {
     serif: 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
     mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
   },
-
-  // Font sizes (in pixels)
+  
+  // Font sizes (matches Tailwind defaults)
   fontSize: {
-    xs: '12px',
-    sm: '14px',
-    base: '16px',
-    lg: '18px',
-    xl: '20px',
-    '2xl': '24px',
-    '3xl': '30px',
-    '4xl': '36px',
-    '5xl': '48px',
-    '6xl': '60px',
+    xs: '0.75rem',     // 12px
+    sm: '0.875rem',    // 14px
+    base: '1rem',      // 16px
+    lg: '1.125rem',    // 18px
+    xl: '1.25rem',     // 20px
+    '2xl': '1.5rem',   // 24px
+    '3xl': '1.875rem', // 30px
+    '4xl': '2.25rem',  // 36px
+    '5xl': '3rem',     // 48px
+    '6xl': '3.75rem',  // 60px
   },
-
+  
   // Font weights
   fontWeight: {
     thin: '100',
@@ -39,7 +39,7 @@ export const typography = {
     extrabold: '800',
     black: '900',
   },
-
+  
   // Line heights
   lineHeight: {
     none: '1',
@@ -49,123 +49,119 @@ export const typography = {
     relaxed: '1.625',
     loose: '2',
   },
-
+  
   // Letter spacing
   letterSpacing: {
     tighter: '-0.05em',
     tight: '-0.025em',
-    normal: '0em',
+    normal: '0',
     wide: '0.025em',
     wider: '0.05em',
     widest: '0.1em',
   },
-
-  // Text transforms
-  textTransform: {
-    uppercase: 'uppercase',
-    lowercase: 'lowercase',
-    capitalize: 'capitalize',
-    normal: 'none',
-  },
-
-  // Text decorations
-  textDecoration: {
-    underline: 'underline',
-    lineThrough: 'line-through',
-    none: 'none',
-  },
-
-  // Predefined text styles
-  textStyle: {
+  
+  // Text styles (combinations of the above)
+  textStyles: {
     // Headings
     h1: {
-      fontSize: '36px',
+      fontSize: '2.25rem',
       fontWeight: '700',
-      lineHeight: '1.2',
+      lineHeight: '1.25',
       letterSpacing: '-0.025em',
-      marginBottom: '24px',
     },
     h2: {
-      fontSize: '30px',
+      fontSize: '1.875rem',
       fontWeight: '700',
-      lineHeight: '1.3',
+      lineHeight: '1.25',
       letterSpacing: '-0.025em',
-      marginBottom: '20px',
     },
     h3: {
-      fontSize: '24px',
+      fontSize: '1.5rem',
       fontWeight: '600',
-      lineHeight: '1.3',
-      letterSpacing: '-0.015em',
-      marginBottom: '16px',
+      lineHeight: '1.25',
+      letterSpacing: '-0.025em',
     },
     h4: {
-      fontSize: '20px',
+      fontSize: '1.25rem',
       fontWeight: '600',
-      lineHeight: '1.4',
-      letterSpacing: '-0.01em',
-      marginBottom: '12px',
+      lineHeight: '1.25',
+      letterSpacing: '-0.025em',
     },
     h5: {
-      fontSize: '18px',
+      fontSize: '1.125rem',
       fontWeight: '600',
-      lineHeight: '1.4',
-      letterSpacing: 'normal',
-      marginBottom: '8px',
+      lineHeight: '1.25',
+      letterSpacing: '-0.025em',
     },
     h6: {
-      fontSize: '16px',
+      fontSize: '1rem',
       fontWeight: '600',
-      lineHeight: '1.5',
-      letterSpacing: 'normal',
-      marginBottom: '8px',
+      lineHeight: '1.25',
+      letterSpacing: '-0.025em',
     },
-
+    
     // Body text
     bodyLarge: {
-      fontSize: '18px',
+      fontSize: '1.125rem',
       fontWeight: '400',
-      lineHeight: '1.6',
+      lineHeight: '1.625',
       letterSpacing: 'normal',
     },
     bodyDefault: {
-      fontSize: '16px',
+      fontSize: '1rem',
       fontWeight: '400',
-      lineHeight: '1.6',
+      lineHeight: '1.5',
       letterSpacing: 'normal',
     },
     bodySmall: {
-      fontSize: '14px',
+      fontSize: '0.875rem',
       fontWeight: '400',
       lineHeight: '1.5',
+      letterSpacing: 'normal',
+    },
+    bodyXSmall: {
+      fontSize: '0.75rem',
+      fontWeight: '400',
+      lineHeight: '1.5',
+      letterSpacing: 'normal',
+    },
+    
+    // Interactive text
+    button: {
+      fontSize: '0.875rem',
+      fontWeight: '500',
+      lineHeight: '1.5',
+      letterSpacing: 'normal',
+    },
+    link: {
+      fontSize: '1rem',
+      fontWeight: '400',
+      lineHeight: '1.5',
+      letterSpacing: 'normal',
+      textDecoration: 'underline',
+    },
+    
+    // UI text
+    label: {
+      fontSize: '0.875rem',
+      fontWeight: '500',
+      lineHeight: '1.25',
       letterSpacing: 'normal',
     },
     caption: {
-      fontSize: '12px',
+      fontSize: '0.75rem',
       fontWeight: '400',
       lineHeight: '1.5',
-      letterSpacing: '0.01em',
-    },
-
-    // Special cases
-    button: {
-      fontSize: '16px',
-      fontWeight: '600',
-      lineHeight: '1.5',
-      letterSpacing: '0.01em',
-    },
-    label: {
-      fontSize: '14px',
-      fontWeight: '500',
-      lineHeight: '1.4',
-      letterSpacing: '0.01em',
-    },
-    code: {
-      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-      fontSize: '14px',
-      fontWeight: '400',
-      lineHeight: '1.7',
       letterSpacing: 'normal',
+    },
+    overline: {
+      fontSize: '0.75rem',
+      fontWeight: '500',
+      lineHeight: '1.5',
+      letterSpacing: '0.05em',
+      textTransform: 'uppercase',
     },
   },
 };
+
+export default typography;
