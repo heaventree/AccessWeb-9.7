@@ -246,7 +246,7 @@ export default function Navbar() {
   ];
 
   const navItems = [
-    { label: "Pricing", href: "#pricing" }
+    { label: "Pricing", href: "/pricing" }
   ];
 
   return (
@@ -279,13 +279,13 @@ export default function Navbar() {
           
           {/* Regular nav items */}
           {navItems.map((item, index) => (
-            <a 
+            <Link 
               key={index}
-              href={item.href} 
+              to={item.href} 
               className="text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium transition-colors"
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
         
