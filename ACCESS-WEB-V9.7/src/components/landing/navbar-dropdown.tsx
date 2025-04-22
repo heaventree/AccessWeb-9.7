@@ -18,15 +18,15 @@ interface DropdownProps {
 
 const NavDropdownItem: React.FC<DropdownItemProps> = ({ icon: Icon, label, description, href }) => {
   return (
-    <div className="flex flex-col hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/20 cursor-pointer py-3 px-3.5 rounded-lg transition-all duration-200" 
+    <div className="dropdown-item flex flex-col hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/20 cursor-pointer py-3 px-3.5 rounded-lg transition-all duration-200" 
          onClick={() => window.location.href = href}>
       <div className="flex items-center mb-1.5">
-        <div className="w-5 h-5 flex items-center justify-center mr-3 text-[#0fae96] dark:text-[#5eead4] flex-shrink-0">
+        <div className="dropdown-icon w-5 h-5 flex items-center justify-center mr-3 text-[#0fae96] dark:text-[#5eead4] flex-shrink-0">
           <Icon className="w-[18px] h-[18px]" />
         </div>
         <span className="font-medium text-[15px] text-gray-800 dark:text-white leading-none">{label}</span>
       </div>
-      <div className="text-[13px] text-gray-500 dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden pl-8 leading-relaxed opacity-80">
+      <div className="dropdown-description text-[13px] text-gray-500 dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden pl-8 leading-relaxed opacity-80">
         {description}
       </div>
     </div>
@@ -72,7 +72,7 @@ export const NavDropdown: React.FC<DropdownProps> = ({ label, items }) => {
             transition={{ duration: 0.15 }}
             className="absolute left-0 mt-2 z-50"
           >
-            <div className="bg-white/98 dark:bg-slate-900/98 backdrop-blur-lg rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 w-[320px] p-2.5 space-y-0.5" 
+            <div className="dropdown-menu bg-white/98 dark:bg-slate-900/98 backdrop-blur-lg rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 w-[320px] p-2.5 space-y-0.5" 
                  style={{ 
                    backgroundColor: 'rgba(255, 255, 255, 0.98)',
                    backdropFilter: 'blur(16px)', 

@@ -9,6 +9,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
+import './dropdown-dark.css';
 
 // Find the root element
 const rootElement = document.getElementById('root');

@@ -1,0 +1,19 @@
+/* Dark mode dropdown */
+.dark .dropdown-menu {
+  background-color: rgba(15, 23, 42, 0.98) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.15) !important;
+  border-color: rgba(51, 65, 85, 0.7) !important;
+}
+
+.dark .dropdown-item:hover {
+  background-color: rgba(15, 174, 150, 0.2) !important;
+}
+
+.dark .dropdown-description {
+  color: #5eead4 !important;
+  opacity: 0.85 !important;
+}
+
+.dark .dropdown-icon {
+  color: #5eead4 !important;
+}
