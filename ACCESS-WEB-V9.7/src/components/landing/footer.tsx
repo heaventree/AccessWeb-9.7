@@ -9,6 +9,7 @@ import {
   CheckCircle,
   ArrowRight
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
@@ -52,51 +53,51 @@ export default function Footer() {
                 Making web accessibility compliance simple, automated, and accessible for organizations of all sizes.
               </p>
               <div className="flex space-x-6">
-                <a href="#" className="w-10 h-10 rounded-full bg-[#f4f7fa] dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-[#0fae96] hover:text-white transition-colors">
+                <Link to="#" className="w-10 h-10 rounded-full bg-[#f4f7fa] dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-[#0fae96] hover:text-white transition-colors">
                   <Twitter size={18} />
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-[#f4f7fa] dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-[#0fae96] hover:text-white transition-colors">
+                </Link>
+                <Link to="#" className="w-10 h-10 rounded-full bg-[#f4f7fa] dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-[#0fae96] hover:text-white transition-colors">
                   <Linkedin size={18} />
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-[#f4f7fa] dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-[#0fae96] hover:text-white transition-colors">
+                </Link>
+                <Link to="#" className="w-10 h-10 rounded-full bg-[#f4f7fa] dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-[#0fae96] hover:text-white transition-colors">
                   <Facebook size={18} />
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-[#f4f7fa] dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-[#0fae96] hover:text-white transition-colors">
+                </Link>
+                <Link to="#" className="w-10 h-10 rounded-full bg-[#f4f7fa] dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-[#0fae96] hover:text-white transition-colors">
                   <Github size={18} />
-                </a>
+                </Link>
               </div>
             </div>
             
             <div>
               <h4 className="font-semibold text-gray-800 dark:text-white mb-5">Product</h4>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400 text-base">
-                <li><a href="#features" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">API</a></li>
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Integrations</a></li>
+                <li><Link to="/" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Features</Link></li>
+                <li><Link to="/pricing" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Pricing</Link></li>
+                <li><Link to="/docs" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Documentation</Link></li>
+                <li><Link to="/docs/api" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">API</Link></li>
+                <li><Link to="/integrations" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Integrations</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold text-gray-800 dark:text-white mb-5">Resources</h4>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400 text-base">
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">WCAG Guidelines</a></li>
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Accessibility Tools</a></li>
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Case Studies</a></li>
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Support Center</a></li>
+                <li><Link to="/blog" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Blog</Link></li>
+                <li><Link to="/tools/wcag-standards" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">WCAG Guidelines</Link></li>
+                <li><Link to="/tools/image-alt-scanner" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Accessibility Tools</Link></li>
+                <li><Link to="/knowledge-base" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Case Studies</Link></li>
+                <li><Link to="/help" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Support Center</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold text-gray-800 dark:text-white mb-5">Company</h4>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400 text-base">
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Terms of Service</a></li>
+                <li><Link to="/about" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">About Us</Link></li>
+                <li><Link to="/careers" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Careers</Link></li>
+                <li><Link to="/contact" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Contact</Link></li>
+                <li><Link to="/privacy" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/terms" className="hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Terms of Service</Link></li>
               </ul>
             </div>
           </div>
@@ -106,10 +107,10 @@ export default function Footer() {
               © {new Date().getFullYear()} AccessWebPro. All rights reserved.
             </p>
             <div className="flex flex-wrap gap-6">
-              <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-[#0fae96] dark:hover:text-[#5eead4] text-base transition-colors">Privacy</a>
-              <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-[#0fae96] dark:hover:text-[#5eead4] text-base transition-colors">Terms</a>
-              <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-[#0fae96] dark:hover:text-[#5eead4] text-base transition-colors">Cookies</a>
-              <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-[#0fae96] dark:hover:text-[#5eead4] text-base transition-colors">Accessibility Statement</a>
+              <Link to="/privacy" className="text-gray-500 dark:text-gray-400 hover:text-[#0fae96] dark:hover:text-[#5eead4] text-base transition-colors">Privacy</Link>
+              <Link to="/terms" className="text-gray-500 dark:text-gray-400 hover:text-[#0fae96] dark:hover:text-[#5eead4] text-base transition-colors">Terms</Link>
+              <Link to="/cookies" className="text-gray-500 dark:text-gray-400 hover:text-[#0fae96] dark:hover:text-[#5eead4] text-base transition-colors">Cookies</Link>
+              <Link to="/accessibility" className="text-gray-500 dark:text-gray-400 hover:text-[#0fae96] dark:hover:text-[#5eead4] text-base transition-colors">Accessibility Statement</Link>
             </div>
           </div>
         </div>

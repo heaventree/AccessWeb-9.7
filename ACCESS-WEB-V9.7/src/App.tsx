@@ -10,7 +10,7 @@ import { Integrations } from './pages/Integrations';
 import { AuthPage } from './pages/AuthPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { Navigation } from './components/Navigation';
-import { Footer } from './components/Footer';
+import Footer from './components/landing/footer';
 import { AdminLayout } from './layouts/AdminLayout';
 import { AccountLayout } from './layouts/AccountLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
