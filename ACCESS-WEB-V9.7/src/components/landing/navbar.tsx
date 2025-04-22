@@ -293,7 +293,7 @@ export default function Navbar() {
                     <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
                     <span className="dark:text-white">{item.label}</span>
                   </div>
-                  <div className="pl-7 text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden">
+                  <div className="pl-7 text-base text-muted-foreground dark:text-[#86e4d4] whitespace-nowrap text-ellipsis overflow-hidden">
                     {item.description}
                   </div>
                 </Link>
@@ -309,7 +309,7 @@ export default function Navbar() {
                     <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
                     <span className="dark:text-white">{item.label}</span>
                   </div>
-                  <div className="pl-7 text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden">
+                  <div className="pl-7 text-base text-muted-foreground dark:text-[#86e4d4] whitespace-nowrap text-ellipsis overflow-hidden">
                     {item.description}
                   </div>
                 </Link>
@@ -325,7 +325,7 @@ export default function Navbar() {
                     <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
                     <span className="dark:text-white">{item.label}</span>
                   </div>
-                  <div className="pl-7 text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden">
+                  <div className="pl-7 text-base text-muted-foreground dark:text-[#86e4d4] whitespace-nowrap text-ellipsis overflow-hidden">
                     {item.description}
                   </div>
                 </Link>
