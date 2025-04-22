@@ -187,7 +187,7 @@ export function AltTextGuide() {
         </div>
         
         {/* Content Sections */}
-        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-slate-800 shadow-sm rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700">
           {/* Basics Tab */}
           {activeTab === 'basics' && (
             <motion.div 
@@ -196,41 +196,44 @@ export function AltTextGuide() {
               transition={{ duration: 0.3 }}
               className="p-6"
             >
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                <div className="rounded-full bg-[#0fae96]/10 dark:bg-[#0fae96]/20 p-2 inline-block mr-3">
+                  <Info className="h-5 w-5 text-[#0fae96] dark:text-[#5eead4]" />
+                </div>
                 Alt Text Basics
               </h2>
               
               <div className="prose dark:prose-invert max-w-none">
-                <h3>What is Alt Text?</h3>
-                <p>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">What is Alt Text?</h3>
+                <p className="text-gray-700 dark:text-gray-300">
                   Alternative text (alt text) is a written description of an image that appears in HTML code. 
                   It's read by screen readers, displayed when images fail to load, and used by search engines 
                   to understand image content.
                 </p>
                 
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg my-4">
-                  <h4 className="font-medium mb-2">HTML Syntax:</h4>
-                  <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-x-auto">
+                <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-xl my-4 border border-gray-200 dark:border-slate-700">
+                  <h4 className="font-medium mb-2 text-gray-900 dark:text-white">HTML Syntax:</h4>
+                  <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded-lg overflow-x-auto border border-gray-200 dark:border-slate-700">
                     <code>&lt;img src="image.jpg" alt="Description of the image" /&gt;</code>
                   </pre>
                 </div>
                 
-                <h3>Why Alt Text Matters</h3>
-                <ul>
-                  <li><strong>Accessibility</strong>: Makes your content accessible to people with visual impairments</li>
-                  <li><strong>SEO</strong>: Helps search engines understand your images and improves rankings</li>
-                  <li><strong>User Experience</strong>: Provides context when images can't be loaded</li>
-                  <li><strong>Legal Compliance</strong>: Required by accessibility laws in many countries</li>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Why Alt Text Matters</h3>
+                <ul className="text-gray-700 dark:text-gray-300 space-y-2">
+                  <li><strong className="text-gray-900 dark:text-white">Accessibility</strong>: Makes your content accessible to people with visual impairments</li>
+                  <li><strong className="text-gray-900 dark:text-white">SEO</strong>: Helps search engines understand your images and improves rankings</li>
+                  <li><strong className="text-gray-900 dark:text-white">User Experience</strong>: Provides context when images can't be loaded</li>
+                  <li><strong className="text-gray-900 dark:text-white">Legal Compliance</strong>: Required by accessibility laws in many countries</li>
                 </ul>
                 
-                <h3>Core Principles</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6">Core Principles</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                    <h4 className="font-medium text-green-800 dark:text-green-300 flex items-center">
-                      <CheckCircle className="h-5 w-5 mr-2" /> Do's
+                  <div className="bg-[#0fae96]/5 dark:bg-[#0fae96]/10 p-4 rounded-xl border border-[#0fae96]/10 dark:border-[#0fae96]/20">
+                    <h4 className="font-medium text-gray-900 dark:text-white flex items-center">
+                      <CheckCircle className="h-5 w-5 mr-2 text-[#0fae96] dark:text-[#5eead4]" /> Do's
                     </h4>
-                    <ul className="mt-2 space-y-1 text-sm">
+                    <ul className="mt-2 space-y-2 text-sm text-gray-700 dark:text-gray-300">
                       <li>Be specific and concise (10-15 words)</li>
                       <li>Focus on the purpose and context of the image</li>
                       <li>Include text that appears in the image</li>
@@ -240,11 +243,11 @@ export function AltTextGuide() {
                     </ul>
                   </div>
                   
-                  <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
-                    <h4 className="font-medium text-red-800 dark:text-red-300 flex items-center">
-                      <AlertTriangle className="h-5 w-5 mr-2" /> Don'ts
+                  <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-800/30">
+                    <h4 className="font-medium text-gray-900 dark:text-white flex items-center">
+                      <AlertTriangle className="h-5 w-5 mr-2 text-red-500 dark:text-red-400" /> Don'ts
                     </h4>
-                    <ul className="mt-2 space-y-1 text-sm">
+                    <ul className="mt-2 space-y-2 text-sm text-gray-700 dark:text-gray-300">
                       <li>Start with "image of" or "picture of"</li>
                       <li>Include redundant information</li>
                       <li>Stuff keywords for SEO purposes</li>
@@ -255,24 +258,24 @@ export function AltTextGuide() {
                   </div>
                 </div>
                 
-                <h3 className="mt-6">When to Use Empty Alt Text</h3>
-                <p>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6">When to Use Empty Alt Text</h3>
+                <p className="text-gray-700 dark:text-gray-300">
                   Use empty alt text (alt="") for images that are purely decorative and don't convey content 
                   that's necessary for understanding the page. This tells screen readers to skip the image.
                 </p>
-                <p>Examples of decorative images that should have empty alt text:</p>
-                <ul>
+                <p className="text-gray-700 dark:text-gray-300">Examples of decorative images that should have empty alt text:</p>
+                <ul className="text-gray-700 dark:text-gray-300 space-y-2">
                   <li>Background textures or patterns</li>
                   <li>Decorative dividers or spacers</li>
                   <li>Purely aesthetic elements</li>
                   <li>Images that repeat information already provided in text</li>
                 </ul>
                 
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg my-4">
-                  <h4 className="font-medium text-yellow-800 dark:text-yellow-300 flex items-center">
-                    <Info className="h-5 w-5 mr-2" /> Important Note
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-xl my-4 border border-yellow-100 dark:border-yellow-800/30">
+                  <h4 className="font-medium text-gray-900 dark:text-white flex items-center">
+                    <Info className="h-5 w-5 mr-2 text-yellow-500 dark:text-yellow-400" /> Important Note
                   </h4>
-                  <p className="text-sm mt-1">
+                  <p className="text-sm mt-2 text-gray-700 dark:text-gray-300">
                     Never omit the alt attribute entirely, as screen readers will often read the file name instead. 
                     Either provide descriptive alt text or use alt="" for decorative images.
                   </p>
@@ -289,36 +292,39 @@ export function AltTextGuide() {
               transition={{ duration: 0.3 }}
               className="p-6"
             >
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                <div className="rounded-full bg-[#0fae96]/10 dark:bg-[#0fae96]/20 p-2 inline-block mr-3">
+                  <FileText className="h-5 w-5 text-[#0fae96] dark:text-[#5eead4]" />
+                </div>
                 Alt Text Examples by Category
               </h2>
               
               <div className="space-y-8">
                 {exampleCategories.map((category, index) => (
-                  <div key={index} className="border-b border-gray-200 dark:border-gray-700 pb-8 last:border-b-0 last:pb-0">
-                    <h3 className="text-xl font-semibold mb-4 flex items-center">
-                      <Image className="w-5 h-5 mr-2 text-primary-500" />
+                  <div key={index} className="border-b border-gray-200 dark:border-slate-700 pb-8 last:border-b-0 last:pb-0">
+                    <h3 className="text-xl font-semibold mb-4 flex items-center text-gray-900 dark:text-white">
+                      <Image className="w-5 h-5 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
                       {category.name}
                     </h3>
                     
                     <div className="space-y-6">
                       {category.examples.map((example, exIndex) => (
-                        <div key={exIndex} className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
-                          <div className="p-4 bg-gray-100 dark:bg-gray-600">
-                            <h4 className="font-medium">{example.description}</h4>
+                        <div key={exIndex} className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 shadow-sm">
+                          <div className="p-4 bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700">
+                            <h4 className="font-medium text-gray-900 dark:text-white">{example.description}</h4>
                           </div>
                           <div className="p-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded">
-                                <p className="text-sm font-medium text-red-800 dark:text-red-300 mb-1 flex items-center">
-                                  <AlertTriangle className="w-4 h-4 mr-1" /> Poor Alt Text
+                              <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-100 dark:border-red-800/30">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white mb-2 flex items-center">
+                                  <AlertTriangle className="w-4 h-4 mr-1 text-red-500 dark:text-red-400" /> Poor Alt Text
                                 </p>
                                 <div className="flex items-center justify-between">
-                                  <p className="text-sm font-mono bg-white dark:bg-gray-800 py-1 px-2 rounded">
+                                  <p className="text-sm font-mono bg-white dark:bg-slate-900 py-1 px-2 rounded border border-gray-200 dark:border-slate-700">
                                     alt="{example.badExample}"
                                   </p>
                                   <button 
-                                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                                    className="text-gray-500 hover:text-[#0fae96] dark:text-gray-400 dark:hover:text-[#5eead4] transition-colors"
                                     aria-label="Copy bad example"
                                   >
                                     <Copy className="w-4 h-4" />
@@ -326,16 +332,16 @@ export function AltTextGuide() {
                                 </div>
                               </div>
                               
-                              <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded">
-                                <p className="text-sm font-medium text-green-800 dark:text-green-300 mb-1 flex items-center">
-                                  <CheckCircle className="w-4 h-4 mr-1" /> Good Alt Text
+                              <div className="bg-[#0fae96]/5 dark:bg-[#0fae96]/10 p-3 rounded-xl border border-[#0fae96]/10 dark:border-[#0fae96]/20">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white mb-2 flex items-center">
+                                  <CheckCircle className="w-4 h-4 mr-1 text-[#0fae96] dark:text-[#5eead4]" /> Good Alt Text
                                 </p>
                                 <div className="flex items-center justify-between">
-                                  <p className="text-sm font-mono bg-white dark:bg-gray-800 py-1 px-2 rounded">
+                                  <p className="text-sm font-mono bg-white dark:bg-slate-900 py-1 px-2 rounded border border-gray-200 dark:border-slate-700">
                                     alt="{example.goodExample}"
                                   </p>
                                   <button 
-                                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                                    className="text-gray-500 hover:text-[#0fae96] dark:text-gray-400 dark:hover:text-[#5eead4] transition-colors"
                                     aria-label="Copy good example"
                                   >
                                     <Copy className="w-4 h-4" />
@@ -343,8 +349,8 @@ export function AltTextGuide() {
                                 </div>
                               </div>
                             </div>
-                            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
-                              <strong>Why it works:</strong> {example.explanation}
+                            <p className="mt-4 text-sm text-gray-700 dark:text-gray-300">
+                              <strong className="text-gray-900 dark:text-white">Why it works:</strong> {example.explanation}
                             </p>
                           </div>
                         </div>
@@ -364,7 +370,10 @@ export function AltTextGuide() {
               transition={{ duration: 0.3 }}
               className="p-6"
             >
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                <div className="rounded-full bg-[#0fae96]/10 dark:bg-[#0fae96]/20 p-2 inline-block mr-3">
+                  <HelpCircle className="h-5 w-5 text-[#0fae96] dark:text-[#5eead4]" />
+                </div>
                 Frequently Asked Questions
               </h2>
               
@@ -374,7 +383,7 @@ export function AltTextGuide() {
                 </div>
                 <input
                   type="text"
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-white rounded-lg leading-5 bg-white dark:bg-slate-800 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-[#0fae96] focus:border-[#0fae96] sm:text-sm"
                   placeholder="Search FAQs..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -386,15 +395,18 @@ export function AltTextGuide() {
                   {filteredFaqs.map((faq, index) => (
                     <div
                       key={index}
-                      className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-sm"
+                      className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm border border-gray-200 dark:border-slate-700"
                     >
-                      <div className="p-4 bg-gray-100 dark:bg-gray-600">
-                        <h3 className="font-medium text-gray-900 dark:text-white">
+                      <div className="p-4 bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700">
+                        <h3 className="font-medium text-gray-900 dark:text-white flex items-center">
+                          <div className="rounded-full bg-[#0fae96]/10 dark:bg-[#0fae96]/20 p-1 inline-block mr-2">
+                            <HelpCircle className="h-4 w-4 text-[#0fae96] dark:text-[#5eead4]" />
+                          </div>
                           {faq.question}
                         </h3>
                       </div>
                       <div className="p-4">
-                        <p className="text-gray-600 dark:text-gray-300">
+                        <p className="text-gray-700 dark:text-gray-300">
                           {faq.answer}
                         </p>
                       </div>
@@ -402,8 +414,8 @@ export function AltTextGuide() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <HelpCircle className="mx-auto h-12 w-12 text-gray-400" />
+                <div className="text-center py-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+                  <HelpCircle className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
                   <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No results found</h3>
                   <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     No FAQs match your search criteria. Try different keywords.
