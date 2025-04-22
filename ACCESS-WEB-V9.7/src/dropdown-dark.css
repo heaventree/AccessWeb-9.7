@@ -1,19 +1,68 @@
-/* Dark mode dropdown */
-.dark .dropdown-menu {
-  background-color: rgba(15, 23, 42, 0.98) !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.15) !important;
-  border-color: rgba(51, 65, 85, 0.7) !important;
-}
+/**
+ * Dropdown Menu Custom Styling
+ * 
+ * This file contains specific styles for the dropdown menu components
+ * to ensure they match the UI kit design in both light and dark modes.
+ */
 
-.dark .dropdown-item:hover {
-  background-color: rgba(15, 174, 150, 0.2) !important;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.dark .dropdown-description {
-  color: #5eead4 !important;
-  opacity: 0.85 !important;
-}
+@layer components {
+  /* Dropdown menu container */
+  .dropdown-menu {
+    @apply bg-white dark:bg-slate-900 backdrop-blur-lg rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 w-[320px] p-2.5 space-y-0.5;
+    background-color: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.07);
+  }
 
-.dark .dropdown-icon {
-  color: #5eead4 !important;
+  /* Dropdown item styling */
+  .dropdown-item {
+    @apply flex flex-col cursor-pointer py-3 px-3.5 rounded-lg transition-all duration-200;
+    background-color: transparent;
+  }
+
+  .dropdown-item:hover {
+    background-color: rgba(15, 174, 150, 0.05);
+  }
+
+  .dark .dropdown-item:hover {
+    background-color: rgba(15, 174, 150, 0.2);
+  }
+
+  /* Dropdown icon container */
+  .dropdown-icon {
+    @apply w-5 h-5 flex items-center justify-center mr-3 flex-shrink-0;
+    color: #0fae96;
+  }
+
+  .dark .dropdown-icon {
+    color: #5eead4;
+  }
+
+  /* Dropdown item icon */
+  .dropdown-icon svg {
+    @apply w-[18px] h-[18px];
+  }
+
+  /* Dropdown item label */
+  .dropdown-item-label {
+    @apply font-medium text-[15px] leading-none;
+    color: #1f2937;
+  }
+
+  .dark .dropdown-item-label {
+    color: #ffffff;
+  }
+
+  /* Dropdown item description */
+  .dropdown-description {
+    @apply text-[13px] whitespace-nowrap text-ellipsis overflow-hidden pl-8 leading-relaxed opacity-80;
+    color: #6b7280;
+  }
+
+  .dark .dropdown-description {
+    color: #5eead4;
+  }
 }
