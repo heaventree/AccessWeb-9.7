@@ -11,7 +11,7 @@ interface HeroSectionProps {
 export default function HeroSection({ onTrialSignup, isSubmitting }: HeroSectionProps) {
   const navigate = useNavigate();
   return (
-    <section className="pt-28 pb-16 md:pb-32 bg-gradient-to-b from-[#f9fdff] to-white dark:from-gray-900 dark:to-gray-800">
+    <section id="sectionID-26" className="pt-28 pb-16 md:pb-32 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.div
@@ -22,28 +22,29 @@ export default function HeroSection({ onTrialSignup, isSubmitting }: HeroSection
             <div className="inline-block px-4 py-1.5 bg-[#e0f5f1] text-[#0fae96] dark:bg-[#0fae96]/20 dark:text-[#5eead4] rounded-full font-medium text-sm mb-6">
               Introducing the industry standard for WCAG compliance
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 text-transparent bg-clip-text">
-              Make Your Website Accessible to <span className="text-primary dark:text-[#5eead4]">Everyone</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-gray-900 dark:text-white">
+              Make Your Website<br /> Accessible to <span className="text-[#0fae96] dark:text-[#5eead4]">Everyone</span>
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto">
               Automated WCAG compliance testing and monitoring to ensure your website is accessible to all users. Get detailed reports and fixes in minutes.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-row gap-4 justify-center">
               <form onSubmit={onTrialSignup} className="flex-shrink-0">
                 <button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto bg-primary hover:bg-primary/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-8 py-6 text-white"
+                  className="flex items-center justify-center w-full sm:w-auto bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-8 py-3 text-white font-medium"
                 >
-                  {isSubmitting ? "Starting..." : "Start Free Trial"} <ArrowRight className="ml-2 h-5 w-5" />
+                  <span>{isSubmitting ? "Starting..." : "Start Free Trial"}</span>
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </button>
               </form>
               <button 
-                className="border border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-[#5eead4] transition-colors rounded-full px-8 py-6"
+                className="flex items-center justify-center border border-gray-200 dark:border-gray-700 hover:border-[#0fae96] dark:hover:border-[#5eead4] bg-white dark:bg-transparent transition-colors rounded-full px-8 py-3"
                 onClick={() => navigate('/demo')}
               >
-                <PlayCircle className="mr-2 h-5 w-5 text-primary dark:text-[#5eead4]" />
-                Watch Demo
+                <PlayCircle className="mr-2 h-5 w-5 text-[#0fae96] dark:text-[#5eead4]" />
+                <span>Watch Demo</span>
               </button>
             </div>
           </motion.div>
