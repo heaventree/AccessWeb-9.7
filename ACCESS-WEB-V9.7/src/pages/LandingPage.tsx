@@ -5,6 +5,7 @@ import StatSection from '../components/landing/stat-section';
 import FeatureSection from '../components/landing/feature-section';
 import CTABanner from '../components/landing/cta-banner';
 import TestimonialSection from '../components/landing/testimonial-section';
+import PricingSection from '../components/landing/pricing-section';
 import FAQSection from '../components/landing/faq-section';
 import AccessibilityBadge from '../components/landing/accessibility-badge';
 
@@ -43,6 +44,7 @@ export function LandingPage() {
         <FeatureSection />
         <CTABanner onTrialSignup={handleTrialSignup} isSubmitting={isTrialSubmitting} />
         <TestimonialSection />
+        <PricingSection />
         <FAQSection />
       </main>
       <AccessibilityBadge />
