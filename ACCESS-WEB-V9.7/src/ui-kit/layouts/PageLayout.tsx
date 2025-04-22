@@ -106,4 +106,4 @@ export function PageHeader({
   );
 }
 
-export { PageLayout, PageHeader };
+// Components already exported above
