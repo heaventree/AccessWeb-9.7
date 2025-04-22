@@ -30,7 +30,7 @@ import {
 type TabType = 'issues' | 'warnings' | 'passes' | 'contrast' | 'structure' | 'responsive' | 'media';
 
 // Pro pill styling
-const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold inline-flex items-center scale-[0.85] origin-left";
+const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-[#0fae96] to-teal-500 text-white font-semibold inline-flex items-center scale-[0.85] origin-left";
 
 export function WCAGCheckerPage() {
   const [selectedRegion, setSelectedRegion] = useState('eu');
@@ -145,11 +145,11 @@ export function WCAGCheckerPage() {
   };
 
   const getTabStyle = (tab: TabType) => {
-    const baseStyle = "px-6 py-3 text-sm font-medium rounded-lg transition-colors border";
+    const baseStyle = "px-6 py-3 text-sm font-medium rounded-full transition-colors border";
     if (activeTab === tab) {
       switch (tab) {
         case 'contrast':
-          return `${baseStyle} border-purple-500 text-purple-700 bg-purple-50`;
+          return `${baseStyle} border-[#0fae96] text-[#0fae96] bg-[#0fae96]/5`;
         case 'issues':
           return `${baseStyle} border-red-500 text-red-700 bg-red-50`;
         case 'warnings':
@@ -157,14 +157,14 @@ export function WCAGCheckerPage() {
         case 'passes':
           return `${baseStyle} border-emerald-500 text-emerald-700 bg-emerald-50`;
         case 'structure':
-          return `${baseStyle} border-blue-500 text-blue-700 bg-blue-50`;
+          return `${baseStyle} border-[#0fae96] text-[#0fae96] bg-[#0fae96]/5`;
         case 'responsive':
-          return `${baseStyle} border-teal-500 text-teal-700 bg-teal-50`;
+          return `${baseStyle} border-[#0fae96] text-[#0fae96] bg-[#0fae96]/5`;
         case 'media':
-          return `${baseStyle} border-purple-500 text-purple-700 bg-purple-50`;
+          return `${baseStyle} border-[#0fae96] text-[#0fae96] bg-[#0fae96]/5`;
       }
     }
-    return `${baseStyle} border-gray-300 text-gray-600 hover:bg-gray-50`;
+    return `${baseStyle} border-gray-300 text-gray-600 hover:border-[#0fae96] hover:text-[#0fae96] hover:bg-[#0fae96]/5`;
   };
 
   const contrastIssues = getContrastIssues();
@@ -580,7 +580,7 @@ export function WCAGCheckerPage() {
         {!results && (
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <FileSearch className="w-8 h-8 text-blue-600 mb-4" />
+              <FileSearch className="w-8 h-8 text-[#0fae96] mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Deep Analysis
               </h3>
@@ -590,7 +590,7 @@ export function WCAGCheckerPage() {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <Zap className="w-8 h-8 text-blue-600 mb-4" />
+              <Zap className="w-8 h-8 text-[#0fae96] mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 AI-Powered Fixes
               </h3>
@@ -600,7 +600,7 @@ export function WCAGCheckerPage() {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <Globe className="w-8 h-8 text-blue-600 mb-4" />
+              <Globe className="w-8 h-8 text-[#0fae96] mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Global Standards
               </h3>
@@ -610,7 +610,7 @@ export function WCAGCheckerPage() {
             </div>
             
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <Download className="w-8 h-8 text-blue-600 mb-4" />
+              <Download className="w-8 h-8 text-[#0fae96] mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 PDF Accessibility
               </h3>
@@ -620,7 +620,7 @@ export function WCAGCheckerPage() {
             </div>
             
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <FileText className="w-8 h-8 text-blue-600 mb-4" />
+              <FileText className="w-8 h-8 text-[#0fae96] mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Office Document Testing
               </h3>
@@ -630,7 +630,7 @@ export function WCAGCheckerPage() {
             </div>
             
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <Video className="w-8 h-8 text-blue-600 mb-4" />
+              <Video className="w-8 h-8 text-[#0fae96] mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Video Accessibility
               </h3>
@@ -640,7 +640,7 @@ export function WCAGCheckerPage() {
             </div>
             
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <Headphones className="w-8 h-8 text-blue-600 mb-4" />
+              <Headphones className="w-8 h-8 text-[#0fae96] mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Audio Accessibility
               </h3>
@@ -650,7 +650,7 @@ export function WCAGCheckerPage() {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <Layout className="w-8 h-8 text-blue-600 mb-4" />
+              <Layout className="w-8 h-8 text-[#0fae96] mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Structure Analysis
               </h3>
@@ -660,7 +660,7 @@ export function WCAGCheckerPage() {
             </div>
             
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <Smartphone className="w-8 h-8 text-blue-600 mb-4" />
+              <Smartphone className="w-8 h-8 text-[#0fae96] mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Responsive Design
               </h3>

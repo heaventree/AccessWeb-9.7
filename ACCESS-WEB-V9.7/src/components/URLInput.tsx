@@ -42,7 +42,7 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Enter website URL (e.g., example.com)"
-              className="flex-1 px-4 py-2 text-base text-gray-700 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all"
+              className="flex-1 px-4 py-2 text-base text-gray-700 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0fae96]/50 transition-all"
               disabled={isLoading}
               required
               aria-invalid={!!error}
@@ -51,7 +51,7 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
             <button
               type="submit"
               disabled={isLoading}
-              className="ml-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg flex items-center transition-colors disabled:opacity-50 disabled:hover:bg-blue-600"
+              className="ml-2 px-6 py-2 bg-[#0fae96] hover:bg-teal-600 text-white font-medium rounded-full flex items-center transition-colors disabled:opacity-50 disabled:hover:bg-[#0fae96]"
             >
               {isLoading ? (
                 <div className="flex items-center">
@@ -86,7 +86,7 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Enter website URL (e.g., example.com)"
-              className="flex-1 px-6 py-4 text-lg text-gray-700 bg-gray-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all"
+              className="flex-1 px-6 py-4 text-lg text-gray-700 bg-gray-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0fae96]/50 transition-all"
               disabled={isLoading}
               required
               aria-invalid={!!error}
@@ -95,7 +95,7 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
             <button
               type="submit"
               disabled={isLoading}
-              className="ml-3 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl flex items-center transition-colors disabled:opacity-50 disabled:hover:bg-blue-600"
+              className="ml-3 px-8 py-4 bg-[#0fae96] hover:bg-teal-600 text-white font-medium rounded-full flex items-center transition-colors disabled:opacity-50 disabled:hover:bg-[#0fae96]"
             >
               {isLoading ? (
                 <div className="flex items-center">
@@ -115,7 +115,7 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
               {error}
             </p>
           )}
-          <p className="text-sm text-blue-600">
+          <p className="text-sm text-[#0fae96]">
             The scan typically takes 30-60 seconds depending on the size of your website
           </p>
         </div>
