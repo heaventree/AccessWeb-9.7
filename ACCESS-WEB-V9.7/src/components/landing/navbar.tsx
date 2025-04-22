@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import {
   Menu,
   X,
@@ -274,16 +274,14 @@ export default function Navbar() {
             <div className="py-2 mb-2">
               <h3 className="font-medium text-base mb-2 dark:text-[#5eead4]">Tools</h3>
               {toolsDropdownItems.map((item, index) => (
-                <Link key={index} href={item.href}>
-                  <a className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
-                    <div className="flex items-center mb-1">
-                      <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
-                      <span className="dark:text-white">{item.label}</span>
-                    </div>
-                    <div className="pl-7 text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden">
-                      {item.description}
-                    </div>
-                  </a>
+                <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
+                  <div className="flex items-center mb-1">
+                    <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
+                    <span className="dark:text-white">{item.label}</span>
+                  </div>
+                  <div className="pl-7 text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden">
+                    {item.description}
+                  </div>
                 </Link>
               ))}
             </div>
@@ -292,16 +290,14 @@ export default function Navbar() {
             <div className="py-2 mb-2">
               <h3 className="font-medium text-base mb-2 dark:text-[#5eead4]">Integrations</h3>
               {integrationsDropdownItems.map((item, index) => (
-                <Link key={index} href={item.href}>
-                  <a className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
-                    <div className="flex items-center mb-1">
-                      <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
-                      <span className="dark:text-white">{item.label}</span>
-                    </div>
-                    <div className="pl-7 text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden">
-                      {item.description}
-                    </div>
-                  </a>
+                <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
+                  <div className="flex items-center mb-1">
+                    <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
+                    <span className="dark:text-white">{item.label}</span>
+                  </div>
+                  <div className="pl-7 text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden">
+                    {item.description}
+                  </div>
                 </Link>
               ))}
             </div>
@@ -310,16 +306,14 @@ export default function Navbar() {
             <div className="py-2 mb-2">
               <h3 className="font-medium text-base mb-2 dark:text-[#5eead4]">Resources</h3>
               {resourcesDropdownItems.map((item, index) => (
-                <Link key={index} href={item.href}>
-                  <a className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
-                    <div className="flex items-center mb-1">
-                      <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
-                      <span className="dark:text-white">{item.label}</span>
-                    </div>
-                    <div className="pl-7 text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden">
-                      {item.description}
-                    </div>
-                  </a>
+                <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
+                  <div className="flex items-center mb-1">
+                    <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
+                    <span className="dark:text-white">{item.label}</span>
+                  </div>
+                  <div className="pl-7 text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden">
+                    {item.description}
+                  </div>
                 </Link>
               ))}
             </div>

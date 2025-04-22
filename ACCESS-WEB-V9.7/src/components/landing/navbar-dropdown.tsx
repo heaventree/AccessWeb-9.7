@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, CheckCircle } from 'lucide-react';
 import NavigationIcons from '../navigation/NavigationIconGuide';
@@ -18,8 +18,7 @@ interface DropdownProps {
 
 const NavDropdownItem: React.FC<DropdownItemProps> = ({ icon: Icon, label, description, href }) => {
   return (
-    <div className="flex flex-col hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 cursor-pointer p-3 rounded-md transition-all duration-200" 
-         onClick={() => window.location.href = href}>
+    <Link to={href} className="flex flex-col hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 cursor-pointer p-3 rounded-md transition-all duration-200">
       <div className="flex items-center mb-1">
         <Icon className="h-5 w-5 text-[#0fae96] dark:text-[#5eead4] mr-2 flex-shrink-0" />
         <span className="font-medium text-base dark:text-white">{label}</span>
@@ -27,7 +26,7 @@ const NavDropdownItem: React.FC<DropdownItemProps> = ({ icon: Icon, label, descr
       <div className="text-base text-muted-foreground dark:text-[#5eead4] whitespace-nowrap text-ellipsis overflow-hidden pl-7">
         {description}
       </div>
-    </div>
+    </Link>
   );
 };
 
