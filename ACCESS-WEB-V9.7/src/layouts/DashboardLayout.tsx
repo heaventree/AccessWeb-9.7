@@ -261,7 +261,7 @@ export function DashboardLayout({
       {/* Main Content */}
       <main 
         id="main-content" 
-        className={`pt-16 min-h-screen transition-all duration-300 ease-in-out ${
+        className={`pt-[130px] min-h-screen transition-all duration-300 ease-in-out ${
           sidebarOpen 
             ? 'md:pl-64' 
             : 'md:pl-20'
