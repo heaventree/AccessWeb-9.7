@@ -233,10 +233,10 @@ export function WCAGCheckerPage() {
             transition={{ duration: 0.5 }}
             className="text-center mb-8"
           >
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               WCAG Accessibility Checker
             </h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Test your website against WCAG 2.1 and 2.2 standards
             </p>
           </motion.div>
@@ -264,7 +264,7 @@ export function WCAGCheckerPage() {
                     onChange={(e) => setEnableDocumentTesting(e.target.checked)}
                     className="h-4 w-4 rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
                   />
-                  <label htmlFor="documentTesting" className="ml-2 text-sm font-medium text-gray-700">
+                  <label htmlFor="documentTesting" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Document Testing
                   </label>
                   <span className={proPillStyle}>PRO</span>
@@ -288,7 +288,7 @@ export function WCAGCheckerPage() {
                     onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
                     className="h-4 w-4 rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
                   />
-                  <label htmlFor="pdfAccessibility" className="ml-2 text-sm font-medium text-gray-700">
+                  <label htmlFor="pdfAccessibility" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     PDF Accessibility
                   </label>
                   <span className={proPillStyle}>PRO</span>
@@ -313,7 +313,7 @@ export function WCAGCheckerPage() {
                     onChange={(e) => setEnableOfficeDocuments(e.target.checked)}
                     className="h-4 w-4 rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
                   />
-                  <label htmlFor="officeDocuments" className="ml-2 text-sm font-medium text-gray-700">
+                  <label htmlFor="officeDocuments" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Test Office Documents
                   </label>
                   <span className={proPillStyle}>PRO</span>
@@ -338,7 +338,7 @@ export function WCAGCheckerPage() {
                     onChange={(e) => setEnableMediaTesting(e.target.checked)}
                     className="h-4 w-4 rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
                   />
-                  <label htmlFor="mediaTesting" className="ml-2 text-sm font-medium text-gray-700">
+                  <label htmlFor="mediaTesting" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Test Media
                   </label>
                   <span className={proPillStyle}>PRO</span>
