@@ -407,14 +407,14 @@ export default function Navbar() {
             
             {/* Regular Nav Items */}
             {navItems.map((item, index) => (
-              <a 
+              <Link 
                 key={index}
-                href={item.href} 
+                to={item.href} 
                 className="block py-3 text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
             <div className="pt-3 mt-3 border-t border-border">
               <div className="flex items-center justify-between py-3">
