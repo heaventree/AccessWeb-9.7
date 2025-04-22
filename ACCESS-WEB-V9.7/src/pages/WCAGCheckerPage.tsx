@@ -224,9 +224,9 @@ export function WCAGCheckerPage() {
 
   return (
     <div className="page-container">
-      <div className="content-container">
+      <div className="content-container max-w-7xl mx-auto px-4">
         {/* URL Input Section */}
-        <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-8 mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -252,7 +252,7 @@ export function WCAGCheckerPage() {
             />
             
             {/* Testing options */}
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+            <div className="mt-4 p-4 bg-[#0fae96]/5 dark:bg-[#0fae96]/10 rounded-lg">
               {/* Pro features row */}
               <div className="flex flex-row justify-center items-center gap-6 flex-wrap">
                 {/* Document Testing */}
@@ -262,7 +262,7 @@ export function WCAGCheckerPage() {
                     id="documentTesting"
                     checked={enableDocumentTesting}
                     onChange={(e) => setEnableDocumentTesting(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
                   />
                   <label htmlFor="documentTesting" className="ml-2 text-sm font-medium text-gray-700">
                     Document Testing
@@ -286,7 +286,7 @@ export function WCAGCheckerPage() {
                     id="pdfAccessibility"
                     checked={enablePDFAccessibility}
                     onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
                   />
                   <label htmlFor="pdfAccessibility" className="ml-2 text-sm font-medium text-gray-700">
                     PDF Accessibility
@@ -311,7 +311,7 @@ export function WCAGCheckerPage() {
                     id="officeDocuments"
                     checked={enableOfficeDocuments}
                     onChange={(e) => setEnableOfficeDocuments(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
                   />
                   <label htmlFor="officeDocuments" className="ml-2 text-sm font-medium text-gray-700">
                     Test Office Documents
@@ -336,7 +336,7 @@ export function WCAGCheckerPage() {
                     id="mediaTesting"
                     checked={enableMediaTesting}
                     onChange={(e) => setEnableMediaTesting(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
                   />
                   <label htmlFor="mediaTesting" className="ml-2 text-sm font-medium text-gray-700">
                     Test Media
@@ -398,7 +398,7 @@ export function WCAGCheckerPage() {
                 </div>
                 <button
                   onClick={handleExport}
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-md rounded-lg transition-all hover:shadow-lg"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-[#0fae96] to-teal-500 hover:from-teal-500 hover:to-[#0fae96] shadow-md rounded-full transition-all hover:shadow-lg"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Export Report
