@@ -188,7 +188,7 @@ export default function Navbar() {
   ];
 
   return (
-    <header className={`fixed w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg z-50 ${scrolled ? 'shadow-md' : ''} transition-all duration-300 border-b border-gray-100 dark:border-gray-800`}>
+    <header className={`fixed w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg z-50 ${scrolled ? 'shadow-md' : ''} transition-all duration-300 border-b border-gray-100 dark:border-gray-800`} style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(16px)' }}>
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="w-9 h-9 rounded-full bg-[#e0f5f1] dark:bg-[#0fae96]/20 flex items-center justify-center">
@@ -267,6 +267,7 @@ export default function Navbar() {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
             className="md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-100 dark:border-gray-800 px-6 py-6 overflow-hidden absolute w-full left-0 shadow-lg"
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(16px)' }}
             role="navigation"
             aria-label="Mobile navigation"
           >

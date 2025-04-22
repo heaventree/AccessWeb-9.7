@@ -70,7 +70,7 @@ export const NavDropdown: React.FC<DropdownProps> = ({ label, items }) => {
             transition={{ duration: 0.15 }}
             className="absolute left-0 mt-2 z-50"
           >
-            <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 w-[280px] p-2 space-y-0.5">
+            <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 w-[280px] p-2 space-y-0.5" style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(16px)' }}>
               {items.map((item, index) => (
                 <NavDropdownItem key={index} {...item} />
               ))}
