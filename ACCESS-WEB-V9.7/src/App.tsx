@@ -125,7 +125,7 @@ function App() {
             <Route path="/ui-demo" element={<><Navigation /><main id="main-content"><UiDemo /></main><Footer /><BackToTop /></>} />
             <Route path="/integrations" element={<><Navigation /><main id="main-content"><Integrations /></main><Footer /><BackToTop /></>} />
             {/* Account Routes with shared layout */}
-            <Route path="/my-account" element={<ProtectedRoute><><Navigation /><AccountLayout /></></ProtectedRoute>}>
+            <Route path="/my-account" element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
               <Route index element={<SubscriptionDashboard />} />
               <Route path="monitoring" element={<MonitoringPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
