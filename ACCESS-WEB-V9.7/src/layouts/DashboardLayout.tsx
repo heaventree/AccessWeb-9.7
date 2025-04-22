@@ -59,7 +59,7 @@ export function DashboardLayout({
 
       {/* Top Navigation */}
       <header className="fixed top-0 w-full z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 px-4 sm:px-6 lg:px-8">
           {/* Left section: Logo and hamburger */}
           <div className="flex items-center">
             <button 
@@ -78,7 +78,7 @@ export function DashboardLayout({
             </button>
             <div className="flex items-center">
               <Link to="/" className="flex items-center">
-                <div className="w-10 h-10 rounded-xl bg-[#e0f5f1] dark:bg-[#0fae96]/20 flex items-center justify-center mr-2">
+                <div className="w-8 h-8 rounded-xl bg-[#e0f5f1] dark:bg-[#0fae96]/20 flex items-center justify-center mr-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -87,15 +87,15 @@ export function DashboardLayout({
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="w-5 h-5 text-[#0fae96] dark:text-[#5eead4]"
+                    className="w-4 h-4 text-[#0fae96] dark:text-[#5eead4]"
                   >
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                     <polyline points="22 4 12 14.01 9 11.01" />
                   </svg>
                 </div>
-                <span className="text-xl font-bold text-gray-900 dark:text-white">AccessWeb<span className="text-[#0fae96] dark:text-[#5eead4]">Pro</span></span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">AccessWeb<span className="text-[#0fae96] dark:text-[#5eead4]">Pro</span></span>
               </Link>
-              <span className="text-xl font-medium text-gray-600 dark:text-gray-400 ml-2 border-l border-gray-200 dark:border-gray-700 pl-2">
+              <span className="text-lg font-medium text-gray-600 dark:text-gray-400 ml-2 border-l border-gray-200 dark:border-gray-700 pl-2">
                 {title}
               </span>
             </div>
@@ -167,7 +167,7 @@ export function DashboardLayout({
 
       {/* Sidebar - Desktop */}
       <aside 
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out pt-16 ${
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out pt-14 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-20'
         }`}
       >
@@ -300,14 +300,14 @@ export function DashboardLayout({
       {/* Main Content */}
       <main 
         id="main-content" 
-        className={`pt-[130px] min-h-screen bg-gray-50 dark:bg-gray-900 transition-all duration-300 ease-in-out ${
+        className={`pt-[75px] min-h-screen bg-gray-50 dark:bg-gray-900 transition-all duration-300 ease-in-out ${
           sidebarOpen 
             ? 'md:pl-64' 
             : 'md:pl-20'
         }`}
       >
-        <div className="p-4 sm:p-6 lg:p-8">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <div className="p-3 sm:p-4 lg:p-5">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
             <Outlet />
           </div>
         </div>
