@@ -213,7 +213,7 @@ export default function Navbar() {
             <a 
               key={index}
               href={item.href} 
-              className="text-muted-foreground hover:text-foreground text-base font-medium transition-colors"
+              className="text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium transition-colors"
             >
               {item.label}
             </a>
@@ -221,7 +221,7 @@ export default function Navbar() {
         </nav>
         
         <div className="flex items-center space-x-5">
-          <a href="#" className="hidden md:inline-block text-muted-foreground hover:text-foreground text-base font-medium transition-colors">
+          <a href="#" className="hidden md:inline-block text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium transition-colors">
             Login
           </a>
           <Button 
@@ -233,7 +233,7 @@ export default function Navbar() {
           {/* Dark Mode Toggle Button */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+            className="p-2 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white transition-colors"
             aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
           >
             {darkMode ? <Sun size={18} /> : <Moon size={18} />}
@@ -323,7 +323,7 @@ export default function Navbar() {
               <a 
                 key={index}
                 href={item.href} 
-                className="block py-3 text-muted-foreground hover:text-foreground text-base font-medium"
+                className="block py-3 text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}
@@ -333,7 +333,7 @@ export default function Navbar() {
               <div className="flex items-center justify-between py-3">
                 <a 
                   href="#" 
-                  className="text-muted-foreground hover:text-foreground text-base font-medium"
+                  className="text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Login
@@ -343,7 +343,7 @@ export default function Navbar() {
                     e.stopPropagation();
                     toggleTheme();
                   }}
-                  className="p-2 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                  className="p-2 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white transition-colors"
                   aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
                 >
                   {darkMode ? <Sun size={18} /> : <Moon size={18} />}
