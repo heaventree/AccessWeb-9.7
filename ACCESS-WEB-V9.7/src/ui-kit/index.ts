@@ -14,8 +14,5 @@ export * from './tokens';
 // Export styling utilities
 export * from './styles';
 
-// Export layout utilities
-export * from './layouts';
-
-// Export documentation
-export * from './documentation';
+// Note: layouts and documentation are not exported by default
+// Use direct imports for these modules when needed

@@ -312,14 +312,3 @@ export const CardFeatureIcon = forwardRef<SVGSVGElement, CardFeatureIconProps>(
 );
 
 CardFeatureIcon.displayName = 'CardFeatureIcon';
-
-export { 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription, 
-  CardContent, 
-  CardFooter, 
-  CardImage,
-  CardFeatureIcon
-};

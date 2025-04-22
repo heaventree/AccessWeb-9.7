@@ -1,183 +1,176 @@
 /**
  * ACCESS-WEB UI Kit - Container Component
  * 
- * A responsive container component that handles content width constraints
- * and padding across different viewport sizes.
+ * A flexible container component for controlling width, padding, and structure.
  */
 
 import React, { forwardRef } from 'react';
-import { cn } from '../../styles/utils';
-import { containerVariants } from '../../styles/variants';
-import { createVariants } from '../../styles/utils';
+import { cn, variantClasses } from '../../styles/utils';
 
 /**
- * Container component props
+ * Container variants
  */
-export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** Additional CSS classes */
-  className?: string;
-  /** Container style variants */
+const containerVariants = {
+  size: {
+    sm: 'max-w-screen-sm',
+    md: 'max-w-screen-md',
+    lg: 'max-w-screen-lg',
+    xl: 'max-w-screen-xl',
+    '2xl': 'max-w-screen-2xl',
+    full: 'max-w-full',
+    none: '',
+  },
+};
+
+export type ContainerProps = React.HTMLAttributes<HTMLDivElement> & {
+  /** Container size variant - controls max width */
   variant?: {
-    /** The width constraint */
     size?: keyof typeof containerVariants.size;
-    /** The container layout variant */
-    variant?: keyof typeof containerVariants.variant;
   };
-  /** Whether to center the container horizontally */
+  /** Whether container should be centered horizontally */
   centered?: boolean;
-  /** Whether to add default vertical padding */
-  verticalPadding?: boolean | 'sm' | 'md' | 'lg';
-  /** Element to render as (defaults to div) */
-  as?: React.ElementType;
-  /** Optional background color/styling */
-  background?: 'none' | 'light' | 'dark' | 'primary' | 'secondary' | 'accent';
-}
+  /** Horizontal padding */
+  horizontalPadding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  /** Vertical padding */
+  verticalPadding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  /** Background color */
+  background?: 'none' | 'light' | 'dark' | 'brand' | 'accent';
+};
 
 /**
  * Container component
  * 
- * Used for providing consistent width constraints and padding
- * to content sections throughout the application.
+ * A multi-purpose container component with various styling options
+ * for controlling layout and spacing.
  */
 export const Container = forwardRef<HTMLDivElement, ContainerProps>(
-  ({
-    className,
-    variant = {
-      size: 'xl',
-      variant: 'default',
-    },
+  ({ 
+    className, 
+    variant = {}, 
     centered = true,
-    verticalPadding = false,
-    as: Component = 'div',
+    horizontalPadding = 'md',
+    verticalPadding = 'none',
     background = 'none',
-    children,
-    ...props
+    ...props 
   }, ref) => {
-    // Get classes from variant
-    const getVariantClasses = createVariants(containerVariants);
-    const variantClasses = getVariantClasses({ variant });
-    
-    // Apply vertical padding based on size
-    const verticalPaddingClasses = 
-      verticalPadding === true ? 'py-8 md:py-12 lg:py-16' :
-      verticalPadding === 'sm' ? 'py-4 md:py-6' :
-      verticalPadding === 'md' ? 'py-8 md:py-10' :
-      verticalPadding === 'lg' ? 'py-12 md:py-16 lg:py-20' :
-      '';
-    
-    // Background styling
-    const backgroundClasses = {
-      'none': '',
-      'light': 'bg-gray-50 dark:bg-gray-900',
-      'dark': 'bg-gray-900 dark:bg-gray-800 text-white',
-      'primary': 'bg-[#0fae96]/10 dark:bg-[#0fae96]/20',
-      'secondary': 'bg-gray-100 dark:bg-gray-800',
-      'accent': 'bg-gradient-to-r from-[#0fae96]/5 to-blue-500/5 dark:from-[#0fae96]/10 dark:to-blue-500/10',
+    const {
+      size = 'xl',
+    } = variant;
+
+    const horizontalPaddingClass = {
+      none: '',
+      sm: 'px-3',
+      md: 'px-4 md:px-6',
+      lg: 'px-6 md:px-12',
+      xl: 'px-8 md:px-16',
+    }[horizontalPadding];
+
+    const verticalPaddingClass = {
+      none: '',
+      sm: 'py-3',
+      md: 'py-4 md:py-6',
+      lg: 'py-6 md:py-12',
+      xl: 'py-8 md:py-16',
+    }[verticalPadding];
+
+    const backgroundClass = {
+      none: '',
+      light: 'bg-gray-50 dark:bg-gray-900',
+      dark: 'bg-gray-900 dark:bg-gray-950 text-white',
+      brand: 'bg-[#0fae96]/10 dark:bg-[#0fae96]/20',
+      accent: 'bg-amber-50 dark:bg-amber-900/20',
     }[background];
 
     return (
-      <Component
+      <div
         ref={ref}
         className={cn(
-          variantClasses,
-          verticalPaddingClasses,
-          backgroundClasses,
-          { 'mx-auto': centered },
+          containerVariants.size[size],
+          centered && 'mx-auto',
+          horizontalPaddingClass,
+          verticalPaddingClass,
+          backgroundClass,
           className
         )}
         {...props}
-      >
-        {children}
-      </Component>
+      />
     );
   }
 );
 
 Container.displayName = 'Container';
 
-/**
- * Section component props
- */
-export interface SectionProps extends ContainerProps {
-  /** Section ID for navigation/linking */
-  id?: string;
-  /** Enable vertical spacing between direct children */
-  spaceY?: boolean | 'sm' | 'md' | 'lg' | 'xl';
-}
+export type SectionProps = React.HTMLAttributes<HTMLDivElement> & {
+  /** Background color */
+  background?: 'none' | 'light' | 'dark' | 'brand' | 'accent';
+  /** Vertical padding */
+  spacing?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+};
 
 /**
  * Section component
  * 
- * Used for creating page sections with consistent spacing.
- * Extends Container with additional spacing controls.
+ * A component for creating page sections with consistent padding and styling.
  */
-export const Section = forwardRef<HTMLElement, SectionProps>(
-  ({
-    className,
-    id,
-    variant = {
-      size: 'xl',
-      variant: 'default',
-    },
-    verticalPadding = true,
-    spaceY = false,
-    children,
-    ...props
-  }, ref) => {
-    // Calculate spacing between children
-    const spaceYClasses = 
-      spaceY === true ? 'space-y-8 md:space-y-12' :
-      spaceY === 'sm' ? 'space-y-4 md:space-y-6' :
-      spaceY === 'md' ? 'space-y-8 md:space-y-10' :
-      spaceY === 'lg' ? 'space-y-12 md:space-y-16' :
-      spaceY === 'xl' ? 'space-y-16 md:space-y-24' :
-      '';
+export const Section = forwardRef<HTMLDivElement, SectionProps>(
+  ({ className, background = 'none', spacing = 'lg', ...props }, ref) => {
+    const backgroundClass = {
+      none: '',
+      light: 'bg-gray-50 dark:bg-gray-900',
+      dark: 'bg-gray-900 dark:bg-gray-950 text-white',
+      brand: 'bg-[#0fae96]/10 dark:bg-[#0fae96]/20',
+      accent: 'bg-amber-50 dark:bg-amber-900/20',
+    }[background];
+
+    const spacingClass = {
+      none: '',
+      sm: 'py-4 md:py-6',
+      md: 'py-6 md:py-8',
+      lg: 'py-8 md:py-12',
+      xl: 'py-12 md:py-16',
+      '2xl': 'py-16 md:py-24',
+    }[spacing];
 
     return (
-      <Container
-        as="section"
+      <section
         ref={ref}
-        id={id}
-        variant={variant}
-        verticalPadding={verticalPadding}
-        className={cn(spaceYClasses, className)}
+        className={cn(
+          backgroundClass,
+          spacingClass,
+          className
+        )}
         {...props}
-      >
-        {children}
-      </Container>
+      />
     );
   }
 );
 
 Section.displayName = 'Section';
 
-/**
- * Main component props
- */
-export interface MainProps extends React.HTMLAttributes<HTMLElement> {
-  /** Additional CSS classes */
-  className?: string;
-}
+export type MainProps = React.HTMLAttributes<HTMLDivElement> & {
+  /** Apply top padding to ensure content doesn't sit directly under the header */
+  withTopPadding?: boolean;
+};
 
 /**
  * Main component
  * 
- * Represents the main content area of the page.
+ * A semantic main element with appropriate styling.
  */
 export const Main = forwardRef<HTMLElement, MainProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, withTopPadding = false, ...props }, ref) => {
     return (
       <main
         ref={ref}
-        className={cn('flex-1', className)}
+        className={cn(
+          'flex-1',
+          withTopPadding && 'pt-16',
+          className
+        )}
         {...props}
-      >
-        {children}
-      </main>
+      />
     );
   }
 );
 
 Main.displayName = 'Main';
-
-export { Container, Section, Main };

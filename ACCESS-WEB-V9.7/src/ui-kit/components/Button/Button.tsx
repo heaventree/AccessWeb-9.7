@@ -1,171 +1,146 @@
 /**
  * ACCESS-WEB UI Kit - Button Component
  * 
- * A versatile button component with multiple variants and sizes.
- * Used for all interactive actions in the application.
+ * A flexible button component with multiple variants.
  */
 
 import React, { forwardRef } from 'react';
-import { cn } from '../../styles/utils';
-import { buttonVariants } from '../../styles/variants';
-import { createVariants } from '../../styles/utils';
-
-// Icons for loading and different button states
-const LoadingSpinner = () => (
-  <svg
-    className="animate-spin -ml-1 mr-2 h-4 w-4"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    ></circle>
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    ></path>
-  </svg>
-);
+import { cn, variantClasses } from '../../styles/utils';
 
 /**
- * Button component props
+ * Button variants
  */
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Additional CSS classes */
-  className?: string;
-  /** Button style variants */
+const buttonVariants = {
+  variant: {
+    primary: 'bg-gradient-to-r from-[#0fae96] to-teal-500 hover:from-teal-500 hover:to-[#0fae96] text-white shadow-sm hover:shadow',
+    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100',
+    outline: 'border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300',
+    ghost: 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300',
+    link: 'text-[#0fae96] hover:underline p-0 h-auto',
+    danger: 'bg-red-500 hover:bg-red-600 text-white',
+  },
+  size: {
+    xs: 'text-xs px-2 py-1',
+    sm: 'text-sm px-3 py-1.5',
+    md: 'text-sm px-4 py-2',
+    lg: 'text-base px-5 py-2.5',
+    xl: 'text-lg px-6 py-3',
+  },
+  shape: {
+    square: 'rounded-none',
+    rounded: 'rounded-md',
+    pill: 'rounded-full',
+  },
+  width: {
+    auto: 'w-auto',
+    full: 'w-full',
+    fit: 'w-fit',
+  },
+};
+
+export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: {
-    /** The visual style variant */
     variant?: keyof typeof buttonVariants.variant;
-    /** The size of the button */
     size?: keyof typeof buttonVariants.size;
-    /** The shape of the button */
     shape?: keyof typeof buttonVariants.shape;
+    width?: keyof typeof buttonVariants.width;
   };
-  /** Whether the button displays a loading spinner */
-  isLoading?: boolean;
-  /** The loading text to display when isLoading is true */
-  loadingText?: string;
-  /** Whether the button is full width */
-  fullWidth?: boolean;
-  /** Optional left icon */
-  leftIcon?: React.ReactNode;
-  /** Optional right icon */
-  rightIcon?: React.ReactNode;
-  /** Whether the button has elevated/drop shadow style */
-  elevated?: boolean;
-  /** Whether the button is active (pressed) */
-  active?: boolean;
-  /** Whether the button is in a success state */
-  success?: boolean;
-  /** Whether to render an unstyled button with only basic behaviors */
-  unstyled?: boolean;
-}
+  icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
+  loading?: boolean;
+  disabled?: boolean;
+  as?: React.ElementType;
+};
 
 /**
- * Main Button component
+ * Button component
  * 
- * Used for all interactive actions in the application.
- * Supports multiple variants, sizes, and states.
+ * A multi-purpose button component with various styling options.
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({
-    className,
-    variant = {
-      variant: 'primary',
-      size: 'md',
-      shape: 'default',
-    },
-    isLoading = false,
-    loadingText,
-    fullWidth = false,
-    leftIcon,
-    rightIcon,
-    elevated = false,
-    active = false,
-    success = false,
-    unstyled = false,
-    children,
-    disabled,
-    type = 'button',
-    ...props
+  ({ 
+    className, 
+    variant = {}, 
+    icon, 
+    iconPosition = 'left', 
+    loading = false, 
+    disabled = false, 
+    children, 
+    as: Component = 'button',
+    ...props 
   }, ref) => {
-    // Get classes based on variants
-    const getVariantClasses = createVariants(buttonVariants);
-    const variantClasses = !unstyled ? getVariantClasses({ variant }) : '';
+    const {
+      variant: variantType = 'primary',
+      size = 'md',
+      shape = 'rounded',
+      width = 'auto',
+    } = variant;
 
-    // Base classes that apply to all variants 
-    const baseClasses = !unstyled
-      ? cn(
-          'inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0fae96] disabled:opacity-50 disabled:pointer-events-none',
-          {
-            'w-full': fullWidth,
-            'shadow-md': elevated,
-            'translate-y-0.5': active && !disabled && !isLoading,
-            'bg-green-600 hover:bg-green-700 text-white': success && !disabled,
-          }
-        )
-      : '';
-
-    // Combine all classes
-    const buttonClasses = cn(baseClasses, variantClasses, className);
+    const isDisabled = disabled || loading;
 
     return (
-      <button
+      <Component
         ref={ref}
-        type={type}
-        className={buttonClasses}
-        disabled={disabled || isLoading}
+        disabled={isDisabled}
+        className={cn(
+          'inline-flex items-center justify-center transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-[#0fae96] focus:ring-offset-2 dark:focus:ring-offset-gray-900 disabled:opacity-70 disabled:cursor-not-allowed',
+          variantClasses(buttonVariants)({
+            variant: variantType,
+            size,
+            shape,
+            width,
+          }),
+          className
+        )}
         {...props}
       >
-        {isLoading && <LoadingSpinner />}
-        {!isLoading && leftIcon && <span className="mr-2">{leftIcon}</span>}
-        {isLoading && loadingText ? loadingText : children}
-        {!isLoading && rightIcon && <span className="ml-2">{rightIcon}</span>}
-      </button>
+        {loading && (
+          <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        )}
+        {icon && iconPosition === 'left' && !loading && (
+          <span className="mr-2">{icon}</span>
+        )}
+        {children}
+        {icon && iconPosition === 'right' && (
+          <span className="ml-2">{icon}</span>
+        )}
+      </Component>
     );
   }
 );
 
 Button.displayName = 'Button';
 
-/**
- * IconButton component props
- */
-export interface IconButtonProps extends ButtonProps {
-  /** The icon to display */
-  icon: React.ReactNode;
-  /** Accessible label for screen readers */
+export type IconButtonProps = Omit<ButtonProps, 'iconPosition'> & {
   'aria-label': string;
-}
+  size?: keyof typeof iconButtonSizes;
+};
+
+const iconButtonSizes = {
+  xs: 'p-1',
+  sm: 'p-1.5',
+  md: 'p-2',
+  lg: 'p-2.5',
+  xl: 'p-3',
+};
 
 /**
- * IconButton component for icon-only buttons
+ * IconButton component
+ * 
+ * A button component optimized for displaying only an icon.
  */
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ icon, className, variant = { size: 'md' }, 'aria-label': ariaLabel, ...props }, ref) => {
-    // Default to square or circular aspect ratio for icon buttons
-    const sizeToIconClass = {
-      xs: 'w-6 h-6 p-0.5',
-      sm: 'w-8 h-8 p-1',
-      md: 'w-10 h-10 p-1.5',
-      lg: 'w-12 h-12 p-2',
-      xl: 'w-14 h-14 p-2.5',
-    }[variant.size || 'md'];
-
+  ({ className, icon, size = 'md', 'aria-label': ariaLabel, ...props }, ref) => {
     return (
       <Button
         ref={ref}
-        variant={variant}
-        className={cn(sizeToIconClass, 'flex items-center justify-center', className)}
+        className={cn(
+          iconButtonSizes[size],
+          className
+        )}
         aria-label={ariaLabel}
         {...props}
       >
@@ -177,71 +152,58 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 
 IconButton.displayName = 'IconButton';
 
-/**
- * ButtonGroup component props
- */
-export interface ButtonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** Child buttons */
+export type ButtonGroupProps = React.HTMLAttributes<HTMLDivElement> & {
   children: React.ReactNode;
-  /** Whether buttons should be attached/joined */
-  attached?: boolean;
-  /** Space between unattached buttons */
-  spacing?: 'xs' | 'sm' | 'md' | 'lg';
-  /** Orientation of the button group */
   orientation?: 'horizontal' | 'vertical';
-  /** Render as a different element */
-  as?: React.ElementType;
-}
+  spacing?: 'none' | 'sm' | 'md' | 'lg';
+};
 
 /**
- * ButtonGroup component for grouping related buttons
+ * ButtonGroup component
+ * 
+ * A component for grouping related buttons.
  */
 export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
-  ({
-    children,
-    attached = false,
-    spacing = 'sm',
-    orientation = 'horizontal',
-    as: Component = 'div',
-    className,
-    ...props
-  }, ref) => {
-    // Spacing between unattached buttons
-    const spacingClasses = {
-      xs: orientation === 'horizontal' ? 'space-x-1' : 'space-y-1',
-      sm: orientation === 'horizontal' ? 'space-x-2' : 'space-y-2',
-      md: orientation === 'horizontal' ? 'space-x-3' : 'space-y-3',
-      lg: orientation === 'horizontal' ? 'space-x-4' : 'space-y-4',
-    }[spacing];
+  ({ children, orientation = 'horizontal', spacing = 'md', className, ...props }, ref) => {
+    const orientationClassNames = {
+      horizontal: 'flex-row',
+      vertical: 'flex-col',
+    };
 
-    // Attached buttons need special styling
-    const attachedClasses = attached
-      ? orientation === 'horizontal'
-        ? '[&>*:not(:first-child)]:rounded-l-none [&>*:not(:last-child)]:rounded-r-none [&>*:not(:first-child)]:-ml-px'
-        : '[&>*:not(:first-child)]:rounded-t-none [&>*:not(:last-child)]:rounded-b-none [&>*:not(:first-child)]:-mt-px'
-      : spacingClasses;
-
-    // Orientation classes
-    const flexClasses = orientation === 'horizontal' ? 'flex flex-row' : 'flex flex-col';
+    const spacingClassNames = {
+      none: orientation === 'horizontal' ? '-ml-px' : '-mt-px',
+      sm: orientation === 'horizontal' ? 'space-x-1' : 'space-y-1',
+      md: orientation === 'horizontal' ? 'space-x-2' : 'space-y-2',
+      lg: orientation === 'horizontal' ? 'space-x-3' : 'space-y-3',
+    };
 
     return (
-      <Component
+      <div
         ref={ref}
         className={cn(
-          flexClasses,
-          attachedClasses,
-          'inline-flex',
+          'flex',
+          orientationClassNames[orientation],
+          spacing !== 'none' && spacingClassNames[spacing],
           className
         )}
-        role="group"
         {...props}
       >
-        {children}
-      </Component>
+        {spacing === 'none'
+          ? React.Children.map(children, (child) => {
+              if (!React.isValidElement(child)) return child;
+              
+              return React.cloneElement(child, {
+                className: cn(
+                  child.props.className,
+                  'rounded-none first:rounded-l-md last:rounded-r-md',
+                  orientation === 'vertical' && 'first:rounded-t-md first:rounded-l-none last:rounded-b-md last:rounded-r-none'
+                ),
+              });
+            })
+          : children}
+      </div>
     );
   }
 );
 
 ButtonGroup.displayName = 'ButtonGroup';
-
-export { Button, IconButton, ButtonGroup };
