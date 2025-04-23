@@ -7,6 +7,11 @@ interface ResultsSummaryProps {
 }
 
 export function ResultsSummary({ results }: ResultsSummaryProps) {
+  // Add null check for results and summary
+  if (!results || !results.summary) {
+    return <div>No results data available</div>;
+  }
+  
   const { summary } = results;
   const hasPDFIssues = summary.pdfIssues && summary.pdfIssues > 0;
   const hasDocumentIssues = summary.documentIssues && summary.documentIssues > 0;

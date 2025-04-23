@@ -1,0 +1,116 @@
+The above error occurred in the <ResultsSummary> component:
+
+    at ResultsSummary (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/ResultsSummary.tsx:18:34)
+    at div
+    at div
+    at MotionComponent (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/framer-motion.js?v=2896703b:269:40)
+    at div
+    at div
+    at WCAGCheckerPage (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/pages/WCAGCheckerPage.tsx:48:47)
+    at main
+    at RenderedRoute (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:3537:5)
+    at Routes (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:3972:5)
+    at div
+    at ErrorBoundary (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/ErrorBoundary.tsx:11:5)
+    at ThemeProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/ThemeProvider.tsx:20:33)
+    at AccessibilityTipsProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/contexts/AccessibilityTipsContext.tsx:40:45)
+    at AuthProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/contexts/AuthContext.tsx:41:32)
+    at Router (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:3915:15)
+    at BrowserRouter (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:4655:5)
+    at SecurityProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/SecurityProvider.tsx:25:36)
+    at QueryClientProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=2896703b:2587:3)
+    at _a (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-helmet-async.js?v=2896703b:642:5)
+    at ErrorBoundary (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/ErrorBoundary.tsx:11:5)
+    at AppProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/AppProvider.tsx:41:31)
+    at App (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/App.tsx:89:35)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+[error] ErrorBoundary: Cannot read properties of undefined (reading 'pdfIssues') 
+Object {componentStack: "↵    at ResultsSummary…"}
+ 
+Object {message: "Cannot read properties of undefined (reading 'pdfIssues')", stack: "TypeError: Cannot read properties of undefined (reading 'pdfIssues')↵    at ResultsSummary…", context: "ErrorBoundary", data: {…}, timestamp: 1745410729268, …}
+
+[Dev] Error would be reported to monitoring service: 
+Object {message: "Cannot read properties of undefined (reading 'pdfIssues')", stack: "TypeError: Cannot read properties of undefined (reading 'pdfIssues')↵    at ResultsSummary…", context: "ErrorBoundary", data: {…}, timestamp: 1745410729268, …}
+The above error occurred in the <li> component:
+
+    at li
+    at ul
+    at div
+    at div
+    at div
+    at div
+    at IssuesList (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/IssuesList.tsx:39:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at MotionComponent (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/framer-motion.js?v=2896703b:269:40)
+    at div
+    at div
+    at WCAGCheckerPage (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/pages/WCAGCheckerPage.tsx:48:47)
+    at main
+    at RenderedRoute (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:3537:5)
+    at Routes (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:3972:5)
+    at div
+    at ErrorBoundary (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/ErrorBoundary.tsx:11:5)
+    at ThemeProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/ThemeProvider.tsx:20:33)
+    at AccessibilityTipsProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/contexts/AccessibilityTipsContext.tsx:40:45)
+    at AuthProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/contexts/AuthContext.tsx:41:32)
+    at Router (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:3915:15)
+    at BrowserRouter (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:4655:5)
+    at SecurityProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/SecurityProvider.tsx:25:36)
+    at QueryClientProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=2896703b:2587:3)
+    at _a (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-helmet-async.js?v=2896703b:642:5)
+    at ErrorBoundary (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/ErrorBoundary.tsx:11:5)
+    at AppProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/AppProvider.tsx:41:31)
+    at App (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/App.tsx:89:35)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+
+at li
+at ul
+at div
+at div
+at div
+at div
+at IssuesList (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/IssuesList.tsx:39:30)
+at div
+at div
+at div
+at div
+at div
+at MotionComponent (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/framer-motion.js?v=2896703b:269:40)
+at div
+at div
+at WCAGCheckerPage (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/pages/WCAGCheckerPage.tsx:48:47)
+at main
+at RenderedRoute (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:3537:5)
+at Routes (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:3972:5)
+at div
+at ErrorBoundary (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/ErrorBoundary.tsx:11:5)
+at ThemeProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/ThemeProvider.tsx:20:33)
+at AccessibilityTipsProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/contexts/AccessibilityTipsContext.tsx:40:45)
+at AuthProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/contexts/AuthContext.tsx:41:32)
+at Router (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:3915:15)
+at BrowserRouter (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2896703b:4655:5)
+at SecurityProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/SecurityProvider.tsx:25:36)
+at QueryClientProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=2896703b:2587:3)
+at _a (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-helmet-async.js?v=2896703b:642:5)
+at ErrorBoundary (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/ErrorBoundary.tsx:11:5)
+at AppProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/AppProvider.tsx:41:31)
+at App (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/App.tsx:89:35)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+at t.value (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+[error] ErrorBoundary: Objects are not valid as a React child (found: object with keys {html, selector, colorPairs}). If you meant to render a collection of children, use an array instead. 
+Object {componentStack: "↵    at li↵    at ul↵    at div↵    at div↵    at div↵    at div↵    at IssuesList…"}
+ 
+Object {message: "Objects are not valid as a React child (found: object with keys {html, selector, colorPairs}). If…", stack: "Error: Objects are not valid as a React child (found: object with keys {html, selector,…", context: "ErrorBoundary", data: {…}, timestamp: 1745410729269, …}
+
+[Dev] Error would be reported to monitoring service: 
+Object {message: "Objects are not valid as a React child (found: object with keys {html, selector, colorPairs}). If…", stack: "Error: Objects are not valid as a React child (found: object with keys {html, selector,…", context: "ErrorBoundary", data: {…}, timestamp: 1745410729269, …}

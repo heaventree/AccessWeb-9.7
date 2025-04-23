@@ -204,7 +204,12 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                     <ul className="mt-2 space-y-1">
                       {issue.nodes.map((node, index) => (
                         <li key={index} className="text-sm text-gray-600 font-mono bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                          {node}
+                          {/* Handle both string and object values */}
+                          {typeof node === 'string' 
+                            ? node 
+                            : typeof node === 'object' && node !== null
+                              ? JSON.stringify(node) 
+                              : String(node)}
                         </li>
                       ))}
                     </ul>
