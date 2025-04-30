@@ -12,6 +12,7 @@ import { registerPaymentRoutes } from "./routes/payments";
 import { registerScanRoutes } from "./routes/scans";
 import { registerSettingRoutes } from "./routes/settings";
 import { registerNotificationRoutes } from "./routes/notifications";
+import { registerAdminRoutes } from "./routes/admin";
 
 // Initialize Stripe
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -93,12 +94,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerAuthRoutes(app, apiPrefix);
   registerUserRoutes(app, apiPrefix);
   registerContentRoutes(app, apiPrefix);
-  registerCategoryRoutes(app, apiPrefix);
-  registerMenuRoutes(app, apiPrefix);
   registerPaymentRoutes(app, apiPrefix, stripe);
-  registerScanRoutes(app, apiPrefix);
-  registerSettingRoutes(app, apiPrefix);
-  registerNotificationRoutes(app, apiPrefix);
+  registerAdminRoutes(app, apiPrefix);
+  
+  // These routes will be implemented later as needed
+  // registerCategoryRoutes(app, apiPrefix);
+  // registerMenuRoutes(app, apiPrefix);
+  // registerScanRoutes(app, apiPrefix);
+  // registerSettingRoutes(app, apiPrefix);
+  // registerNotificationRoutes(app, apiPrefix);
 
   return httpServer;
 }
