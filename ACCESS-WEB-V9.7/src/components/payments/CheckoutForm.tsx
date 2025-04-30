@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 
 interface CheckoutFormProps {
   onSuccess?: (paymentIntentId: string) => void;
@@ -7,6 +6,8 @@ interface CheckoutFormProps {
   amount: number;
   buttonText?: string;
   buttonClassName?: string;
+  stripe?: any;
+  elements?: any;
 }
 
 const CheckoutForm: React.FC<CheckoutFormProps> = ({
@@ -15,9 +16,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   amount,
   buttonText = 'Pay Now',
   buttonClassName = 'bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline',
+  stripe,
+  elements
 }) => {
-  const stripe = useStripe();
-  const elements = useElements();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -62,7 +63,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
+      {/* Payment Element is mounted by the parent component */}
       
       {errorMessage && (
         <div className="text-red-500 text-sm mt-2">{errorMessage}</div>

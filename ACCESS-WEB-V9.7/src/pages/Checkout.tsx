@@ -1,13 +1,104 @@
-import React, { useState, useEffect } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
+import React, { useState, useEffect, useRef } from 'react';
 import CheckoutForm from '../components/payments/CheckoutForm';
 import { useAuth } from '../hooks/useAuth';
 import { axiosInstance } from '../utils/axiosInstance';
 
-// Make sure to call loadStripe outside of a component's render to avoid recreating the Stripe object on every render
-// This is your Stripe publishable API key
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+// Define types for Stripe global objects
+declare global {
+  interface Window {
+    Stripe?: any;
+  }
+}
+
+// Create a wrapper for the Stripe object
+const getStripe = () => {
+  if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
+  }
+  return window.Stripe?.(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+};
+
+// Checkout Form Wrapper - uses CDN approach instead of Elements
+interface CheckoutFormWrapperProps {
+  clientSecret: string;
+  amount: number;
+  onSuccess: (paymentIntentId: string) => void;
+  onError: (error: Error) => void;
+}
+
+const CheckoutFormWrapper: React.FC<CheckoutFormWrapperProps> = ({ 
+  clientSecret, 
+  amount, 
+  onSuccess, 
+  onError 
+}) => {
+  const [stripe, setStripe] = useState<any>(null);
+  const [elements, setElements] = useState<any>(null);
+  const paymentElementRef = useRef<HTMLDivElement>(null);
+  
+  // Load Stripe script if needed
+  useEffect(() => {
+    // Load Stripe.js script if not already loaded
+    if (!window.Stripe) {
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+    
+    // Initialize Stripe
+    const initStripe = async () => {
+      if (window.Stripe) {
+        const stripeInstance = getStripe();
+        setStripe(stripeInstance);
+        
+        if (stripeInstance && clientSecret && paymentElementRef.current) {
+          const elementsInstance = stripeInstance.elements({
+            clientSecret,
+            appearance: { theme: 'stripe' }
+          });
+          
+          // Mount the payment element
+          const paymentElement = elementsInstance.create('payment');
+          if (paymentElementRef.current) {
+            paymentElement.mount(paymentElementRef.current);
+            setElements(elementsInstance);
+          }
+        }
+      } else {
+        // If Stripe isn't loaded yet, try again in 100ms
+        setTimeout(initStripe, 100);
+      }
+    };
+    
+    initStripe();
+    
+    // Cleanup function
+    return () => {
+      if (elements) {
+        // Unmount elements if needed
+      }
+    };
+  }, [clientSecret]);
+  
+  // Create a custom CheckoutForm that doesn't rely on Elements context
+  return (
+    <div className="space-y-6">
+      <div 
+        ref={paymentElementRef} 
+        className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+      />
+      
+      <CheckoutForm 
+        amount={amount}
+        onSuccess={onSuccess}
+        onError={onError}
+        stripe={stripe}
+        elements={elements}
+      />
+    </div>
+  );
+};
 
 const Checkout: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -130,13 +221,14 @@ const Checkout: React.FC = () => {
         </div>
 
         {clientSecret && (
-          <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <CheckoutForm 
+          <div>
+            <CheckoutFormWrapper
+              clientSecret={clientSecret}
               amount={amount} 
               onSuccess={handlePaymentSuccess}
               onError={handlePaymentError}
             />
-          </Elements>
+          </div>
         )}
       </div>
     </div>
