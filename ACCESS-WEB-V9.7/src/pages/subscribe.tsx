@@ -40,13 +40,51 @@ const getStripe = () => {
   return window.Stripe?.(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 };
 
-// The subscription form with Stripe Elements
-const SubscribeForm = () => {
-  const stripe = useStripe();
-  const elements = useElements();
+// Define interface for component props
+interface SubscribeFormProps {
+  clientSecret: string;
+  selectedPlan: any;
+}
+
+// The subscription form using CDN Stripe approach
+const SubscribeForm = ({ clientSecret, selectedPlan }: SubscribeFormProps) => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [stripe, setStripe] = useState<any>(null);
+  const [elements, setElements] = useState<any>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  
+  useEffect(() => {
+    // Initialize Stripe only when the script is loaded
+    const checkStripeAndInit = () => {
+      if (window.Stripe) {
+        const stripe = getStripe();
+        setStripe(stripe);
+        
+        if (stripe && clientSecret) {
+          const elements = stripe.elements({
+            clientSecret,
+            appearance: { theme: 'stripe' }
+          });
+          
+          // Create and mount the Payment Element
+          const paymentElement = elements.create('payment');
+          const paymentElementMount = document.getElementById('payment-element');
+          
+          if (paymentElementMount) {
+            paymentElement.mount('#payment-element');
+            setElements(elements);
+          }
+        }
+      } else {
+        // If Stripe isn't loaded yet, try again in 100ms
+        setTimeout(checkStripeAndInit, 100);
+      }
+    };
+    
+    checkStripeAndInit();
+  }, [clientSecret]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,8 +111,9 @@ const SubscribeForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+      {/* Mount point for the Stripe Payment Element */}
+      <div id="payment-element" className="p-4 border border-gray-200 dark:border-slate-700 rounded-lg"></div>
       
       {errorMessage && (
         <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400">
@@ -114,7 +153,12 @@ const SubscribeForm = () => {
 };
 
 // Plan selector component
-const PlanSelector = ({ selectedPlan, onSelectPlan }) => {
+interface PlanSelectorProps {
+  selectedPlan: any;
+  onSelectPlan: (plan: any) => void;
+}
+
+const PlanSelector = ({ selectedPlan, onSelectPlan }: PlanSelectorProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       {SUBSCRIPTION_PLANS.map((plan) => (
@@ -162,6 +206,16 @@ export default function Subscribe() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  
+  // Ensure Stripe script is loaded
+  useEffect(() => {
+    if (!window.Stripe) {
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
 
   // Function to proceed to payment step
   const handleProceedToPayment = async () => {
@@ -258,9 +312,7 @@ export default function Subscribe() {
                 </div>
               </div>
               
-              <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
-                <SubscribeForm />
-              </Elements>
+              <SubscribeForm clientSecret={clientSecret} selectedPlan={selectedPlan} />
             </div>
           )}
         </>
