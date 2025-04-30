@@ -1,11 +1,23 @@
-import { Router, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import Stripe from 'stripe';
-import { storage } from '../storage';
 import { authenticate } from '../middleware/authMiddleware';
-import * as stripeUtils from '../utils/stripe';
+import { storage } from '../storage';
+import { errorHandler } from '../utils/errorHandler';
 
+/**
+ * Register payment routes for subscription and billing management
+ * @param app Express application
+ * @param apiPrefix API prefix for all routes
+ * @param stripe Stripe instance
+ */
 export function registerPaymentRoutes(app: any, apiPrefix: string, stripe: Stripe | null): void {
-  const router = Router();
+  // Skip registering routes if Stripe is not configured
+  if (!stripe) {
+    console.warn('Stripe is not configured. Payment routes will not be registered.');
+    return;
+  }
+
+  const router = express.Router();
 
   /**
    * @route   POST /api/v1/payments/create-payment-intent
@@ -14,48 +26,23 @@ export function registerPaymentRoutes(app: any, apiPrefix: string, stripe: Strip
    */
   router.post('/create-payment-intent', authenticate, async (req: Request, res: Response) => {
     try {
-      if (!stripe) {
-        return res.status(503).json({ error: 'Payment service is currently unavailable' });
-      }
-
-      const { amount, currency = 'usd' } = req.body;
-
-      if (!amount || amount <= 0) {
+      const { amount } = req.body;
+      
+      if (!amount || isNaN(amount) || amount <= 0) {
         return res.status(400).json({ error: 'Valid amount is required' });
       }
 
-      const user = (req as any).user;
-
-      // Ensure user has a Stripe customer ID
-      let customerId = user.stripeCustomerId;
-
-      if (!customerId) {
-        // Create a customer in Stripe
-        const customer = await stripeUtils.createCustomer(user.email, user.fullName || user.username);
-        
-        if (!customer) {
-          return res.status(500).json({ error: 'Failed to create customer' });
-        }
-        
-        // Update user with Stripe customer ID
-        customerId = customer.id;
-        await storage.updateUser(user.id, { stripeCustomerId: customerId });
-      }
-
-      // Create payment intent
-      const paymentIntent = await stripeUtils.createPaymentIntent(
-        Math.round(amount * 100), // Convert to cents
-        currency,
-        customerId
-      );
-
-      res.json({ 
-        clientSecret: paymentIntent.client_secret,
-        paymentIntentId: paymentIntent.id 
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: 'usd',
+        metadata: {
+          userId: req.user?.id?.toString() || '',
+        },
       });
-    } catch (error) {
-      console.error('Payment intent error:', error);
-      res.status(500).json({ error: 'Failed to create payment intent' });
+
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (err) {
+      errorHandler(err, req, res, 'create_payment_intent_error');
     }
   });
 
@@ -66,56 +53,70 @@ export function registerPaymentRoutes(app: any, apiPrefix: string, stripe: Strip
    */
   router.post('/create-subscription', authenticate, async (req: Request, res: Response) => {
     try {
-      if (!stripe) {
-        return res.status(503).json({ error: 'Payment service is currently unavailable' });
-      }
-
       const { priceId } = req.body;
-
-      if (!priceId) {
-        return res.status(400).json({ error: 'Price ID is required' });
+      
+      if (!req.user) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+      
+      const user = await storage.getUser(req.user.id);
+      
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
       }
 
-      const user = (req as any).user;
-
-      // Ensure user has a Stripe customer ID
-      let customerId = user.stripeCustomerId;
-
-      if (!customerId) {
-        // Create a customer in Stripe
-        const customer = await stripeUtils.createCustomer(user.email, user.fullName || user.username);
+      // Check if user already has a subscription
+      if (user.stripeSubscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
         
-        if (!customer) {
-          return res.status(500).json({ error: 'Failed to create customer' });
+        if (subscription.status !== 'canceled') {
+          return res.json({
+            subscriptionId: subscription.id,
+            clientSecret: (subscription.latest_invoice as Stripe.Invoice).payment_intent?.client_secret,
+          });
         }
+      }
+
+      // Create or get customer
+      let customerId = user.stripeCustomerId;
+      
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email || undefined,
+          name: user.username,
+          metadata: {
+            userId: user.id.toString(),
+          },
+        });
+        
+        customerId = customer.id;
         
         // Update user with Stripe customer ID
-        customerId = customer.id;
         await storage.updateUser(user.id, { stripeCustomerId: customerId });
       }
 
-      // Create or retrieve subscription
-      const subscription = await stripeUtils.createOrRetrieveSubscription(customerId, priceId);
+      // Create subscription
+      const subscription = await stripe.subscriptions.create({
+        customer: customerId,
+        items: [
+          {
+            price: priceId || process.env.STRIPE_DEFAULT_PRICE_ID,
+          },
+        ],
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent'],
+      });
 
-      // Update user with subscription ID if it's a new subscription
-      if (!user.stripeSubscriptionId || user.stripeSubscriptionId !== subscription.id) {
-        await storage.updateUser(user.id, { 
-          stripeSubscriptionId: subscription.id,
-          subscriptionStatus: subscription.status
-        });
-      }
+      // Update user with subscription ID
+      await storage.updateUser(user.id, { stripeSubscriptionId: subscription.id });
 
-      // Return the client secret for payment if needed
-      const clientSecret = subscription.latest_invoice?.payment_intent?.client_secret;
-
+      // Return the subscription and client secret
       res.json({
         subscriptionId: subscription.id,
-        clientSecret,
-        status: subscription.status
+        clientSecret: (subscription.latest_invoice as Stripe.Invoice).payment_intent?.client_secret,
       });
-    } catch (error) {
-      console.error('Subscription error:', error);
-      res.status(500).json({ error: 'Failed to create subscription' });
+    } catch (err) {
+      errorHandler(err, req, res, 'create_subscription_error');
     }
   });
 
@@ -126,31 +127,31 @@ export function registerPaymentRoutes(app: any, apiPrefix: string, stripe: Strip
    */
   router.post('/cancel-subscription', authenticate, async (req: Request, res: Response) => {
     try {
-      if (!stripe) {
-        return res.status(503).json({ error: 'Payment service is currently unavailable' });
+      if (!req.user) {
+        return res.status(401).json({ error: 'User not authenticated' });
       }
-
-      const user = (req as any).user;
+      
+      const user = await storage.getUser(req.user.id);
+      
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
 
       if (!user.stripeSubscriptionId) {
         return res.status(400).json({ error: 'No active subscription found' });
       }
 
-      // Cancel subscription
-      const canceledSubscription = await stripeUtils.cancelSubscription(user.stripeSubscriptionId);
-
-      // Update user record
-      await storage.updateUser(user.id, {
-        subscriptionStatus: canceledSubscription.status,
+      const subscription = await stripe.subscriptions.update(user.stripeSubscriptionId, {
+        cancel_at_period_end: true,
       });
 
       res.json({
-        message: 'Subscription cancelled successfully',
-        canceledAt: canceledSubscription.canceled_at
+        status: subscription.status,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
       });
-    } catch (error) {
-      console.error('Cancel subscription error:', error);
-      res.status(500).json({ error: 'Failed to cancel subscription' });
+    } catch (err) {
+      errorHandler(err, req, res, 'cancel_subscription_error');
     }
   });
 
@@ -161,34 +162,32 @@ export function registerPaymentRoutes(app: any, apiPrefix: string, stripe: Strip
    */
   router.get('/subscription-status', authenticate, async (req: Request, res: Response) => {
     try {
-      if (!stripe) {
-        return res.status(503).json({ error: 'Payment service is currently unavailable' });
+      if (!req.user) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+      
+      const user = await storage.getUser(req.user.id);
+      
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
       }
 
-      const user = (req as any).user;
-
+      // If no subscription ID, return no subscription
       if (!user.stripeSubscriptionId) {
         return res.json({ status: 'no_subscription' });
       }
 
-      // Get subscription from Stripe
+      // Get subscription details from Stripe
       const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-
-      // Update subscription status if needed
-      if (user.subscriptionStatus !== subscription.status) {
-        await storage.updateUser(user.id, {
-          subscriptionStatus: subscription.status
-        });
-      }
 
       res.json({
         status: subscription.status,
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-        cancelAtPeriodEnd: subscription.cancel_at_period_end
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+        priceId: subscription.items.data[0]?.price.id,
       });
-    } catch (error) {
-      console.error('Subscription status error:', error);
-      res.status(500).json({ error: 'Failed to get subscription status' });
+    } catch (err) {
+      errorHandler(err, req, res, 'subscription_status_error');
     }
   });
 
@@ -199,23 +198,30 @@ export function registerPaymentRoutes(app: any, apiPrefix: string, stripe: Strip
    */
   router.get('/payment-methods', authenticate, async (req: Request, res: Response) => {
     try {
-      if (!stripe) {
-        return res.status(503).json({ error: 'Payment service is currently unavailable' });
+      if (!req.user) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+      
+      const user = await storage.getUser(req.user.id);
+      
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
       }
 
-      const user = (req as any).user;
-
+      // If no customer ID, return empty list
       if (!user.stripeCustomerId) {
         return res.json({ paymentMethods: [] });
       }
 
       // Get payment methods from Stripe
-      const paymentMethods = await stripeUtils.getPaymentMethods(user.stripeCustomerId);
+      const paymentMethods = await stripe.paymentMethods.list({
+        customer: user.stripeCustomerId,
+        type: 'card',
+      });
 
-      res.json({ paymentMethods });
-    } catch (error) {
-      console.error('Payment methods error:', error);
-      res.status(500).json({ error: 'Failed to get payment methods' });
+      res.json({ paymentMethods: paymentMethods.data });
+    } catch (err) {
+      errorHandler(err, req, res, 'payment_methods_error');
     }
   });
 

@@ -6,24 +6,12 @@ import { storage } from "./storage";
 import { registerAuthRoutes } from "./routes/auth";
 import { registerUserRoutes } from "./routes/users";
 import { registerContentRoutes } from "./routes/content";
-import { registerCategoryRoutes } from "./routes/categories";
-import { registerMenuRoutes } from "./routes/menus";
 import { registerPaymentRoutes } from "./routes/payments";
-import { registerScanRoutes } from "./routes/scans";
-import { registerSettingRoutes } from "./routes/settings";
-import { registerNotificationRoutes } from "./routes/notifications";
 import { registerAdminRoutes } from "./routes/admin";
+import { initializeStripe } from "./utils/stripe";
 
 // Initialize Stripe
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.warn('Warning: Missing required Stripe secret: STRIPE_SECRET_KEY');
-}
-
-const stripe = process.env.STRIPE_SECRET_KEY
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2023-10-16",
-    })
-  : null;
+const stripe = initializeStripe();
 
 /**
  * Register all API routes
