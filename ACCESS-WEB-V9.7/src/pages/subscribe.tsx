@@ -1,8 +1,14 @@
-import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useState } from 'react';
+// Using the CDN approach instead of direct imports
+import { useEffect, useState, useRef } from 'react';
 import { axiosInstance } from "../utils/axiosInstance";
 import { useNavigate } from 'react-router-dom';
+
+// Define types for Stripe global objects
+declare global {
+  interface Window {
+    Stripe?: any;
+  }
+}
 
 // Plans configuration
 const SUBSCRIPTION_PLANS = [
@@ -26,12 +32,13 @@ const SUBSCRIPTION_PLANS = [
   }
 ];
 
-// Make sure to call `loadStripe` outside of a component's render to avoid
-// recreating the `Stripe` object on every render.
-if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
-}
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+// Create a wrapper for the Stripe object
+const getStripe = () => {
+  if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
+  }
+  return window.Stripe?.(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+};
 
 // The subscription form with Stripe Elements
 const SubscribeForm = () => {

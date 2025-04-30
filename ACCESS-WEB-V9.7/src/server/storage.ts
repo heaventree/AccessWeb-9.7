@@ -123,6 +123,11 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.select().from(schema.users).where(eq(schema.users.username, username));
     return user;
   }
+  
+  async getUserByStripeCustomerId(stripeCustomerId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(schema.users).where(eq(schema.users.stripeCustomerId, stripeCustomerId));
+    return user;
+  }
 
   async createUser(user: InsertUser): Promise<User> {
     const [newUser] = await db.insert(schema.users).values(user).returning();
