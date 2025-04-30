@@ -104,11 +104,11 @@ interface PaymentFormProps {
   amount: number;
   onSuccess: () => void;
   onError: (error: string) => void;
+  stripe?: any;
+  elements?: any;
 }
 
-function PaymentForm({ amount, onSuccess, onError }: PaymentFormProps) {
-  const stripe = useStripe();
-  const elements = useElements();
+function PaymentForm({ amount, onSuccess, onError, stripe, elements }: PaymentFormProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
@@ -158,9 +158,7 @@ function PaymentForm({ amount, onSuccess, onError }: PaymentFormProps) {
         </div>
       </div>
 
-      <div className="mb-6">
-        <PaymentElement />
-      </div>
+      {/* Payment Element is handled via the ref in PaymentFormWrapper */}
 
       {paymentError && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
