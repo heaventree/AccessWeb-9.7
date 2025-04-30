@@ -1,8 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Check, CreditCard } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+// Define types for Stripe global objects
+declare global {
+  interface Window {
+    Stripe?: any;
+  }
+}
+
+// Create a wrapper for the Stripe object
+const getStripe = () => {
+  if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
+  }
+  return window.Stripe?.(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+};
 
 interface Plan {
   name: string;
@@ -58,10 +70,25 @@ const plans: Plan[] = [
 ];
 
 export function PricingPlans() {
+  // Ensure Stripe script is loaded
+  useEffect(() => {
+    if (!window.Stripe) {
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+  
   const handleSubscribe = async (plan: Plan) => {
     try {
-      // TODO: Replace with actual backend call once implemented
-      alert('Backend implementation pending. Selected plan: ' + plan.name);
+      // Ensure Stripe is loaded
+      if (!window.Stripe) {
+        throw new Error('Stripe has not loaded yet. Please try again.');
+      }
+      
+      // Navigate to the subscribe page with the plan ID as a parameter
+      window.location.href = `/subscribe?plan=${plan.name.toLowerCase()}`;
     } catch (error) {
       console.error('Error processing subscription:', error);
     }

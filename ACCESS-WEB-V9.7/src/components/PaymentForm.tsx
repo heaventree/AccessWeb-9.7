@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import {
-  Elements,
-  PaymentElement,
-  useStripe,
-  useElements,
-} from '@stripe/react-stripe-js';
+import React, { useState, useEffect, useRef } from 'react';
 import { CreditCard, Loader } from 'lucide-react';
 
-// Initialize Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+// Define types for Stripe global objects
+declare global {
+  interface Window {
+    Stripe?: any;
+  }
+}
+
+// Create a wrapper for the Stripe object
+const getStripe = () => {
+  if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
+  }
+  return window.Stripe?.(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+};
 
 interface PaymentFormWrapperProps {
   clientSecret: string;
@@ -19,25 +24,79 @@ interface PaymentFormWrapperProps {
 }
 
 export function PaymentFormWrapper({ clientSecret, amount, onSuccess, onError }: PaymentFormWrapperProps) {
-  const options = {
-    clientSecret,
-    appearance: {
-      theme: 'stripe',
-      variables: {
-        colorPrimary: '#2563eb',
-        colorBackground: '#ffffff',
-        colorText: '#1f2937',
-        colorDanger: '#dc2626',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        borderRadius: '8px',
-      },
-    },
-  };
+  const [stripe, setStripe] = useState<any>(null);
+  const [elements, setElements] = useState<any>(null);
+  const paymentElementRef = useRef<HTMLDivElement>(null);
+  
+  // Ensure Stripe script is loaded
+  useEffect(() => {
+    // Load Stripe.js script if not already loaded
+    if (!window.Stripe) {
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+    
+    // Initialize Stripe
+    const initStripe = async () => {
+      if (window.Stripe) {
+        const stripeInstance = getStripe();
+        setStripe(stripeInstance);
+        
+        if (stripeInstance && clientSecret && paymentElementRef.current) {
+          const elementsInstance = stripeInstance.elements({
+            clientSecret,
+            appearance: {
+              theme: 'stripe',
+              variables: {
+                colorPrimary: '#2563eb',
+                colorBackground: '#ffffff',
+                colorText: '#1f2937',
+                colorDanger: '#dc2626',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                borderRadius: '8px',
+              },
+            },
+          });
+          
+          // Mount the payment element
+          const paymentElement = elementsInstance.create('payment');
+          if (paymentElementRef.current) {
+            paymentElement.mount(paymentElementRef.current);
+            setElements(elementsInstance);
+          }
+        }
+      } else {
+        // If Stripe isn't loaded yet, try again in 100ms
+        setTimeout(initStripe, 100);
+      }
+    };
+    
+    initStripe();
+    
+    // Cleanup function
+    return () => {
+      if (elements) {
+        // Unmount elements if needed
+      }
+    };
+  }, [clientSecret]);
 
   return (
-    <Elements stripe={stripePromise} options={options}>
-      <PaymentForm amount={amount} onSuccess={onSuccess} onError={onError} />
-    </Elements>
+    <div className="w-full max-w-md mx-auto">
+      <div 
+        ref={paymentElementRef} 
+        className="p-4 border border-gray-200 rounded-lg mb-4"
+      />
+      <PaymentForm 
+        amount={amount} 
+        onSuccess={onSuccess} 
+        onError={onError}
+        stripe={stripe}
+        elements={elements} 
+      />
+    </div>
   );
 }
 
