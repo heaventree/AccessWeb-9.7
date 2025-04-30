@@ -1,12 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
+import React, { useState, useEffect, useRef } from 'react';
 import CheckoutForm from '../components/payments/CheckoutForm';
 import { useAuth } from '../hooks/useAuth';
 import { axiosInstance } from '../utils/axiosInstance';
 
-// Make sure to call loadStripe outside of a component's render to avoid recreating the Stripe object on every render
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+// Declare types for the Stripe objects we're using from the global scope
+declare global {
+  interface Window {
+    Stripe?: any;
+  }
+}
+
+// Create a wrapper for the Stripe object
+const getStripe = () => {
+  if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
+  }
+  return window.Stripe?.(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+};
 
 // Subscription plans
 const SUBSCRIPTION_PLANS = [
@@ -137,6 +147,16 @@ const Subscribe: React.FC = () => {
     );
   }
 
+  // Ensure Stripe script is loaded
+  useEffect(() => {
+    if (!window.Stripe) {
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -208,14 +228,16 @@ const Subscribe: React.FC = () => {
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                 Complete Your Subscription
               </h2>
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
+              {/* We'll use a direct checkout form with the window.Stripe approach */}
+              <div id="payment-container">
                 <CheckoutForm
+                  clientSecret={clientSecret}
                   amount={selectedPlan.price * 100}
                   onSuccess={handlePaymentSuccess}
                   onError={(err) => setError(err.message)}
                   buttonText="Subscribe Now"
                 />
-              </Elements>
+              </div>
             </div>
           ) : (
             <div className="text-center">

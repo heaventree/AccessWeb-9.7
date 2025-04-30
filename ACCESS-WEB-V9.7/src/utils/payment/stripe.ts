@@ -1,4 +1,11 @@
-import type { PaymentIntent } from '@stripe/stripe-js';
+// Define our own PaymentIntent type instead of importing from @stripe/stripe-js
+interface PaymentIntent {
+  id: string;
+  amount: number;
+  status: string;
+  client_secret: string;
+  // Add other properties as needed
+}
 
 interface CreatePaymentIntentResponse {
   clientSecret: string;
