@@ -1,10 +1,9 @@
-// Instead of using the direct import, we'll add script tags to the index.html
-// and use the global Stripe object
-import { useEffect, useState, useRef } from 'react';
+// Using CDN approach for Stripe
+import { useState, useEffect, useRef } from 'react';
 import { axiosInstance } from "../utils/axiosInstance";
 import { useNavigate } from 'react-router-dom';
 
-// We'll declare types for the Stripe objects we're using from the global scope
+// Define types for Stripe global objects
 declare global {
   interface Window {
     Stripe?: any;
@@ -18,17 +17,6 @@ const getStripe = () => {
   }
   return window.Stripe?.(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 };
-
-// Need to ensure the Stripe script is loaded first
-useEffect(() => {
-  // Check if Stripe is already loaded
-  if (!window.Stripe) {
-    const script = document.createElement('script');
-    script.src = 'https://js.stripe.com/v3/';
-    script.async = true;
-    document.body.appendChild(script);
-  }
-}, []);
 
 // Define interface for component props
 interface CheckoutFormProps {
@@ -145,6 +133,16 @@ export default function Checkout() {
   const [clientSecret, setClientSecret] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Ensure Stripe script is loaded
+  useEffect(() => {
+    if (!window.Stripe) {
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
 
   useEffect(() => {
     // Create PaymentIntent as soon as the page loads
