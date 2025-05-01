@@ -83,6 +83,9 @@ import { ErrorBoundary as CustomErrorBoundary } from './components/ErrorBoundary
 import { registerErrorHandler, unregisterErrorHandler, StructuredError } from './utils/errorHandler';
 import { initSecureStorage } from './utils/secureStorage';
 
+// Import the simple checkout for development mode
+import CheckoutSimple from './pages/CheckoutSimple';
+
 
 function App() {
   const [errorLog, setErrorLog] = useState<StructuredError[]>([]);
@@ -175,7 +178,9 @@ function App() {
             <Route path="/payment/:planId" element={<ProtectedRoute><><Navigation /><main id="main-content"><PaymentPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
             
             {/* Stripe Payment Routes */}
-            <Route path="/checkout" element={<><Navigation /><main id="main-content"><Checkout /></main><Footer /><BackToTop /></>} />
+            <Route path="/checkout" element={<><Navigation /><main id="main-content">
+              {import.meta.env.DEV ? <CheckoutSimple /> : <Checkout />}
+            </main><Footer /><BackToTop /></>} />
             <Route path="/subscribe" element={<><Navigation /><main id="main-content"><Subscribe /></main><Footer /><BackToTop /></>} />
 
             {/* Admin Routes */}
