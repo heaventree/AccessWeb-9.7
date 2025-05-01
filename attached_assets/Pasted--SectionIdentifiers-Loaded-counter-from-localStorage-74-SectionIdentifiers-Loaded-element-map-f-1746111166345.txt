@@ -1,0 +1,55 @@
+[SectionIdentifiers] Loaded counter from localStorage: 74
+[SectionIdentifiers] Loaded element map from localStorage with 73 entries
+[vite] connecting...
+[vite] connected.
+Custom error handler registered
+Custom error handler not found: (error) => {
+      setErrorLog((prev) => [...prev, error]);
+    }
+Custom error handler registered
+Secure storage initialized
+[error] CSP Violation: CSP Violation: script-src-elem 
+Object {blockedURI: "https://replit.com/public/js/beacon.js", violatedDirective: "script-src-elem", originalPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net…", disposition: "enforce", documentURI: "https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/checkout", …}
+blockedURI: "https://replit.com/public/js/beacon.js"
+columnNumber: 39
+disposition: "enforce"
+documentURI: "https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/checkout"
+effectiveDirective: "script-src-elem"
+lineNumber: 142
+originalPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.accessibility-checker.org https://api.stripe.com; frame-src 'self' https://js.stripe.com https://hooks.stripe.com; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; block-all-mixed-content;"
+sourceFile: "https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/__replco/workspace_iframe.html"
+violatedDirective: "script-src-elem"
+[[Prototype]]: Object
+ 
+Object {message: "CSP Violation: script-src-elem", stack: "Error: CSP Violation: script-src-elem↵    at HTMLDocument.<anonymous>…", context: "CSP Violation", data: {…}, timestamp: 1746107546103, …}
+
+[Dev] Error would be reported to monitoring service: 
+Object {message: "CSP Violation: script-src-elem", stack: "Error: CSP Violation: script-src-elem↵    at HTMLDocument.<anonymous>…", context: "CSP Violation", data: {…}, timestamp: 1746107546103, …}
+[error] CSP Violation: CSP Violation: script-src-elem 
+Object {blockedURI: "https://replit.com/public/js/beacon.js", violatedDirective: "script-src-elem", originalPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net…", disposition: "enforce", documentURI: "https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/checkout", …}
+ 
+Object {message: "CSP Violation: script-src-elem", stack: "Error: CSP Violation: script-src-elem↵    at HTMLDocument.<anonymous>…", context: "CSP Violation", data: {…}, timestamp: 1746107546103, …}
+
+[Dev] Error would be reported to monitoring service: 
+Object {message: "CSP Violation: script-src-elem", stack: "Error: CSP Violation: script-src-elem↵    at HTMLDocument.<anonymous>…", context: "CSP Violation", data: {…}, timestamp: 1746107546103, …}
+[error] CSP Violation: CSP Violation: script-src-elem 
+Object {blockedURI: "https://replit.com/public/js/beacon.js", violatedDirective: "script-src-elem", originalPolicy: "default-src 'self'; script-src 'self' 'nonce-kJivEVFFJPH-GR6bxM4vUQ' https://cdn.jsdelivr.net…", disposition: "enforce", documentURI: "https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/checkout", …}
+ 
+Object {message: "CSP Violation: script-src-elem", stack: "Error: CSP Violation: script-src-elem↵    at HTMLDocument.<anonymous>…", context: "CSP Violation", data: {…}, timestamp: 1746107546103, …}
+
+[Dev] Error would be reported to monitoring service: 
+Object {message: "CSP Violation: script-src-elem", stack: "Error: CSP Violation: script-src-elem↵    at HTMLDocument.<anonymous>…", context: "CSP Violation", data: {…}, timestamp: 1746107546103, …}
+[error] CSP Violation: CSP Violation: script-src-elem 
+Object {blockedURI: "https://replit.com/public/js/beacon.js", violatedDirective: "script-src-elem", originalPolicy: "default-src 'self'; script-src 'self' 'nonce-kJivEVFFJPH-GR6bxM4vUQ' https://cdn.jsdelivr.net…", disposition: "enforce", documentURI: "https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/checkout", …}
+ 
+Object {message: "CSP Violation: script-src-elem", stack: "Error: CSP Violation: script-src-elem↵    at HTMLDocument.<anonymous>…", context: "CSP Violation", data: {…}, timestamp: 1746107546104, …}
+
+[Dev] Error would be reported to monitoring service: 
+Object {message: "CSP Violation: script-src-elem", stack: "Error: CSP Violation: script-src-elem↵    at HTMLDocument.<anonymous>…", context: "CSP Violation", data: {…}, timestamp: 1746107546104, …}
+[error] CSP Violation: CSP Violation: script-src-elem 
+Object {blockedURI: "https://replit.com/public/js/beacon.js", violatedDirective: "script-src-elem", originalPolicy: "default-src 'self'; script-src 'self' 'nonce-kJivEVFFJPH-GR6bxM4vUQ' https://cdn.jsdelivr.net…", disposition: "enforce", documentURI: "https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/checkout", …}
+ 
+Object {message: "CSP Violation: script-src-elem", stack: "Error: CSP Violation: script-src-elem↵    at HTMLDocument.<anonymous>…", context: "CSP Violation", data: {…}, timestamp: 1746107546104, …}
+
+[Dev] Error would be reported to monitoring service: 
+Object {message: "CSP Violation: script-src-elem", stack: "Error: CSP Violation: script-src-elem↵    at HTMLDocument.<anonymous>…", context: "CSP Violation", data: {…}, timestamp: 1746107546104, …}

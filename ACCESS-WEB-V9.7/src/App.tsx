@@ -83,7 +83,7 @@ import { ErrorBoundary as CustomErrorBoundary } from './components/ErrorBoundary
 import { registerErrorHandler, unregisterErrorHandler, StructuredError } from './utils/errorHandler';
 import { initSecureStorage } from './utils/secureStorage';
 
-// Import the simple checkout for development mode
+// Import the simplified checkout for development mode
 import CheckoutSimple from './pages/CheckoutSimple';
 
 
@@ -179,7 +179,7 @@ function App() {
             
             {/* Stripe Payment Routes */}
             <Route path="/checkout" element={<><Navigation /><main id="main-content">
-              {import.meta.env.DEV ? <CheckoutSimple /> : <Checkout />}
+              {import.meta.env.DEV ? <CheckoutMinimal /> : <Checkout />}
             </main><Footer /><BackToTop /></>} />
             <Route path="/subscribe" element={<><Navigation /><main id="main-content"><Subscribe /></main><Footer /><BackToTop /></>} />
 
