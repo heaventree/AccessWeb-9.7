@@ -179,7 +179,7 @@ function App() {
             
             {/* Stripe Payment Routes */}
             <Route path="/checkout" element={<><Navigation /><main id="main-content">
-              {import.meta.env.DEV ? <CheckoutMinimal /> : <Checkout />}
+              {import.meta.env.DEV ? <CheckoutSimple /> : <Checkout />}
             </main><Footer /><BackToTop /></>} />
             <Route path="/subscribe" element={<><Navigation /><main id="main-content"><Subscribe /></main><Footer /><BackToTop /></>} />
 
