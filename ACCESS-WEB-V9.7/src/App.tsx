@@ -179,10 +179,10 @@ function App() {
             <Route path="/payment/:planId" element={<ProtectedRoute><><Navigation /><main id="main-content"><PaymentPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
             
             {/* Stripe Payment Routes */}
-            <Route path="/checkout" element={<><Navigation /><main id="main-content">
+            <Route path="/checkout" element={<><Navigation /><main id="main-content" className="pt-32">
               {import.meta.env.DEV ? <CheckoutSimple /> : <Checkout />}
             </main><Footer /><BackToTop /></>} />
-            <Route path="/subscribe" element={<><Navigation /><main id="main-content"><Subscribe /></main><Footer /><BackToTop /></>} />
+            <Route path="/subscribe" element={<><Navigation /><main id="main-content" className="pt-32"><Subscribe /></main><Footer /><BackToTop /></>} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>

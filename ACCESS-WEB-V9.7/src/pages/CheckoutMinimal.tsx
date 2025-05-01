@@ -29,7 +29,7 @@ const CheckoutMinimal: React.FC = () => {
   
   if (complete) {
     return (
-      <div className="p-6 max-w-md mx-auto mt-32 bg-white dark:bg-slate-800 rounded-xl shadow-md">
+      <div className="p-6 max-w-md mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md">
         <div className="text-center">
           <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Payment Successful!</h2>
           <p className="mb-4 text-gray-700 dark:text-gray-300">Thank you for your purchase.</p>
@@ -42,7 +42,7 @@ const CheckoutMinimal: React.FC = () => {
   }
   
   return (
-    <div className="p-6 max-w-md mx-auto mt-32 bg-white dark:bg-slate-800 rounded-xl shadow-md">
+    <div className="p-6 max-w-md mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md">
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Complete Purchase</h2>
       
       <div className="mb-4 p-4 bg-gray-100 dark:bg-slate-700 rounded-lg">
