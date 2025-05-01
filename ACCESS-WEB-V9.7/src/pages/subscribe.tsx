@@ -225,6 +225,20 @@ export default function Subscribe() {
     setError(null);
     
     try {
+      if (import.meta.env.DEV) {
+        // In development, use a mock client secret for testing
+        console.log('Using mock subscription in development mode');
+        // This is a test client secret that does not trigger any real payment
+        // In production, you would get this from the server
+        setTimeout(() => {
+          setClientSecret('sub_mock_client_secret_XXXXXXXXXXXXXX');
+          setStep('payment');
+          setLoading(false);
+        }, 1000);
+        return;
+      }
+      
+      // In production, get a real client secret from the server
       const response = await axiosInstance.post("/api/v1/payments/create-subscription", {
         priceId: selectedPlan.id
       });

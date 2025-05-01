@@ -122,6 +122,19 @@ const Checkout: React.FC = () => {
         setLoading(true);
         setError(null);
 
+        if (import.meta.env.DEV) {
+          // In development, use a mock client secret for testing
+          console.log('Using mock payment intent in development mode');
+          // This is a test client secret that does not trigger any real payment
+          // In production, you would get this from the server
+          setTimeout(() => {
+            setClientSecret('pi_3OcXXXXXXXXXXXXXmock_secret_XXXXXXXXXXXXXX');
+            setLoading(false);
+          }, 1000);
+          return;
+        }
+
+        // In production, get a real payment intent from the server
         const response = await axiosInstance.post('/api/v1/payments/create-payment-intent', {
           amount,
           currency: 'usd',
