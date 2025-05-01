@@ -5,6 +5,9 @@ import { LandingPage } from './pages/LandingPage';
 import PricingPage from './pages/PricingPage';
 import { SubscriptionDashboard } from './pages/SubscriptionDashboard';
 import { PaymentPage } from './pages/PaymentPage';
+// Import Stripe payment pages
+import Checkout from './pages/Checkout';
+import Subscribe from './pages/subscribe';
 import { IntegrationsPage } from './pages/integrations/IntegrationsPage';
 import { Integrations } from './pages/Integrations';
 import { AuthPage } from './pages/AuthPage';
@@ -170,6 +173,10 @@ function App() {
             <Route path="/team" element={<ProtectedRoute><><Navigation /><main id="main-content"><TeamPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
             <Route path="/integrations/shopify" element={<ProtectedRoute><><Navigation /><main id="main-content"><ShopifyIntegrationPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
             <Route path="/payment/:planId" element={<ProtectedRoute><><Navigation /><main id="main-content"><PaymentPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+            
+            {/* Stripe Payment Routes */}
+            <Route path="/checkout" element={<><Navigation /><main id="main-content"><Checkout /></main><Footer /><BackToTop /></>} />
+            <Route path="/subscribe" element={<><Navigation /><main id="main-content"><Subscribe /></main><Footer /><BackToTop /></>} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
