@@ -2,8 +2,8 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import VerificationDashboardPage from './pages/admin/VerificationDashboardPage';
-import Checkout from './pages/checkout';
-import Subscribe from './pages/Subscribe';
+import Checkout from './pages/Checkout';
+import Subscribe from './pages/subscribe';
 
 /**
  * Application Routes
