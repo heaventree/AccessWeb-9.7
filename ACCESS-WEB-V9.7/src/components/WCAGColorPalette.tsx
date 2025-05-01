@@ -1202,13 +1202,24 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('analogous');
                   const newPalette = generateAccessiblePalette(baseColor, 'analogous');
-                  // Ensure main color is locked
+                  
+                  // Create a map of locked colors from current palette
+                  const lockedColors = new Map();
+                  generatedPalette.forEach(combo => {
+                    if (combo.isLocked) {
+                      lockedColors.set(combo.background, true);
+                    }
+                  });
+                  
+                  // Ensure main color is locked and preserve other locked colors
                   const updatedPalette = newPalette.map((combo, index) => {
-                    if (index === 0) {
+                    // Always lock the main color or previously locked colors
+                    if (index === 0 || lockedColors.has(combo.background)) {
                       return { ...combo, isLocked: true };
                     }
                     return combo;
                   });
+                  
                   setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
@@ -1221,13 +1232,24 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('triadic');
                   const newPalette = generateAccessiblePalette(baseColor, 'triadic');
-                  // Ensure main color is locked
+                  
+                  // Create a map of locked colors from current palette
+                  const lockedColors = new Map();
+                  generatedPalette.forEach(combo => {
+                    if (combo.isLocked) {
+                      lockedColors.set(combo.background, true);
+                    }
+                  });
+                  
+                  // Ensure main color is locked and preserve other locked colors
                   const updatedPalette = newPalette.map((combo, index) => {
-                    if (index === 0) {
+                    // Always lock the main color or previously locked colors
+                    if (index === 0 || lockedColors.has(combo.background)) {
                       return { ...combo, isLocked: true };
                     }
                     return combo;
                   });
+                  
                   setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
@@ -1240,13 +1262,24 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('split-complementary');
                   const newPalette = generateAccessiblePalette(baseColor, 'split-complementary');
-                  // Ensure main color is locked
+                  
+                  // Create a map of locked colors from current palette
+                  const lockedColors = new Map();
+                  generatedPalette.forEach(combo => {
+                    if (combo.isLocked) {
+                      lockedColors.set(combo.background, true);
+                    }
+                  });
+                  
+                  // Ensure main color is locked and preserve other locked colors
                   const updatedPalette = newPalette.map((combo, index) => {
-                    if (index === 0) {
+                    // Always lock the main color or previously locked colors
+                    if (index === 0 || lockedColors.has(combo.background)) {
                       return { ...combo, isLocked: true };
                     }
                     return combo;
                   });
+                  
                   setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
@@ -1259,13 +1292,24 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('monochromatic');
                   const newPalette = generateAccessiblePalette(baseColor, 'monochromatic');
-                  // Ensure main color is locked
+                  
+                  // Create a map of locked colors from current palette
+                  const lockedColors = new Map();
+                  generatedPalette.forEach(combo => {
+                    if (combo.isLocked) {
+                      lockedColors.set(combo.background, true);
+                    }
+                  });
+                  
+                  // Ensure main color is locked and preserve other locked colors
                   const updatedPalette = newPalette.map((combo, index) => {
-                    if (index === 0) {
+                    // Always lock the main color or previously locked colors
+                    if (index === 0 || lockedColors.has(combo.background)) {
                       return { ...combo, isLocked: true };
                     }
                     return combo;
                   });
+                  
                   setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
@@ -1278,13 +1322,24 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('tetradic');
                   const newPalette = generateAccessiblePalette(baseColor, 'tetradic');
-                  // Ensure main color is locked
+                  
+                  // Create a map of locked colors from current palette
+                  const lockedColors = new Map();
+                  generatedPalette.forEach(combo => {
+                    if (combo.isLocked) {
+                      lockedColors.set(combo.background, true);
+                    }
+                  });
+                  
+                  // Ensure main color is locked and preserve other locked colors
                   const updatedPalette = newPalette.map((combo, index) => {
-                    if (index === 0) {
+                    // Always lock the main color or previously locked colors
+                    if (index === 0 || lockedColors.has(combo.background)) {
                       return { ...combo, isLocked: true };
                     }
                     return combo;
                   });
+                  
                   setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
@@ -1297,13 +1352,24 @@ export function WCAGColorPalette() {
                 onClick={() => {
                   setColorHarmony('square');
                   const newPalette = generateAccessiblePalette(baseColor, 'square');
-                  // Ensure main color is locked
+                  
+                  // Create a map of locked colors from current palette
+                  const lockedColors = new Map();
+                  generatedPalette.forEach(combo => {
+                    if (combo.isLocked) {
+                      lockedColors.set(combo.background, true);
+                    }
+                  });
+                  
+                  // Ensure main color is locked and preserve other locked colors
                   const updatedPalette = newPalette.map((combo, index) => {
-                    if (index === 0) {
+                    // Always lock the main color or previously locked colors
+                    if (index === 0 || lockedColors.has(combo.background)) {
                       return { ...combo, isLocked: true };
                     }
                     return combo;
                   });
+                  
                   setGeneratedPalette(updatedPalette);
                 }}
                 className={`p-2 text-sm rounded-lg transition-colors ${
@@ -1341,11 +1407,32 @@ export function WCAGColorPalette() {
                         setBaseColor(newColor);
                         const newPalette = generateAccessiblePalette(newColor, colorHarmony);
                         
-                        // Ensure main color is locked
+                        // Create a map of locked colors from current palette
+                        const lockedColors = new Map();
+                        generatedPalette.forEach(combo => {
+                          if (combo.isLocked) {
+                            lockedColors.set(combo.background, true);
+                          }
+                        });
+                        
+                        // Ensure main color is locked and preserve other locked colors
                         const updatedPalette = newPalette.map((combo, index) => {
+                          // For main color, always lock it
                           if (index === 0) {
                             return { ...combo, isLocked: true };
                           }
+                          
+                          // For other colors, check if the previous palette had a locked color at this index
+                          const previousCombo = generatedPalette[index];
+                          if (previousCombo && previousCombo.isLocked) {
+                            return { ...previousCombo };
+                          }
+                          
+                          // Also preserve any matching colors that were locked in the previous palette
+                          if (lockedColors.has(combo.background)) {
+                            return { ...combo, isLocked: true };
+                          }
+                          
                           return combo;
                         });
                         
