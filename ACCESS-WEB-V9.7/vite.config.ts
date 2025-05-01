@@ -14,6 +14,9 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       port: 5000,
     },
+    optimizeDeps: {
+      exclude: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
+    },
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src'),
