@@ -382,7 +382,7 @@ export default function Subscribe() {
       
       setClientSecret(response.data.clientSecret);
       setStep('payment');
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error creating subscription:", err);
       setError(err.response?.data?.error?.message || "Failed to create subscription. Please try again later.");
     } finally {

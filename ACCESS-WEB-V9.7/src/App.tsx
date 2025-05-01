@@ -102,11 +102,12 @@ function App() {
       setErrorLog(prev => [...prev, error]);
     };
 
-    registerErrorHandler(errorCallback);
-
+    // Store the handler ID for cleanup
+    const handlerId = registerErrorHandler(errorCallback);
+    
     // Cleanup on unmount
     return () => {
-      unregisterErrorHandler(errorCallback);
+      unregisterErrorHandler(handlerId);
     };
   }, []);
 
