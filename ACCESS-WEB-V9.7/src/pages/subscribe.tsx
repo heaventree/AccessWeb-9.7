@@ -46,7 +46,7 @@ interface SubscribeFormProps {
   selectedPlan: any;
 }
 
-// The subscription form using CDN Stripe approach
+// The subscription form with development mode support
 const SubscribeForm = ({ clientSecret, selectedPlan }: SubscribeFormProps) => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -55,38 +55,47 @@ const SubscribeForm = ({ clientSecret, selectedPlan }: SubscribeFormProps) => {
   const [elements, setElements] = useState<any>(null);
   const formRef = useRef<HTMLFormElement>(null);
   
+  // For development mode
+  const [cardNumber, setCardNumber] = useState('');
+  const [expDate, setExpDate] = useState('');
+  const [cvv, setCvv] = useState('');
+  const [success, setSuccess] = useState(false);
+  
   useEffect(() => {
-    // Initialize Stripe only when the script is loaded
-    const checkStripeAndInit = () => {
-      if (window.Stripe) {
-        const stripe = getStripe();
-        setStripe(stripe);
-        
-        if (stripe && clientSecret) {
-          const elements = stripe.elements({
-            clientSecret,
-            appearance: { theme: 'stripe' }
-          });
+    // Only attempt to initialize Stripe in production
+    if (!import.meta.env.DEV && window.Stripe) {
+      const checkStripeAndInit = () => {
+        if (window.Stripe) {
+          const stripe = getStripe();
+          setStripe(stripe);
           
-          // Create and mount the Payment Element
-          const paymentElement = elements.create('payment');
-          const paymentElementMount = document.getElementById('payment-element');
-          
-          if (paymentElementMount) {
-            paymentElement.mount('#payment-element');
-            setElements(elements);
+          if (stripe && clientSecret) {
+            const elements = stripe.elements({
+              clientSecret,
+              appearance: { theme: 'stripe' }
+            });
+            
+            // Create and mount the Payment Element
+            const paymentElement = elements.create('payment');
+            const paymentElementMount = document.getElementById('payment-element');
+            
+            if (paymentElementMount) {
+              paymentElement.mount('#payment-element');
+              setElements(elements);
+            }
           }
+        } else {
+          // If Stripe isn't loaded yet, try again in 100ms
+          setTimeout(checkStripeAndInit, 100);
         }
-      } else {
-        // If Stripe isn't loaded yet, try again in 100ms
-        setTimeout(checkStripeAndInit, 100);
-      }
-    };
-    
-    checkStripeAndInit();
+      };
+      
+      checkStripeAndInit();
+    }
   }, [clientSecret]);
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Production mode submission
+  const handleProdSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
@@ -109,9 +118,137 @@ const SubscribeForm = ({ clientSecret, selectedPlan }: SubscribeFormProps) => {
     }
     // No need to handle success case as user will be redirected to return_url
   };
-
+  
+  // Development mode submission
+  const handleDevSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!cardNumber || !expDate || !cvv) {
+      setErrorMessage('Please fill out all fields');
+      return;
+    }
+    
+    setLoading(true);
+    setErrorMessage(null);
+    
+    // Mock successful subscription after 1.5 seconds
+    setTimeout(() => {
+      setSuccess(true);
+      setLoading(false);
+      // Simulate redirect to success page
+      navigate('/my-account/billing');
+    }, 1500);
+  };
+  
+  // Development mode success view
+  if (success) {
+    return (
+      <div className="p-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+        <h3 className="text-lg font-medium text-green-800 dark:text-green-400 mb-2">Subscription Activated!</h3>
+        <p className="text-green-700 dark:text-green-300 mb-4">
+          Thank you for subscribing. Your subscription is now active.
+        </p>
+        <button
+          onClick={() => navigate('/my-account/billing')}
+          className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md"
+        >
+          Go to Billing Dashboard
+        </button>
+      </div>
+    );
+  }
+  
+  // Development mode form
+  if (import.meta.env.DEV) {
+    return (
+      <form ref={formRef} onSubmit={handleDevSubmit} className="space-y-6">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Card Number
+            </label>
+            <input
+              type="text"
+              placeholder="4242 4242 4242 4242"
+              value={cardNumber}
+              onChange={(e) => setCardNumber(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md"
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Expiration Date
+              </label>
+              <input
+                type="text"
+                placeholder="MM/YY"
+                value={expDate}
+                onChange={(e) => setExpDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Security Code
+              </label>
+              <input
+                type="text"
+                placeholder="CVV"
+                value={cvv}
+                onChange={(e) => setCvv(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md"
+              />
+            </div>
+          </div>
+        </div>
+        
+        {errorMessage && (
+          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400">
+            {errorMessage}
+          </div>
+        )}
+        
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="mr-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md"
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md disabled:opacity-50"
+          >
+            {loading ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+              </span>
+            ) : (
+              `Subscribe - $${selectedPlan.price.toFixed(2)}/month`
+            )}
+          </button>
+        </div>
+        
+        <div className="text-gray-600 dark:text-gray-400 text-xs mt-2">
+          <p>This is a test mode payment form. No actual payment will be processed.</p>
+          <p>You can use any values in the form fields.</p>
+        </div>
+      </form>
+    );
+  }
+  
+  // Production mode form with Stripe Elements
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+    <form ref={formRef} onSubmit={handleProdSubmit} className="space-y-6">
       {/* Mount point for the Stripe Payment Element */}
       <div id="payment-element" className="p-4 border border-gray-200 dark:border-slate-700 rounded-lg"></div>
       
