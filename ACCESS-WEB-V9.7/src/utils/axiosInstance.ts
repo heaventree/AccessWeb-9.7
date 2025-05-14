@@ -55,9 +55,29 @@ axiosInstance.interceptors.response.use(
       console.error('Server error:', error.response.data.error || 'An unexpected server error occurred');
     }
     
-    // Handle network errors
+    // Enhanced network error handling
     if (error.request && !error.response) {
-      console.error('Network error:', 'Unable to reach the server. Please check your internet connection.');
+      // Check if CORS error
+      if (error.message && error.message.includes('Network Error')) {
+        console.error('CORS Error:', 'The request was blocked due to CORS policy. The website may not allow external testing.');
+      }
+      // Check if timeout error
+      else if (error.code === 'ECONNABORTED' || (error.message && error.message.includes('timeout'))) {
+        console.error('Timeout Error:', 'The connection to the server timed out. The website may be slow or unresponsive.');
+      }
+      // Check for SSL/TLS errors
+      else if (error.message && (
+        error.message.includes('SSL') || 
+        error.message.includes('certificate') || 
+        error.message.includes('CERT_') || 
+        error.message.includes('SSL handshake')
+      )) {
+        console.error('SSL/TLS Error:', 'There was an issue with the website\'s SSL certificate or HTTPS configuration.');
+      }
+      // Generic network error
+      else {
+        console.error('Network Error:', 'Unable to reach the server. Please check your internet connection.');
+      }
     }
     
     return Promise.reject(error);
