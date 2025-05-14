@@ -1,111 +1,80 @@
-import React, { useState } from 'react';
-import { 
-  AlertTriangle, 
-  Shield, 
-  Clock, 
-  Globe, 
-  ServerCrash, 
-  Wifi, 
-  ChevronDown, 
-  ChevronUp 
-} from 'lucide-react';
-import type { ConnectionErrorDetails } from '../utils/websiteConnectionErrorHandler';
+import React from 'react';
+import { AlertTriangle, ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-interface WebsiteConnectionErrorProps {
+export interface WebsiteConnectionErrorProps {
   url: string;
-  errorDetails: ConnectionErrorDetails;
+  details: {
+    type: string;
+    message: string;
+    technicalDetails?: string;
+    userFriendlyMessage: string;
+    possibleSolutions: string[];
+  };
+  onDismiss: () => void;
 }
 
-export const WebsiteConnectionError: React.FC<WebsiteConnectionErrorProps> = ({ 
-  url, 
-  errorDetails 
-}) => {
-  const [showDetails, setShowDetails] = useState(false);
-
-  // Select icon based on error type
-  const getIcon = () => {
-    switch (errorDetails.type) {
-      case 'ssl':
-        return <Shield className="h-6 w-6 text-orange-500" />;
-      case 'timeout':
-        return <Clock className="h-6 w-6 text-orange-500" />;
-      case 'cors':
-        return <Shield className="h-6 w-6 text-orange-500" />;
-      case 'dns':
-        return <Globe className="h-6 w-6 text-orange-500" />;
-      case 'http':
-        return <ServerCrash className="h-6 w-6 text-orange-500" />;
-      case 'network':
-        return <Wifi className="h-6 w-6 text-orange-500" />;
-      default:
-        return <AlertTriangle className="h-6 w-6 text-orange-500" />;
-    }
-  };
-
+export function WebsiteConnectionError({ url, details, onDismiss }: WebsiteConnectionErrorProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-6 mb-6">
-      <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 bg-orange-100 dark:bg-orange-900/20 p-3 rounded-full">
-          {getIcon()}
-        </div>
-        
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            {errorDetails.message}
-          </h3>
-          
-          <p className="text-gray-600 dark:text-gray-300 mb-4">
-            We couldn't connect to <span className="font-semibold break-all">{url}</span>. 
-            {errorDetails.userFriendlyMessage}
-          </p>
-          
-          {/* Toggle button for technical details */}
-          <button 
-            className="inline-flex items-center text-sm font-medium text-[#0fae96] hover:text-[#0fae96]/80 dark:text-teal-400 dark:hover:text-teal-300"
-            onClick={() => setShowDetails(!showDetails)}
-          >
-            {showDetails ? (
-              <>
-                <ChevronUp className="mr-1 h-4 w-4" />
-                Hide details
-              </>
-            ) : (
-              <>
-                <ChevronDown className="mr-1 h-4 w-4" />
-                Show details
-              </>
-            )}
-          </button>
-          
-          {/* Collapsible details section */}
-          {showDetails && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                Possible Solutions:
-              </h4>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="w-full max-w-3xl"
+    >
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
+        <div className="flex items-start">
+          <div className="flex-shrink-0">
+            <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+          </div>
+          <div className="ml-3 flex-1">
+            <h3 className="text-lg font-medium text-red-800 dark:text-red-300">
+              Website Connection Issue
+            </h3>
+            <div className="mt-2">
+              <p className="text-sm text-red-700 dark:text-red-300">
+                We couldn't connect to <strong>{url}</strong>
+              </p>
+              <p className="mt-2 text-sm text-red-700 dark:text-red-300">
+                {details.userFriendlyMessage}
+              </p>
               
-              <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 space-y-1 mb-4">
-                {errorDetails.possibleSolutions.map((solution, index) => (
-                  <li key={index} className="text-sm">
-                    {solution}
-                  </li>
-                ))}
-              </ul>
-              
-              {errorDetails.technicalDetails && (
-                <>
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                    Technical Details:
-                  </h4>
-                  <div className="p-3 bg-gray-100 dark:bg-gray-900 rounded-md text-xs font-mono text-gray-700 dark:text-gray-300 overflow-x-auto">
-                    {errorDetails.technicalDetails}
-                  </div>
-                </>
+              {details.technicalDetails && (
+                <div className="mt-3 p-2 bg-red-100 dark:bg-red-900/30 rounded text-xs font-mono text-red-800 dark:text-red-300">
+                  {details.technicalDetails}
+                </div>
               )}
+              
+              <div className="mt-4">
+                <h4 className="text-sm font-semibold text-red-800 dark:text-red-300 mb-2">
+                  Possible Solutions:
+                </h4>
+                <ul className="text-sm text-red-700 dark:text-red-300 space-y-1 list-disc list-inside">
+                  {details.possibleSolutions.map((solution, index) => (
+                    <li key={index}>{solution}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="mt-4 flex items-center space-x-4">
+                <button
+                  onClick={onDismiss}
+                  className="text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                >
+                  Dismiss
+                </button>
+                <a 
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                >
+                  Open website <ExternalLink className="ml-1 h-3 w-3" />
+                </a>
+              </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
-};
+}

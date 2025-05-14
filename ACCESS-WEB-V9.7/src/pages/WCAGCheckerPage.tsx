@@ -8,7 +8,9 @@ import { EmbedBadge } from '../components/EmbedBadge';
 import { StructureAnalysisPanel } from '../components/StructureAnalysisPanel';
 import { ResponsiveAnalysisPanel } from '../components/ResponsiveAnalysisPanel';
 import { MediaAnalysisPanel } from '../components/MediaAnalysisPanel';
-import { testAccessibility } from '../utils/accessibility/accessibilityTester';
+import { testAccessibilityWithErrorHandling } from '../utils/accessibility/accessibilityTesterMock';
+import { WebsiteConnectionError } from '../utils/websiteConnectionChecker';
+import { WebsiteConnectionError as WebsiteConnectionErrorComponent } from '../components/WebsiteConnectionError';
 import type { TestResult, AccessibilityIssue } from '../types';
 import { exportToPDF } from '../utils/formats/pdfExport';
 import { 
@@ -43,9 +45,18 @@ export function WCAGCheckerPage() {
   const [enableOfficeDocuments, setEnableOfficeDocuments] = useState(false);
   const [enableMediaTesting, setEnableMediaTesting] = useState(false);
 
+  // New state for connection error details
+  const [connectionError, setConnectionError] = useState<{ 
+    url: string; 
+    details: any;
+  } | null>(null);
+
   const handleSubmit = async (url: string) => {
     setIsLoading(true);
     setError(null);
+    setConnectionError(null);
+    setResults(null);
+    
     try {
       // Configure testing options
       const options = {
@@ -63,7 +74,7 @@ export function WCAGCheckerPage() {
         } : {})
       };
 
-      const testResults = await testAccessibility(url, selectedRegion, options);
+      const testResults = await testAccessibilityWithErrorHandling(url, selectedRegion, options);
       setResults(testResults);
       
       // Check for document-specific issues
@@ -118,7 +129,17 @@ export function WCAGCheckerPage() {
         setActiveTab('passes');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while testing the URL');
+      // Check if this is our specialized website connection error
+      if (err instanceof WebsiteConnectionError) {
+        // Handle website connection error specifically
+        setConnectionError({
+          url: err.url,
+          details: err.details
+        });
+      } else {
+        // Handle other errors
+        setError(err instanceof Error ? err.message : 'An error occurred while testing the URL');
+      }
     } finally {
       setIsLoading(false);
     }
