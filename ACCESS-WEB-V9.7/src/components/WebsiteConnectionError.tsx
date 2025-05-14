@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, ExternalLink } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Lock, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export interface WebsiteConnectionErrorProps {
@@ -15,6 +15,12 @@ export interface WebsiteConnectionErrorProps {
 }
 
 export function WebsiteConnectionError({ url, details, onDismiss }: WebsiteConnectionErrorProps) {
+  // Determine if using HTTP or HTTPS
+  const isSecure = url.toLowerCase().startsWith('https://');
+  const ProtocolIcon = isSecure ? Lock : Globe;
+  const protocolLabel = isSecure ? 'HTTPS' : 'HTTP';
+  const isSslError = details.type === 'ssl';
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -31,6 +37,13 @@ export function WebsiteConnectionError({ url, details, onDismiss }: WebsiteConne
               Website Connection Issue
             </h3>
             <div className="mt-2">
+              <div className="flex items-center mb-1">
+                <ProtocolIcon className="h-4 w-4 mr-1 text-red-600 dark:text-red-400" />
+                <span className="text-xs font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-2 py-0.5 rounded">{protocolLabel}</span>
+                {isSecure && isSslError && (
+                  <span className="ml-2 text-xs text-red-600 dark:text-red-400">(SSL/TLS Issue Detected)</span>
+                )}
+              </div>
               <p className="text-sm text-red-700 dark:text-red-300">
                 We couldn't connect to <strong>{url}</strong>
               </p>
