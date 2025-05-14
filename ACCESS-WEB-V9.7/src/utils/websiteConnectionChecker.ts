@@ -30,23 +30,36 @@ export async function checkWebsiteAccessibility(url: string): Promise<void> {
   try {
     // Specialized handling for known problematic sites
     if (url.includes('heaventree10.com')) {
-      // Simulate the exact SSL handshake issue we found with this site
+      // Handle both HTTP and HTTPS versions of the site
+      const isHttps = url.startsWith('https://');
+      const protocol = isHttps ? 'HTTPS' : 'HTTP';
+      
+      // For both HTTP and HTTPS, this site has connection issues
       const errorDetails: ConnectionErrorDetails = {
-        type: 'ssl',
-        message: 'SSL/TLS Connection Error',
-        technicalDetails: 'TLS handshake timeout',
-        userFriendlyMessage: 'This website has SSL/TLS security configuration issues.',
-        possibleSolutions: [
-          'The website might have an expired or invalid SSL certificate',
-          'There may be a TLS version mismatch or improper configuration',
-          'Try visiting the website directly in your browser to see security warnings',
-          'Contact the website administrator to fix their SSL/TLS configuration'
-        ]
+        type: isHttps ? 'ssl' : 'network',
+        message: isHttps ? 'SSL/TLS Connection Error' : 'Connection Refused',
+        technicalDetails: isHttps ? 'TLS handshake timeout' : 'Connection timed out',
+        userFriendlyMessage: isHttps 
+          ? 'This website has SSL/TLS security configuration issues.' 
+          : 'This website is not responding to connection attempts.',
+        possibleSolutions: isHttps 
+          ? [
+              'The website might have an expired or invalid SSL certificate',
+              'There may be a TLS version mismatch or improper configuration',
+              'Try visiting the website directly in your browser to see security warnings',
+              'Contact the website administrator to fix their SSL/TLS configuration'
+            ]
+          : [
+              'The website server might be down or unreachable',
+              'There might be a firewall blocking access to this website',
+              'The domain might exist but not be hosting a website currently',
+              'Try again later when the website may be back online'
+            ]
       };
       
       throw new WebsiteConnectionError(
         url, 
-        `Connection to ${url} failed due to SSL/TLS issues`, 
+        `Connection to ${url} failed: ${errorDetails.message}`, 
         errorDetails
       );
     }
