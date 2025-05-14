@@ -383,7 +383,22 @@ export function WCAGCheckerPage() {
           </motion.div>
         </div>
 
-        {/* Error Message */}
+        {/* Connection Error Message */}
+        {connectionError && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <WebsiteConnectionErrorComponent
+              url={connectionError.url}
+              details={connectionError.details}
+              onDismiss={() => setConnectionError(null)}
+            />
+          </motion.div>
+        )}
+        
+        {/* General Error Message */}
         {error && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
