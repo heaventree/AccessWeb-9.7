@@ -155,15 +155,89 @@ if __name__ == "__main__":
     import urllib3
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     
-    # Get URL from command line or use default
-    url = "https://heaventree10.com/" if len(sys.argv) < 2 else sys.argv[1]
+    # Use HTTP instead of HTTPS to avoid SSL handshake issues
+    url = "http://heaventree10.com/" if len(sys.argv) < 2 else sys.argv[1]
+    print(f"Using HTTP URL: {url}")
     
-    # Run scraper
-    content = scrape_with_fallbacks(url)
+    # Skip method 1 and go directly to method 3 (socket connection)
+    print("Skipping to Method 3: Using low-level socket connection")
     
-    # Save content to file
-    if content and len(content) > 200:  # If we got meaningful content
-        filename = "scraped_content.txt"
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(content)
-        print(f"Content saved to {filename}")
+    # Parse the domain from the URL
+    if "://" in url:
+        domain = url.split("://")[1].split("/")[0]
+    else:
+        domain = url.split("/")[0]
+    
+    if ":" in domain:
+        domain, port_str = domain.split(":")
+        port = int(port_str)
+    else:
+        port = 80
+    
+    print(f"Connecting to {domain}:{port}...")
+    
+    try:
+        # Create socket
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(2)  # Very short timeout
+        
+        # Connect
+        s.connect((domain, port))
+        
+        # Send HTTP request
+        request = f"GET / HTTP/1.1\r\nHost: {domain}\r\nUser-Agent: Mozilla/5.0\r\nAccept: */*\r\nConnection: close\r\n\r\n"
+        s.sendall(request.encode())
+        
+        # Receive response
+        print("Receiving data...")
+        chunks = []
+        start_time = time.time()
+        max_time = 3  # Maximum 3 seconds
+        
+        while time.time() - start_time < max_time:
+            try:
+                chunk = s.recv(4096)
+                if not chunk:
+                    break
+                chunks.append(chunk)
+            except socket.timeout:
+                print("Socket receive timed out, but we have some data")
+                break
+        
+        # Process response
+        response_data = b''.join(chunks)
+        print(f"Received {len(response_data)} bytes")
+        
+        if response_data:
+            # Try to decode to utf-8, falling back to latin-1
+            try:
+                response_text = response_data.decode('utf-8')
+            except UnicodeDecodeError:
+                response_text = response_data.decode('latin-1')
+            
+            # Print first part
+            print("First 200 characters:")
+            print(response_text[:200])
+            print("...")
+            
+            # Save the raw response to a file
+            with open("raw_response.txt", "w", encoding="utf-8") as f:
+                f.write(response_text)
+            print("Raw response saved to raw_response.txt")
+            
+            # Save only headers to a separate file
+            headers_end = response_text.find("\r\n\r\n")
+            if headers_end > 0:
+                headers = response_text[:headers_end]
+                with open("headers_only.txt", "w", encoding="utf-8") as f:
+                    f.write(headers)
+                print("Headers saved to headers_only.txt")
+    except socket.timeout:
+        print("Socket connection timed out")
+    except Exception as e:
+        print(f"Socket error: {type(e).__name__}: {e}")
+    finally:
+        try:
+            s.close()
+        except:
+            pass

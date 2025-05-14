@@ -1,0 +1,6 @@
+HTTP/1.1 301 Moved Permanently
+content-length: 0
+location: https://heaventree10.com/css/style.css
+x-via: LHR1
+connection: close
+
