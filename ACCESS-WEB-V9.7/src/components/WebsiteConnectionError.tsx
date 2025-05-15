@@ -1,6 +1,7 @@
 import React from 'react';
-import { AlertTriangle, ExternalLink, Lock, Globe, AlertCircle, Info, HelpCircle } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Lock, Globe, AlertCircle, Info, HelpCircle, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { httpsToHttp } from '../utils/urlUtils';
 
 export interface WebsiteConnectionErrorProps {
   url: string;
@@ -15,9 +16,10 @@ export interface WebsiteConnectionErrorProps {
     learnMoreUrl?: string;
   };
   onDismiss: () => void;
+  onTryAlternative?: (alternativeUrl: string) => void;
 }
 
-export function WebsiteConnectionError({ url, details, onDismiss }: WebsiteConnectionErrorProps) {
+export function WebsiteConnectionError({ url, details, onDismiss, onTryAlternative }: WebsiteConnectionErrorProps) {
   // Determine if using HTTP or HTTPS
   const isSecure = url.toLowerCase().startsWith('https://');
   const ProtocolIcon = isSecure ? Lock : Globe;
@@ -186,6 +188,18 @@ export function WebsiteConnectionError({ url, details, onDismiss }: WebsiteConne
                 >
                   Dismiss
                 </button>
+                
+                {/* HTTP Fallback button for HTTPS SSL errors */}
+                {isSecure && details.type === 'ssl' && onTryAlternative && (
+                  <button
+                    onClick={() => onTryAlternative(httpsToHttp(url))}
+                    className="inline-flex items-center px-3 py-1.5 bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-700 rounded-md text-sm font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
+                  >
+                    <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+                    Try HTTP instead
+                  </button>
+                )}
+                
                 <a 
                   href={url}
                   target="_blank"

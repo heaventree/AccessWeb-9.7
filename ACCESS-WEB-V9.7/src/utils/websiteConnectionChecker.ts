@@ -27,27 +27,54 @@ export class WebsiteConnectionError extends Error {
  * @param url The website URL to check
  * @returns Promise that resolves if website is accessible, rejects with WebsiteConnectionError otherwise
  */
+/**
+ * Test different types of SSL errors for demo purposes
+ * This helps demonstrate our comprehensive SSL error handling
+ */
+const simulateDifferentSSLErrors = (url: string): string | null => {
+  // Use different domains to demonstrate different SSL errors
+  if (url.includes('heaventree10.com')) {
+    return 'TLS handshake timeout';
+  } else if (url.includes('example-expired.com')) {
+    return 'certificate has expired';
+  } else if (url.includes('example-self-signed.com')) {
+    return 'self signed certificate';
+  } else if (url.includes('example-untrusted.com')) {
+    return 'unable to verify the first certificate';
+  } else if (url.includes('example-mismatch.com')) {
+    return 'hostname/ip doesn\'t match';
+  } else if (url.includes('example-protocol.com')) {
+    return 'protocol version';
+  } else if (url.includes('example-revoked.com')) {
+    return 'certificate has been revoked';
+  } else if (url.includes('example-cipher.com')) {
+    return 'cipher suite';
+  }
+  return null;
+};
+
 export async function checkWebsiteAccessibility(url: string): Promise<void> {
   try {
-    // Specialized handling for known problematic sites
-    if (url.includes('heaventree10.com')) {
-      // Handle both HTTP and HTTPS versions of the site
+    // Check for demonstration domains with known SSL error types
+    const simulatedErrorMessage = simulateDifferentSSLErrors(url);
+    
+    if (simulatedErrorMessage) {
       const isHttps = url.startsWith('https://');
       const protocol = isHttps ? 'HTTPS' : 'HTTP';
       
       if (isHttps) {
-        // For HTTPS, use our specialized SSL error detection
-        const technicalDetails = 'TLS handshake timeout';
-        const sslErrorInfo = analyzeSSLError(technicalDetails);
+        // Use our specialized SSL error detection
+        const sslErrorInfo = analyzeSSLError(simulatedErrorMessage);
         
         // Create a more detailed error for SSL/TLS issues
         const errorDetails: ConnectionErrorDetails = {
           type: 'ssl',
           message: sslErrorInfo.message,
-          technicalDetails: technicalDetails,
+          technicalDetails: simulatedErrorMessage,
           userFriendlyMessage: sslErrorInfo.userFriendlyMessage,
           possibleSolutions: sslErrorInfo.possibleSolutions,
           severityLevel: sslErrorInfo.severityLevel,
+          requiresExpertise: sslErrorInfo.requiresExpertise,
           learnMoreUrl: sslErrorInfo.learnMoreUrl
         };
         
@@ -68,7 +95,8 @@ export async function checkWebsiteAccessibility(url: string): Promise<void> {
             'There might be a firewall blocking access to this website',
             'The domain might exist but not be hosting a website currently',
             'Try again later when the website may be back online'
-          ]
+          ],
+          severityLevel: 'medium'
         };
         
         throw new WebsiteConnectionError(
