@@ -13,6 +13,7 @@ import { WebsiteConnectionError } from '../utils/websiteConnectionChecker';
 import { WebsiteConnectionError as WebsiteConnectionErrorComponent } from '../components/WebsiteConnectionError';
 import type { TestResult, AccessibilityIssue } from '../types';
 import { exportToPDF } from '../utils/formats/pdfExport';
+import { normalizeUrl, httpsToHttp } from '../utils/urlUtils';
 import { 
   Download, 
   AlertTriangle, 
@@ -52,6 +53,9 @@ export function WCAGCheckerPage() {
   } | null>(null);
 
   const handleSubmit = async (url: string) => {
+    // Normalize the URL (ensure it has a protocol)
+    const normalizedUrl = normalizeUrl(url);
+    
     setIsLoading(true);
     setError(null);
     setConnectionError(null);
@@ -74,7 +78,7 @@ export function WCAGCheckerPage() {
         } : {})
       };
 
-      const testResults = await testAccessibilityWithErrorHandling(url, selectedRegion, options);
+      const testResults = await testAccessibilityWithErrorHandling(normalizedUrl, selectedRegion, options);
       setResults(testResults);
       
       // Check for document-specific issues
@@ -394,6 +398,11 @@ export function WCAGCheckerPage() {
               url={connectionError.url}
               details={connectionError.details}
               onDismiss={() => setConnectionError(null)}
+              onTryAlternative={(alternativeUrl) => {
+                // When trying HTTP instead of HTTPS
+                setConnectionError(null);
+                handleSubmit(alternativeUrl);
+              }}
             />
           </motion.div>
         )}
