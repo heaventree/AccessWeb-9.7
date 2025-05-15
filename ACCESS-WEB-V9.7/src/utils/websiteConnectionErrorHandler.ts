@@ -9,6 +9,9 @@ export interface ConnectionErrorDetails {
   technicalDetails?: string;
   userFriendlyMessage: string;
   possibleSolutions: string[];
+  severityLevel?: 'critical' | 'high' | 'medium' | 'low';
+  requiresExpertise?: boolean;
+  learnMoreUrl?: string;
 }
 
 /**

@@ -5,6 +5,7 @@
 
 import { axiosInstance } from './axiosInstance';
 import { analyzeConnectionError, type ConnectionErrorDetails } from './websiteConnectionErrorHandler';
+import { analyzeSSLError, SSLErrorType } from './ssl-error-detection';
 
 // Custom error class for website connection issues
 export class WebsiteConnectionError extends Error {
@@ -34,34 +35,48 @@ export async function checkWebsiteAccessibility(url: string): Promise<void> {
       const isHttps = url.startsWith('https://');
       const protocol = isHttps ? 'HTTPS' : 'HTTP';
       
-      // For both HTTP and HTTPS, this site has connection issues
-      const errorDetails: ConnectionErrorDetails = {
-        type: isHttps ? 'ssl' : 'network',
-        message: isHttps ? 'SSL/TLS Connection Error' : 'Connection Refused',
-        technicalDetails: isHttps ? 'TLS handshake timeout' : 'Connection timed out',
-        userFriendlyMessage: isHttps 
-          ? 'This website has SSL/TLS security configuration issues.' 
-          : 'This website is not responding to connection attempts.',
-        possibleSolutions: isHttps 
-          ? [
-              'The website might have an expired or invalid SSL certificate',
-              'There may be a TLS version mismatch or improper configuration',
-              'Try visiting the website directly in your browser to see security warnings',
-              'Contact the website administrator to fix their SSL/TLS configuration'
-            ]
-          : [
-              'The website server might be down or unreachable',
-              'There might be a firewall blocking access to this website',
-              'The domain might exist but not be hosting a website currently',
-              'Try again later when the website may be back online'
-            ]
-      };
-      
-      throw new WebsiteConnectionError(
-        url, 
-        `Connection to ${url} failed: ${errorDetails.message}`, 
-        errorDetails
-      );
+      if (isHttps) {
+        // For HTTPS, use our specialized SSL error detection
+        const technicalDetails = 'TLS handshake timeout';
+        const sslErrorInfo = analyzeSSLError(technicalDetails);
+        
+        // Create a more detailed error for SSL/TLS issues
+        const errorDetails: ConnectionErrorDetails = {
+          type: 'ssl',
+          message: sslErrorInfo.message,
+          technicalDetails: technicalDetails,
+          userFriendlyMessage: sslErrorInfo.userFriendlyMessage,
+          possibleSolutions: sslErrorInfo.possibleSolutions,
+          severityLevel: sslErrorInfo.severityLevel,
+          learnMoreUrl: sslErrorInfo.learnMoreUrl
+        };
+        
+        throw new WebsiteConnectionError(
+          url, 
+          `Connection to ${url} failed: ${errorDetails.message}`, 
+          errorDetails
+        );
+      } else {
+        // For HTTP, use standard network error details
+        const errorDetails: ConnectionErrorDetails = {
+          type: 'network',
+          message: 'Connection Refused',
+          technicalDetails: 'Connection timed out',
+          userFriendlyMessage: 'This website is not responding to connection attempts.',
+          possibleSolutions: [
+            'The website server might be down or unreachable',
+            'There might be a firewall blocking access to this website',
+            'The domain might exist but not be hosting a website currently',
+            'Try again later when the website may be back online'
+          ]
+        };
+        
+        throw new WebsiteConnectionError(
+          url, 
+          `Connection to ${url} failed: ${errorDetails.message}`, 
+          errorDetails
+        );
+      }
     }
     
     // For other URLs, we'd make a real check
