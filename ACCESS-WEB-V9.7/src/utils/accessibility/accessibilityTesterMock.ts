@@ -35,6 +35,19 @@ export async function testAccessibilityWithErrorHandling(
         warningCount: 6,
         issueCount: 14,
         region,
+        summary: {
+          critical: 2,
+          serious: 5,
+          moderate: 4,
+          minor: 3,
+          warnings: 6,
+          passes: 16,
+          pdfIssues: 0,
+          documentIssues: 0,
+          mediaIssues: 0,
+          audioIssues: 0,
+          videoIssues: 0
+        },
         standards: {
           wcag21: true,
           wcag22: true,
@@ -123,6 +136,19 @@ export async function testAccessibilityWithErrorHandling(
       warningCount: 5,
       issueCount: 12,
       region,
+      summary: {
+        critical: 1,
+        serious: 4,
+        moderate: 3,
+        minor: 4,
+        warnings: 5,
+        passes: 18,
+        pdfIssues: 0,
+        documentIssues: 0,
+        mediaIssues: 0,
+        audioIssues: 0,
+        videoIssues: 0
+      },
       standards: {
         wcag21: true,
         wcag22: true,
