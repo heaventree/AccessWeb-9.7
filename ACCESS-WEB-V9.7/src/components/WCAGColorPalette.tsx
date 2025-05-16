@@ -1204,8 +1204,8 @@ export function WCAGColorPalette() {
                 onClick={() => changeColorHarmony('all')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'all' 
-                    ? 'bg-green-100 dark:bg-green-400 text-green-800 dark:text-green-900 border border-green-300 dark:border-green-500'
-                    : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
+                    ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50'
+                    : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
                 }`}
               >
                 All Harmonies
@@ -1213,7 +1213,7 @@ export function WCAGColorPalette() {
               <button 
                 onClick={() => changeColorHarmony('complementary')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'complementary' ? 'bg-green-100 dark:bg-green-400 text-green-800 dark:text-green-900 border border-green-300 dark:border-green-500' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
+                  colorHarmony === 'complementary' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
                 }`}
               >
                 Complementary
@@ -1221,7 +1221,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('analogous')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'analogous' ? 'bg-green-100 dark:bg-green-400 text-green-800 dark:text-green-900 border border-green-300 dark:border-green-500' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
+                  colorHarmony === 'analogous' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
                 }`}
               >
                 Analogous
@@ -1229,7 +1229,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('triadic')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'triadic' ? 'bg-green-100 dark:bg-green-400 text-green-800 dark:text-green-900 border border-green-300 dark:border-green-500' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
+                  colorHarmony === 'triadic' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
                 }`}
               >
                 Triadic
@@ -1237,7 +1237,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('split-complementary')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'split-complementary' ? 'bg-green-100 dark:bg-green-400 text-green-800 dark:text-green-900 border border-green-300 dark:border-green-500' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
+                  colorHarmony === 'split-complementary' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
                 }`}
               >
                 Split Comp
@@ -1245,7 +1245,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('monochromatic')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'monochromatic' ? 'bg-green-100 dark:bg-green-400 text-green-800 dark:text-green-900 border border-green-300 dark:border-green-500' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
+                  colorHarmony === 'monochromatic' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
                 }`}
               >
                 Monochromatic
@@ -1253,7 +1253,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('tetradic')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'tetradic' ? 'bg-green-100 dark:bg-green-400 text-green-800 dark:text-green-900 border border-green-300 dark:border-green-500' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
+                  colorHarmony === 'tetradic' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
                 }`}
               >
                 Tetradic
@@ -1261,7 +1261,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('square')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'square' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
+                  colorHarmony === 'square' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#1D3640]/80'
                 }`}
               >
                 Square
