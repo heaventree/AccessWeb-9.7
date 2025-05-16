@@ -902,28 +902,30 @@ export function WCAGColorPalette() {
         // Generate new palette with the selected harmony
         const newPalette = generateAccessiblePalette(baseColor, newHarmony);
         
-        // Keep track of which indices were locked in the original palette
-        const lockedIndices: number[] = [];
+        // Store both the indices and the actual colors that were locked
+        const lockedColors: {index: number, color: ColorCombination}[] = [];
         for (let i = 0; i < generatedPalette.length; i++) {
           if (generatedPalette[i].isLocked) {
-            lockedIndices.push(i);
-            console.log(`Preserving lock for index ${i}`);
+            lockedColors.push({
+              index: i,
+              color: {...generatedPalette[i]} // Clone to avoid reference issues
+            });
+            console.log(`Preserving lock and color for index ${i}`);
           }
         }
         
-        // Apply locked status from original palette to new palette
-        const updatedPalette = newPalette.map((combo, index) => {
-          // Always lock the first color (base color)
-          // Or lock if the index was locked in the original palette
-          const shouldBeLocked = index === 0 || lockedIndices.includes(index);
-          
-          return {
-            ...combo,
-            isLocked: shouldBeLocked
-          };
+        // Start with the new palette
+        const updatedPalette = [...newPalette];
+        
+        // For any locked positions, use the original color
+        lockedColors.forEach(({ index, color }) => {
+          if (index < updatedPalette.length) {
+            // Preserve the original color but make sure it's marked as locked
+            updatedPalette[index] = { ...color, isLocked: true };
+          }
         });
         
-        console.log('Harmony changed, locked indices preserved:', lockedIndices);
+        console.log('Harmony changed, locked colors preserved:', lockedColors.map(lc => lc.index));
         setGeneratedPalette(updatedPalette);
       } catch (error) {
         console.error('Error changing color harmony:', error);
