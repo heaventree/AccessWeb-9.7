@@ -1278,13 +1278,15 @@ export function WCAGColorPalette() {
                 </label>
               </div>
               <div className="flex items-center gap-4">
-                <input
-                  type="color"
-                  id="baseColor"
-                  value={baseColor}
-                  onChange={handleBaseColorChange}
-                  className="h-12 w-20 rounded border border-gray-300"
-                />
+                <div className="h-12 w-20 rounded-lg overflow-hidden shadow-sm border-2 border-gray-300 dark:border-gray-700 hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
+                  <input
+                    type="color"
+                    id="baseColor"
+                    value={baseColor}
+                    onChange={handleBaseColorChange}
+                    className="h-full w-full cursor-pointer"
+                  />
+                </div>
                 <div className="flex flex-1">
                   <input
                     type="text"
