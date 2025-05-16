@@ -871,13 +871,55 @@ export function WCAGColorPalette() {
       });
       
       setGeneratedPalette(updatedInitialPalette);
+      
+      // Initialize lockedPositions array - only the base color (index 0) is locked by default
+      const initialLockedPositions = updatedInitialPalette.map((_, index) => index === 0);
+      setLockedPositions(initialLockedPositions);
     }
   }, []);
+  
+  // Update lockedPositions whenever palette isLocked status changes
+  useEffect(() => {
+    if (generatedPalette.length > 0) {
+      const newLockedPositions = generatedPalette.map(combo => !!combo.isLocked);
+      setLockedPositions(newLockedPositions);
+    }
+  }, [generatedPalette.map(c => c.isLocked).join(',')]);
 
   const copyToClipboard = (color: string) => {
     navigator.clipboard.writeText(color);
     setCopiedColor(color);
     setTimeout(() => setCopiedColor(null), 2000);
+  };
+  
+  // Helper function to handle color harmony changes - preserves locked colors
+  const changeColorHarmony = (newHarmony: ColorHarmony) => {
+    setColorHarmony(newHarmony);
+    setIsGenerating(true);
+    
+    setTimeout(() => {
+      try {
+        // Generate new palette with the selected harmony
+        const newPalette = generateAccessiblePalette(baseColor, newHarmony);
+        
+        // Apply locked positions from the current state
+        const updatedPalette = newPalette.map((combo, index) => {
+          // Check if this position is locked based on lockedPositions array
+          const isPositionLocked = index < lockedPositions.length ? lockedPositions[index] : (index === 0);
+          
+          return {
+            ...combo,
+            isLocked: isPositionLocked
+          };
+        });
+        
+        setGeneratedPalette(updatedPalette);
+      } catch (error) {
+        console.error('Error changing color harmony:', error);
+      } finally {
+        setIsGenerating(false);
+      }
+    }, 100);
   };
 
   const generateNewPalette = () => {
