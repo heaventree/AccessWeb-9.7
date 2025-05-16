@@ -842,6 +842,10 @@ export function WCAGColorPalette() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [colorHarmony, setColorHarmony] = useState<ColorHarmony>('all');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Store an array of boolean flags indicating which positions are locked
+  // This helps preserve locked status when changing harmony types
+  const [lockedPositions, setLockedPositions] = useState<boolean[]>([]);
   const paletteRef = useRef<HTMLDivElement>(null);
   
   // Function to clear/reset the generator
