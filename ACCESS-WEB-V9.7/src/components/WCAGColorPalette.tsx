@@ -1188,15 +1188,13 @@ export function WCAGColorPalette() {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 mt-2">
             <div className="flex items-center justify-between">
-              <span>Generate Custom Palette</span>
+              <span>Colour Harmony</span>
             </div>
           </h3>
           
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Color Harmony
-              </label>
+              {/* Harmony selector buttons below */}
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
