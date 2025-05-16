@@ -1159,7 +1159,7 @@ export function WCAGColorPalette() {
   };
 
   return (
-    <div className="dark:bg-gray-900">
+    <div>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
