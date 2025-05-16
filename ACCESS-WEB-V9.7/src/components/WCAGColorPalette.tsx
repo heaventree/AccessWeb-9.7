@@ -1183,8 +1183,8 @@ export function WCAGColorPalette() {
 
         {/* Generator Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border-2 border-primary-100 dark:border-gray-700 relative">
-          <div className="absolute -top-3 left-4 bg-white dark:bg-gray-800 px-2">
-            <span className="text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">Palette Generator</span>
+          <div className="absolute -top-3 left-4">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0fae96] dark:bg-[#0fae96] text-white uppercase tracking-wider shadow-sm">Palette Generator</span>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 mt-2">
             <div className="flex items-center justify-between">
@@ -1357,8 +1357,8 @@ export function WCAGColorPalette() {
         {/* Generated Palette */}
         {generatedPalette.length > 0 && (
           <div className="border-2 border-dashed border-secondary-100 dark:border-gray-700 rounded-lg p-6 mb-8 bg-white dark:bg-gray-800 shadow-md relative">
-            <div className="absolute -top-3 left-4 bg-white dark:bg-gray-800 px-2">
-              <span className="text-xs font-medium text-secondary-600 dark:text-secondary-400 uppercase tracking-wider">Generated Palette</span>
+            <div className="absolute -top-3 left-4">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0fae96] dark:bg-[#0fae96] text-white uppercase tracking-wider shadow-sm">Generated Palette</span>
             </div>
             
             <div className="flex justify-between items-center gap-4 mb-6">
