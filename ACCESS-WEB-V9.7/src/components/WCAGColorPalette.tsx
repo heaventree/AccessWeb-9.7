@@ -834,7 +834,7 @@ function determineColorName(baseHsl: { h: number, s: number, l: number }, colorH
 }
 
 // Pro pill styling
-const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold inline-flex items-center scale-[0.85] origin-left";
+const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-800 to-purple-900 text-white font-semibold inline-flex items-center scale-[0.85] origin-left";
 
 export function WCAGColorPalette() {
   const { theme } = useTheme();
@@ -1451,7 +1451,7 @@ export function WCAGColorPalette() {
                   }}
                   disabled={isGenerating}
                   aria-label="Shuffle colors"
-                  className="inline-flex items-center gap-2 px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0d8b78] dark:hover:bg-[#0a7363] transition-all duration-300"
+                  className="inline-flex items-center gap-2 px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300"
                 >
                   <Shuffle className={`w-4 h-4 text-white ${isGenerating ? 'animate-spin' : ''}`} />
                   Shuffle
@@ -1462,7 +1462,7 @@ export function WCAGColorPalette() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={exportToText}
-                  className="inline-flex items-center px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0d8b78] dark:hover:bg-[#0a7363] transition-all duration-300"
+                  className="inline-flex items-center px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300"
                 >
                   <FileText className="w-5 h-5 mr-2 text-white" />
                   Export as Text
@@ -1470,7 +1470,7 @@ export function WCAGColorPalette() {
                 </button>
                 <button
                   onClick={exportToPDF}
-                  className="inline-flex items-center px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0d8b78] dark:hover:bg-[#0a7363] transition-all duration-300"
+                  className="inline-flex items-center px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300"
                 >
                   <FileDown className="w-5 h-5 mr-2 text-white" />
                   Export as PDF
