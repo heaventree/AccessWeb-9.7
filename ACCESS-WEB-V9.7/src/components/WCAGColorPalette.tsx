@@ -1273,7 +1273,7 @@ export function WCAGColorPalette() {
             <div className="flex-1">
               <div className="flex items-center mb-2">
                 <Palette className="w-5 h-5 mr-2 text-primary-600" />
-                <label htmlFor="baseColor" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="baseColor" className="block text-sm font-medium text-gray-700 dark:text-white">
                   Base Color
                 </label>
               </div>
