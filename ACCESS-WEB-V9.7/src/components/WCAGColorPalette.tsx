@@ -1356,9 +1356,9 @@ export function WCAGColorPalette() {
 
         {/* Generated Palette */}
         {generatedPalette.length > 0 && (
-          <div className="border-2 border-dashed border-secondary-100 rounded-lg p-6 mb-8 bg-white shadow-md relative">
-            <div className="absolute -top-3 left-4 bg-white px-2">
-              <span className="text-xs font-medium text-secondary-600 uppercase tracking-wider">Generated Palette</span>
+          <div className="border-2 border-dashed border-secondary-100 dark:border-gray-700 rounded-lg p-6 mb-8 bg-white dark:bg-gray-800 shadow-md relative">
+            <div className="absolute -top-3 left-4 bg-white dark:bg-gray-800 px-2">
+              <span className="text-xs font-medium text-secondary-600 dark:text-secondary-400 uppercase tracking-wider">Generated Palette</span>
             </div>
             
             <div className="flex justify-between items-center gap-4 mb-6">
@@ -1451,9 +1451,9 @@ export function WCAGColorPalette() {
                   }}
                   disabled={isGenerating}
                   aria-label="Shuffle colors"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
-                  <Shuffle className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                  <Shuffle className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${isGenerating ? 'animate-spin' : ''}`} />
                   Shuffle
                 </button>
               </div>
@@ -1462,17 +1462,17 @@ export function WCAGColorPalette() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={exportToText}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
-                  <FileText className="w-5 h-5 mr-2" />
+                  <FileText className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" />
                   Export as Text
                   <span className={proPillStyle}>PRO</span>
                 </button>
                 <button
                   onClick={exportToPDF}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
-                  <FileDown className="w-5 h-5 mr-2" />
+                  <FileDown className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" />
                   Export as PDF
                   <span className={proPillStyle}>PRO</span>
                 </button>
