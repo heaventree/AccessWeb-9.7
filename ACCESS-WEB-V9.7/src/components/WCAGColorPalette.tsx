@@ -1185,59 +1185,15 @@ export function WCAGColorPalette() {
             
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
               <button
-                onClick={() => {
-                  setColorHarmony('all');
-                  const newPalette = generateAccessiblePalette(baseColor, 'all');
-                  
-                  // Create a map of locked colors from current palette
-                  const lockedColors = new Map();
-                  generatedPalette.forEach(combo => {
-                    if (combo.isLocked) {
-                      lockedColors.set(combo.background, true);
-                    }
-                  });
-                  
-                  // Ensure main color is locked and preserve other locked colors
-                  const updatedPalette = newPalette.map((combo, index) => {
-                    // Always lock the main color or previously locked colors
-                    if (index === 0 || lockedColors.has(combo.background)) {
-                      return { ...combo, isLocked: true };
-                    }
-                    return combo;
-                  });
-                  
-                  setGeneratedPalette(updatedPalette);
-                }}
+                onClick={() => changeColorHarmony('all')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'all' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
                 }`}
               >
                 All Harmonies
               </button>
-              <button
-                onClick={() => {
-                  setColorHarmony('complementary');
-                  const newPalette = generateAccessiblePalette(baseColor, 'complementary');
-                  
-                  // Create a map of locked colors from current palette
-                  const lockedColors = new Map();
-                  generatedPalette.forEach(combo => {
-                    if (combo.isLocked) {
-                      lockedColors.set(combo.background, true);
-                    }
-                  });
-                  
-                  // Ensure main color is locked and preserve other locked colors
-                  const updatedPalette = newPalette.map((combo, index) => {
-                    // Always lock the main color or previously locked colors
-                    if (index === 0 || lockedColors.has(combo.background)) {
-                      return { ...combo, isLocked: true };
-                    }
-                    return combo;
-                  });
-                  
-                  setGeneratedPalette(updatedPalette);
-                }}
+              <button 
+                onClick={() => changeColorHarmony('complementary')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
                   colorHarmony === 'complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
                 }`}
