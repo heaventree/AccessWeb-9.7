@@ -1278,7 +1278,7 @@ export function WCAGColorPalette() {
                 </label>
               </div>
               <div className="flex items-center gap-4">
-                <div className="relative h-12 w-12 rounded-full overflow-hidden shadow-md border-2 border-gray-300 dark:border-gray-700 hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
+                <div className="relative h-12 w-12 rounded-full overflow-hidden shadow-md border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
                   <input
                     type="color"
                     id="baseColor"
