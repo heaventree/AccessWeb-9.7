@@ -1278,14 +1278,18 @@ export function WCAGColorPalette() {
                 </label>
               </div>
               <div className="flex items-center gap-4">
-                <div className="h-12 w-20 rounded-lg overflow-hidden shadow-sm border-2 border-gray-300 dark:border-gray-700 hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
+                <div className="relative h-12 w-12 rounded-full overflow-hidden shadow-md border-2 border-gray-300 dark:border-gray-700 hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
                   <input
                     type="color"
                     id="baseColor"
                     value={baseColor}
                     onChange={handleBaseColorChange}
-                    className="h-full w-full cursor-pointer"
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                   />
+                  <div 
+                    className="absolute inset-0"
+                    style={{ backgroundColor: baseColor }}
+                  ></div>
                 </div>
                 <div className="flex flex-1">
                   <input
