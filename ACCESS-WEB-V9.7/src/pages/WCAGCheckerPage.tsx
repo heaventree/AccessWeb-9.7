@@ -55,6 +55,7 @@ export function WCAGCheckerPage() {
   const handleSubmit = async (url: string) => {
     // Normalize the URL (ensure it has a protocol)
     const normalizedUrl = normalizeUrl(url);
+    console.log(`Submitting URL for testing: ${normalizedUrl}`);
     
     setIsLoading(true);
     setError(null);
