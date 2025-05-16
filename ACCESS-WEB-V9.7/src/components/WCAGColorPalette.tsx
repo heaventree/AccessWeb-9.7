@@ -902,17 +902,28 @@ export function WCAGColorPalette() {
         // Generate new palette with the selected harmony
         const newPalette = generateAccessiblePalette(baseColor, newHarmony);
         
-        // Apply locked positions from the current state
+        // Keep track of which indices were locked in the original palette
+        const lockedIndices: number[] = [];
+        for (let i = 0; i < generatedPalette.length; i++) {
+          if (generatedPalette[i].isLocked) {
+            lockedIndices.push(i);
+            console.log(`Preserving lock for index ${i}`);
+          }
+        }
+        
+        // Apply locked status from original palette to new palette
         const updatedPalette = newPalette.map((combo, index) => {
-          // Check if this position is locked based on lockedPositions array
-          const isPositionLocked = index < lockedPositions.length ? lockedPositions[index] : (index === 0);
+          // Always lock the first color (base color)
+          // Or lock if the index was locked in the original palette
+          const shouldBeLocked = index === 0 || lockedIndices.includes(index);
           
           return {
             ...combo,
-            isLocked: isPositionLocked
+            isLocked: shouldBeLocked
           };
         });
         
+        console.log('Harmony changed, locked indices preserved:', lockedIndices);
         setGeneratedPalette(updatedPalette);
       } catch (error) {
         console.error('Error changing color harmony:', error);
@@ -1063,14 +1074,6 @@ export function WCAGColorPalette() {
       });
       
       setGeneratedPalette(updatedPalette);
-      
-      // Ensure lockedPositions also reflects this
-      const newLockedPositions = [...lockedPositions];
-      if (newLockedPositions.length > 0) {
-        newLockedPositions[0] = true;
-        setLockedPositions(newLockedPositions);
-      }
-      
       return; // Exit early - don't toggle the main color
     }
     
@@ -1086,16 +1089,7 @@ export function WCAGColorPalette() {
     });
     
     setGeneratedPalette(updatedPalette);
-    
-    // Update lockedPositions array to match
-    const newLockedPositions = [...lockedPositions];
-    // Make sure the array is long enough
-    while (newLockedPositions.length < generatedPalette.length) {
-      newLockedPositions.push(false);
-    }
-    // Toggle the lock state for this index
-    newLockedPositions[index] = !newLockedPositions[index];
-    setLockedPositions(newLockedPositions);
+    console.log('Color lock toggled at index:', index);
   };
 
   const toggleDarkMode = () => {
