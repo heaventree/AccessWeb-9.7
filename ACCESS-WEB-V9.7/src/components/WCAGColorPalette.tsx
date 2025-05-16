@@ -1291,10 +1291,11 @@ export function WCAGColorPalette() {
                     style={{ backgroundColor: baseColor }}
                   ></div>
                 </div>
-                <div className="flex flex-1">
+                <div className="flex">
                   <input
                     type="text"
                     value={baseColor}
+                    className="w-24 px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-500 dark:focus:border-[#5eead4] focus:ring-1 focus:ring-primary-500 dark:focus:ring-[#5eead4] outline-none"
                     onChange={(e) => {
                       const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
                       if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
@@ -1333,7 +1334,6 @@ export function WCAGColorPalette() {
                         setGeneratedPalette(updatedPalette);
                       }
                     }}
-                    className="px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-1"
                     placeholder="#000000"
                   />
                   <button
