@@ -1174,19 +1174,19 @@ export function WCAGColorPalette() {
 
         {isGenerating && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
               <LoadingSpinner size="large" className="mb-4" />
-              <p className="text-gray-900 font-medium">Generating Color Palette...</p>
+              <p className="text-gray-900 dark:text-gray-100 font-medium">Generating Color Palette...</p>
             </div>
           </div>
         )}
 
         {/* Generator Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 border-2 border-primary-100 relative">
-          <div className="absolute -top-3 left-4 bg-white px-2">
-            <span className="text-xs font-medium text-primary-600 uppercase tracking-wider">Palette Generator</span>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border-2 border-primary-100 dark:border-gray-700 relative">
+          <div className="absolute -top-3 left-4 bg-white dark:bg-gray-800 px-2">
+            <span className="text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">Palette Generator</span>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 mt-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 mt-2">
             <div className="flex items-center justify-between">
               <span>Generate Custom Palette</span>
             </div>
@@ -1194,7 +1194,7 @@ export function WCAGColorPalette() {
           
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Color Harmony
               </label>
             </div>
@@ -1203,7 +1203,9 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('all')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'all' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                  colorHarmony === 'all' 
+                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700'
+                    : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                 }`}
               >
                 All Harmonies
@@ -1211,7 +1213,7 @@ export function WCAGColorPalette() {
               <button 
                 onClick={() => changeColorHarmony('complementary')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                  colorHarmony === 'complementary' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                 }`}
               >
                 Complementary
@@ -1219,7 +1221,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('analogous')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'analogous' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                  colorHarmony === 'analogous' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                 }`}
               >
                 Analogous
@@ -1227,7 +1229,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('triadic')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'triadic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                  colorHarmony === 'triadic' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                 }`}
               >
                 Triadic
@@ -1235,7 +1237,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('split-complementary')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'split-complementary' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                  colorHarmony === 'split-complementary' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                 }`}
               >
                 Split Comp
@@ -1243,7 +1245,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('monochromatic')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'monochromatic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                  colorHarmony === 'monochromatic' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                 }`}
               >
                 Monochromatic
@@ -1251,7 +1253,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('tetradic')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'tetradic' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                  colorHarmony === 'tetradic' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                 }`}
               >
                 Tetradic
@@ -1259,7 +1261,7 @@ export function WCAGColorPalette() {
               <button
                 onClick={() => changeColorHarmony('square')}
                 className={`p-2 text-sm rounded-lg transition-colors ${
-                  colorHarmony === 'square' ? 'bg-blue-100 text-blue-700 border border-blue-300' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                  colorHarmony === 'square' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                 }`}
               >
                 Square
@@ -1362,14 +1364,6 @@ export function WCAGColorPalette() {
             <div className="flex justify-between items-center gap-4 mb-6">
               {/* Left side - Control buttons */}
               <div className="flex items-center gap-2">
-                <button
-                  onClick={toggleDarkMode}
-                  aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
-                >
-                  {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                </button>
-                
                 <button
                   onClick={() => {
                     setIsGenerating(true);
