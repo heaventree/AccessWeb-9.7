@@ -837,12 +837,15 @@ function determineColorName(baseHsl: { h: number, s: number, l: number }, colorH
 const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold inline-flex items-center scale-[0.85] origin-left";
 
 export function WCAGColorPalette() {
+  const { theme } = useTheme();
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const [baseColor, setBaseColor] = useState('#1a365d');
   const [generatedPalette, setGeneratedPalette] = useState<ColorCombination[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [colorHarmony, setColorHarmony] = useState<ColorHarmony>('all');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Get dark mode from theme provider instead of local state
+  const isDarkMode = theme === 'dark';
   
   // Store an array of boolean flags indicating which positions are locked
   // This helps preserve locked status when changing harmony types
@@ -1095,9 +1098,7 @@ export function WCAGColorPalette() {
     console.log('Color lock toggled at index:', index);
   };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+  // Dark mode now managed by ThemeProvider
 
   const getLevelBadgeColor = (level: 'AAA' | 'AA' | 'Fail') => {
     switch (level) {
@@ -1158,13 +1159,13 @@ export function WCAGColorPalette() {
   };
 
   return (
-    <div>
+    <div className="dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             WCAG Color Palette Generator
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             Generate accessible color combinations that meet WCAG 2.1 and 2.2 contrast requirements.
             Our algorithm creates diverse palettes using multiple color harmonies including complementary, analogous, triadic, 
             monochromatic, tetradic, square, and split-complementary.
