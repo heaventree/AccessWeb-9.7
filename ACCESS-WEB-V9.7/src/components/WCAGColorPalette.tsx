@@ -1462,17 +1462,17 @@ export function WCAGColorPalette() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={exportToText}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  className="inline-flex items-center px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300"
                 >
-                  <FileText className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" />
+                  <FileText className="w-5 h-5 mr-2 text-white" />
                   Export as Text
                   <span className={proPillStyle}>PRO</span>
                 </button>
                 <button
                   onClick={exportToPDF}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  className="inline-flex items-center px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300"
                 >
-                  <FileDown className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" />
+                  <FileDown className="w-5 h-5 mr-2 text-white" />
                   Export as PDF
                   <span className={proPillStyle}>PRO</span>
                 </button>
