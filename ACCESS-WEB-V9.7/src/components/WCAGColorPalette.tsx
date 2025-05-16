@@ -1451,9 +1451,9 @@ export function WCAGColorPalette() {
                   }}
                   disabled={isGenerating}
                   aria-label="Shuffle colors"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  className="inline-flex items-center gap-2 px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300"
                 >
-                  <Shuffle className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${isGenerating ? 'animate-spin' : ''}`} />
+                  <Shuffle className={`w-4 h-4 text-white ${isGenerating ? 'animate-spin' : ''}`} />
                   Shuffle
                 </button>
               </div>
