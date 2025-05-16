@@ -1361,7 +1361,7 @@ export function WCAGColorPalette() {
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0fae96] dark:bg-[#0fae96] text-white uppercase tracking-wider shadow-sm">Generated Palette</span>
             </div>
             
-            <div className="flex justify-between items-center gap-4 mb-6">
+            <div className="flex justify-between items-center gap-4 mb-6 mt-8">
               {/* Left side - Control buttons */}
               <div className="flex items-center gap-2">
                 <button
