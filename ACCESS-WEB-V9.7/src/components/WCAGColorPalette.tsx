@@ -840,7 +840,7 @@ const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r fro
 export function WCAGColorPalette() {
   const { theme } = useTheme();
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
-  const [baseColor, setBaseColor] = useState('#0fae96');
+  const [baseColor, setBaseColor] = useState('#FF5733');
   const [generatedPalette, setGeneratedPalette] = useState<ColorCombination[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [colorHarmony, setColorHarmony] = useState<ColorHarmony>('all');
@@ -1288,8 +1288,8 @@ export function WCAGColorPalette() {
                       className="absolute inset-0"
                       style={{ backgroundColor: baseColor }}
                     ></div>
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 opacity-0 hover:opacity-100 transition-opacity">
-                      <Pencil className="w-3 h-3 text-white" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+                      <Pencil className="w-4 h-4 text-white" />
                     </div>
                   </div>
                 </div>
