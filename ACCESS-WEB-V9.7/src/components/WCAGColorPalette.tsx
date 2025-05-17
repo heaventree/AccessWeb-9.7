@@ -1162,15 +1162,22 @@ export function WCAGColorPalette() {
   return (
     <div>
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            WCAG Color Palette Generator
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300">
-            Generate accessible color combinations that meet WCAG 2.1 and 2.2 contrast requirements.
-            Our algorithm creates diverse palettes using multiple color harmonies including complementary, analogous, triadic, 
-            monochromatic, tetradic, square, and split-complementary.
-          </p>
+        <div className="grid grid-cols-3 gap-6 mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+              Website Accessibility
+            </h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              Colour Palette Generator
+            </h2>
+          </div>
+          <div className="col-span-2">
+            <p className="text-gray-600 dark:text-gray-300">
+              Generate accessible color combinations that meet WCAG 2.1 and 2.2 contrast requirements.
+              Our algorithm creates diverse palettes using multiple color harmonies including complementary, analogous, triadic, 
+              monochromatic, tetradic, square, and split-complementary.
+            </p>
+          </div>
         </div>
 
         {isGenerating && (
