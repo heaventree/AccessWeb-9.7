@@ -1191,7 +1191,7 @@ export function WCAGColorPalette() {
         )}
 
         {/* Generator Section */}
-        <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-slate-700 relative">
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md p-8 mb-12 border border-gray-200 dark:border-slate-700 relative">
           <div className="absolute -top-3 left-4">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0fae96] text-white uppercase tracking-wider shadow-sm">PALETTE GENERATOR</span>
           </div>
@@ -1199,11 +1199,11 @@ export function WCAGColorPalette() {
           <div className="grid grid-cols-3 gap-6 mt-4">
             {/* Left column - Colour Harmony (2/3 width) */}
             <div className="col-span-2">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
                 Colour Harmony
               </h3>
               
-              <div className="grid grid-cols-4 gap-2 mb-4">
+              <div className="grid grid-cols-4 gap-3 mb-6">
                 <button
                   onClick={() => changeColorHarmony('all')}
                   className={`p-2 text-sm rounded-full transition-colors ${
@@ -1240,7 +1240,7 @@ export function WCAGColorPalette() {
                 </button>
               </div>
               
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 gap-3">
                 <button
                   onClick={() => changeColorHarmony('split-complementary')}
                   className={`p-2 text-sm rounded-full transition-colors ${
@@ -1278,11 +1278,11 @@ export function WCAGColorPalette() {
             
             {/* Right column - Base Colour (1/3 width) */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
                 Base Colour
               </h3>
               
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-4 mb-6">
                 <div className="flex-none">
                   <label htmlFor="baseColor" className="cursor-pointer">
                     <div className="relative h-8 w-8 rounded-full overflow-hidden shadow-sm border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
