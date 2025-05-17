@@ -1162,7 +1162,7 @@ export function WCAGColorPalette() {
   return (
     <div>
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-2 gap-6 mb-16">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
               Website Accessibility
