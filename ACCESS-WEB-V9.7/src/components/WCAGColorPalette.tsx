@@ -1186,110 +1186,97 @@ export function WCAGColorPalette() {
           <div className="absolute -top-3 left-4">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0fae96] dark:bg-[#0fae96] text-white uppercase tracking-wider shadow-sm">Palette Generator</span>
           </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 mt-2">
+            <div className="flex items-center justify-between">
+              <span>Colour Harmony</span>
+            </div>
+          </h3>
           
-          {/* Grid layout for Colour Harmony and Base Colour sections */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-4">
-            {/* Left side - Colour Harmony section */}
-            <div className="md:col-span-8">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                <span>Colour Harmony</span>
-              </h3>
-              
-              {/* First row of harmony buttons */}
-              <div className="grid grid-cols-4 gap-2 mb-2">
-                <button
-                  onClick={() => changeColorHarmony('all')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
-                    colorHarmony === 'all' 
-                      ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50'
-                      : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
-                  }`}
-                >
-                  All Harmonies
-                </button>
-                <button 
-                  onClick={() => changeColorHarmony('complementary')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
-                    colorHarmony === 'complementary' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
-                  }`}
-                >
-                  Complementary
-                </button>
-                <button
-                  onClick={() => changeColorHarmony('analogous')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
-                    colorHarmony === 'analogous' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
-                  }`}
-                >
-                  Analogous
-                </button>
-                <button
-                  onClick={() => changeColorHarmony('triadic')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
-                    colorHarmony === 'triadic' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
-                  }`}
-                >
-                  Triadic
-                </button>
-              </div>
-              
-              {/* Second row of harmony buttons */}
-              <div className="grid grid-cols-4 gap-2">
-                <button
-                  onClick={() => changeColorHarmony('split-complementary')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
-                    colorHarmony === 'split-complementary' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
-                  }`}
-                >
-                  Split Comp
-                </button>
-                <button
-                  onClick={() => changeColorHarmony('monochromatic')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
-                    colorHarmony === 'monochromatic' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
-                  }`}
-                >
-                  Monochromatic
-                </button>
-                <button
-                  onClick={() => changeColorHarmony('tetradic')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
-                    colorHarmony === 'tetradic' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
-                  }`}
-                >
-                  Tetradic
-                </button>
-                <button
-                  onClick={() => changeColorHarmony('square')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
-                    colorHarmony === 'square' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
-                  }`}
-                >
-                  Square
-                </button>
-              </div>
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              {/* Harmony selector buttons below */}
             </div>
             
-            {/* Right side - Base Colour section */}
-            <div className="md:col-span-4">
-              <div className="flex justify-between items-start mb-3">
-                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                  <span>Base Colour</span>
-                </h3>
-                
-                {/* Generate button */}
-                <button
-                  onClick={generateNewPalette}
-                  disabled={isGenerating}
-                  className="inline-flex items-center gap-1 px-3 py-1 border-none rounded-full shadow-sm text-xs font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] dark:bg-[#0fae96] dark:hover:bg-[#0d9a85] disabled:opacity-50 transition-colors"
-                >
-                  <RefreshCw className={`w-3 h-3 ${isGenerating ? 'animate-spin' : ''}`} />
-                  Generate
-                </button>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+              <button
+                onClick={() => changeColorHarmony('all')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'all' 
+                    ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50'
+                    : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
+                }`}
+              >
+                All Harmonies
+              </button>
+              <button 
+                onClick={() => changeColorHarmony('complementary')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'complementary' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
+                }`}
+              >
+                Complementary
+              </button>
+              <button
+                onClick={() => changeColorHarmony('analogous')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'analogous' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
+                }`}
+              >
+                Analogous
+              </button>
+              <button
+                onClick={() => changeColorHarmony('triadic')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'triadic' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
+                }`}
+              >
+                Triadic
+              </button>
+              <button
+                onClick={() => changeColorHarmony('split-complementary')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'split-complementary' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
+                }`}
+              >
+                Split Comp
+              </button>
+              <button
+                onClick={() => changeColorHarmony('monochromatic')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'monochromatic' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
+                }`}
+              >
+                Monochromatic
+              </button>
+              <button
+                onClick={() => changeColorHarmony('tetradic')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'tetradic' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
+                }`}
+              >
+                Tetradic
+              </button>
+              <button
+                onClick={() => changeColorHarmony('square')}
+                className={`p-2 text-sm rounded-lg transition-colors ${
+                  colorHarmony === 'square' ? 'bg-teal-100 dark:bg-[#0fae96]/20 text-teal-800 dark:text-[#5eead4] border border-teal-300 dark:border-[#0fae96]/50' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
+                }`}
+              >
+                Square
+              </button>
+            </div>
+          </div>
+          
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex-1">
+              <div className="flex items-center mb-2">
+                <Palette className="w-5 h-5 mr-2 text-primary-600 dark:text-[#5eead4]" />
+                <label htmlFor="baseColor" className="block text-sm font-medium text-gray-700 dark:text-white">
+                  Base Color
+                </label>
               </div>
-              
-              <div className="flex items-center gap-2 flex-wrap">
-                <div className="relative h-10 w-10 rounded-full overflow-hidden shadow-md border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
+              <div className="flex items-center gap-4">
+                <div className="relative h-12 w-12 rounded-full overflow-hidden shadow-md border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
                   <input
                     type="color"
                     id="baseColor"
@@ -1302,11 +1289,12 @@ export function WCAGColorPalette() {
                     style={{ backgroundColor: baseColor }}
                   ></div>
                 </div>
-                <input
-                  type="text"
-                  value={baseColor}
-                  className="w-24 px-3 py-1 text-sm rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-500 dark:focus:border-[#5eead4] focus:ring-1 focus:ring-primary-500 dark:focus:ring-[#5eead4] outline-none"
-                  onChange={(e) => {
+                <div className="flex">
+                  <input
+                    type="text"
+                    value={baseColor}
+                    className="w-24 px-3 py-1 text-sm rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-500 dark:focus:border-[#5eead4] focus:ring-1 focus:ring-primary-500 dark:focus:ring-[#5eead4] outline-none"
+                    onChange={(e) => {
                       const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
                       if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
                         setBaseColor(newColor);
@@ -1356,18 +1344,29 @@ export function WCAGColorPalette() {
                 </div>
               </div>
             </div>
+            
+            <div className="flex items-end gap-2">
+              <button
+                onClick={generateNewPalette}
+                disabled={isGenerating}
+                className="inline-flex items-center gap-2 px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] dark:bg-[#0fae96] dark:hover:bg-[#0d9a85] disabled:opacity-50 transition-colors"
+              >
+                <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                Generate New
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Generated Palette */}
         {generatedPalette.length > 0 && (
-          <div className="border-2 border-primary-100 dark:border-gray-700 rounded-lg p-6 mb-12 bg-white dark:bg-gray-800 shadow-md relative">
+          <div className="border-2 border-dashed border-secondary-100 dark:border-gray-700 rounded-lg p-6 mb-8 bg-white dark:bg-gray-800 shadow-md relative">
             <div className="absolute -top-3 left-4">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0fae96] dark:bg-[#0fae96] text-white uppercase tracking-wider shadow-sm">Generated Palette</span>
             </div>
             
-            <div className="flex justify-between items-center gap-2 mb-6 mt-2">
-              {/* Control buttons */}
+            <div className="flex justify-between items-center gap-4 mb-6 mt-8">
+              {/* Left side - Control buttons */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
@@ -1656,5 +1655,3 @@ export function WCAGColorPalette() {
     </div>
   );
 }
-
-export default WCAGColorPalette;

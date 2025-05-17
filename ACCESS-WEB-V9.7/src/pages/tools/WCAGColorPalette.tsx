@@ -1,4 +1,4 @@
-import { WCAGColorPaletteFixed as ColorPaletteComponent } from '../../components/WCAGColorPaletteFixed';
+import { WCAGColorPalette as ColorPaletteComponent } from '../../components/WCAGColorPalette';
 
 export function WCAGColorPalette() {
   return (
