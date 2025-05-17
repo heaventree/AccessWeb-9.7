@@ -1205,35 +1205,43 @@ export function WCAGColorPalette() {
               <div className="grid grid-cols-4 gap-3 mb-6">
                 <button
                   onClick={() => changeColorHarmony('all')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
+                  className={`p-2 text-base rounded-full transition-colors ${
                     colorHarmony === 'all' 
                       ? 'bg-teal-100 dark:bg-[#0fae96] text-teal-800 dark:text-white border border-teal-300 dark:border-[#0fae96]'
                       : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
                   }`}
+                  aria-pressed={colorHarmony === 'all'}
+                  aria-label="All Harmonies"
                 >
                   All Harmonies
                 </button>
                 <button 
                   onClick={() => changeColorHarmony('complementary')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
+                  className={`p-2 text-base rounded-full transition-colors ${
                     colorHarmony === 'complementary' ? 'bg-teal-100 dark:bg-[#0fae96] text-teal-800 dark:text-white border border-teal-300 dark:border-[#0fae96]' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
                   }`}
+                  aria-pressed={colorHarmony === 'complementary'}
+                  aria-label="Complementary colours"
                 >
                   Complementary
                 </button>
                 <button
                   onClick={() => changeColorHarmony('analogous')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
+                  className={`p-2 text-base rounded-full transition-colors ${
                     colorHarmony === 'analogous' ? 'bg-teal-100 dark:bg-[#0fae96] text-teal-800 dark:text-white border border-teal-300 dark:border-[#0fae96]' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
                   }`}
+                  aria-pressed={colorHarmony === 'analogous'}
+                  aria-label="Analogous colours"
                 >
                   Analogous
                 </button>
                 <button
                   onClick={() => changeColorHarmony('triadic')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
+                  className={`p-2 text-base rounded-full transition-colors ${
                     colorHarmony === 'triadic' ? 'bg-teal-100 dark:bg-[#0fae96] text-teal-800 dark:text-white border border-teal-300 dark:border-[#0fae96]' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
                   }`}
+                  aria-pressed={colorHarmony === 'triadic'}
+                  aria-label="Triadic colours"
                 >
                   Triadic
                 </button>
@@ -1242,17 +1250,21 @@ export function WCAGColorPalette() {
               <div className="grid grid-cols-4 gap-3">
                 <button
                   onClick={() => changeColorHarmony('split-complementary')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
+                  className={`p-2 text-base rounded-full transition-colors ${
                     colorHarmony === 'split-complementary' ? 'bg-teal-100 dark:bg-[#0fae96] text-teal-800 dark:text-white border border-teal-300 dark:border-[#0fae96]' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
                   }`}
+                  aria-pressed={colorHarmony === 'split-complementary'}
+                  aria-label="Split complementary colours"
                 >
                   Split Comp
                 </button>
                 <button
                   onClick={() => changeColorHarmony('monochromatic')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
+                  className={`p-2 text-base rounded-full transition-colors ${
                     colorHarmony === 'monochromatic' ? 'bg-teal-100 dark:bg-[#0fae96] text-teal-800 dark:text-white border border-teal-300 dark:border-[#0fae96]' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
                   }`}
+                  aria-pressed={colorHarmony === 'monochromatic'}
+                  aria-label="Monochromatic colours"
                 >
                   Monochromatic
                 </button>
@@ -1288,11 +1300,13 @@ export function WCAGColorPalette() {
                       <div 
                         className="absolute inset-0"
                         style={{ backgroundColor: baseColor }}
+                        aria-hidden="true"
                       ></div>
                       <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 pointer-events-none">
-                        <Pencil className="w-4 h-4 text-white" />
+                        <Pencil className="w-4 h-4 text-white" aria-hidden="true" />
                       </div>
                     </div>
+                    <span className="sr-only">Select base colour</span>
                   </label>
                   <input
                     type="color"
@@ -1300,13 +1314,16 @@ export function WCAGColorPalette() {
                     value={baseColor}
                     onChange={handleBaseColorChange}
                     className="sr-only"
+                    aria-label="Base colour picker"
                   />
                 </div>
                 <div className="flex-1">
+                  <label htmlFor="baseColorHex" className="sr-only">Hex colour value</label>
                   <input
                     type="text"
+                    id="baseColorHex"
                     value={baseColor}
-                    className="w-full p-2 text-sm rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-500 dark:focus:border-[#5eead4] focus:ring-1 focus:ring-primary-500 dark:focus:ring-[#5eead4] outline-none text-center"
+                    className="w-full p-2 text-base rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-500 dark:focus:border-[#5eead4] focus:ring-1 focus:ring-primary-500 dark:focus:ring-[#5eead4] outline-none text-center"
                     onChange={(e) => {
                       const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
                       if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
