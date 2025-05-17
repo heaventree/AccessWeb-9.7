@@ -1274,8 +1274,8 @@ export function WCAGColorPalette() {
                 Base Colour
               </h3>
               
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                <div className="flex items-center justify-start">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex-none">
                   <div className="relative h-8 w-8 rounded-full overflow-hidden shadow-sm border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
                     <input
                       type="color"
@@ -1297,7 +1297,7 @@ export function WCAGColorPalette() {
                   <input
                     type="text"
                     value={baseColor}
-                    className="w-full p-2 text-sm rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-500 dark:focus:border-[#5eead4] focus:ring-1 focus:ring-primary-500 dark:focus:ring-[#5eead4] outline-none"
+                    className="w-full p-2 text-sm rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-500 dark:focus:border-[#5eead4] focus:ring-1 focus:ring-primary-500 dark:focus:ring-[#5eead4] outline-none text-center"
                     onChange={(e) => {
                       const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
                       if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
@@ -1339,7 +1339,7 @@ export function WCAGColorPalette() {
                     placeholder="#000000"
                   />
                 </div>
-                <div>
+                <div className="flex-1">
                   <button
                     onClick={clearGenerator}
                     className="w-full p-2 text-sm rounded-full transition-colors bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
