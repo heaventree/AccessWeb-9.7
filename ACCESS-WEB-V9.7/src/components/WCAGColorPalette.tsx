@@ -1173,8 +1173,8 @@ export function WCAGColorPalette() {
           </div>
           <div>
             <p className="text-gray-600 dark:text-gray-300">
-              Generate accessible color combinations that meet WCAG 2.1 and 2.2 contrast requirements.
-              Our algorithm creates diverse palettes using multiple color harmonies including complementary, analogous, triadic, 
+              Generate accessible colour combinations that meet WCAG 2.1 and 2.2 contrast requirements.
+              Our algorithm creates diverse palettes using multiple colour harmonies including complementary, analogous, triadic, 
               monochromatic, tetradic, square, and split-complementary.
             </p>
           </div>
@@ -1184,7 +1184,7 @@ export function WCAGColorPalette() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
               <LoadingSpinner size="large" className="mb-4" />
-              <p className="text-gray-900 dark:text-gray-100 font-medium">Generating Color Palette...</p>
+              <p className="text-gray-900 dark:text-gray-100 font-medium">Generating Colour Palette...</p>
             </div>
           </div>
         )}
@@ -1638,7 +1638,7 @@ export function WCAGColorPalette() {
                 <li>AAA level (Enhanced): 7:1 contrast ratio for normal text</li>
                 <li>AA level (Minimum): 4.5:1 contrast ratio for normal text</li>
                 <li>Large text (18pt+ or 14pt+ bold): 3:1 for AA, 4.5:1 for AAA</li>
-                <li>UI components and graphical objects: minimum 3:1 against adjacent colors</li>
+                <li>UI components and graphical objects: minimum 3:1 against adjacent colours</li>
                 <li>Focus indicators: minimum 3:1 contrast (WCAG 2.2, SC 2.4.11)</li>
                 <li>Target size: minimum 24x24 pixels (WCAG 2.2, SC 2.5.8)</li>
                 <li>Dragging movement: alternatives required (WCAG 2.2, SC 2.5.7)</li>
@@ -1647,18 +1647,18 @@ export function WCAGColorPalette() {
               <h4 className="font-medium text-[#0fae96] dark:text-[#5eead4] mt-6 mb-3">Why Contrast Matters</h4>
               <ul className="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-2">
                 <li>Improves readability for all users, especially in poor lighting</li>
-                <li>Essential for people with low vision or color blindness</li>
+                <li>Essential for people with low vision or colour blindness</li>
                 <li>Helps maintain usability when screens are viewed outdoors</li>
                 <li>Can reduce eye strain during prolonged usage</li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-medium text-[#0fae96] dark:text-[#5eead4] mb-3">Beyond Contrast: Color Best Practices</h4>
+              <h4 className="font-medium text-[#0fae96] dark:text-[#5eead4] mb-3">Beyond Contrast: Colour Best Practices</h4>
               <ul className="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-2">
-                <li>Never use color as the only means to convey information (WCAG 1.4.1)</li>
+                <li>Never use colour as the only means to convey information (WCAG 1.4.1)</li>
                 <li>Provide additional indicators like icons, patterns, or text labels</li>
-                <li>Test your palette with color blindness simulators</li>
+                <li>Test your palette with colour blindness simulators</li>
                 <li>Consider how your colors appear in high contrast modes</li>
                 <li>Maintain consistent color meaning throughout your interface</li>
                 <li>Limit your palette to 3-5 primary colors for better cohesion</li>
