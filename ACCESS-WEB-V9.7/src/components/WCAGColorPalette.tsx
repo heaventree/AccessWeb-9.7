@@ -1659,19 +1659,19 @@ export function WCAGColorPalette() {
                 <li>Never use colour as the only means to convey information (WCAG 1.4.1)</li>
                 <li>Provide additional indicators like icons, patterns, or text labels</li>
                 <li>Test your palette with colour blindness simulators</li>
-                <li>Consider how your colors appear in high contrast modes</li>
-                <li>Maintain consistent color meaning throughout your interface</li>
-                <li>Limit your palette to 3-5 primary colors for better cohesion</li>
+                <li>Consider how your colours appear in high contrast modes</li>
+                <li>Maintain consistent colour meaning throughout your interface</li>
+                <li>Limit your palette to 3-5 primary colours for better cohesion</li>
               </ul>
               
               <h4 className="font-medium text-[#0fae96] dark:text-[#5eead4] mt-6 mb-3">Implementation Tips</h4>
               <ul className="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-2">
                 <li>Use the generated palettes for complementary elements</li>
-                <li>Text over colored backgrounds should meet minimum contrast</li>
-                <li>Apply your base color to primary interactive elements</li>
+                <li>Text over coloured backgrounds should meet minimum contrast</li>
+                <li>Apply your base colour to primary interactive elements</li>
                 <li>Save AAA combinations for critical content and navigation</li>
                 <li>Test your design in different lighting conditions</li>
-                <li>Document your color system for consistent implementation</li>
+                <li>Document your colour system for consistent implementation</li>
               </ul>
             </div>
           </div>
