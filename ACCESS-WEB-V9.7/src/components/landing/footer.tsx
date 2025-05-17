@@ -14,30 +14,6 @@ export default function Footer() {
   return (
     <footer className="bg-[#f9fdff] dark:bg-gray-900 pt-24 pb-8 border-t border-gray-100 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Newsletter signup */}
-        <div className="bg-white dark:bg-gray-800 p-10 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h3 className="text-2xl font-bold mb-3 dark:text-white">Stay updated on accessibility</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Get the latest accessibility news, compliance tips, and product updates delivered to your inbox.
-              </p>
-            </div>
-            <div>
-              <form className="flex flex-col sm:flex-row gap-3">
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="rounded-full px-5 py-6 border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 flex-grow"
-                  required
-                />
-                <Button type="submit" className="rounded-full bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 py-6 whitespace-nowrap">
-                  Subscribe <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </form>
-            </div>
-          </div>
-        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-16">
           <div className="md:col-span-1">
