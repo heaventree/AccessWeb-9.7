@@ -1279,7 +1279,7 @@ export function WCAGColorPalette() {
                 Base Colour
               </h3>
               
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-4 mb-4">
                 <div className="relative h-12 w-12 rounded-full overflow-hidden shadow-md border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
                   <input
                     type="color"
@@ -1297,7 +1297,7 @@ export function WCAGColorPalette() {
                   <input
                     type="text"
                     value={baseColor}
-                    className="w-full p-2 text-sm rounded-full border border-gray-300 dark:border-gray-600 dark:bg-[#1D3640] dark:text-gray-300 focus:border-primary-500 dark:focus:border-[#5eead4] focus:ring-1 focus:ring-primary-500 dark:focus:ring-[#5eead4] outline-none"
+                    className="w-full px-3 py-1 text-sm rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-500 dark:focus:border-[#5eead4] focus:ring-1 focus:ring-primary-500 dark:focus:ring-[#5eead4] outline-none"
                     onChange={(e) => {
                       const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
                       if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
@@ -1339,23 +1339,25 @@ export function WCAGColorPalette() {
                     placeholder="#000000"
                   />
                 </div>
+              </div>
+              
+              <div className="flex justify-between">
                 <button
                   onClick={clearGenerator}
-                  className="p-2 text-sm rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#24404a] transition-colors"
+                  className="px-3 py-1 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                   aria-label="Clear color palette"
                 >
                   Clear
                 </button>
-              </div>
-              
-              <button
-                onClick={generateNewPalette}
-                disabled={isGenerating}
-                className="w-full inline-flex items-center justify-center gap-2 p-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] dark:bg-[#0fae96] dark:hover:bg-[#0d9a85] disabled:opacity-50 transition-colors"
-              >
-                <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
-                Generate New
-              </button>
+                
+                <button
+                  onClick={generateNewPalette}
+                  disabled={isGenerating}
+                  className="inline-flex items-center gap-2 px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] dark:bg-[#0fae96] dark:hover:bg-[#0d9a85] disabled:opacity-50 transition-colors"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                  Generate New
+                </button>
               </div>
             </div>
           </div>
