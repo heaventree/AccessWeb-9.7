@@ -1296,7 +1296,7 @@ export function WCAGColorPalette() {
                       className="absolute inset-0"
                       style={{ backgroundColor: baseColor }}
                     ></div>
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 pointer-events-none">
                       <Pencil className="w-4 h-4 text-white" />
                     </div>
                   </div>
