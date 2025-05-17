@@ -19,6 +19,36 @@ import type { ChangeEvent } from 'react';
 // Define our harmony type
 type ColorHarmony = 'all' | 'complementary' | 'analogous' | 'triadic' | 'split-complementary' | 'monochromatic' | 'tetradic' | 'square';
 
+interface ColorRGB {
+  r: number;
+  g: number;
+  b: number;
+}
+
+interface ColorHSL {
+  h: number;
+  s: number;
+  l: number;
+}
+
+interface ContrastResult {
+  ratio: number;
+  wcagLevel: string;
+  isLargeText: boolean;
+}
+
+interface ColorCombination {
+  name: string;
+  background: string;
+  text: string;
+  ratio: number;
+  wcagLevel: string;
+  wcagLarge: string;
+  isBaseColor?: boolean;
+  harmonyType?: string;
+  isLocked?: boolean;
+}
+
 // This is a simplified version that implements the new UI design
 export function WCAGColorPaletteFixed() {
   const { theme } = useTheme();
@@ -27,22 +57,23 @@ export function WCAGColorPaletteFixed() {
   const [showColorNames, setShowColorNames] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [generatedPalette, setGeneratedPalette] = useState<ColorCombination[]>([]);
+  const [copiedColor, setCopiedColor] = useState<string | null>(null);
   
   // Get dark mode from theme provider
   const isDarkMode = theme === 'dark';
   
-  // Mock functions
+  // Color utility functions would be defined here...
+  // This is a simplified implementation
+
   const toggleDarkMode = () => {
-    // We access document directly as a workaround since setTheme isn't available
-    if (isDarkMode) {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
+    // We access document directly as a workaround
+    document.documentElement.classList.toggle('dark');
   };
   
   const changeColorHarmony = (harmony: ColorHarmony) => {
     setColorHarmony(harmony);
+    generateNewPalette();
   };
   
   const handleBaseColorChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -50,19 +81,56 @@ export function WCAGColorPaletteFixed() {
   };
   
   const clearGenerator = () => {
-    // Reset logic
+    setBaseColor('#1a365d');
+    setGeneratedPalette([]);
   };
   
   const generateNewPalette = () => {
     setIsGenerating(true);
+    
     // Simulate generation
     setTimeout(() => {
+      const mockPalette = [
+        {
+          name: "Base Color",
+          background: baseColor,
+          text: "#FFFFFF",
+          ratio: 7.2,
+          wcagLevel: "AAA",
+          wcagLarge: "AAA",
+          isBaseColor: true,
+          harmonyType: "Base"
+        },
+        {
+          name: "Complementary",
+          background: "#d53f8c",
+          text: "#FFFFFF",
+          ratio: 5.1,
+          wcagLevel: "AA",
+          wcagLarge: "AAA",
+          isBaseColor: false,
+          harmonyType: "Complementary"
+        },
+        {
+          name: "Analogous",
+          background: "#38a169",
+          text: "#FFFFFF",
+          ratio: 4.8,
+          wcagLevel: "AA",
+          wcagLarge: "AAA",
+          isBaseColor: false,
+          harmonyType: "Analogous"
+        }
+      ];
+      
+      setGeneratedPalette(mockPalette);
       setIsGenerating(false);
-    }, 500);
+    }, 800);
   };
   
   const shufflePalette = () => {
-    // Shuffle logic
+    // Shuffle logic would be implemented here
+    generateNewPalette();
   };
   
   const toggleColorNames = () => {
@@ -75,6 +143,25 @@ export function WCAGColorPaletteFixed() {
       setIsExporting(false);
     }, 500);
   };
+
+  const copyColorToClipboard = (hex: string) => {
+    navigator.clipboard.writeText(hex);
+    setCopiedColor(hex);
+    setTimeout(() => setCopiedColor(null), 2000);
+  };
+
+  const toggleLock = (index: number) => {
+    setGeneratedPalette(prev => 
+      prev.map((combo, i) => 
+        i === index ? { ...combo, isLocked: !combo.isLocked } : combo
+      )
+    );
+  };
+
+  // Generate initial palette on component mount
+  useEffect(() => {
+    generateNewPalette();
+  }, []);
 
   return (
     <div className="w-full max-w-7xl mx-auto">
@@ -219,7 +306,7 @@ export function WCAGColorPaletteFixed() {
           </div>
         </div>
 
-        {/* Generated Palette Section (Placeholder) */}
+        {/* Generated Palette Section */}
         <div className="border-2 border-primary-100 dark:border-gray-700 rounded-lg p-6 mb-12 bg-white dark:bg-gray-800 shadow-md relative">
           <div className="absolute -top-3 left-4">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0fae96] dark:bg-[#0fae96] text-white uppercase tracking-wider shadow-sm">Generated Palette</span>
@@ -264,18 +351,75 @@ export function WCAGColorPaletteFixed() {
             </div>
           </div>
           
-          {/* Sample color palette display (placeholder) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-            <div className="bg-blue-500 h-24 rounded-lg flex items-end p-3">
-              <span className="text-white font-semibold">#1a365d</span>
+          {isGenerating ? (
+            <div className="flex justify-center items-center p-12">
+              <RefreshCw className="w-8 h-8 animate-spin text-[#0fae96]" />
             </div>
-            <div className="bg-pink-500 h-24 rounded-lg flex items-end p-3">
-              <span className="text-white font-semibold">#d53f8c</span>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+              {generatedPalette.map((combo, index) => (
+                <div 
+                  key={index}
+                  style={{ backgroundColor: combo.background }}
+                  className="h-32 rounded-lg flex flex-col justify-between p-4 relative"
+                >
+                  {/* Upper controls */}
+                  <div className="flex justify-between">
+                    {/* Color name badge */}
+                    {showColorNames && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200">
+                        {combo.harmonyType}
+                      </span>
+                    )}
+                    
+                    {/* Lock button */}
+                    <button
+                      onClick={() => toggleLock(index)}
+                      className="w-8 h-8 flex items-center justify-center rounded-full bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700"
+                    >
+                      {combo.isLocked ? (
+                        <Lock className="w-4 h-4 text-[#0fae96]" />
+                      ) : (
+                        <Unlock className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* Lower info */}
+                  <div className="flex justify-between items-end">
+                    <span className="font-semibold" style={{ color: combo.text }}>
+                      {combo.background.toUpperCase()}
+                    </span>
+                    
+                    {/* Copy button */}
+                    <button
+                      onClick={() => copyColorToClipboard(combo.background)}
+                      className="w-8 h-8 flex items-center justify-center rounded-full bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700"
+                    >
+                      {copiedColor === combo.background ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* WCAG rating */}
+                  <div className="absolute bottom-2 right-2">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                      combo.wcagLevel === 'AAA' 
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' 
+                        : combo.wcagLevel === 'AA' 
+                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'
+                    }`}>
+                      {combo.wcagLevel}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="bg-green-500 h-24 rounded-lg flex items-end p-3">
-              <span className="text-white font-semibold">#38a169</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
