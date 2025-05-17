@@ -1632,8 +1632,8 @@ export function WCAGColorPalette() {
           
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Contrast Requirements (WCAG 2.1 & 2.2)</h4>
-              <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2">
+              <h4 className="font-medium text-[#0fae96] dark:text-[#5eead4] mb-3">Contrast Requirements (WCAG 2.1 & 2.2)</h4>
+              <ul className="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-2">
                 <li>AAA level (Enhanced): 7:1 contrast ratio for normal text</li>
                 <li>AA level (Minimum): 4.5:1 contrast ratio for normal text</li>
                 <li>Large text (18pt+ or 14pt+ bold): 3:1 for AA, 4.5:1 for AAA</li>
@@ -1643,8 +1643,8 @@ export function WCAGColorPalette() {
                 <li>Dragging movement: alternatives required (WCAG 2.2, SC 2.5.7)</li>
               </ul>
               
-              <h4 className="font-medium text-gray-900 dark:text-gray-100 mt-6 mb-3">Why Contrast Matters</h4>
-              <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2">
+              <h4 className="font-medium text-[#0fae96] dark:text-[#5eead4] mt-6 mb-3">Why Contrast Matters</h4>
+              <ul className="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-2">
                 <li>Improves readability for all users, especially in poor lighting</li>
                 <li>Essential for people with low vision or color blindness</li>
                 <li>Helps maintain usability when screens are viewed outdoors</li>
@@ -1653,8 +1653,8 @@ export function WCAGColorPalette() {
             </div>
             
             <div>
-              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Beyond Contrast: Color Best Practices</h4>
-              <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2">
+              <h4 className="font-medium text-[#0fae96] dark:text-[#5eead4] mb-3">Beyond Contrast: Color Best Practices</h4>
+              <ul className="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-2">
                 <li>Never use color as the only means to convey information (WCAG 1.4.1)</li>
                 <li>Provide additional indicators like icons, patterns, or text labels</li>
                 <li>Test your palette with color blindness simulators</li>
@@ -1663,8 +1663,8 @@ export function WCAGColorPalette() {
                 <li>Limit your palette to 3-5 primary colors for better cohesion</li>
               </ul>
               
-              <h4 className="font-medium text-gray-900 dark:text-gray-100 mt-6 mb-3">Implementation Tips</h4>
-              <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2">
+              <h4 className="font-medium text-[#0fae96] dark:text-[#5eead4] mt-6 mb-3">Implementation Tips</h4>
+              <ul className="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-2">
                 <li>Use the generated palettes for complementary elements</li>
                 <li>Text over colored backgrounds should meet minimum contrast</li>
                 <li>Apply your base color to primary interactive elements</li>
