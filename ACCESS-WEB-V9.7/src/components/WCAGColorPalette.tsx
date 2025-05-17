@@ -1270,17 +1270,21 @@ export function WCAGColorPalette() {
                 </button>
                 <button
                   onClick={() => changeColorHarmony('tetradic')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
+                  className={`p-2 text-base rounded-full transition-colors ${
                     colorHarmony === 'tetradic' ? 'bg-teal-100 dark:bg-[#0fae96] text-teal-800 dark:text-white border border-teal-300 dark:border-[#0fae96]' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
                   }`}
+                  aria-pressed={colorHarmony === 'tetradic'}
+                  aria-label="Tetradic colours"
                 >
                   Tetradic
                 </button>
                 <button
                   onClick={() => changeColorHarmony('square')}
-                  className={`p-2 text-sm rounded-full transition-colors ${
+                  className={`p-2 text-base rounded-full transition-colors ${
                     colorHarmony === 'square' ? 'bg-teal-100 dark:bg-[#0fae96] text-teal-800 dark:text-white border border-teal-300 dark:border-[#0fae96]' : 'bg-gray-50 dark:bg-[#1D3640] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#24404a]'
                   }`}
+                  aria-pressed={colorHarmony === 'square'}
+                  aria-label="Square colour harmony"
                 >
                   Square
                 </button>
@@ -1368,8 +1372,8 @@ export function WCAGColorPalette() {
                 <div className="flex-1">
                   <button
                     onClick={clearGenerator}
-                    className="w-full p-2 text-sm rounded-full transition-colors bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
-                    aria-label="Clear color palette"
+                    className="w-full p-2 text-base rounded-full transition-colors bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
+                    aria-label="Clear colour palette"
                   >
                     Clear
                   </button>
@@ -1381,9 +1385,10 @@ export function WCAGColorPalette() {
                 <button
                   onClick={generateNewPalette}
                   disabled={isGenerating}
-                  className="w-full inline-flex items-center justify-center gap-2 p-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] dark:bg-[#0fae96] dark:hover:bg-[#0d9a85] disabled:opacity-50 transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 p-2 border-none rounded-full shadow-sm text-base font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] dark:bg-[#0fae96] dark:hover:bg-[#0d9a85] disabled:opacity-50 transition-colors"
+                  aria-label={isGenerating ? "Generating new colour palette" : "Generate new colour palette"}
                 >
-                  <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} aria-hidden="true" />
                   Generate New
                 </button>
               </div>
