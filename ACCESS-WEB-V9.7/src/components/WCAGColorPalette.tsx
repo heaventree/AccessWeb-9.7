@@ -1187,14 +1187,14 @@ export function WCAGColorPalette() {
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0fae96] text-white uppercase tracking-wider shadow-sm">PALETTE GENERATOR</span>
           </div>
           
-          <div className="grid grid-cols-2 gap-6 mt-4">
-            {/* Left column - Colour Harmony */}
-            <div>
+          <div className="grid grid-cols-3 gap-6 mt-4">
+            {/* Left column - Colour Harmony (2/3 width) */}
+            <div className="col-span-2">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 Colour Harmony
               </h3>
               
-              <div className="grid grid-cols-2 gap-2 mb-2">
+              <div className="grid grid-cols-4 gap-2 mb-2">
                 <button
                   onClick={() => changeColorHarmony('all')}
                   className={`p-2 text-sm rounded-full transition-colors ${
@@ -1213,9 +1213,6 @@ export function WCAGColorPalette() {
                 >
                   Complementary
                 </button>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-2 mb-2">
                 <button
                   onClick={() => changeColorHarmony('analogous')}
                   className={`p-2 text-sm rounded-full transition-colors ${
@@ -1234,7 +1231,7 @@ export function WCAGColorPalette() {
                 </button>
               </div>
               
-              <div className="grid grid-cols-2 gap-2 mb-2">
+              <div className="grid grid-cols-4 gap-2">
                 <button
                   onClick={() => changeColorHarmony('split-complementary')}
                   className={`p-2 text-sm rounded-full transition-colors ${
@@ -1251,9 +1248,6 @@ export function WCAGColorPalette() {
                 >
                   Monochromatic
                 </button>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => changeColorHarmony('tetradic')}
                   className={`p-2 text-sm rounded-full transition-colors ${
@@ -1273,14 +1267,14 @@ export function WCAGColorPalette() {
               </div>
             </div>
             
-            {/* Right column - Base Colour */}
+            {/* Right column - Base Colour (1/3 width) */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 Base Colour
               </h3>
               
-              <div className="flex items-center gap-4 mb-4">
-                <div className="relative h-12 w-12 rounded-full overflow-hidden shadow-md border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <div className="relative w-full aspect-square rounded-full overflow-hidden shadow-md border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
                   <input
                     type="color"
                     id="baseColor"
@@ -1293,11 +1287,11 @@ export function WCAGColorPalette() {
                     style={{ backgroundColor: baseColor }}
                   ></div>
                 </div>
-                <div className="flex-1">
+                <div className="col-span-2">
                   <input
                     type="text"
                     value={baseColor}
-                    className="w-full px-3 py-1 text-sm rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-500 dark:focus:border-[#5eead4] focus:ring-1 focus:ring-primary-500 dark:focus:ring-[#5eead4] outline-none"
+                    className="w-full p-2 text-sm rounded-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-500 dark:focus:border-[#5eead4] focus:ring-1 focus:ring-primary-500 dark:focus:ring-[#5eead4] outline-none"
                     onChange={(e) => {
                       const newColor = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`;
                       if (/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
@@ -1341,10 +1335,10 @@ export function WCAGColorPalette() {
                 </div>
               </div>
               
-              <div className="flex justify-between">
+              <div className="grid grid-cols-1 gap-2">
                 <button
                   onClick={clearGenerator}
-                  className="px-3 py-1 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  className="p-2 text-sm rounded-full transition-colors bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
                   aria-label="Clear color palette"
                 >
                   Clear
@@ -1353,7 +1347,7 @@ export function WCAGColorPalette() {
                 <button
                   onClick={generateNewPalette}
                   disabled={isGenerating}
-                  className="inline-flex items-center gap-2 px-4 py-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] dark:bg-[#0fae96] dark:hover:bg-[#0d9a85] disabled:opacity-50 transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 p-2 border-none rounded-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] dark:bg-[#0fae96] dark:hover:bg-[#0d9a85] disabled:opacity-50 transition-colors"
                 >
                   <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
                   Generate New
