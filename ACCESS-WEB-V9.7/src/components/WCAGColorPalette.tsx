@@ -1162,16 +1162,16 @@ export function WCAGColorPalette() {
   return (
     <div>
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-2 gap-6 mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
               Website Accessibility
             </h2>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               Colour Palette Generator
             </h2>
           </div>
-          <div className="col-span-2">
+          <div>
             <p className="text-gray-600 dark:text-gray-300">
               Generate accessible color combinations that meet WCAG 2.1 and 2.2 contrast requirements.
               Our algorithm creates diverse palettes using multiple color harmonies including complementary, analogous, triadic, 
@@ -1179,6 +1179,7 @@ export function WCAGColorPalette() {
             </p>
           </div>
         </div>
+        <div className="border-t border-gray-200 dark:border-gray-700 mb-8"></div>
 
         {isGenerating && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -1610,16 +1611,16 @@ export function WCAGColorPalette() {
 
         {/* Usage Guidelines */}
         <div className="mt-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-          <div className="grid grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-2 gap-6 mb-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">
                 Website Accessibility
               </h3>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 Colour Usage Guidelines
               </h3>
             </div>
-            <div className="col-span-2">
+            <div>
               <p className="text-gray-700 dark:text-gray-300">
                 Proper color usage is crucial for accessibility. About 1 in 12 men and 1 in 200 women have some form of color vision deficiency, 
                 and many users have low vision or situational limitations like bright sunlight. Following WCAG guidelines ensures your content is 
@@ -1627,6 +1628,7 @@ export function WCAGColorPalette() {
               </p>
             </div>
           </div>
+          <div className="border-t border-gray-200 dark:border-gray-700 mb-6"></div>
           
           <div className="grid md:grid-cols-2 gap-8">
             <div>
