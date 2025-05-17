@@ -1187,14 +1187,14 @@ export function WCAGColorPalette() {
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0fae96] text-white uppercase tracking-wider shadow-sm">PALETTE GENERATOR</span>
           </div>
           
-          <div className="grid grid-cols-2 gap-6 mt-4">
-            {/* Left column - Colour Harmony */}
-            <div>
+          <div className="grid grid-cols-3 gap-6 mt-4">
+            {/* Left column - Colour Harmony (2/3 width) */}
+            <div className="col-span-2">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 Colour Harmony
               </h3>
               
-              <div className="grid grid-cols-2 gap-2 mb-2">
+              <div className="grid grid-cols-4 gap-2 mb-4">
                 <button
                   onClick={() => changeColorHarmony('all')}
                   className={`p-2 text-sm rounded-full transition-colors ${
@@ -1213,9 +1213,6 @@ export function WCAGColorPalette() {
                 >
                   Complementary
                 </button>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-2 mb-2">
                 <button
                   onClick={() => changeColorHarmony('analogous')}
                   className={`p-2 text-sm rounded-full transition-colors ${
@@ -1234,7 +1231,7 @@ export function WCAGColorPalette() {
                 </button>
               </div>
               
-              <div className="grid grid-cols-2 gap-2 mb-2">
+              <div className="grid grid-cols-4 gap-2">
                 <button
                   onClick={() => changeColorHarmony('split-complementary')}
                   className={`p-2 text-sm rounded-full transition-colors ${
@@ -1251,9 +1248,6 @@ export function WCAGColorPalette() {
                 >
                   Monochromatic
                 </button>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => changeColorHarmony('tetradic')}
                   className={`p-2 text-sm rounded-full transition-colors ${
