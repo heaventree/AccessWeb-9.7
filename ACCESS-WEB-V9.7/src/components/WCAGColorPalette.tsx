@@ -1194,7 +1194,7 @@ export function WCAGColorPalette() {
                 Colour Harmony
               </h3>
               
-              <div className="grid grid-cols-4 gap-2 mb-2">
+              <div className="grid grid-cols-4 gap-2 mb-4">
                 <button
                   onClick={() => changeColorHarmony('all')}
                   className={`p-2 text-sm rounded-full transition-colors ${
@@ -1274,7 +1274,7 @@ export function WCAGColorPalette() {
               </h3>
               
               <div className="grid grid-cols-4 gap-2 mb-4">
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-start">
                   <div className="relative h-8 w-8 rounded-full overflow-hidden shadow-sm border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
                     <input
                       type="color"
