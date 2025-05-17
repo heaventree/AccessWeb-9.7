@@ -13,14 +13,14 @@
   
   html {
     font-family: 'Inter', system-ui, sans-serif;
-    font-size: 16px;
+    font-size: 18px;
     line-height: 1.5;
     @apply antialiased;
   }
   
   body {
     @apply bg-background text-foreground;
-    font-size: 16px; /* Minimum readable size per WCAG 1.4.4 */
+    font-size: 18px; /* Updated to 18px for better WCAG compliance */
     line-height: 1.5; /* WCAG 1.4.8 recommendation */
     letter-spacing: 0.01em; /* Improve readability */
     word-spacing: 0.05em; /* Improve readability */
@@ -100,7 +100,7 @@
   }
 
   .form-label {
-    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+    @apply block text-base font-medium text-gray-700 dark:text-gray-300 mb-1;
   }
 
   .form-input {
@@ -108,7 +108,7 @@
   }
 
   .form-error {
-    @apply text-sm text-red-600 dark:text-red-400 mt-1;
+    @apply text-base text-red-600 dark:text-red-400 mt-1;
   }
 
   /* Grid Layouts */
