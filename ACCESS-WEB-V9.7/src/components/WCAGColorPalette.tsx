@@ -1610,15 +1610,23 @@ export function WCAGColorPalette() {
 
         {/* Usage Guidelines */}
         <div className="mt-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-            WCAG Color Usage Guidelines
-          </h3>
-          
-          <p className="text-gray-700 dark:text-gray-300 mb-6">
-            Proper color usage is crucial for accessibility. About 1 in 12 men and 1 in 200 women have some form of color vision deficiency, 
-            and many users have low vision or situational limitations like bright sunlight. Following WCAG guidelines ensures your content is 
-            accessible to all users regardless of their visual capabilities.
-          </p>
+          <div className="grid grid-cols-3 gap-6 mb-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                Website Accessibility
+              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Colour Usage Guidelines
+              </h3>
+            </div>
+            <div className="col-span-2">
+              <p className="text-gray-700 dark:text-gray-300">
+                Proper color usage is crucial for accessibility. About 1 in 12 men and 1 in 200 women have some form of color vision deficiency, 
+                and many users have low vision or situational limitations like bright sunlight. Following WCAG guidelines ensures your content is 
+                accessible to all users regardless of their visual capabilities.
+              </p>
+            </div>
+          </div>
           
           <div className="grid md:grid-cols-2 gap-8">
             <div>
