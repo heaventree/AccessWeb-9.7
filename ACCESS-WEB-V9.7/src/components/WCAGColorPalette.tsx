@@ -1284,22 +1284,24 @@ export function WCAGColorPalette() {
               
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex-none">
-                  <div className="relative h-8 w-8 rounded-full overflow-hidden shadow-sm border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
-                    <input
-                      type="color"
-                      id="baseColor"
-                      value={baseColor}
-                      onChange={handleBaseColorChange}
-                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                    />
-                    <div 
-                      className="absolute inset-0"
-                      style={{ backgroundColor: baseColor }}
-                    ></div>
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 pointer-events-none">
-                      <Pencil className="w-4 h-4 text-white" />
+                  <label htmlFor="baseColor" className="cursor-pointer">
+                    <div className="relative h-8 w-8 rounded-full overflow-hidden shadow-sm border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
+                      <div 
+                        className="absolute inset-0"
+                        style={{ backgroundColor: baseColor }}
+                      ></div>
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 pointer-events-none">
+                        <Pencil className="w-4 h-4 text-white" />
+                      </div>
                     </div>
-                  </div>
+                  </label>
+                  <input
+                    type="color"
+                    id="baseColor"
+                    value={baseColor}
+                    onChange={handleBaseColorChange}
+                    className="sr-only"
+                  />
                 </div>
                 <div className="flex-1">
                   <input
