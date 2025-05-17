@@ -1179,7 +1179,6 @@ export function WCAGColorPalette() {
             </p>
           </div>
         </div>
-        <div className="border-t border-gray-200 dark:border-gray-700 mb-8"></div>
 
         {isGenerating && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
