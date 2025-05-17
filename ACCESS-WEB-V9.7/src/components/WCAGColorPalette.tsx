@@ -1656,3 +1656,5 @@ export function WCAGColorPalette() {
     </div>
   );
 }
+
+export default WCAGColorPalette;
