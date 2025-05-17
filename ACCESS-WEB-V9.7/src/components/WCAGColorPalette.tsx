@@ -1273,19 +1273,21 @@ export function WCAGColorPalette() {
                 Base Colour
               </h3>
               
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                <div className="relative w-full aspect-square rounded-full overflow-hidden shadow-md border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
-                  <input
-                    type="color"
-                    id="baseColor"
-                    value={baseColor}
-                    onChange={handleBaseColorChange}
-                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                  />
-                  <div 
-                    className="absolute inset-0"
-                    style={{ backgroundColor: baseColor }}
-                  ></div>
+              <div className="grid grid-cols-4 gap-2 mb-4">
+                <div className="flex items-center justify-center">
+                  <div className="relative h-8 w-8 rounded-full overflow-hidden shadow-sm border-2 border-gray-300 dark:border-white hover:border-primary-500 dark:hover:border-[#5eead4] transition-all">
+                    <input
+                      type="color"
+                      id="baseColor"
+                      value={baseColor}
+                      onChange={handleBaseColorChange}
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    />
+                    <div 
+                      className="absolute inset-0"
+                      style={{ backgroundColor: baseColor }}
+                    ></div>
+                  </div>
                 </div>
                 <div className="col-span-2">
                   <input
@@ -1333,16 +1335,18 @@ export function WCAGColorPalette() {
                     placeholder="#000000"
                   />
                 </div>
+                <div>
+                  <button
+                    onClick={clearGenerator}
+                    className="w-full p-2 text-sm rounded-full transition-colors bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
+                    aria-label="Clear color palette"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
               
               <div className="grid grid-cols-1 gap-2">
-                <button
-                  onClick={clearGenerator}
-                  className="p-2 text-sm rounded-full transition-colors bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
-                  aria-label="Clear color palette"
-                >
-                  Clear
-                </button>
                 
                 <button
                   onClick={generateNewPalette}
