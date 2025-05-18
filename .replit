@@ -38,7 +38,7 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd ACCESS-WEB-V9.7/strapi && npx create-strapi-app@latest strapi-cms --quickstart"
+args = "cd ACCESS-WEB-V9.7/strapi && npm run develop"
 
 [deployment]
 run = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run dev"]
