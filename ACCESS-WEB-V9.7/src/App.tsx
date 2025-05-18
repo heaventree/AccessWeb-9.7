@@ -6,6 +6,10 @@ import HomePage from '@/pages/HomePage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import DynamicPageRenderer from '@/pages/DynamicPageRenderer';
 
+// Import real tool pages
+import WCAGColorPalette from '@/pages/tools/WCAGColorPalette';
+import { ImageAltScannerPage } from '@/pages/tools/ImageAltScannerPage';
+
 // Admin pages for the new CMS functionality
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
 import ContentManagerPage from '@/pages/admin/ContentManagerPage';
@@ -17,21 +21,6 @@ const SimpleAccountPage = () => (
   <div className="container mx-auto px-4 py-8">
     <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">My Account</h1>
     <p className="text-gray-700 dark:text-gray-300">This is a simple account page. More functionality will be added soon.</p>
-  </div>
-);
-
-// Simple tool page wrappers
-const ColorPalettePage = () => (
-  <div className="container mx-auto px-4 py-8">
-    <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">WCAG Colour Palette Tool</h1>
-    <p className="text-gray-700 dark:text-gray-300">The WCAG Colour Palette Tool helps you create and test accessible color combinations.</p>
-  </div>
-);
-
-const ImageAltScannerPage = () => (
-  <div className="container mx-auto px-4 py-8">
-    <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Image Alt Scanner Tool</h1>
-    <p className="text-gray-700 dark:text-gray-300">The Image Alt Scanner helps you identify and fix missing alt text for better accessibility.</p>
   </div>
 );
 
@@ -60,7 +49,7 @@ const App: React.FC = () => {
             <Route path="/" element={<HomePage />} />
             
             {/* Tool pages */}
-            <Route path="/tools/colour-palette" element={<ColorPalettePage />} />
+            <Route path="/tools/colour-palette" element={<WCAGColorPalette />} />
             <Route path="/tools/image-alt-scanner" element={<ImageAltScannerPage />} />
             
             {/* Account page */}
