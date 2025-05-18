@@ -217,7 +217,7 @@ export const ImageAltScanner = ({
 
   return (
     <div className="space-y-8 pb-6">
-      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl p-6 border border-gray-200 dark:border-gray-700">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
           Scan for Image Accessibility Issues
         </h2>
@@ -273,13 +273,13 @@ export const ImageAltScanner = ({
               className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 overflow-hidden"
               id="advanced-options-panel"
             >
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
                 Advanced Scan Options
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Issue Detection</h4>
+                  <h4 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Issue Detection</h4>
                   <div className="space-y-2">
                     <label className="flex items-center">
                       <input
@@ -321,7 +321,7 @@ export const ImageAltScanner = ({
                 </div>
                 
                 <div>
-                  <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Pattern Settings</h4>
+                  <h4 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Pattern Settings</h4>
                   <div className="space-y-4">
                     <div>
                       <label htmlFor="redundant-patterns" className="block text-base font-medium text-gray-700 dark:text-gray-300">
@@ -332,7 +332,7 @@ export const ImageAltScanner = ({
                         type="text"
                         value={scanOptions.redundantPatterns.join(', ')}
                         onChange={(e) => handleOptionChange('redundantPatterns', e.target.value.split(',').map(s => s.trim()))}
-                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#0fae96] focus:ring-[#0fae96] text-base"
+                        className="mt-1 block w-full rounded-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#0fae96] focus:ring-[#0fae96] text-base px-4 py-2"
                         aria-describedby="redundant-terms-desc"
                       />
                       <p id="redundant-terms-desc" className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -348,7 +348,7 @@ export const ImageAltScanner = ({
                         type="text"
                         value={scanOptions.suspiciousPatterns.join(', ')}
                         onChange={(e) => handleOptionChange('suspiciousPatterns', e.target.value.split(',').map(s => s.trim()))}
-                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#0fae96] focus:ring-[#0fae96] text-base"
+                        className="mt-1 block w-full rounded-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#0fae96] focus:ring-[#0fae96] text-base px-4 py-2"
                         aria-describedby="suspicious-patterns-desc"
                       />
                       <p id="suspicious-patterns-desc" className="mt-1 text-sm text-gray-500 dark:text-gray-400">
