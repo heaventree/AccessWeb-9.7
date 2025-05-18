@@ -1,0 +1,44 @@
+{
+  "collectionName": "components_sections_feature_sections",
+  "info": {
+    "displayName": "Feature Section",
+    "icon": "grid",
+    "description": "A multi-column feature section"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "backgroundColor": {
+      "type": "string",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "default": "#ffffff"
+    },
+    "darkModeBackgroundColor": {
+      "type": "string",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "default": "#1f2937"
+    },
+    "features": {
+      "type": "component",
+      "repeatable": true,
+      "component": "blocks.feature-item",
+      "min": 1,
+      "max": 6
+    },
+    "columns": {
+      "type": "enumeration",
+      "enum": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "default": "3"
+    }
+  }
+}

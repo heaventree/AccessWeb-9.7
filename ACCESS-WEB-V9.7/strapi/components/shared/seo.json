@@ -1,0 +1,74 @@
+{
+  "collectionName": "components_shared_seos",
+  "info": {
+    "displayName": "SEO",
+    "icon": "search",
+    "description": "Search engine optimization metadata"
+  },
+  "options": {},
+  "attributes": {
+    "metaTitle": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60
+    },
+    "metaDescription": {
+      "type": "text",
+      "required": true,
+      "maxLength": 160
+    },
+    "metaImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "canonicalURL": {
+      "type": "string"
+    },
+    "keywords": {
+      "type": "text",
+      "description": "Comma-separated keywords"
+    },
+    "metaRobots": {
+      "type": "string",
+      "default": "index, follow"
+    },
+    "structuredData": {
+      "type": "json",
+      "description": "JSON-LD structured data for Schema.org"
+    },
+    "metaViewport": {
+      "type": "string",
+      "default": "width=device-width, initial-scale=1"
+    },
+    "metaTwitterCard": {
+      "type": "enumeration",
+      "enum": [
+        "summary",
+        "summary_large_image",
+        "app",
+        "player"
+      ],
+      "default": "summary"
+    },
+    "metaTwitterSite": {
+      "type": "string"
+    },
+    "metaTwitterCreator": {
+      "type": "string"
+    },
+    "metaFacebookTitle": {
+      "type": "string"
+    },
+    "metaFacebookDescription": {
+      "type": "text"
+    },
+    "metaFacebookImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

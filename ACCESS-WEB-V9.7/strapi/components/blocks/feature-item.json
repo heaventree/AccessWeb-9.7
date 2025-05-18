@@ -1,0 +1,34 @@
+{
+  "collectionName": "components_blocks_feature_items",
+  "info": {
+    "displayName": "Feature Item",
+    "icon": "star",
+    "description": "A single feature item with icon, title and description"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon name from available icon set (e.g., 'shopping-cart', 'users', 'shield')"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "linkText": {
+      "type": "string"
+    },
+    "linkUrl": {
+      "type": "string"
+    }
+  }
+}

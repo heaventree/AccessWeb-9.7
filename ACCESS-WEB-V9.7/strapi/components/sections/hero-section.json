@@ -1,0 +1,65 @@
+{
+  "collectionName": "components_sections_hero_sections",
+  "info": {
+    "displayName": "Hero Section",
+    "icon": "star",
+    "description": "A full-width hero section with background image and text overlay"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subtitle": {
+      "type": "text"
+    },
+    "backgroundImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "darkModeBackgroundImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "textColor": {
+      "type": "string",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "default": "#ffffff"
+    },
+    "darkModeTextColor": {
+      "type": "string",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "default": "#ffffff"
+    },
+    "buttonText": {
+      "type": "string"
+    },
+    "buttonLink": {
+      "type": "string"
+    },
+    "alignment": {
+      "type": "enumeration",
+      "enum": [
+        "left",
+        "center",
+        "right"
+      ],
+      "default": "center"
+    },
+    "height": {
+      "type": "enumeration",
+      "enum": [
+        "small",
+        "medium",
+        "large",
+        "full"
+      ],
+      "default": "medium"
+    }
+  }
+}

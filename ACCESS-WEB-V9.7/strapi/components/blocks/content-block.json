@@ -1,0 +1,46 @@
+{
+  "collectionName": "components_blocks_content_blocks",
+  "info": {
+    "displayName": "Content Block",
+    "icon": "align-left",
+    "description": "A flexible content block with rich text editor"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "alignment": {
+      "type": "enumeration",
+      "enum": [
+        "left",
+        "center",
+        "right"
+      ],
+      "default": "left"
+    },
+    "backgroundColor": {
+      "type": "string",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "default": "#ffffff"
+    },
+    "darkModeBackgroundColor": {
+      "type": "string",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "default": "#1f2937"
+    },
+    "textColor": {
+      "type": "string",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "default": "#000000"
+    },
+    "darkModeTextColor": {
+      "type": "string",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "default": "#ffffff"
+    }
+  }
+}
