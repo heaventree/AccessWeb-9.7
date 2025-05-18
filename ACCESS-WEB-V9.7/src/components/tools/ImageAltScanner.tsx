@@ -425,25 +425,25 @@ export const ImageAltScanner = ({
                     <ImageIcon className="h-6 w-6 text-[#0fae96]" />
                   </div>
                   <div className="ml-3">
-                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Images</div>
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-300">Total Images</div>
                     <div className="text-lg font-semibold text-gray-900 dark:text-white">{scanResult.totalImages}</div>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <AlertTriangle className="h-6 w-6 text-orange-500" />
                   </div>
                   <div className="ml-3">
-                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Issues Found</div>
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-300">Issues Found</div>
                     <div className="text-lg font-semibold text-gray-900 dark:text-white">{scanResult.issues.length}</div>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <CheckCircle className="h-6 w-6 text-green-500" />
@@ -455,10 +455,10 @@ export const ImageAltScanner = ({
                 </div>
               </div>
               
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <BarChart className="h-6 w-6 text-blue-500" />
+                    <BarChart className="h-6 w-6 text-[#0fae96]" />
                   </div>
                   <div className="ml-3">
                     <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Compliance</div>
