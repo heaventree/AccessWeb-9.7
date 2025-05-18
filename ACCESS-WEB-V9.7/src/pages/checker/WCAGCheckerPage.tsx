@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { WCAGToolbar } from '@/components/WCAGToolbar/WCAGToolbar';
+import { motion } from 'framer-motion';
+import { FiCheck, FiAlertTriangle, FiX } from 'react-icons/fi';
 
 /**
  * WCAG Checker Page component
@@ -7,6 +10,14 @@ import React, { useState } from 'react';
 const WCAGCheckerPage: React.FC = () => {
   const [url, setUrl] = useState('');
   const [isScanning, setIsScanning] = useState(false);
+  const [results, setResults] = useState<null | {
+    score: number;
+    issues: {
+      critical: number;
+      major: number;
+      minor: number;
+    }
+  }>(null);
   
   const handleScan = () => {
     if (!url) return;
@@ -15,11 +26,23 @@ const WCAGCheckerPage: React.FC = () => {
     // Simulate scan for demo purposes
     setTimeout(() => {
       setIsScanning(false);
+      // Demo results
+      setResults({
+        score: 83,
+        issues: {
+          critical: 2,
+          major: 5,
+          minor: 8
+        }
+      });
     }, 2000);
   };
   
   return (
     <div className="content-container py-12">
+      {/* Accessibility Toolbar */}
+      <WCAGToolbar position="bottom-right" />
+      
       <div className="max-w-5xl mx-auto">
         <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -30,7 +53,7 @@ const WCAGCheckerPage: React.FC = () => {
             is accessible to everyone, including people with disabilities.
           </p>
           
-          <div className="mt-4 p-4 bg-[#0fae96]/5 dark:bg-[#0fae96]/10 rounded-lg">
+          <div className="mt-4 p-6 bg-[#0fae96]/5 dark:bg-[#0fae96]/10 rounded-lg">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Website URL
             </h2>
@@ -66,6 +89,95 @@ const WCAGCheckerPage: React.FC = () => {
             </p>
           </div>
         </div>
+        
+        {results && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 mb-8"
+          >
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              Accessibility Score
+            </h2>
+            
+            <div className="flex flex-col md:flex-row items-center gap-8 mb-8">
+              <div className="flex-shrink-0">
+                <div className="relative w-32 h-32">
+                  <svg className="w-full h-full" viewBox="0 0 36 36">
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#e2e8f0"
+                      strokeWidth="3"
+                    />
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke={results.score > 80 ? "#10b981" : results.score > 60 ? "#f59e0b" : "#ef4444"}
+                      strokeWidth="3"
+                      strokeDasharray={`${results.score}, 100`}
+                      strokeLinecap="round"
+                    />
+                    <text 
+                      x="18" 
+                      y="20.5" 
+                      textAnchor="middle" 
+                      fontSize="8" 
+                      fill={results.score > 80 ? "#10b981" : results.score > 60 ? "#f59e0b" : "#ef4444"}
+                      fontWeight="bold"
+                    >
+                      {results.score}%
+                    </text>
+                  </svg>
+                </div>
+              </div>
+              
+              <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-900/30">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-red-500 rounded-full mr-3">
+                      <FiX className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-red-800 dark:text-red-200 text-sm font-semibold">Critical Issues</p>
+                      <p className="text-2xl font-bold text-red-900 dark:text-red-100">{results.issues.critical}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-900/30">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-amber-500 rounded-full mr-3">
+                      <FiAlertTriangle className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-amber-800 dark:text-amber-200 text-sm font-semibold">Major Issues</p>
+                      <p className="text-2xl font-bold text-amber-900 dark:text-amber-100">{results.issues.major}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-900/30">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-blue-500 rounded-full mr-3">
+                      <FiCheck className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-blue-800 dark:text-blue-200 text-sm font-semibold">Minor Issues</p>
+                      <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{results.issues.minor}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-center">
+              <button className="px-6 py-3 rounded-full bg-[#0fae96] hover:bg-[#0c9a85] text-white font-medium transition-colors">
+                View Detailed Report
+              </button>
+            </div>
+          </motion.div>
+        )}
         
         <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
