@@ -217,7 +217,7 @@ export const ImageAltScanner = ({
 
   return (
     <div className="space-y-8 pb-6">
-      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-900 shadow-sm rounded-xl p-6 border border-gray-200 dark:border-gray-700">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
           Scan for Image Accessibility Issues
         </h2>
@@ -277,10 +277,10 @@ export const ImageAltScanner = ({
                 Advanced Scan Options
               </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <h4 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Issue Detection</h4>
-                  <div className="space-y-2">
+                  <h4 className="text-lg font-medium text-gray-700 dark:text-white mb-4">Issue Detection</h4>
+                  <div className="space-y-4">
                     <label className="flex items-center">
                       <input
                         type="checkbox"
@@ -290,7 +290,7 @@ export const ImageAltScanner = ({
                         className="rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
                         aria-describedby="duplicate-check-desc"
                       />
-                      <span className="ml-2 text-base text-gray-700 dark:text-gray-300">Check for duplicate images with same alt text</span>
+                      <span className="ml-2 text-base text-gray-700 dark:text-white">Check for duplicate images with same alt text</span>
                     </label>
                     <span id="duplicate-check-desc" className="sr-only">When enabled, the scanner will identify multiple images using identical alt text</span>
                     <label className="flex items-center">
@@ -302,7 +302,7 @@ export const ImageAltScanner = ({
                         className="rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
                         aria-describedby="redundant-check-desc"
                       />
-                      <span className="ml-2 text-base text-gray-700 dark:text-gray-300">Check for redundant terms in alt text</span>
+                      <span className="ml-2 text-base text-gray-700 dark:text-white">Check for redundant terms in alt text</span>
                     </label>
                     <span id="redundant-check-desc" className="sr-only">When enabled, the scanner will identify alt text containing redundant words like 'image' or 'photo'</span>
                     <label className="flex items-center">
@@ -314,17 +314,17 @@ export const ImageAltScanner = ({
                         className="rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
                         aria-describedby="suspicious-check-desc"
                       />
-                      <span className="ml-2 text-base text-gray-700 dark:text-gray-300">Check for suspicious alt text patterns</span>
+                      <span className="ml-2 text-base text-gray-700 dark:text-white">Check for suspicious alt text patterns</span>
                     </label>
                     <span id="suspicious-check-desc" className="sr-only">When enabled, the scanner will identify alt text that may be auto-generated filenames or placeholder text</span>
                   </div>
                 </div>
                 
                 <div>
-                  <h4 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Pattern Settings</h4>
+                  <h4 className="text-lg font-medium text-gray-700 dark:text-white mb-4">Pattern Settings</h4>
                   <div className="space-y-4">
                     <div>
-                      <label htmlFor="redundant-patterns" className="block text-base font-medium text-gray-700 dark:text-gray-300">
+                      <label htmlFor="redundant-patterns" className="block text-base font-medium text-gray-700 dark:text-white">
                         Redundant Terms
                       </label>
                       <input
@@ -340,7 +340,7 @@ export const ImageAltScanner = ({
                       </p>
                     </div>
                     <div>
-                      <label htmlFor="suspicious-patterns" className="block text-base font-medium text-gray-700 dark:text-gray-300">
+                      <label htmlFor="suspicious-patterns" className="block text-base font-medium text-gray-700 dark:text-white">
                         Suspicious Patterns
                       </label>
                       <input
