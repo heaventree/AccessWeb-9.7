@@ -10,6 +10,7 @@ import { ThemeProvider } from '@/providers/ThemeProvider';
 // Import real tool pages
 import WCAGColorPalette from '@/pages/tools/WCAGColorPalette';
 import { ImageAltScannerPage } from '@/pages/tools/ImageAltScannerPage';
+import WCAGCheckerPage from '@/pages/checker/WCAGCheckerPage';
 
 // Admin pages for the new CMS functionality
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
@@ -53,11 +54,12 @@ const App: React.FC = () => {
             {/* Tool pages */}
             <Route path="/tools/colour-palette" element={<WCAGColorPalette />} />
             <Route path="/tools/image-alt-scanner" element={<ImageAltScannerPage />} />
+            <Route path="/checker" element={<WCAGCheckerPage />} />
             
             {/* Account page */}
             <Route path="/my-account" element={<SimpleAccountPage />} />
             
-            {/* Catch-all route for dynamic Strapi pages */}
+            {/* Catch-all route for dynamic Strapi pages - Note: This must be after all explicit routes */}
             <Route path="/:slug" element={<DynamicPageRenderer />} />
             
             {/* 404 Page */}
