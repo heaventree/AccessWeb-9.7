@@ -284,30 +284,39 @@ export const ImageAltScanner = ({
                     <label className="flex items-center">
                       <input
                         type="checkbox"
+                        id="include-duplicate-check"
                         checked={scanOptions.includeDuplicateCheck}
                         onChange={(e) => handleOptionChange('includeDuplicateCheck', e.target.checked)}
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        className="rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
+                        aria-describedby="duplicate-check-desc"
                       />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Check for duplicate images with same alt text</span>
+                      <span className="ml-2 text-base text-gray-700 dark:text-gray-300">Check for duplicate images with same alt text</span>
                     </label>
+                    <span id="duplicate-check-desc" className="sr-only">When enabled, the scanner will identify multiple images using identical alt text</span>
                     <label className="flex items-center">
                       <input
                         type="checkbox"
+                        id="include-redundant-check"
                         checked={scanOptions.includeRedundantCheck}
                         onChange={(e) => handleOptionChange('includeRedundantCheck', e.target.checked)}
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        className="rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
+                        aria-describedby="redundant-check-desc"
                       />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Check for redundant terms in alt text</span>
+                      <span className="ml-2 text-base text-gray-700 dark:text-gray-300">Check for redundant terms in alt text</span>
                     </label>
+                    <span id="redundant-check-desc" className="sr-only">When enabled, the scanner will identify alt text containing redundant words like 'image' or 'photo'</span>
                     <label className="flex items-center">
                       <input
                         type="checkbox"
+                        id="include-suspicious-check"
                         checked={scanOptions.includeSuspiciousCheck}
                         onChange={(e) => handleOptionChange('includeSuspiciousCheck', e.target.checked)}
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        className="rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96]"
+                        aria-describedby="suspicious-check-desc"
                       />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Check for suspicious alt text patterns</span>
+                      <span className="ml-2 text-base text-gray-700 dark:text-gray-300">Check for suspicious alt text patterns</span>
                     </label>
+                    <span id="suspicious-check-desc" className="sr-only">When enabled, the scanner will identify alt text that may be auto-generated filenames or placeholder text</span>
                   </div>
                 </div>
                 
@@ -315,7 +324,7 @@ export const ImageAltScanner = ({
                   <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Pattern Settings</h4>
                   <div className="space-y-4">
                     <div>
-                      <label htmlFor="redundant-patterns" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label htmlFor="redundant-patterns" className="block text-base font-medium text-gray-700 dark:text-gray-300">
                         Redundant Terms
                       </label>
                       <input
@@ -323,11 +332,15 @@ export const ImageAltScanner = ({
                         type="text"
                         value={scanOptions.redundantPatterns.join(', ')}
                         onChange={(e) => handleOptionChange('redundantPatterns', e.target.value.split(',').map(s => s.trim()))}
-                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#0fae96] focus:ring-[#0fae96] text-base"
+                        aria-describedby="redundant-terms-desc"
                       />
+                      <p id="redundant-terms-desc" className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Words like 'image' or 'photo' that are redundant in alt text. Separate with commas.
+                      </p>
                     </div>
                     <div>
-                      <label htmlFor="suspicious-patterns" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label htmlFor="suspicious-patterns" className="block text-base font-medium text-gray-700 dark:text-gray-300">
                         Suspicious Patterns
                       </label>
                       <input
@@ -335,8 +348,12 @@ export const ImageAltScanner = ({
                         type="text"
                         value={scanOptions.suspiciousPatterns.join(', ')}
                         onChange={(e) => handleOptionChange('suspiciousPatterns', e.target.value.split(',').map(s => s.trim()))}
-                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#0fae96] focus:ring-[#0fae96] text-base"
+                        aria-describedby="suspicious-patterns-desc"
                       />
+                      <p id="suspicious-patterns-desc" className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Terms that indicate auto-generated or placeholder alt text. Separate with commas.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -350,34 +367,46 @@ export const ImageAltScanner = ({
       {scanResult && (
         <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
           <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="flex -mb-px overflow-x-auto" aria-label="Tabs">
+            <nav className="flex -mb-px overflow-x-auto" aria-label="Scan Results Tabs" role="tablist">
               <button
                 onClick={() => setActiveTab('issues')}
-                className={`flex-1 md:flex-none whitespace-nowrap px-6 py-4 border-b-2 font-medium text-sm ${
+                role="tab"
+                id="tab-issues"
+                aria-controls="panel-issues"
+                aria-selected={activeTab === 'issues'}
+                className={`flex-1 md:flex-none whitespace-nowrap px-6 py-4 border-b-2 font-medium text-base ${
                   activeTab === 'issues'
-                    ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                    ? 'border-[#0fae96] text-[#0fae96] dark:text-[#5eead4]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                 }`}
               >
-                <AlertTriangle className="w-4 h-4 mr-2 inline" />
+                <AlertTriangle className="w-4 h-4 mr-2 inline" aria-hidden="true" />
                 Issues ({scanResult.issues.length})
               </button>
               <button
                 onClick={() => setActiveTab('fixed')}
-                className={`flex-1 md:flex-none whitespace-nowrap px-6 py-4 border-b-2 font-medium text-sm ${
+                role="tab"
+                id="tab-fixed"
+                aria-controls="panel-fixed"
+                aria-selected={activeTab === 'fixed'}
+                className={`flex-1 md:flex-none whitespace-nowrap px-6 py-4 border-b-2 font-medium text-base ${
                   activeTab === 'fixed'
-                    ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                    ? 'border-[#0fae96] text-[#0fae96] dark:text-[#5eead4]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                 }`}
               >
-                <CheckCircle className="w-4 h-4 mr-2 inline" />
+                <CheckCircle className="w-4 h-4 mr-2 inline" aria-hidden="true" />
                 Fixed ({fixedIssues.length})
               </button>
               <button
                 onClick={() => setActiveTab('settings')}
-                className={`flex-1 md:flex-none whitespace-nowrap px-6 py-4 border-b-2 font-medium text-sm ${
+                role="tab"
+                id="tab-settings"
+                aria-controls="panel-settings"
+                aria-selected={activeTab === 'settings'}
+                className={`flex-1 md:flex-none whitespace-nowrap px-6 py-4 border-b-2 font-medium text-base ${
                   activeTab === 'settings'
-                    ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                    ? 'border-[#0fae96] text-[#0fae96] dark:text-[#5eead4]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                 }`}
               >
