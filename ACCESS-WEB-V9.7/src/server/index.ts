@@ -1,49 +1,54 @@
 import express from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
+import path from 'path';
 import morgan from 'morgan';
 import { createServer } from 'http';
-import { registerRoutes } from './routes';
-import { securityHeadersMiddleware } from './middleware/securityMiddleware';
+import dotenv from 'dotenv';
+import cmsRoutes from './routes/cms';
 
-// Load environment variables from .env file
+// Load environment variables
 dotenv.config();
 
 // Create Express app
 const app = express();
-const PORT = process.env.API_PORT || 3000;
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(morgan('dev'));
-app.use(securityHeadersMiddleware);
 
-// Register all routes
-registerRoutes(app).then((httpServer) => {
-  // Start server
-  httpServer.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
-    console.log(`📊 API available at http://localhost:${PORT}/api`);
-  });
-}).catch(error => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, '../../public')));
+
+// API routes
+app.use('/api/cms', cmsRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-  // Perform any cleanup if needed
-  process.exit(1);
+// Catch-all route to serve the React app
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  res.sendFile(path.join(__dirname, '../../public/index.html'));
 });
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  // Perform any cleanup if needed
+// Error handling middleware
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Server error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
-export default app;
+// Create HTTP server
+const httpServer = createServer(app);
+
+// Start server
+const PORT = process.env.PORT || 5000;
+httpServer.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+export default httpServer;
