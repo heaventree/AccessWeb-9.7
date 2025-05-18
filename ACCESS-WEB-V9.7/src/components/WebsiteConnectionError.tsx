@@ -6,31 +6,45 @@ import { httpsToHttp } from '../utils/urlUtils';
 export interface WebsiteConnectionErrorProps {
   url: string;
   details: {
-    type: string;
-    message: string;
+    type?: string;
+    message?: string;
     technicalDetails?: string;
-    userFriendlyMessage: string;
-    possibleSolutions: string[];
+    userFriendlyMessage?: string;
+    possibleSolutions?: string[];
     severityLevel?: 'critical' | 'high' | 'medium' | 'low';
     requiresExpertise?: boolean;
     learnMoreUrl?: string;
   };
-  onDismiss: () => void;
-  onTryAlternative?: (alternativeUrl: string) => void;
+  onTryHttp?: () => void;
 }
 
-export function WebsiteConnectionError({ url, details, onDismiss, onTryAlternative }: WebsiteConnectionErrorProps) {
+export function WebsiteConnectionError({ url, details, onTryHttp }: WebsiteConnectionErrorProps) {
   // Determine if using HTTP or HTTPS
   const isSecure = url.toLowerCase().startsWith('https://');
   const ProtocolIcon = isSecure ? Lock : Globe;
   const protocolLabel = isSecure ? 'HTTPS' : 'HTTP';
   const isSslError = details.type === 'ssl';
   
+  // Create default error details if not provided
+  const errorDetails = {
+    type: details.type || (isSecure ? 'ssl' : 'connection'),
+    message: details.message || `Failed to connect to ${url}`,
+    userFriendlyMessage: details.userFriendlyMessage || 'The website may be down or not responding correctly.',
+    possibleSolutions: details.possibleSolutions || [
+      'Check if the website is available from your browser',
+      'Verify that the URL is correct',
+      isSecure ? 'Try using HTTP instead of HTTPS' : 'Check your internet connection',
+      'Try again later'
+    ],
+    severityLevel: details.severityLevel || 'medium',
+    requiresExpertise: details.requiresExpertise || false
+  };
+  
   // Determine severity indicator
   const getSeverityIcon = () => {
-    if (!details.severityLevel) return null;
+    if (!errorDetails.severityLevel) return null;
     
-    switch (details.severityLevel) {
+    switch (errorDetails.severityLevel) {
       case 'critical':
         return <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />;
       case 'high':
@@ -45,9 +59,9 @@ export function WebsiteConnectionError({ url, details, onDismiss, onTryAlternati
   };
   
   const getSeverityLabel = () => {
-    if (!details.severityLevel) return '';
+    if (!errorDetails.severityLevel) return '';
     
-    switch (details.severityLevel) {
+    switch (errorDetails.severityLevel) {
       case 'critical':
         return 'Critical';
       case 'high':
@@ -62,9 +76,9 @@ export function WebsiteConnectionError({ url, details, onDismiss, onTryAlternati
   };
   
   const getSeverityClass = () => {
-    if (!details.severityLevel) return '';
+    if (!errorDetails.severityLevel) return '';
     
-    switch (details.severityLevel) {
+    switch (errorDetails.severityLevel) {
       case 'critical':
         return 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400';
       case 'high':
@@ -82,7 +96,7 @@ export function WebsiteConnectionError({ url, details, onDismiss, onTryAlternati
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-3xl"
+      className="w-full max-w-3xl mx-auto mb-6"
     >
       <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
         <div className="flex items-start">
@@ -109,7 +123,7 @@ export function WebsiteConnectionError({ url, details, onDismiss, onTryAlternati
                 )}
                 
                 {/* Severity indicator if available */}
-                {details.severityLevel && (
+                {errorDetails.severityLevel && (
                   <div className="flex items-center">
                     {getSeverityIcon()}
                     <span className={`ml-1 text-xs font-medium px-2 py-0.5 rounded ${getSeverityClass()}`}>
@@ -119,7 +133,7 @@ export function WebsiteConnectionError({ url, details, onDismiss, onTryAlternati
                 )}
                 
                 {/* Expertise indicator if available */}
-                {details.requiresExpertise && (
+                {errorDetails.requiresExpertise && (
                   <span className="text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">
                     Requires Technical Expertise
                   </span>
@@ -134,10 +148,10 @@ export function WebsiteConnectionError({ url, details, onDismiss, onTryAlternati
                 {/* Error message */}
                 <div className="mt-2 p-3 bg-red-100 dark:bg-red-900/20 rounded border border-red-200 dark:border-red-800">
                   <p className="text-sm font-medium text-red-800 dark:text-red-300">
-                    {details.message}
+                    {errorDetails.message}
                   </p>
                   <p className="mt-1 text-sm text-red-700 dark:text-red-300">
-                    {details.userFriendlyMessage}
+                    {errorDetails.userFriendlyMessage}
                   </p>
                 </div>
               </div>
@@ -160,7 +174,7 @@ export function WebsiteConnectionError({ url, details, onDismiss, onTryAlternati
                   Possible Solutions:
                 </h4>
                 <ul className="text-sm text-red-700 dark:text-red-300 space-y-2 list-disc list-inside">
-                  {details.possibleSolutions.map((solution, index) => (
+                  {errorDetails.possibleSolutions.map((solution, index) => (
                     <li key={index}>{solution}</li>
                   ))}
                 </ul>
@@ -182,18 +196,11 @@ export function WebsiteConnectionError({ url, details, onDismiss, onTryAlternati
               )}
               
               <div className="mt-4 pt-3 border-t border-red-200 dark:border-red-800 flex flex-wrap items-center gap-4">
-                <button
-                  onClick={onDismiss}
-                  className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-red-300 dark:border-red-700 rounded-md text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                >
-                  Dismiss
-                </button>
-                
                 {/* HTTP Fallback button for HTTPS SSL errors */}
-                {isSecure && details.type === 'ssl' && onTryAlternative && (
+                {isSecure && (errorDetails.type === 'ssl' || isSecure) && onTryHttp && (
                   <button
-                    onClick={() => onTryAlternative(httpsToHttp(url))}
-                    className="inline-flex items-center px-3 py-1.5 bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-700 rounded-md text-sm font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
+                    onClick={onTryHttp}
+                    className="inline-flex items-center px-3 py-1.5 bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-700 rounded-full text-sm font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
                   >
                     <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
                     Try HTTP instead
@@ -204,7 +211,7 @@ export function WebsiteConnectionError({ url, details, onDismiss, onTryAlternati
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="inline-flex items-center px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   Open website <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
                 </a>
