@@ -597,12 +597,12 @@ export const ImageAltScanner = ({
                                           name={`alt-text-${issue.id}`}
                                           id={`alt-text-${issue.id}`}
                                           defaultValue={issue.suggestedAlt}
-                                          className="flex-1 min-w-0 block w-full px-3 py-2 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                                          className="flex-1 min-w-0 block w-full px-4 py-2 rounded-l-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-[#0fae96] focus:border-[#0fae96] sm:text-sm"
                                         />
                                         <button
                                           type="button"
                                           onClick={() => handleFixIssue(issue.id, issue.suggestedAlt || '')}
-                                          className="inline-flex items-center px-4 py-2 border border-transparent rounded-r-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                          className="inline-flex items-center px-4 py-2 border border-transparent rounded-r-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0c9a85] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96]"
                                         >
                                           <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
                                           Apply Fix
@@ -622,7 +622,7 @@ export const ImageAltScanner = ({
                   <div className="text-center py-12">
                     <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
                     <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">No issues found!</h3>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
                       All images appear to have proper alt text attributes.
                     </p>
                   </div>
