@@ -485,7 +485,7 @@ export const ImageAltScanner = ({
                       
                       <div className="flex flex-wrap gap-2">
                         <select
-                          className="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-1 pl-3 pr-10 text-base focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                          className="rounded-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-1 pl-4 pr-10 text-base focus:outline-none focus:ring-[#0fae96] focus:border-[#0fae96] sm:text-sm"
                           value={filterOptions.issueTypes.length === 5 ? 'all' : filterOptions.issueTypes.join(',')}
                           onChange={(e) => {
                             const value = e.target.value;
@@ -506,7 +506,7 @@ export const ImageAltScanner = ({
                         </select>
                         
                         <select
-                          className="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-1 pl-3 pr-10 text-base focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                          className="rounded-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-1 pl-4 pr-10 text-base focus:outline-none focus:ring-[#0fae96] focus:border-[#0fae96] sm:text-sm"
                           value={filterOptions.impacts.length === 4 ? 'all' : filterOptions.impacts.join(',')}
                           onChange={(e) => {
                             const value = e.target.value;
@@ -544,7 +544,7 @@ export const ImageAltScanner = ({
                           initial="hidden"
                           animate="visible"
                           transition={{ delay: index * 0.1 }}
-                          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4"
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md p-5"
                         >
                           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div className="flex-1">
