@@ -107,21 +107,9 @@ export default function Navbar() {
     },
     { 
       icon: NavigationIcons.tools.colorPalette, 
-      label: 'Color Palette',
-      description: 'Create accessible color combinations',
-      href: '/tools/colors'
-    },
-    { 
-      icon: NavigationIcons.tools.colorSimulator, 
-      label: 'Color Accessibility Simulator',
-      description: 'Test colors for accessibility',
-      href: '/tools/color-simulator'
-    },
-    { 
-      icon: NavigationIcons.tools.wcagStandards, 
-      label: 'WCAG Standards',
-      description: 'Browse WCAG 2.1 standards',
-      href: '/tools/wcag-standards'
+      label: 'Colour Palette',
+      description: 'Create accessible colour combinations',
+      href: '/tools/colour-palette'
     },
     { 
       icon: NavigationIcons.tools.imageAltScanner, 
