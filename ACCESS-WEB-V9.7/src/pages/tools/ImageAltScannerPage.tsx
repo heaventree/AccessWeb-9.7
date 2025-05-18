@@ -44,18 +44,18 @@ export function ImageAltScannerPage() {
           <div className="mt-4 md:mt-0 flex space-x-3">
             <Link 
               to="/help/alt-text-guide" 
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96]"
             >
-              <HelpCircle className="-ml-1 mr-2 h-5 w-5" />
+              <HelpCircle className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
               Alt Text Guide
             </Link>
             <a 
               href="https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96]"
             >
-              <ExternalLink className="-ml-1 mr-2 h-5 w-5" />
+              <ExternalLink className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
               WCAG 1.1.1 Spec
             </a>
           </div>
@@ -81,7 +81,7 @@ export function ImageAltScannerPage() {
                   type="text"
                   name="url"
                   id="url"
-                  className="flex-1 min-w-0 block w-full rounded-md text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-[#0fae96] focus:border-[#0fae96]"
+                  className="flex-1 min-w-0 block w-full rounded-full text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-[#0fae96] focus:border-[#0fae96] px-4 py-2"
                   placeholder="https://example.com"
                   value={urlToScan}
                   onChange={(e) => setUrlToScan(e.target.value)}
@@ -100,7 +100,7 @@ export function ImageAltScannerPage() {
               <select
                 id="integration-type"
                 name="integration-type"
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-2 pl-3 pr-10 text-base focus:outline-none focus:ring-[#0fae96] focus:border-[#0fae96]"
+                className="mt-1 block w-full rounded-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-2 pl-4 pr-10 text-base focus:outline-none focus:ring-[#0fae96] focus:border-[#0fae96]"
                 value={integrationType}
                 onChange={(e) => setIntegrationType(e.target.value as 'browser' | 'wordpress' | 'shopify')}
                 aria-describedby="integration-type-desc"
@@ -161,7 +161,7 @@ export function ImageAltScannerPage() {
               href="https://www.w3.org/WAI/tutorials/images/decision-tree/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150"
+              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md"
             >
               <div className="flex-shrink-0">
                 <LinkIcon className="h-6 w-6 text-primary-500" />
