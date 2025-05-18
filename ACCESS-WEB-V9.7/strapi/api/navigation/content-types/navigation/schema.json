@@ -1,20 +1,21 @@
-
 {
   "kind": "singleType",
   "collectionName": "navigations",
   "info": {
     "singularName": "navigation",
     "pluralName": "navigations",
-    "displayName": "Navigation"
+    "displayName": "Navigation",
+    "description": "Manage the main navigation menu of your website"
   },
   "options": {
     "draftAndPublish": true
   },
+  "pluginOptions": {},
   "attributes": {
     "items": {
       "type": "component",
       "repeatable": true,
-      "component": "menu.menu-item"
+      "component": "navigation.menu-item"
     }
   }
 }

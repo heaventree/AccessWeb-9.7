@@ -5,11 +5,12 @@
     "singularName": "page",
     "pluralName": "pages",
     "displayName": "Page",
-    "description": "Create and manage flexible pages with dynamic sections"
+    "description": "Create and manage dynamic pages for your website"
   },
   "options": {
     "draftAndPublish": true
   },
+  "pluginOptions": {},
   "attributes": {
     "title": {
       "type": "string",
@@ -33,28 +34,6 @@
       "repeatable": false,
       "component": "shared.seo"
     },
-    "showInNavigation": {
-      "type": "boolean",
-      "default": false,
-      "description": "Whether to show this page in the main navigation"
-    },
-    "parentPage": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::page.page",
-      "inversedBy": "childPages"
-    },
-    "childPages": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::page.page",
-      "mappedBy": "parentPage"
-    },
-    "navigationOrder": {
-      "type": "integer",
-      "default": 0,
-      "description": "Order in which to display in navigation (lower numbers first)"
-    },
     "layout": {
       "type": "enumeration",
       "enum": [
@@ -63,7 +42,7 @@
         "sidebar"
       ],
       "default": "default",
-      "description": "Page layout template to use"
+      "required": true
     }
   }
 }

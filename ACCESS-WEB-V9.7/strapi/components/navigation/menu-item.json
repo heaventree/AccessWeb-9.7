@@ -1,0 +1,43 @@
+{
+  "collectionName": "components_navigation_menu_items",
+  "info": {
+    "displayName": "Menu Item",
+    "description": "Navigation menu item with support for nested items"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string"
+    },
+    "page": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::page.page"
+    },
+    "target": {
+      "type": "enumeration",
+      "enum": ["_self", "_blank"],
+      "default": "_self"
+    },
+    "icon": {
+      "type": "string"
+    },
+    "isButton": {
+      "type": "boolean",
+      "default": false
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    },
+    "children": {
+      "type": "component",
+      "repeatable": true,
+      "component": "navigation.menu-item"
+    }
+  }
+}

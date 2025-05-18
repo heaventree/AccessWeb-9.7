@@ -2,8 +2,7 @@
   "collectionName": "components_sections_hero_sections",
   "info": {
     "displayName": "Hero Section",
-    "icon": "star",
-    "description": "A full-width hero section with background image and text overlay"
+    "description": "A full-width hero section with background image and call-to-action"
   },
   "options": {},
   "attributes": {
@@ -28,12 +27,10 @@
     },
     "textColor": {
       "type": "string",
-      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
       "default": "#ffffff"
     },
     "darkModeTextColor": {
       "type": "string",
-      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
       "default": "#ffffff"
     },
     "buttonText": {
@@ -44,21 +41,12 @@
     },
     "alignment": {
       "type": "enumeration",
-      "enum": [
-        "left",
-        "center",
-        "right"
-      ],
+      "enum": ["left", "center", "right"],
       "default": "center"
     },
     "height": {
       "type": "enumeration",
-      "enum": [
-        "small",
-        "medium",
-        "large",
-        "full"
-      ],
+      "enum": ["small", "medium", "large", "full"],
       "default": "medium"
     }
   }
