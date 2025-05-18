@@ -223,7 +223,7 @@ export const ImageAltScanner = ({
         </h2>
         
         <div className="mb-6">
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-300">
             This tool scans for WCAG 1.1.1 compliance issues with images, detecting missing or improper alt text.
           </p>
         </div>
@@ -253,7 +253,7 @@ export const ImageAltScanner = ({
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
-              className="flex items-center px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              className="flex items-center px-4 py-2 text-base font-medium text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-[#5eead4] rounded-full border border-gray-300 dark:border-gray-700"
               aria-expanded={showAdvancedOptions}
               aria-controls="advanced-options-panel"
             >
@@ -335,7 +335,7 @@ export const ImageAltScanner = ({
                         className="mt-1 block w-full rounded-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#0fae96] focus:ring-[#0fae96] text-base px-4 py-2"
                         aria-describedby="redundant-terms-desc"
                       />
-                      <p id="redundant-terms-desc" className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      <p id="redundant-terms-desc" className="mt-1 text-sm text-gray-500 dark:text-gray-300">
                         Words like 'image' or 'photo' that are redundant in alt text. Separate with commas.
                       </p>
                     </div>
@@ -351,7 +351,7 @@ export const ImageAltScanner = ({
                         className="mt-1 block w-full rounded-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#0fae96] focus:ring-[#0fae96] text-base px-4 py-2"
                         aria-describedby="suspicious-patterns-desc"
                       />
-                      <p id="suspicious-patterns-desc" className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      <p id="suspicious-patterns-desc" className="mt-1 text-sm text-gray-500 dark:text-gray-300">
                         Terms that indicate auto-generated or placeholder alt text. Separate with commas.
                       </p>
                     </div>
