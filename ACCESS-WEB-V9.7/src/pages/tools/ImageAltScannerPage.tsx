@@ -73,7 +73,7 @@ export function ImageAltScannerPage() {
           
           <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
             <div className="sm:col-span-4">
-              <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="url" className="block text-base font-medium text-gray-700 dark:text-gray-300">
                 URL to scan
               </label>
               <div className="mt-1 flex rounded-md shadow-sm">
@@ -81,32 +81,37 @@ export function ImageAltScannerPage() {
                   type="text"
                   name="url"
                   id="url"
-                  className="flex-1 min-w-0 block w-full rounded-md sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                  className="flex-1 min-w-0 block w-full rounded-md text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-[#0fae96] focus:border-[#0fae96]"
                   placeholder="https://example.com"
                   value={urlToScan}
                   onChange={(e) => setUrlToScan(e.target.value)}
+                  aria-describedby="url-description"
                 />
               </div>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p id="url-description" className="mt-1 text-base text-gray-500 dark:text-gray-400">
                 Leave empty to scan the current page
               </p>
             </div>
             
             <div className="sm:col-span-2">
-              <label htmlFor="integration-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="integration-type" className="block text-base font-medium text-gray-700 dark:text-gray-300">
                 Integration Type
               </label>
               <select
                 id="integration-type"
                 name="integration-type"
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-2 pl-3 pr-10 text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-2 pl-3 pr-10 text-base focus:outline-none focus:ring-[#0fae96] focus:border-[#0fae96]"
                 value={integrationType}
                 onChange={(e) => setIntegrationType(e.target.value as 'browser' | 'wordpress' | 'shopify')}
+                aria-describedby="integration-type-desc"
               >
                 <option value="browser">Browser (Current Page)</option>
                 <option value="wordpress">WordPress Integration</option>
                 <option value="shopify">Shopify Integration</option>
               </select>
+              <p id="integration-type-desc" className="mt-1 text-base text-gray-500 dark:text-gray-400">
+                Select how you want to integrate with the website being scanned
+              </p>
             </div>
           </div>
           
