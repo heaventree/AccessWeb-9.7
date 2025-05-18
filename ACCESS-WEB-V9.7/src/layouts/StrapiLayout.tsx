@@ -1,111 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import Navigation from '@/components/strapi/navigation/Navigation';
-import axios from 'axios';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { Navigation } from '@/components/Navigation';
+import { CheckCircle } from 'lucide-react';
 
 interface StrapiLayoutProps {
   children?: React.ReactNode;
 }
 
 /**
- * Layout component that integrates Strapi navigation with the original application layout
+ * Layout component that integrates navigation with the original application layout
  */
 const StrapiLayout: React.FC<StrapiLayoutProps> = ({ children }) => {
   const location = useLocation();
-  const [useStrapiFallback, setUseStrapiFallback] = useState(false);
   
-  // Always use fallback navigation for now until Strapi is fully connected
-  useEffect(() => {
-    setUseStrapiFallback(true);
-    console.log('Using fallback navigation while Strapi integration is being completed');
-  }, []);
-  
-  // This function renders either the original navigation or the Strapi navigation
-  // depending on connection status
-  const renderNavigation = () => {
-    if (useStrapiFallback) {
-      // Fallback to original navigation if Strapi is not available
-      return (
-        <nav className="flex items-center space-x-6">
-          <Link
-            to="/"
-            className={`text-gray-700 dark:text-gray-300 hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors ${
-              location.pathname === '/' ? 'font-medium text-[#0fae96] dark:text-[#5eead4]' : ''
-            }`}
-          >
-            Home
-          </Link>
-          <Link
-            to="/tools/colour-palette"
-            className={`text-gray-700 dark:text-gray-300 hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors ${
-              location.pathname === '/tools/colour-palette' ? 'font-medium text-[#0fae96] dark:text-[#5eead4]' : ''
-            }`}
-          >
-            WCAG Colour Palette
-          </Link>
-          <Link
-            to="/tools/image-alt-scanner"
-            className={`text-gray-700 dark:text-gray-300 hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors ${
-              location.pathname === '/tools/image-alt-scanner' ? 'font-medium text-[#0fae96] dark:text-[#5eead4]' : ''
-            }`}
-          >
-            Image Alt Scanner
-          </Link>
-        </nav>
-      );
-    }
-    
-    // Use Strapi navigation if available
-    return <Navigation className="ml-auto" />;
-  };
-
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Modern header with unified navigation component */}
       <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-30">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <img 
-              src="/logo.svg" 
-              alt="AccessWeb" 
-              className="h-8 w-auto" 
-            />
-            <span className="text-xl font-bold text-gray-900 dark:text-white">AccessWeb</span>
-          </Link>
-          
-          {renderNavigation()}
-          
-          <div className="flex items-center space-x-4 ml-4">
-            {/* Dark mode toggle */}
-            <button
-              type="button"
-              className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
-              aria-label="Toggle dark mode"
-              onClick={() => document.documentElement.classList.toggle('dark')}
-            >
-              <svg className="hidden dark:block h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-              <svg className="block dark:hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            </button>
-
-            {/* Account/Login button */}
-            <Link
-              to="/my-account"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-[#0fae96] hover:bg-[#0c9a85] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96] transition-colors"
-            >
-              My Account
-            </Link>
-            
-            {/* Admin link (only visible to admins in a real app) */}
-            <Link
-              to="/admin"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-full shadow-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96] transition-colors"
-            >
-              Admin
-            </Link>
-          </div>
+        <div className="container mx-auto px-4 py-4">
+          <Navigation />
         </div>
       </header>
 
@@ -131,6 +45,9 @@ const StrapiLayout: React.FC<StrapiLayoutProps> = ({ children }) => {
                 </li>
                 <li>
                   <Link to="/tools/image-alt-scanner" className="text-gray-600 dark:text-gray-300 hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">Image Alt Scanner</Link>
+                </li>
+                <li>
+                  <Link to="/checker" className="text-gray-600 dark:text-gray-300 hover:text-[#0fae96] dark:hover:text-[#5eead4] transition-colors">WCAG Checker</Link>
                 </li>
               </ul>
             </div>
