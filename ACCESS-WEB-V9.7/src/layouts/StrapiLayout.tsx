@@ -14,21 +14,10 @@ const StrapiLayout: React.FC<StrapiLayoutProps> = ({ children }) => {
   const location = useLocation();
   const [useStrapiFallback, setUseStrapiFallback] = useState(false);
   
-  // Check if we should use Strapi navigation or fallback to the original navigation
-  // This helps ensure the site works even if Strapi/API isn't connected
+  // Always use fallback navigation for now until Strapi is fully connected
   useEffect(() => {
-    const checkStrapiConnection = async () => {
-      try {
-        // Try to fetch navigation from API
-        await axios.get('/api/cms/navigation');
-        setUseStrapiFallback(false);
-      } catch (error) {
-        console.log('Strapi navigation unavailable, using fallback navigation');
-        setUseStrapiFallback(true);
-      }
-    };
-    
-    checkStrapiConnection();
+    setUseStrapiFallback(true);
+    console.log('Using fallback navigation while Strapi integration is being completed');
   }, []);
   
   // This function renders either the original navigation or the Strapi navigation

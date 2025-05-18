@@ -6,14 +6,34 @@ import HomePage from '@/pages/HomePage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import DynamicPageRenderer from '@/pages/DynamicPageRenderer';
 
-// Admin pages
+// Admin pages for the new CMS functionality
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
 import ContentManagerPage from '@/pages/admin/ContentManagerPage';
 import PageEditorPage from '@/pages/admin/PageEditorPage';
 import PagePreviewPage from '@/pages/admin/PagePreviewPage';
 
-// We'll import the existing pages as needed
-// For example, if the app has tools/WCAGColorPalettePage, you'd import it here
+// Simple account page component
+const SimpleAccountPage = () => (
+  <div className="container mx-auto px-4 py-8">
+    <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">My Account</h1>
+    <p className="text-gray-700 dark:text-gray-300">This is a simple account page. More functionality will be added soon.</p>
+  </div>
+);
+
+// Simple tool page wrappers
+const ColorPalettePage = () => (
+  <div className="container mx-auto px-4 py-8">
+    <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">WCAG Colour Palette Tool</h1>
+    <p className="text-gray-700 dark:text-gray-300">The WCAG Colour Palette Tool helps you create and test accessible color combinations.</p>
+  </div>
+);
+
+const ImageAltScannerPage = () => (
+  <div className="container mx-auto px-4 py-8">
+    <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Image Alt Scanner Tool</h1>
+    <p className="text-gray-700 dark:text-gray-300">The Image Alt Scanner helps you identify and fix missing alt text for better accessibility.</p>
+  </div>
+);
 
 const App: React.FC = () => {
   return (
@@ -26,25 +46,25 @@ const App: React.FC = () => {
       
       <BrowserRouter>
         <Routes>
-          {/* Admin routes */}
+          {/* Admin routes for the CMS */}
           <Route path="/admin" element={<AdminDashboardPage />}>
             <Route path="content" element={<ContentManagerPage />} />
             <Route path="content/create" element={<PageEditorPage />} />
             <Route path="content/edit/:id" element={<PageEditorPage />} />
             <Route path="content/preview/:id" element={<PagePreviewPage />} />
-            {/* Add more admin routes as needed */}
           </Route>
           
           {/* Main routes with standard layout */}
           <Route element={<StrapiLayout />}>
+            {/* Homepage */}
             <Route path="/" element={<HomePage />} />
             
-            {/* Here you would add all your existing routes */}
-            {/* For example:
-            <Route path="/tools/colour-palette" element={<WCAGColorPalettePage />} />
+            {/* Tool pages */}
+            <Route path="/tools/colour-palette" element={<ColorPalettePage />} />
             <Route path="/tools/image-alt-scanner" element={<ImageAltScannerPage />} />
-            <Route path="/my-account" element={<MyAccountPage />} />
-            */}
+            
+            {/* Account page */}
+            <Route path="/my-account" element={<SimpleAccountPage />} />
             
             {/* Catch-all route for dynamic Strapi pages */}
             <Route path="/:slug" element={<DynamicPageRenderer />} />
