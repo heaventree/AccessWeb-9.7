@@ -6,10 +6,10 @@ if (!process.env.DATABASE_URL) {
 }
 
 export default {
-  schema: './src/db/schema.ts',
+  schema: './src/shared/schema.ts',
   out: './drizzle',
   driver: 'pg',
   dbCredentials: {
     connectionString: process.env.DATABASE_URL,
-  }
+  },
 } satisfies Config;

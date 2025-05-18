@@ -166,11 +166,6 @@ export interface LegislationCompliance {
 export interface TestResult {
   url: string;
   timestamp: string;
-  score: number;
-  passCount?: number;
-  warningCount?: number;
-  issueCount?: number;
-  region?: string;
   issues: AccessibilityIssue[];
   passes: AccessibilityIssue[];
   warnings: AccessibilityIssue[];
@@ -190,12 +185,6 @@ export interface TestResult {
     headingIssues?: number;
     semanticIssues?: number;
     urlIssues?: number;
-  };
-  standards?: {
-    wcag21: boolean;
-    wcag22: boolean;
-    section508: boolean;
-    eaa: boolean;
   };
   legislationCompliance?: LegislationCompliance;
 }
