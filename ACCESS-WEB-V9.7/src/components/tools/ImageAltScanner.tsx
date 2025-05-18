@@ -365,7 +365,7 @@ export const ImageAltScanner = ({
       
       {/* Results Section */}
       {scanResult && (
-        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-md">
           <div className="border-b border-gray-200 dark:border-gray-700">
             <nav className="flex -mb-px overflow-x-auto" aria-label="Scan Results Tabs" role="tablist">
               <button
@@ -419,10 +419,10 @@ export const ImageAltScanner = ({
           <div className="p-6">
             {/* Summary Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <ImageIcon className="h-6 w-6 text-primary-500" />
+                    <ImageIcon className="h-6 w-6 text-[#0fae96]" />
                   </div>
                   <div className="ml-3">
                     <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Images</div>
