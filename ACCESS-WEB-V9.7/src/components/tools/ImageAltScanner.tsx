@@ -449,7 +449,7 @@ export const ImageAltScanner = ({
                     <CheckCircle className="h-6 w-6 text-green-500" />
                   </div>
                   <div className="ml-3">
-                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Issues Fixed</div>
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-300">Issues Fixed</div>
                     <div className="text-lg font-semibold text-gray-900 dark:text-white">{fixedIssues.length}</div>
                   </div>
                 </div>
@@ -461,7 +461,7 @@ export const ImageAltScanner = ({
                     <BarChart className="h-6 w-6 text-[#0fae96]" />
                   </div>
                   <div className="ml-3">
-                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Compliance</div>
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-300">Compliance</div>
                     <div className="text-lg font-semibold text-gray-900 dark:text-white">
                       {scanResult.totalImages > 0
                         ? Math.round(((scanResult.totalImages - scanResult.issues.length) / scanResult.totalImages) * 100)
@@ -479,7 +479,7 @@ export const ImageAltScanner = ({
                     {/* Filter Controls */}
                     <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div className="flex items-center">
-                        <Filter className="h-5 w-5 text-gray-400 mr-2" />
+                        <Filter className="h-5 w-5 text-[#0fae96] dark:text-[#5eead4] mr-2" />
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter Issues:</span>
                       </div>
                       
@@ -679,9 +679,9 @@ export const ImageAltScanner = ({
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <Info className="mx-auto h-12 w-12 text-gray-400" />
+                    <Info className="mx-auto h-12 w-12 text-[#0fae96] dark:text-[#5eead4]" />
                     <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">No fixed issues yet</h3>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
                       After you fix issues, they will appear here for reference.
                     </p>
                   </div>
