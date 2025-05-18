@@ -233,16 +233,17 @@ export const ImageAltScanner = ({
             <button
               onClick={startScan}
               disabled={isScanning}
-              className="w-full md:w-auto flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full md:w-auto flex items-center justify-center px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96] disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label={isScanning ? "Currently scanning for image issues" : "Start scanning for image accessibility issues"}
             >
               {isScanning ? (
                 <>
-                  <RefreshCw className="animate-spin -ml-1 mr-3 h-5 w-5" />
+                  <RefreshCw className="animate-spin -ml-1 mr-3 h-5 w-5" aria-hidden="true" />
                   Scanning...
                 </>
               ) : (
                 <>
-                  <Scan className="-ml-1 mr-3 h-5 w-5" />
+                  <Scan className="-ml-1 mr-3 h-5 w-5" aria-hidden="true" />
                   Start Scan
                 </>
               )}
@@ -252,9 +253,11 @@ export const ImageAltScanner = ({
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
-              className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              className="flex items-center px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              aria-expanded={showAdvancedOptions}
+              aria-controls="advanced-options-panel"
             >
-              <Settings className="h-4 w-4 mr-2" />
+              <Settings className="h-4 w-4 mr-2" aria-hidden="true" />
               <span>{showAdvancedOptions ? 'Hide' : 'Show'} Advanced Options</span>
             </button>
           </div>
@@ -268,6 +271,7 @@ export const ImageAltScanner = ({
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
               className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 overflow-hidden"
+              id="advanced-options-panel"
             >
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Advanced Scan Options
