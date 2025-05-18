@@ -62,7 +62,7 @@ export function ImageAltScannerPage() {
         </div>
         
         {/* Scan Settings */}
-        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl p-6 mb-8 border border-gray-200 dark:border-gray-700">
           <div className="md:flex md:items-center md:justify-between">
             <div className="flex-1 min-w-0">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -151,7 +151,7 @@ export function ImageAltScannerPage() {
         />
         
         {/* Resource Links */}
-        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl p-6 mb-8 border border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
             Additional Resources
           </h2>
@@ -164,7 +164,7 @@ export function ImageAltScannerPage() {
               className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md"
             >
               <div className="flex-shrink-0">
-                <LinkIcon className="h-6 w-6 text-primary-500" />
+                <LinkIcon className="h-6 w-6 text-[#0fae96]" aria-hidden="true" />
               </div>
               <div className="ml-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
@@ -180,10 +180,10 @@ export function ImageAltScannerPage() {
               href="https://webaim.org/techniques/alttext/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150"
+              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md"
             >
               <div className="flex-shrink-0">
-                <LinkIcon className="h-6 w-6 text-primary-500" />
+                <LinkIcon className="h-6 w-6 text-[#0fae96]" aria-hidden="true" />
               </div>
               <div className="ml-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
@@ -197,10 +197,10 @@ export function ImageAltScannerPage() {
             
             <Link 
               to="/help/alt-text-guide"
-              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150"
+              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md"
             >
               <div className="flex-shrink-0">
-                <HelpCircle className="h-6 w-6 text-primary-500" />
+                <HelpCircle className="h-6 w-6 text-[#0fae96]" aria-hidden="true" />
               </div>
               <div className="ml-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
@@ -216,10 +216,10 @@ export function ImageAltScannerPage() {
               href="https://www.deque.com/blog/great-alt-text-introduction/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150"
+              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md"
             >
               <div className="flex-shrink-0">
-                <LinkIcon className="h-6 w-6 text-primary-500" />
+                <LinkIcon className="h-6 w-6 text-[#0fae96]" aria-hidden="true" />
               </div>
               <div className="ml-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
@@ -235,7 +235,7 @@ export function ImageAltScannerPage() {
         
         {/* Scan History */}
         {scanHistory.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
               Scan History
             </h2>
