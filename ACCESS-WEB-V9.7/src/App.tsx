@@ -5,6 +5,7 @@ import StrapiLayout from '@/layouts/StrapiLayout';
 import HomePage from '@/pages/HomePage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import DynamicPageRenderer from '@/pages/DynamicPageRenderer';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 
 // Import real tool pages
 import WCAGColorPalette from '@/pages/tools/WCAGColorPalette';
@@ -33,8 +34,9 @@ const App: React.FC = () => {
         <meta name="theme-color" content="#0fae96" />
       </Helmet>
       
-      <BrowserRouter>
-        <Routes>
+      <ThemeProvider>
+        <BrowserRouter>
+          <Routes>
           {/* Admin routes for the CMS */}
           <Route path="/admin" element={<AdminDashboardPage />}>
             <Route path="content" element={<ContentManagerPage />} />
@@ -63,6 +65,7 @@ const App: React.FC = () => {
           </Route>
         </Routes>
       </BrowserRouter>
+      </ThemeProvider>
     </HelmetProvider>
   );
 };
