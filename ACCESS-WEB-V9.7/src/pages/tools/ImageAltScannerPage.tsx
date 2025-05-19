@@ -4,6 +4,8 @@ import { ImageAltScannerInfo } from '../../components/tools/ImageAltScannerInfo'
 import { ExternalLink, HelpCircle, Info, Link as LinkIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { ScanResult, ImageIssue, ScanOptions } from '../../services/imageAltScanService';
+import CardContainer from '../../components/ui/CardContainer';
+import StyledButton from '../../components/ui/StyledButton';
 
 export function ImageAltScannerPage() {
   const [urlToScan, setUrlToScan] = useState('');
@@ -29,14 +31,14 @@ export function ImageAltScannerPage() {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-[130px] pb-[80px]">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pt-[130px] pb-[80px]">
       <div className="content-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
               Image Alt Text Scanner
             </h1>
-            <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
               Find and fix image accessibility issues to ensure WCAG 1.1.1 compliance
             </p>
           </div>
@@ -44,7 +46,7 @@ export function ImageAltScannerPage() {
           <div className="mt-4 md:mt-0 flex space-x-3">
             <Link 
               to="/help/alt-text-guide" 
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96]"
+              className="inline-flex items-center px-6 py-3 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96] transition-colors"
             >
               <HelpCircle className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
               Alt Text Guide
@@ -53,7 +55,7 @@ export function ImageAltScannerPage() {
               href="https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96]"
+              className="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-slate-600 rounded-full shadow-sm text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 hover:text-[#0fae96] dark:hover:text-[#5eead4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96] transition-colors"
             >
               <ExternalLink className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
               WCAG 1.1.1 Spec
@@ -62,12 +64,14 @@ export function ImageAltScannerPage() {
         </div>
         
         {/* Scan Settings */}
-        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl p-6 mb-8 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-slate-800 shadow-sm rounded-xl p-6 mb-8 border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+            Scan Settings
+          </h2>
+          
           <div className="md:flex md:items-center md:justify-between">
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                Scan Settings
-              </h2>
+              {/* Title is now handled by the h2 above */}
             </div>
           </div>
           
@@ -76,19 +80,19 @@ export function ImageAltScannerPage() {
               <label htmlFor="url" className="block text-base font-medium text-gray-700 dark:text-gray-300">
                 URL to scan
               </label>
-              <div className="mt-1 flex rounded-md shadow-sm">
+              <div className="mt-2 flex rounded-full shadow-sm">
                 <input
                   type="text"
                   name="url"
                   id="url"
-                  className="flex-1 min-w-0 block w-full rounded-full text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-[#0fae96] focus:border-[#0fae96] px-4 py-2"
+                  className="flex-1 min-w-0 block w-full rounded-full text-base border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-[#0fae96] focus:border-[#0fae96] px-6 py-3"
                   placeholder="https://example.com"
                   value={urlToScan}
                   onChange={(e) => setUrlToScan(e.target.value)}
                   aria-describedby="url-description"
                 />
               </div>
-              <p id="url-description" className="mt-1 text-base text-gray-500 dark:text-gray-400">
+              <p id="url-description" className="mt-2 text-base text-gray-500 dark:text-gray-400">
                 Leave empty to scan the current page
               </p>
             </div>
@@ -100,7 +104,7 @@ export function ImageAltScannerPage() {
               <select
                 id="integration-type"
                 name="integration-type"
-                className="mt-1 block w-full rounded-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-2 pl-4 pr-10 text-base focus:outline-none focus:ring-[#0fae96] focus:border-[#0fae96]"
+                className="mt-2 block w-full rounded-full border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white py-3 pl-6 pr-10 text-base focus:outline-none focus:ring-[#0fae96] focus:border-[#0fae96]"
                 value={integrationType}
                 onChange={(e) => setIntegrationType(e.target.value as 'browser' | 'wordpress' | 'shopify')}
                 aria-describedby="integration-type-desc"
@@ -116,16 +120,16 @@ export function ImageAltScannerPage() {
           </div>
           
           {(integrationType === 'wordpress' || integrationType === 'shopify') && (
-            <div className="mt-4 rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-4">
+            <div className="mt-6 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 p-5 border border-yellow-200 dark:border-yellow-900">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <Info className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+                  <Info className="h-6 w-6 text-yellow-500" aria-hidden="true" />
                 </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-400">
+                <div className="ml-4">
+                  <h3 className="text-base font-medium text-yellow-800 dark:text-yellow-400">
                     {integrationType === 'wordpress' ? 'WordPress Integration' : 'Shopify Integration'}
                   </h3>
-                  <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                  <div className="mt-2 text-base text-yellow-700 dark:text-yellow-300">
                     <p>
                       {integrationType === 'wordpress'
                         ? 'To use WordPress integration, you need to install our plugin first. Go to your WordPress admin dashboard and install "WCAG Image Scanner" plugin.'
