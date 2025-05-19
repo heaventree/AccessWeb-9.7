@@ -155,7 +155,7 @@ export function ImageAltScannerPage() {
         />
         
         {/* Resource Links */}
-        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl p-6 mb-8 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-slate-800 shadow-sm rounded-xl p-6 mb-8 border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
             Additional Resources
           </h2>
@@ -165,7 +165,7 @@ export function ImageAltScannerPage() {
               href="https://www.w3.org/WAI/tutorials/images/decision-tree/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md"
+              className="flex items-start p-4 bg-gray-50 dark:bg-slate-700 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-600 transition duration-150 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md"
             >
               <div className="flex-shrink-0">
                 <LinkIcon className="h-6 w-6 text-[#0fae96]" aria-hidden="true" />
@@ -184,7 +184,7 @@ export function ImageAltScannerPage() {
               href="https://webaim.org/techniques/alttext/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md"
+              className="flex items-start p-4 bg-gray-50 dark:bg-slate-700 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-600 transition duration-150 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md"
             >
               <div className="flex-shrink-0">
                 <LinkIcon className="h-6 w-6 text-[#0fae96]" aria-hidden="true" />
@@ -201,7 +201,7 @@ export function ImageAltScannerPage() {
             
             <Link 
               to="/help/alt-text-guide"
-              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md"
+              className="flex items-start p-4 bg-gray-50 dark:bg-slate-700 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-600 transition duration-150 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md"
             >
               <div className="flex-shrink-0">
                 <HelpCircle className="h-6 w-6 text-[#0fae96]" aria-hidden="true" />
@@ -220,7 +220,7 @@ export function ImageAltScannerPage() {
               href="https://www.deque.com/blog/great-alt-text-introduction/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-150 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md"
+              className="flex items-start p-4 bg-gray-50 dark:bg-slate-700 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-600 transition duration-150 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md"
             >
               <div className="flex-shrink-0">
                 <LinkIcon className="h-6 w-6 text-[#0fae96]" aria-hidden="true" />
@@ -239,12 +239,12 @@ export function ImageAltScannerPage() {
         
         {/* Scan History */}
         {scanHistory.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 shadow-sm rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-slate-800 shadow-sm rounded-xl p-6 border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
               Scan History
             </h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
                 <thead>
                   <tr>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -261,19 +261,19 @@ export function ImageAltScannerPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                   {scanHistory.map((scan) => (
                     <tr key={scan.id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                         {scan.url}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                         {new Date(scan.timestamp).toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                         {scan.totalImages}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                         {scan.issues.length}
                       </td>
                     </tr>
