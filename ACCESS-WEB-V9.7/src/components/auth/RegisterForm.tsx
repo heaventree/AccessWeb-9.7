@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface RegisterFormProps {
@@ -16,6 +16,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   
   const { register, error, clearError } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +54,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       if (onSuccess) {
         onSuccess();
       } else {
-        navigate('/dashboard');
+        // Get the redirect location from state (if any)
+        const state = location.state as any;
+        const from = state?.from?.pathname || '/dashboard';
+        navigate(from, { replace: true });
       }
     } catch (err) {
       // Error is already handled in auth context
