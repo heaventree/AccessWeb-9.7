@@ -45,6 +45,7 @@ import { ProtectedRoute, PublicOnlyRoute } from './layouts/AuthLayout';
 // Import auth pages
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import AdminBypass from './pages/AdminBypass';
 import { AuthProvider } from './contexts/AuthContext';
 
 import { WCAGCheckerPage } from './pages/WCAGCheckerPage';
@@ -146,6 +147,7 @@ function App() {
               <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
               <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
               <Route path="/admin/login" element={<AdminLoginPage />} />
+              <Route path="/admin-bypass" element={<AdminBypass />} />
               
               {/* Account Routes with shared layout */}
               <Route path="/my-account" element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
