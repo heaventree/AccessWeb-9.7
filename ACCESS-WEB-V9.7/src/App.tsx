@@ -16,6 +16,7 @@ import { Navigation } from './components/Navigation';
 import Footer from './components/landing/footer';
 import { AccountLayout } from './layouts/AccountLayout';
 import AdminLayout from './components/admin/AdminLayout';
+import SuperAdminLogin from './pages/SuperAdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
 import { AdminPackages } from './pages/admin/AdminPackages';
 import { AdminClients } from './pages/admin/AdminClients';
@@ -146,6 +147,7 @@ function App() {
               <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
               <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
               <Route path="/admin/login" element={<AdminLoginPage />} />
+              <Route path="/super-admin" element={<SuperAdminLogin />} />
               
               {/* Account Routes with shared layout */}
               <Route path="/my-account" element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
