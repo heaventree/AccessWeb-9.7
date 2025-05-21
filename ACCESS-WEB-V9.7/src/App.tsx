@@ -14,9 +14,9 @@ import { AuthPage } from './pages/AuthPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { Navigation } from './components/Navigation';
 import Footer from './components/landing/footer';
-import { AdminLayout } from './layouts/AdminLayout';
 import { AccountLayout } from './layouts/AccountLayout';
-import { AdminDashboard } from './pages/admin/AdminDashboard';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './components/admin/AdminDashboard';
 import { AdminPackages } from './pages/admin/AdminPackages';
 import { AdminClients } from './pages/admin/AdminClients';
 import { AdminReports } from './pages/admin/AdminReports';
@@ -27,6 +27,10 @@ import { AdminRoadmap } from './pages/admin/AdminRoadmap';
 import { AdminDebug } from './pages/admin/AdminDebug';
 import { ChatbotManagement } from './pages/admin/ChatbotManagement';
 import { SupportChat } from './components/support/SupportChat';
+import UserManagement from './components/admin/UserManagement';
+import SubscriptionPlans from './components/admin/SubscriptionPlans';
+import SubscriptionManagement from './components/admin/SubscriptionManagement';
+import AdminSettings from './components/admin/AdminSettings';
 import { IntegrationsOverview } from './pages/integrations/IntegrationsOverview';
 import { ConnectionsPage } from './pages/connections/ConnectionsPage';
 import { CustomAPIPage } from './pages/connections/CustomAPIPage';
@@ -198,6 +202,11 @@ function App() {
               {/* Admin Routes */}
               <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
                 <Route index element={<AdminDashboard />} />
+                <Route path="users" element={<UserManagement />} />
+                <Route path="plans" element={<SubscriptionPlans />} />
+                <Route path="subscriptions" element={<SubscriptionManagement />} />
+                <Route path="settings" element={<AdminSettings />} />
+                {/* Keep existing admin routes for backward compatibility */}
                 <Route path="packages" element={<AdminPackages />} />
                 <Route path="clients" element={<AdminClients />} />
                 <Route path="reports" element={<AdminReports />} />

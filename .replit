@@ -72,7 +72,7 @@ task = "shell.exec"
 args = "cd ACCESS-WEB-V9.7 && npm run build && npm run api"
 
 [deployment]
-run = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run api"]
+run = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run dev"]
 build = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run build"]
 
 [[ports]]
@@ -86,3 +86,11 @@ externalPort = 80
 [[ports]]
 localPort = 5001
 externalPort = 3000
+
+[[ports]]
+localPort = 5002
+externalPort = 3002
+
+[[ports]]
+localPort = 5003
+externalPort = 3003
