@@ -304,16 +304,46 @@ export default function Navbar() {
         </nav>
         
         <div className="flex items-center space-x-5">
-          <Link to="/login" className="hidden md:inline-block text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium transition-colors">
-            Login
-          </Link>
-          <Link to="/signup">
-            <Button 
-              className="bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-6 text-white"
-            >
-              Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+          {loading ? (
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0fae96] border-t-transparent"></div>
+          ) : user ? (
+            <>
+              <div className="hidden md:flex items-center space-x-2">
+                <span className="text-muted-foreground dark:text-gray-300">
+                  {user.email}
+                </span>
+                <Button
+                  onClick={handleLogout}
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white"
+                >
+                  <LogOut className="h-4 w-4 mr-1" />
+                  Logout
+                </Button>
+              </div>
+              <Link to="/my-account">
+                <Button 
+                  className="bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-6 text-white"
+                >
+                  Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="hidden md:inline-block text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium transition-colors">
+                Login
+              </Link>
+              <Link to="/register">
+                <Button 
+                  className="bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-6 text-white"
+                >
+                  Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </>
+          )}
           
           {/* Dark Mode Toggle Button */}
           <button
@@ -431,33 +461,77 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="pt-3 mt-3 border-t border-border">
-              <div className="flex items-center justify-between py-3">
-                <Link 
-                  to="/login" 
-                  className="text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Login
-                </Link>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleTheme();
-                  }}
-                  className="p-2 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white transition-colors"
-                  aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-                >
-                  {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-                </button>
-              </div>
-              <Link to="/signup" className="w-full">
-                <Button 
-                  className="w-full mt-3 bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-6 text-white"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+              {loading ? (
+                <div className="flex justify-center py-4">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0fae96] border-t-transparent"></div>
+                </div>
+              ) : user ? (
+                <div className="py-3">
+                  <div className="flex items-center mb-3">
+                    <User className="h-5 w-5 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
+                    <span className="text-foreground dark:text-white truncate">{user.email}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Link 
+                      to="/my-account" 
+                      className="text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleTheme();
+                      }}
+                      className="p-2 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white transition-colors"
+                      aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                    >
+                      {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+                    </button>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full mt-3 flex items-center justify-center bg-red-100 hover:bg-red-200 dark:bg-red-950/30 dark:hover:bg-red-950/50 text-red-600 dark:text-red-400 py-2 px-4 rounded-full font-medium transition-colors"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between py-3">
+                    <Link 
+                      to="/login" 
+                      className="text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Login
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleTheme();
+                      }}
+                      className="p-2 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white transition-colors"
+                      aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                    >
+                      {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+                    </button>
+                  </div>
+                  <Link to="/register" className="w-full">
+                    <Button 
+                      className="w-full mt-3 bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-6 text-white"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </motion.div>
         )}
