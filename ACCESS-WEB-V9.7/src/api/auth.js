@@ -1,8 +1,9 @@
-import express, { Router } from 'express';
+import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../lib/prisma';
+import { PrismaClient } from '@prisma/client';
 
+const prisma = new PrismaClient();
 const router = Router();
 
 // Register new user
@@ -117,7 +118,7 @@ router.get('/me', async (req, res) => {
     }
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as { userId: number };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
     
     // Get user
     const user = await prisma.user.findUnique({ 

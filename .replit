@@ -16,15 +16,20 @@ author = "agent"
 task = "workflow.run"
 args = "ACCESS-WEB-V9.7 Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "ACCESS-WEB-V9.7 Frontend and API"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "API Server"
+
 [[workflows.workflow]]
 name = "ACCESS-WEB-V9.7 Server"
 author = "agent"
 
 [workflows.workflow.metadata]
 agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -40,8 +45,29 @@ mode = "sequential"
 task = "shell.exec"
 args = "cd ACCESS-WEB-V9.7/strapi && npm run develop"
 
+[[workflows.workflow]]
+name = "ACCESS-WEB-V9.7 Frontend and API"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd ACCESS-WEB-V9.7 && npm run dev:all"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "API Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd ACCESS-WEB-V9.7 && node src/server/server.js"
+
 [deployment]
 run = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run dev"]
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
 
 [[ports]]
 localPort = 5000
