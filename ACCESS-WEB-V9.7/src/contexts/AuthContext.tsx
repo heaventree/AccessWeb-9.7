@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import { authApi } from '../lib/apiClient';
 
 // User type from our auth system
 interface User {
@@ -40,9 +40,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const response = await axios.get('/api/auth/me', { withCredentials: true });
-        if (response.data && response.data.user) {
-          setUser(response.data.user);
+        const data = await authApi.getCurrentUser();
+        if (data && data.user) {
+          setUser(data.user);
         }
       } catch (err) {
         // User is not authenticated - that's fine

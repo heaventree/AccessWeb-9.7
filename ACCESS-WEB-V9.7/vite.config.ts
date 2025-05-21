@@ -13,6 +13,13 @@ export default defineConfig(({ mode }) => {
     server: {
       host: '0.0.0.0',
       port: 5000,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:5000',
+          changeOrigin: true,
+          secure: false
+        }
+      }
     },
     optimizeDeps: {
       exclude: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
