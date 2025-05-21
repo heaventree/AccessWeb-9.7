@@ -5,7 +5,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'subscriber' | 'user';
   emailVerified: boolean;
   createdAt: string;
   subscription?: {
@@ -40,15 +40,29 @@ export function useAuth() {
         localStorage.setItem('auth_token', 'dev-mode-token-access-web-v97');
       }
       
-      const devUser = {
-        id: 'dev-admin-1',
-        email: 'admin@accessweb.dev',
-        name: 'Development Admin',
-        role: 'admin',
+      // Get role from localStorage or URL parameter for easy testing
+      const urlParams = new URLSearchParams(window.location.search);
+      const roleParam = urlParams.get('role');
+      
+      // If role is specified in URL, store it
+      if (roleParam && ['admin', 'subscriber'].includes(roleParam)) {
+        localStorage.setItem('dev_role', roleParam);
+      }
+      
+      // Get stored role or default to admin
+      const storedRole = localStorage.getItem('dev_role') || 'admin';
+      
+      // Create development user based on role
+      const userRole: 'admin' | 'subscriber' = (storedRole === 'admin' ? 'admin' : 'subscriber');
+      const devUser: User = {
+        id: userRole === 'admin' ? 'dev-admin-1' : 'dev-subscriber-1',
+        email: userRole === 'admin' ? 'admin@accessweb.dev' : 'subscriber@accessweb.dev',
+        name: userRole === 'admin' ? 'Development Admin' : 'Development Subscriber',
+        role: userRole,
         emailVerified: true,
         createdAt: new Date().toISOString(),
         subscription: {
-          plan: 'enterprise',
+          plan: userRole === 'admin' ? 'enterprise' : 'professional',
           status: 'active',
           currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         }

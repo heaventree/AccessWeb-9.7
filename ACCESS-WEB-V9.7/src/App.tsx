@@ -36,7 +36,7 @@ import { APIGuide } from './pages/docs/APIGuide';
 import { WordPressGuide } from './pages/docs/WordPressGuide';
 import { ShopifyGuide } from './pages/docs/ShopifyGuide';
 import { Documentation as DocumentationPage } from './pages/docs/Documentation';
-import { ProtectedRoute, PublicOnlyRoute } from './layouts/AuthLayout';
+import { ProtectedRoute, PublicOnlyRoute, SubscriberRoute, AdminRoute } from './layouts/AuthLayout';
 
 // Import auth pages
 import LoginPage from './pages/auth/LoginPage';
@@ -50,6 +50,7 @@ import ImageAltScannerPage from './pages/tools/ImageAltScannerPage';
 import { WordPressDashboard } from './components/integrations/WordPressDashboard';
 import { CustomAPISetup } from './components/integrations/CustomAPISetup';
 import { MonitoringDashboard } from './components/MonitoringDashboard';
+import UnauthorizedPage from './pages/UnauthorizedPage';
 import { RealTimeMonitor } from './components/RealTimeMonitor';
 import { ShopifyAppSetup } from './components/integrations/ShopifyAppSetup';
 import { ShopifyDashboard } from './components/integrations/ShopifyDashboard';
@@ -143,8 +144,8 @@ function App() {
               <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
               <Route path="/admin/login" element={<AdminLoginPage />} />
               
-              {/* Account Routes with shared layout */}
-              <Route path="/my-account" element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
+              {/* Account Routes with shared layout - Subscriber Only */}
+              <Route path="/my-account" element={<SubscriberRoute><AccountLayout /></SubscriberRoute>}>
                 <Route index element={<SubscriptionDashboard />} />
                 <Route path="monitoring" element={<MonitoringPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
@@ -196,8 +197,8 @@ function App() {
               </main><Footer /><BackToTop /></>} />
               <Route path="/subscribe" element={<><Navigation /><main id="main-content" className="pt-32"><Subscribe /></main><Footer /><BackToTop /></>} />
 
-              {/* Admin Routes */}
-              <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+              {/* Admin Routes - Admin Only */}
+              <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="packages" element={<AdminPackages />} />
                 <Route path="clients" element={<AdminClients />} />
@@ -210,6 +211,9 @@ function App() {
                 <Route path="chatbot" element={<ChatbotManagement />} />
               </Route>
 
+              {/* Unauthorized Route */}
+              <Route path="/unauthorized" element={<><Navigation /><main id="main-content"><UnauthorizedPage /></main><Footer /><BackToTop /></>} />
+              
               {/* 404 Route */}
               <Route path="*" element={
                 <ErrorPage

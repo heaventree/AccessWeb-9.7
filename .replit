@@ -14,27 +14,15 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "ACCESS-WEB-V9.7 Server"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "ACCESS-WEB-V9.7 Frontend and API"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "API Server"
 
-[[workflows.workflow]]
-name = "ACCESS-WEB-V9.7 Server"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
 [[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd ACCESS-WEB-V9.7 && npm run dev"
-waitForPort = 5000
+task = "workflow.run"
+args = "ACCESS-WEB-V9.7 Server"
 
 [[workflows.workflow]]
 name = "Strapi CMS"
@@ -61,6 +49,15 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd ACCESS-WEB-V9.7 && node src/server/server.js"
+
+[[workflows.workflow]]
+name = "ACCESS-WEB-V9.7 Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd ACCESS-WEB-V9.7 && npm run dev"
+waitForPort = 5000
 
 [deployment]
 run = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run dev"]
