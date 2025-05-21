@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './providers/AppProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import { LandingPage } from './pages/LandingPage';
@@ -217,8 +217,8 @@ function App() {
                 <Route path="plans" element={<SubscriptionPlans />} />
                 <Route path="subscriptions" element={<SubscriptionManagement />} />
                 <Route path="settings" element={<AdminSettings />} />
-                {/* Keep existing admin routes for backward compatibility */}
-                <Route path="packages" element={<AdminPackages />} />
+                {/* Redirect old routes to new ones */}
+                <Route path="packages" element={<Navigate to="/admin/plans" replace />} />
                 <Route path="clients" element={<AdminClients />} />
                 <Route path="reports" element={<AdminReports />} />
                 <Route path="payments" element={<AdminPayments />} />
