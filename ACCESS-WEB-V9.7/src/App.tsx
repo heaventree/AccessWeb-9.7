@@ -163,6 +163,15 @@ function App() {
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="team" element={<TeamPage />} />
               </Route>
+              
+              {/* Dashboard Routes */}
+              <Route path="/dashboard" element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
+                <Route index element={<SubscriptionDashboard />} />
+                <Route path="monitoring" element={<MonitoringPage />} />
+                <Route path="analytics" element={<AnalyticsPage />} />
+                <Route path="billing" element={<BillingPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+              </Route>
               <Route path="/integrations/wordpress" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/analytics" element={<><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/compliance" element={<><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></>} />
