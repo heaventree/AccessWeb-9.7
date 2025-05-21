@@ -119,42 +119,45 @@ function LoginPage(): JSX.Element {
   return (
     <>
       <Helmet>
-        <title>WCAG Accessibility Audit - Login</title>
-        <meta name="description" content="Log in to your WCAG Accessibility Audit account" />
+        <title>AccessWeb - Login</title>
+        <meta name="description" content="Log in to your AccessWeb account" />
       </Helmet>
       
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
-          <div>
-            <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Sign in to your account
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+              AccessWeb
             </h1>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              Or{' '}
-              <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500 focus-ring">
-                create a new account
-              </Link>
+            <p className="mt-2 text-center text-gray-600 dark:text-gray-400">
+              The Ultimate Accessibility Platform
             </p>
           </div>
           
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
-            {/* General error message */}
-            {generalError && (
-              <div className="rounded-md bg-red-50 p-4" role="alert">
-                <div className="flex">
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">
-                      {generalError}
-                    </h3>
+          <div className="mt-8 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 px-6 py-8 hover:shadow-md transition-shadow">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+              Log in to your account
+            </h2>
+            
+            <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+              {/* General error message */}
+              {generalError && (
+                <div className="rounded-xl bg-red-50 dark:bg-red-900/30 p-4" role="alert">
+                  <div className="flex">
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                        {generalError}
+                      </h3>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            
-            <div className="rounded-md shadow-sm -space-y-px">
+              )}
+              
               {/* Email */}
               <div>
-                <label htmlFor="email" className="sr-only">Email address</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Email Address
+                </label>
                 <input
                   id="email"
                   name="email"
@@ -163,15 +166,15 @@ function LoginPage(): JSX.Element {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
-                    errors.email ? 'border-red-300 placeholder-red-300' : 'border-gray-300 placeholder-gray-500'
-                  } text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
-                  placeholder="Email address"
+                  className={`appearance-none block w-full px-4 py-2 border ${
+                    errors.email ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-slate-600'
+                  } rounded-full text-gray-900 dark:text-white dark:bg-slate-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-[#0fae96] focus:border-[#0fae96] focus:z-10 sm:text-sm`}
+                  placeholder="your@email.com"
                   aria-invalid={!!errors.email}
                   aria-describedby={errors.email ? 'email-error' : undefined}
                 />
                 {errors.email && (
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400" id="email-error">
                     {errors.email}
                   </p>
                 )}
@@ -179,7 +182,9 @@ function LoginPage(): JSX.Element {
               
               {/* Password */}
               <div>
-                <label htmlFor="password" className="sr-only">Password</label>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Password
+                </label>
                 <input
                   id="password"
                   name="password"
@@ -188,56 +193,65 @@ function LoginPage(): JSX.Element {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
-                    errors.password ? 'border-red-300 placeholder-red-300' : 'border-gray-300 placeholder-gray-500'
-                  } text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
-                  placeholder="Password"
+                  className={`appearance-none block w-full px-4 py-2 border ${
+                    errors.password ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-slate-600'
+                  } rounded-full text-gray-900 dark:text-white dark:bg-slate-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-[#0fae96] focus:border-[#0fae96] focus:z-10 sm:text-sm`}
+                  placeholder="••••••••"
                   aria-invalid={!!errors.password}
                   aria-describedby={errors.password ? 'password-error' : undefined}
                 />
                 {errors.password && (
-                  <p className="mt-2 text-sm text-red-600" id="password-error">
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400" id="password-error">
                     {errors.password}
                   </p>
                 )}
               </div>
-            </div>
-            
-            {/* Remember me */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="rememberMe"
-                  type="checkbox"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Remember me
-                </label>
+              
+              {/* Remember me */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="rememberMe"
+                    type="checkbox"
+                    checked={formData.rememberMe}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-[#0fae96] focus:ring-[#0fae96] border-gray-300 dark:border-slate-600 rounded"
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                    Remember me
+                  </label>
+                </div>
+                
+                <div className="text-sm">
+                  <Link to="/forgot-password" className="font-medium text-[#0fae96] hover:text-[#0d9a85] dark:text-[#5eead4] dark:hover:text-[#0fae96]">
+                    Forgot your password?
+                  </Link>
+                </div>
               </div>
               
-              <div className="text-sm">
-                <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500 focus-ring">
-                  Forgot your password?
-                </Link>
+              {/* Submit button */}
+              <div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-[#0fae96] hover:bg-[#0d9a85] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96] disabled:bg-[#0fae96]/70 disabled:cursor-not-allowed transition-colors"
+                  aria-busy={isLoading}
+                >
+                  {isLoading ? 'Signing in...' : 'Log in'}
+                </button>
               </div>
-            </div>
-            
-            {/* Submit button */}
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed"
-                aria-busy={isLoading}
-              >
-                {isLoading ? 'Signing in...' : 'Sign in'}
-              </button>
-            </div>
-          </form>
+              
+              <div className="text-center mt-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Don't have an account?{' '}
+                  <Link to="/register" className="font-medium text-[#0fae96] hover:text-[#0d9a85] dark:text-[#5eead4] dark:hover:text-[#0fae96]">
+                    Sign up
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </>
