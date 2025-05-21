@@ -6,36 +6,6 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const router = Router();
 
-// Create a super admin account if it doesn't exist
-async function ensureSuperAdmin() {
-  try {
-    const adminEmail = 'admin@accessweb.com';
-    const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
-    
-    if (!existingAdmin) {
-      // Hash the password 'admin123'
-      const hashedPassword = await bcrypt.hash('admin123', 10);
-      
-      // Create the super admin user
-      await prisma.user.create({
-        data: {
-          email: adminEmail,
-          password: hashedPassword,
-          name: 'Super Admin',
-          isAdmin: true
-        }
-      });
-      
-      console.log('Super Admin account created successfully');
-    }
-  } catch (error) {
-    console.error('Error ensuring Super Admin exists:', error);
-  }
-}
-
-// Call the function to ensure Super Admin exists
-ensureSuperAdmin();
-
 // Register new user
 router.post('/register', async (req, res) => {
   try {

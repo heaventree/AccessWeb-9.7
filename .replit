@@ -61,7 +61,6 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd ACCESS-WEB-V9.7 && node src/server/server.js"
-waitForPort = 3001
 
 [[workflows.workflow]]
 name = "Production Build and Start"

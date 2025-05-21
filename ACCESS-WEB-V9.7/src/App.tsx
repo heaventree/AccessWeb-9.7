@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { AppProvider } from './providers/AppProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import { LandingPage } from './pages/LandingPage';
@@ -16,7 +16,6 @@ import { Navigation } from './components/Navigation';
 import Footer from './components/landing/footer';
 import { AccountLayout } from './layouts/AccountLayout';
 import AdminLayout from './components/admin/AdminLayout';
-import SuperAdminLogin from './pages/SuperAdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
 import { AdminPackages } from './pages/admin/AdminPackages';
 import { AdminClients } from './pages/admin/AdminClients';
@@ -147,7 +146,6 @@ function App() {
               <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
               <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
               <Route path="/admin/login" element={<AdminLoginPage />} />
-              <Route path="/super-admin" element={<SuperAdminLogin />} />
               
               {/* Account Routes with shared layout */}
               <Route path="/my-account" element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
@@ -162,15 +160,6 @@ function App() {
                 <Route path="billing" element={<BillingPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="team" element={<TeamPage />} />
-              </Route>
-              
-              {/* Dashboard Routes */}
-              <Route path="/dashboard" element={<ProtectedRoute><AccountLayout /></ProtectedRoute>}>
-                <Route index element={<SubscriptionDashboard />} />
-                <Route path="monitoring" element={<MonitoringPage />} />
-                <Route path="analytics" element={<AnalyticsPage />} />
-                <Route path="billing" element={<BillingPage />} />
-                <Route path="settings" element={<SettingsPage />} />
               </Route>
               <Route path="/integrations/wordpress" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/analytics" element={<><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></>} />
@@ -217,8 +206,8 @@ function App() {
                 <Route path="plans" element={<SubscriptionPlans />} />
                 <Route path="subscriptions" element={<SubscriptionManagement />} />
                 <Route path="settings" element={<AdminSettings />} />
-                {/* Redirect old routes to new ones */}
-                <Route path="packages" element={<Navigate to="/admin/plans" replace />} />
+                {/* Keep existing admin routes for backward compatibility */}
+                <Route path="packages" element={<AdminPackages />} />
                 <Route path="clients" element={<AdminClients />} />
                 <Route path="reports" element={<AdminReports />} />
                 <Route path="payments" element={<AdminPayments />} />
