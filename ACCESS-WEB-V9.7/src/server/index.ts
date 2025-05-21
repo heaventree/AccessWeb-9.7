@@ -1,49 +1,39 @@
 import express from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
-import morgan from 'morgan';
-import { createServer } from 'http';
-import { registerRoutes } from './routes';
-import { securityHeadersMiddleware } from './middleware/securityMiddleware';
-
-// Load environment variables from .env file
-dotenv.config();
+import cookieParser from 'cookie-parser';
+import authRouter from '../api/auth';
+import { prisma } from '../lib/prisma';
 
 // Create Express app
 const app = express();
-const PORT = process.env.API_PORT || 3000;
+const PORT = process.env.SERVER_PORT || 3001;
 
 // Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(morgan('dev'));
-app.use(securityHeadersMiddleware);
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-app-domain.com'] 
+    : ['http://localhost:5000', 'http://localhost:3001'],
+  credentials: true
+}));
+app.use(express.json());
+app.use(cookieParser());
 
-// Register all routes
-registerRoutes(app).then((httpServer) => {
-  // Start server
-  httpServer.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
-    console.log(`📊 API available at http://localhost:${PORT}/api`);
-  });
-}).catch(error => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
+// Database connection test
+app.get('/api/health', async (req, res) => {
+  try {
+    // Test database connection
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ status: 'ok', database: 'connected' });
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ status: 'error', database: 'disconnected', error: String(error) });
+  }
 });
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-  // Perform any cleanup if needed
-  process.exit(1);
-});
+// API Routes
+app.use('/api/auth', authRouter);
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  // Perform any cleanup if needed
+// Start server
+app.listen(PORT, () => {
+  console.log(`API Server running on port ${PORT}`);
 });
-
-export default app;

@@ -61,13 +61,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       setError(null);
 
-      const response = await axios.post('/api/auth/login', 
-        { email, password },
-        { withCredentials: true }
-      );
+      const data = await authApi.login(email, password);
 
-      if (response.data && response.data.user) {
-        setUser(response.data.user);
+      if (data && data.user) {
+        setUser(data.user);
       }
     } catch (err: any) {
       if (err.response && err.response.data && err.response.data.error) {
@@ -87,12 +84,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       setError(null);
 
-      const response = await axios.post('/api/auth/register', 
-        { email, password, name },
-        { withCredentials: true }
-      );
+      const data = await authApi.register(email, password, name);
 
-      if (response.data && response.data.user) {
+      if (data && data.user) {
         // Auto login after registration
         await login(email, password);
       }
@@ -112,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       setLoading(true);
-      await axios.post('/api/auth/logout', {}, { withCredentials: true });
+      await authApi.logout();
       setUser(null);
     } catch (err: any) {
       console.error('Logout error:', err);
