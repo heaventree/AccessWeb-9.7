@@ -13,8 +13,7 @@
     "db:generate": "drizzle-kit generate:pg",
     "db:push": "drizzle-kit push:pg",
     "db:studio": "drizzle-kit studio",
-    "dev:all": "concurrently \"npm run dev\" \"npm run api\"",
-    "prod:all": "concurrently \"npm run start\" \"npm run api\""
+    "dev:all": "concurrently \"npm run dev\" \"npm run api\""
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
