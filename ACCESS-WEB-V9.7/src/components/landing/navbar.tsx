@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Menu,
   X,
@@ -9,10 +9,12 @@ import {
   ArrowRight,
   Sun,
   Moon,
-  User
+  User,
+  LogOut
 } from "lucide-react";
 import NavDropdown from "./navbar-dropdown";
 import NavigationIcons from "../navigation/NavigationIconGuide";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,6 +25,18 @@ export default function Navbar() {
     }
     return false;
   });
+  
+  const { user, loading, logout } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
   
   // Toggle dark mode function
   const toggleTheme = () => {
