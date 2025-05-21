@@ -62,8 +62,18 @@ author = "agent"
 task = "shell.exec"
 args = "cd ACCESS-WEB-V9.7 && node src/server/server.js"
 
+[[workflows.workflow]]
+name = "Production Build and Start"
+author = 40264017
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd ACCESS-WEB-V9.7 && npm run build && npm run api"
+
 [deployment]
-run = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run dev"]
+run = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run api"]
+build = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run build"]
 
 [[ports]]
 localPort = 3001
