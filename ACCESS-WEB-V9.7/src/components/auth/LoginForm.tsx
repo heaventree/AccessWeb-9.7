@@ -69,7 +69,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
       <form onSubmit={handleSubmit}>
         {error && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-            {error}
+            {typeof error === 'string' 
+              ? error 
+              : error.message || 'An error occurred during login. Please try again.'}
           </div>
         )}
         
