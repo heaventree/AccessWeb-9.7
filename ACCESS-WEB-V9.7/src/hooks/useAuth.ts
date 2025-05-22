@@ -321,10 +321,22 @@ export function useAuth() {
     }
   }, []);
 
-  const logout = useCallback(async () => {
+  const logout = useCallback(async (redirectPath?: string) => {
     if (DEVELOPMENT_MODE) {
-      // No-op in development mode
-      console.info('🔓 Logout attempted, but ignored in development mode');
+      // In development mode, we still want to clear state
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('dev_role');
+      setUser(null);
+      setIsAuthenticated(false);
+      
+      // Redirect to specified path or default login
+      if (redirectPath) {
+        window.location.href = redirectPath;
+      } else {
+        window.location.href = '/login';
+      }
+      
       return;
     }
     
@@ -343,6 +355,18 @@ export function useAuth() {
       setIsAuthenticated(false);
       setUser(null);
       setLoading(false);
+      
+      // Check if we're in the admin section to determine where to redirect
+      const isAdminSection = window.location.pathname.toLowerCase().includes('/admin');
+      
+      // Redirect to specified path, or admin login if in admin section, or default login
+      if (redirectPath) {
+        window.location.href = redirectPath;
+      } else if (isAdminSection) {
+        window.location.href = '/admin/login';
+      } else {
+        window.location.href = '/login';
+      }
     }
   }, []);
 

@@ -46,13 +46,30 @@ export const SubscriberRoute: React.FC<{ children?: React.ReactNode }> = ({ chil
   );
 };
 
-// Admin-only route wrapper
+// Admin-only route wrapper that redirects to admin login page
 export const AdminRoute: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-  return (
-    <ProtectedRoute allowedRoles={['admin']}>
-      {children}
-    </ProtectedRoute>
-  );
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="animate-spin w-12 h-12 border-4 border-[#0fae96] border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
+  
+  // Not authenticated? Redirect to admin login instead of regular login
+  if (!user) {
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+  }
+  
+  // Not an admin? Redirect to unauthorized page
+  if (!user.isAdmin) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+  
+  return <>{children || <Outlet />}</>;
 };
 
 // Public only route wrapper that redirects to dashboard if already authenticated

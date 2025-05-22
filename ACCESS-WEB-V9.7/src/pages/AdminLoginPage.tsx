@@ -44,9 +44,9 @@ export function AdminLoginPage() {
           setError('You do not have admin privileges. Please log in with an admin account.');
           setPassword('');
           
-          // Log them out since they don't have admin permissions
+          // Log them out since they don't have admin permissions and stay on admin login page
           setTimeout(() => {
-            logout();
+            logout('/admin/login'); // Pass admin login path to stay in admin section
           }, 100);
         }
       } else {
