@@ -32,9 +32,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
         setEmail('');
         setPassword('');
         
-        // If user is admin-only, they might need to be redirected to admin login
-        if (result.error?.code === 'auth/use-admin-login' && result.error?.redirectToAdmin) {
-          navigate('/admin/login');
+        // Handle admin redirect if needed
+        if (result.isAdminRedirect && result.redirectUrl) {
+          // Show friendly message before redirecting
+          toast.info('Please use the admin login page', {
+            duration: 3000
+          });
+          
+          // Redirect to admin login after a brief delay
+          setTimeout(() => {
+            navigate(result.redirectUrl);
+          }, 1000);
           return;
         }
         

@@ -121,16 +121,14 @@ router.post('/login', async (req, res) => {
       });
     }
     
-    // If trying to login as regular user but user is admin only, redirect to admin login
-    if (!isAdminLoginAttempt && user.isAdmin && !user.canAccessUserFeatures) {
-      console.log("Admin-only user trying to access regular login:", email);
-      return res.status(401).json({ 
-        success: false,
-        error: { 
-          message: 'Please use the admin login page',
-          code: 'auth/use-admin-login',
-          redirectToAdmin: true
-        }
+    // If trying to login as regular user but user is admin, redirect to admin login
+    if (!isAdminLoginAttempt && user.isAdmin) {
+      console.log("Admin user trying to access regular login:", email);
+      return res.status(200).json({ 
+        success: true,
+        isAdminRedirect: true,
+        message: 'Please use the admin login page',
+        redirectUrl: '/admin/login'
       });
     }
 
