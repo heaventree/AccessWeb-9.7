@@ -28,8 +28,8 @@ export function AdminLoginPage() {
       // Use the provided email/username as is
       const emailToUse = username.includes('@') ? username : `${username}@example.com`;
       
-      // Attempt login with the provided credentials
-      const result = await login(emailToUse, password);
+      // Attempt login with the provided credentials and specify this is an admin login
+      const result = await login(emailToUse, password, true);
       
       if (result.success) {
         // Check if the user has admin privileges based on the isAdmin flag from the database

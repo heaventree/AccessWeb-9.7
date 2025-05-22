@@ -72,6 +72,15 @@ router.post('/login', async (req, res) => {
     // Handle both request formats for compatibility
     const email = req.body && (req.body.email || req.body.username);
     const password = req.body && req.body.password;
+    
+    // Check if this is an admin login attempt by:
+    // 1. Checking the request URL/referer
+    // 2. Or checking the explicit isAdminLogin flag in the request body
+    const isAdminLoginAttempt = 
+      (req.headers.referer && req.headers.referer.includes('/admin/login')) || 
+      (req.body && req.body.isAdminLogin === true);
+    
+    console.log("Is admin login attempt:", isAdminLoginAttempt);
 
     // Validate input
     if (!email || !password) {
@@ -99,6 +108,31 @@ router.post('/login', async (req, res) => {
     }
 
     console.log("User found:", user.email, "isAdmin:", user.isAdmin);
+    
+    // If trying to login as admin but user is not admin, reject the login
+    if (isAdminLoginAttempt && !user.isAdmin) {
+      console.log("Non-admin user trying to access admin login:", email);
+      return res.status(401).json({ 
+        success: false,
+        error: { 
+          message: 'You do not have admin privileges',
+          code: 'auth/insufficient-permissions'
+        }
+      });
+    }
+    
+    // If trying to login as regular user but user is admin only, redirect to admin login
+    if (!isAdminLoginAttempt && user.isAdmin && !user.canAccessUserFeatures) {
+      console.log("Admin-only user trying to access regular login:", email);
+      return res.status(401).json({ 
+        success: false,
+        error: { 
+          message: 'Please use the admin login page',
+          code: 'auth/use-admin-login',
+          redirectToAdmin: true
+        }
+      });
+    }
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);

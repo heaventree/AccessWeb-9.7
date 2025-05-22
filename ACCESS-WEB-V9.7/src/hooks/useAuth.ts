@@ -139,10 +139,12 @@ export function useAuth() {
 
   const login = useCallback(async (
     email: string, 
-    password: string
+    password: string,
+    isAdminLogin: boolean = false
   ): Promise<{ success: boolean; error?: AuthError; verificationToken?: string; user?: User }> => {
     // We will use a simpler approach that works the same in development and production
     // We will check the database's isAdmin flag for determining admin privileges
+    // Also adding isAdminLogin parameter to inform the backend of the context
     // This way, the admin login is consistent across environments
     
     setLoading(true);

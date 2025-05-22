@@ -25,18 +25,28 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
     setIsSubmitting(true);
     
     try {
-      await login(email, password);
-      setEmail('');
-      setPassword('');
+      // Call login with isAdminLogin=false to indicate this is a regular user login
+      const result = await login(email, password, false);
       
-      // Navigate to dashboard or run callback
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        // Get the redirect location from state (if any)
-        const state = location.state as any;
-        const from = state?.from?.pathname || '/dashboard';
-        navigate(from, { replace: true });
+      if (result.success) {
+        setEmail('');
+        setPassword('');
+        
+        // If user is admin-only, they might need to be redirected to admin login
+        if (result.error?.code === 'auth/use-admin-login' && result.error?.redirectToAdmin) {
+          navigate('/admin/login');
+          return;
+        }
+        
+        // Navigate to dashboard or run callback
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          // Get the redirect location from state (if any)
+          const state = location.state as any;
+          const from = state?.from?.pathname || '/dashboard';
+          navigate(from, { replace: true });
+        }
       }
     } catch (err) {
       // Error is already handled in auth context
