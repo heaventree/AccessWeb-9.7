@@ -39,8 +39,20 @@ export function DashboardLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    // TODO: Implement logout logic
-    navigate('/login');
+    // Check if we're in the admin section to determine where to redirect
+    const isAdminSection = window.location.pathname.toLowerCase().includes('/admin');
+    
+    // If in admin section, use auth hook for proper logout
+    if (isAdminSection) {
+      // Import the AuthContext to use the logout function directly
+      import('../contexts/AuthContext').then(({ useAuth }) => {
+        const { logout } = useAuth();
+        logout('/admin/login');
+      });
+    } else {
+      // Standard user logout - redirect to normal login
+      navigate('/login');
+    }
   };
 
   const toggleSidebar = () => {
