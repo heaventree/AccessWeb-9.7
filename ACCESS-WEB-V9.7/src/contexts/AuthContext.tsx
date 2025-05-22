@@ -10,13 +10,18 @@ interface User {
   isAdmin: boolean;
 }
 
+// Login options interface
+interface LoginOptions {
+  isAdminLogin?: boolean;
+}
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, options?: LoginOptions) => Promise<any>;
   register: (email: string, password: string, name?: string) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: (redirectPath?: string) => Promise<void>;
   clearError: () => void;
 }
 
@@ -55,17 +60,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuthStatus();
   }, []);
 
-  // Login function
-  const login = async (email: string, password: string) => {
+  // Login function with options
+  const login = async (email: string, password: string, options?: LoginOptions) => {
     try {
       setLoading(true);
       setError(null);
 
-      const data = await authApi.login(email, password);
+      const data = await authApi.login(email, password, options);
 
       if (data && data.user) {
         setUser(data.user);
       }
+      
+      return data; // Return the full response for additional handling
     } catch (err: any) {
       if (err.response && err.response.data && err.response.data.error) {
         setError(err.response.data.error);
@@ -102,12 +109,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Logout function
-  const logout = async () => {
+  // Logout function with optional redirect path
+  const logout = async (redirectPath?: string) => {
     try {
       setLoading(true);
       await authApi.logout();
       setUser(null);
+      
+      // If a redirect path is provided, navigate to it after logout
+      if (redirectPath && typeof window !== 'undefined') {
+        window.location.href = redirectPath;
+      }
     } catch (err: any) {
       console.error('Logout error:', err);
       setError('An error occurred during logout');

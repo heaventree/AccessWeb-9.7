@@ -74,11 +74,11 @@ router.post('/login', async (req, res) => {
     const password = req.body && req.body.password;
     
     // Check if this is an admin login attempt by:
-    // 1. Checking the request URL/referer
-    // 2. Or checking the explicit isAdminLogin flag in the request body
+    // 1. Checking if isAdminLogin is explicitly true in the options
+    // 2. Or as a fallback, checking if the request is coming from an admin URL
     const isAdminLoginAttempt = 
-      (req.headers.referer && req.headers.referer.includes('/admin/login')) || 
-      (req.body && req.body.isAdminLogin === true);
+      (req.body && req.body.isAdminLogin === true) ||
+      (req.headers.referer && req.headers.referer.includes('/admin/login'));
     
     console.log("Is admin login attempt:", isAdminLoginAttempt);
 

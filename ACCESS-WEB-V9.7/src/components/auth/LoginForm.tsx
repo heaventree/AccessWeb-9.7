@@ -26,7 +26,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
     
     try {
       // Call login with isAdminLogin=false to indicate this is a regular user login
-      const result = await login(email, password, false);
+      const result = await login(email, password, { isAdminLogin: false });
       
       if (result.success) {
         setEmail('');

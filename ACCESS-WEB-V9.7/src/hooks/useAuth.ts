@@ -137,10 +137,15 @@ export function useAuth() {
     checkAuth();
   }, []);
 
+  // Define LoginOptions interface for consistency
+  interface LoginOptions {
+    isAdminLogin?: boolean;
+  }
+
   const login = useCallback(async (
     email: string, 
     password: string,
-    isAdminLogin: boolean = false
+    options?: LoginOptions
   ): Promise<{ success: boolean; error?: AuthError; verificationToken?: string; user?: User }> => {
     // We will use a simpler approach that works the same in development and production
     // We will check the database's isAdmin flag for determining admin privileges
@@ -151,7 +156,9 @@ export function useAuth() {
     setError(null);
     
     try {
-      const response = await authApi.login(email, password);
+      // Pass the isAdminLogin flag to the login API if provided
+      const isAdminLogin = options?.isAdminLogin || false;
+      const response = await authApi.login(email, password, { isAdminLogin });
       
       // Save auth token to localStorage
       localStorage.setItem('auth_token', response.token);

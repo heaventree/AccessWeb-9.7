@@ -48,13 +48,24 @@ export interface RegistrationResponse {
 }
 
 /**
+ * Login options interface
+ */
+interface LoginOptions {
+  isAdminLogin?: boolean;
+}
+
+/**
  * Login user with email and password
  * @param email User email
  * @param password User password
- * @param isAdminLogin Whether this is an admin login attempt
+ * @param options Login options including isAdminLogin flag
  * @returns Login response
  */
-export async function login(email: string, password: string, isAdminLogin: boolean = false): Promise<LoginResponse> {
+export async function login(
+  email: string, 
+  password: string, 
+  options: LoginOptions = { isAdminLogin: false }
+): Promise<LoginResponse> {
   try {
     // Check if account is locked
     if (AccountLockoutManager.isAccountLocked(email)) {
@@ -66,12 +77,14 @@ export async function login(email: string, password: string, isAdminLogin: boole
       );
     }
     
+    // Ensure the isAdminLogin flag is defined
+    const isAdminLogin = options.isAdminLogin === true;
+    
     // Log the login attempt for debugging
     console.log('Attempting login with:', { email, password: '********', isAdminLogin });
     
     // Make login request directly to the API
-    // The isAdminLogin will be detected on the server side via the referer header
-    // But we can also include it in the request body for extra clarity
+    // Send the isAdminLogin flag in the request body for clarity
     const directResponse = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
@@ -80,7 +93,7 @@ export async function login(email: string, password: string, isAdminLogin: boole
       body: JSON.stringify({ 
         email, 
         password,
-        isAdminLogin // Add this to the request body
+        isAdminLogin // Add this to the request body with the explicit value
       }),
       credentials: 'include'
     });
