@@ -35,10 +35,8 @@ export function AdminLoginPage() {
         // Check if the user has admin privileges based on the isAdmin flag from the database
         if (result.user && result.user.isAdmin) {
           toast.success('Admin login successful');
-          // Redirect to admin dashboard after successful login
-          setTimeout(() => {
-            navigate('/admin');
-          }, 500);
+          // Redirect to admin dashboard immediately after successful login
+          navigate('/admin');
         } else {
           // User logged in but doesn't have admin privileges in the database
           setError('You do not have admin privileges. Please log in with an admin account.');
