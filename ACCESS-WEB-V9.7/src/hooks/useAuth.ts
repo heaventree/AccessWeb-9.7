@@ -142,17 +142,29 @@ export function useAuth() {
     password: string
   ): Promise<{ success: boolean; error?: AuthError; verificationToken?: string; user?: User }> => {
     if (DEVELOPMENT_MODE) {
-      // For admin login page, check if it's the admin credential pattern
-      const isAdminLogin = email.includes('admin');
+      // Check for admin login - admin login page should always return true for credentials containing 'admin'
+      // Determine if we're on the admin login page by checking if the URL contains 'admin'
+      const isAdminLoginPage = window.location.pathname.includes('admin');
       
-      // Create a development user based on login credentials
-      const userRole: 'admin' | 'subscriber' = isAdminLogin ? 'admin' : 'subscriber';
+      // If we're on the admin login page and login contains "admin", grant admin access
+      // Otherwise use standard login logic for non-admin pages
+      const isAdminCredential = isAdminLoginPage ? email.includes('admin') : false;
+      
+      // For normal login, we need to check email for 'admin' keyword
+      const isAdminAccount = email.includes('admin');
+      
+      // This is needed to fix admin access issue
+      const forcedAdminAccess = isAdminLoginPage && isAdminCredential;
+      
+      // Create appropriate user role
+      const userRole: 'admin' | 'subscriber' = (isAdminAccount || forcedAdminAccess) ? 'admin' : 'subscriber';
+      
       const devUser: User = {
         id: userRole === 'admin' ? 'dev-admin-1' : 'dev-subscriber-1',
         email: email,
         name: userRole === 'admin' ? 'Development Admin' : 'Development Subscriber',
         role: userRole,
-        isAdmin: isAdminLogin, // Set isAdmin flag based on login credentials
+        isAdmin: userRole === 'admin', // Set isAdmin flag based on role
         emailVerified: true,
         createdAt: new Date().toISOString(),
         subscription: {
@@ -167,13 +179,27 @@ export function useAuth() {
       localStorage.setItem('user', JSON.stringify(devUser));
       localStorage.setItem('dev_role', userRole);
       
-      setIsAuthenticated(true);
-      setUser(devUser);
-      
-      return { 
-        success: true,
-        user: devUser
-      };
+      // Only authenticate if:
+      // 1. We're on a regular page and trying to log in normally
+      // 2. We're on admin page AND using admin credentials
+      if (!isAdminLoginPage || (isAdminLoginPage && isAdminCredential)) {
+        setIsAuthenticated(true);
+        setUser(devUser);
+        
+        return { 
+          success: true,
+          user: devUser
+        };
+      } else {
+        // If on admin page but not using admin credentials, return error
+        return {
+          success: false,
+          error: {
+            message: 'You do not have admin privileges. Please log in with an admin account.',
+            code: 'auth/invalid-admin'
+          }
+        };
+      }
     }
     
     setLoading(true);
