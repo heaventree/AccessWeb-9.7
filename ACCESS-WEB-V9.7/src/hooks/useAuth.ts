@@ -139,10 +139,39 @@ export function useAuth() {
   const login = useCallback(async (
     email: string, 
     password: string
-  ): Promise<{ success: boolean; error?: AuthError; verificationToken?: string }> => {
+  ): Promise<{ success: boolean; error?: AuthError; verificationToken?: string; user?: User }> => {
     if (DEVELOPMENT_MODE) {
-      // Always succeed in development mode
-      return { success: true };
+      // For admin login page, check if it's the admin credential pattern
+      const isAdminLogin = email.includes('admin');
+      
+      // Create a development user based on login credentials
+      const userRole: 'admin' | 'subscriber' = isAdminLogin ? 'admin' : 'subscriber';
+      const devUser: User = {
+        id: userRole === 'admin' ? 'dev-admin-1' : 'dev-subscriber-1',
+        email: email,
+        name: userRole === 'admin' ? 'Development Admin' : 'Development Subscriber',
+        role: userRole,
+        emailVerified: true,
+        createdAt: new Date().toISOString(),
+        subscription: {
+          plan: userRole === 'admin' ? 'enterprise' : 'professional',
+          status: 'active',
+          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        }
+      };
+      
+      // Save user info for development mode
+      localStorage.setItem('auth_token', 'dev-mode-token-access-web-v97');
+      localStorage.setItem('user', JSON.stringify(devUser));
+      localStorage.setItem('dev_role', userRole);
+      
+      setIsAuthenticated(true);
+      setUser(devUser);
+      
+      return { 
+        success: true,
+        user: devUser
+      };
     }
     
     setLoading(true);
@@ -155,10 +184,25 @@ export function useAuth() {
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
       
-      setIsAuthenticated(true);
-      setUser(response.user);
+      // Create a proper User object from the API response
+      const userObj: User = {
+        id: response.user.id,
+        email: response.user.email,
+        name: response.user.name,
+        role: response.user.role as 'admin' | 'subscriber' | 'user',
+        emailVerified: true, // Assume verified if they can log in
+        createdAt: new Date().toISOString(), // Default to now
+        // Add subscription info if available
+        subscription: response.user.subscription
+      };
       
-      return { success: true };
+      setIsAuthenticated(true);
+      setUser(userObj);
+      
+      return { 
+        success: true,
+        user: userObj
+      };
     } catch (error: any) {
       const errorMsg = error.response?.data?.message || 'Failed to authenticate';
       const errorCode = error.response?.data?.code || 'auth/failed';

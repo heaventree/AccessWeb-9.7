@@ -10,7 +10,7 @@ export function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,13 +18,27 @@ export function AdminLoginPage() {
     setError(null);
 
     try {
+      // Use email/username for login
       const result = await login(username, password);
+      
       if (result.success) {
-        toast.success('Login successful');
-        // Redirect to admin dashboard after successful login
-        setTimeout(() => {
-          navigate('/admin');
-        }, 500);
+        // Only redirect to admin dashboard if user has admin role
+        if (result.user && result.user.role === 'admin') {
+          toast.success('Admin login successful');
+          // Redirect to admin dashboard after successful login
+          setTimeout(() => {
+            navigate('/admin');
+          }, 500);
+        } else {
+          // User logged in but doesn't have admin role
+          setError('You do not have admin privileges. Please log in with an admin account.');
+          setPassword('');
+          
+          // Log them out since they don't have admin permissions
+          setTimeout(() => {
+            logout();
+          }, 100);
+        }
       } else {
         setError(result.error?.message || 'Invalid credentials');
         // Clear password field on error
