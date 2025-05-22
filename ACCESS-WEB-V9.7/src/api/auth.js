@@ -63,23 +63,47 @@ router.post('/register', async (req, res) => {
 // Login user
 router.post('/login', async (req, res) => {
   try {
+    console.log("Login request received:", req.body);
     const { email, password } = req.body;
 
     // Validate input
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      console.log("Missing email or password");
+      return res.status(400).json({ 
+        success: false,
+        error: { 
+          message: 'Email and password are required',
+          code: 'auth/missing-credentials'
+        }
+      });
     }
 
     // Check if user exists
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      console.log("User not found:", email);
+      return res.status(401).json({ 
+        success: false,
+        error: { 
+          message: 'Invalid credentials',
+          code: 'auth/invalid-credentials'
+        }
+      });
     }
+
+    console.log("User found:", user.email, "isAdmin:", user.isAdmin);
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      console.log("Invalid password for user:", email);
+      return res.status(401).json({ 
+        success: false,
+        error: { 
+          message: 'Invalid credentials',
+          code: 'auth/invalid-credentials'
+        }
+      });
     }
 
     // Create JWT token
@@ -89,6 +113,13 @@ router.post('/login', async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    // Create refresh token
+    const refreshToken = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_REFRESH_SECRET || 'refresh-secret',
+      { expiresIn: '30d' }
+    );
+
     // Set cookie
     res.cookie('accessToken', token, {
       httpOnly: true,
@@ -96,12 +127,38 @@ router.post('/login', async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
-    // Return user without password
+    // Define user role and admin status
+    const role = user.isAdmin ? 'admin' : 'subscriber';
+    
+    // Format the user object to match what the frontend expects
     const { password: _, ...userWithoutPassword } = user;
-    return res.json({ 
-      user: userWithoutPassword, 
+    
+    // Return user data with token in the format expected by the frontend
+    const response = { 
+      success: true,
+      token,
+      refreshToken,
+      expiresIn: 604800, // 7 days in seconds
+      user: {
+        ...userWithoutPassword,
+        role,
+        isAdmin: !!user.isAdmin, // Ensure this is a boolean
+        subscription: {
+          plan: user.isAdmin ? 'enterprise' : 'professional',
+          status: 'active',
+          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        }
+      },
       message: 'Logged in successfully' 
+    };
+    
+    console.log("Login successful. Response (without tokens):", {
+      ...response,
+      token: '[REDACTED]',
+      refreshToken: '[REDACTED]'
     });
+    
+    return res.json(response);
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({ error: 'Internal server error' });

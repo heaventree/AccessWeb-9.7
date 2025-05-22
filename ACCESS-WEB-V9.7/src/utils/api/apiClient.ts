@@ -60,7 +60,7 @@ export interface ApiClientConfig {
  * Default API client configuration
  */
 const DEFAULT_CONFIG: ApiClientConfig = {
-  baseUrl: '',
+  baseUrl: '/api',
   timeout: API_TIMEOUT,
   defaultHeaders: {
     'Content-Type': 'application/json',
