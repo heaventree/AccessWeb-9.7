@@ -34,14 +34,15 @@ export function AdminLoginPage() {
       if (result.success) {
         // Check if the user has admin privileges based on the isAdmin flag from the database
         if (result.user && result.user.isAdmin) {
-          // Show success message with a guarantee to redirect after the toast
+          // Show success message with shorter duration
           toast.success('Admin login successful', {
-            duration: 1500,
-            onClose: () => {
-              // Force redirect to admin dashboard after toast is closed
-              window.location.href = '/admin';
-            }
+            duration: 1500
           });
+          
+          // Set a timer to force redirection to admin dashboard
+          setTimeout(() => {
+            window.location.replace('/admin');
+          }, 1600);
           
           // Also try immediate navigation as a backup
           setTimeout(() => {

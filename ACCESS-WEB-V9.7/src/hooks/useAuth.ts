@@ -336,14 +336,17 @@ export function useAuth() {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
       localStorage.removeItem('dev_role');
+      sessionStorage.clear(); // Clear any session storage as well
+      
+      // Reset state
       setUser(null);
       setIsAuthenticated(false);
       
       // Redirect to specified path or default login
       if (redirectPath) {
-        window.location.href = redirectPath;
+        window.location.replace(redirectPath); // Use replace to prevent history issues
       } else {
-        window.location.href = '/login';
+        window.location.replace('/login');
       }
       
       return;
@@ -357,10 +360,19 @@ export function useAuth() {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      // Clean up local storage and state regardless of server response
+      // Completely clear all storage
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('expiresAt');
+      sessionStorage.clear();
       
+      // Clear any cookies via the API endpoint
+      document.cookie.split(";").forEach(function(c) { 
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+      });
+      
+      // Reset state
       setIsAuthenticated(false);
       setUser(null);
       setLoading(false);
@@ -368,13 +380,13 @@ export function useAuth() {
       // Check if we're in the admin section to determine where to redirect
       const isAdminSection = window.location.pathname.toLowerCase().includes('/admin');
       
-      // Redirect to specified path, or admin login if in admin section, or default login
+      // Use full page redirect to clear any lingering state
       if (redirectPath) {
-        window.location.href = redirectPath;
+        window.location.replace(redirectPath); // Use replace to prevent history issues
       } else if (isAdminSection) {
-        window.location.href = '/admin/login';
+        window.location.replace('/admin/login');
       } else {
-        window.location.href = '/login';
+        window.location.replace('/login');
       }
     }
   }, []);
