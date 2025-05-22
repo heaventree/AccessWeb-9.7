@@ -25,16 +25,21 @@ const AUTH_ENDPOINTS = {
 
 // Login response interface
 export interface LoginResponse {
-  token: string;
-  refreshToken: string;
-  expiresIn: number;
-  user: {
+  success: boolean;
+  token?: string;
+  refreshToken?: string;
+  expiresIn?: number;
+  user?: {
     id: string;
     email: string;
     name: string;
     role: string;
     isAdmin?: boolean; // Flag to determine admin access
   };
+  // For admin redirect scenarios
+  isAdminRedirect?: boolean;
+  redirectUrl?: string;
+  message?: string;
 }
 
 // Registration response interface

@@ -34,15 +34,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
         
         // Handle admin redirect if needed
         if (result.isAdminRedirect && result.redirectUrl) {
-          // Show friendly message before redirecting
-          toast.info('Please use the admin login page', {
-            duration: 3000
-          });
+          // Use alert for simplicity instead of toast
+          alert('Please use the admin login page');
           
-          // Redirect to admin login after a brief delay
-          setTimeout(() => {
-            navigate(result.redirectUrl);
-          }, 1000);
+          // Redirect to admin login
+          navigate(result.redirectUrl);
           return;
         }
         
