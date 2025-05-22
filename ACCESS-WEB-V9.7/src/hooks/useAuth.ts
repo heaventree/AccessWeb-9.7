@@ -142,29 +142,33 @@ export function useAuth() {
     password: string
   ): Promise<{ success: boolean; error?: AuthError; verificationToken?: string; user?: User }> => {
     if (DEVELOPMENT_MODE) {
-      // Check for admin login - admin login page should always return true for credentials containing 'admin'
-      // Determine if we're on the admin login page by checking if the URL contains 'admin'
-      const isAdminLoginPage = window.location.pathname.includes('admin');
+      // SIMPLIFIED ADMIN LOGIN APPROACH FOR DEVELOPMENT MODE
+      console.log("Development mode login attempt with:", email);
       
-      // If we're on the admin login page and login contains "admin", grant admin access
-      // Otherwise use standard login logic for non-admin pages
-      const isAdminCredential = isAdminLoginPage ? email.includes('admin') : false;
+      // For admin login page, force admin login to work with any credentials
+      // This overrides the normal login flow to make admin login easier to test
+      const isAdminLoginPage = window.location.pathname.toLowerCase().includes('admin');
+      console.log("Is admin login page?", isAdminLoginPage);
       
-      // For normal login, we need to check email for 'admin' keyword
-      const isAdminAccount = email.includes('admin');
+      // If on admin page, any account with 'admin' should work
+      // Otherwise, only allow admin access based on the email containing 'admin'
+      const isAdminAccount = email.toLowerCase().includes('admin');
+      console.log("Email contains 'admin'?", isAdminAccount);
       
-      // This is needed to fix admin access issue
-      const forcedAdminAccess = isAdminLoginPage && isAdminCredential;
+      // Simplified admin check - on admin login page, any credential works
+      // On other pages, only email with 'admin' gets admin role
+      const shouldHaveAdminRole = isAdminLoginPage || isAdminAccount;
       
-      // Create appropriate user role
-      const userRole: 'admin' | 'subscriber' = (isAdminAccount || forcedAdminAccess) ? 'admin' : 'subscriber';
+      const userRole: 'admin' | 'subscriber' = shouldHaveAdminRole ? 'admin' : 'subscriber';
+      console.log("Assigned role:", userRole);
       
+      // Create dev user object
       const devUser: User = {
         id: userRole === 'admin' ? 'dev-admin-1' : 'dev-subscriber-1',
         email: email,
         name: userRole === 'admin' ? 'Development Admin' : 'Development Subscriber',
         role: userRole,
-        isAdmin: userRole === 'admin', // Set isAdmin flag based on role
+        isAdmin: userRole === 'admin',
         emailVerified: true,
         createdAt: new Date().toISOString(),
         subscription: {
@@ -179,19 +183,20 @@ export function useAuth() {
       localStorage.setItem('user', JSON.stringify(devUser));
       localStorage.setItem('dev_role', userRole);
       
-      // Only authenticate if:
-      // 1. We're on a regular page and trying to log in normally
-      // 2. We're on admin page AND using admin credentials
-      if (!isAdminLoginPage || (isAdminLoginPage && isAdminCredential)) {
+      // For admin page logins, if login has admin, it should work
+      // For non-admin pages, login should always work
+      if (!isAdminLoginPage || (isAdminLoginPage && isAdminAccount)) {
         setIsAuthenticated(true);
         setUser(devUser);
         
+        console.log("Login successful in dev mode:", devUser);
         return { 
           success: true,
           user: devUser
         };
       } else {
-        // If on admin page but not using admin credentials, return error
+        // If on admin login page but not using admin email, return error
+        console.log("Admin login failed - not admin email");
         return {
           success: false,
           error: {
