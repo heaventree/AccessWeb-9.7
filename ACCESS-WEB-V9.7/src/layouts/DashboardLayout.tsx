@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { useAuth } from '../contexts/AuthContext';
 import {
   Bell,
   Settings,
@@ -38,20 +39,17 @@ export function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const { logout } = useAuth();
+  
   const handleLogout = () => {
     // Check if we're in the admin section to determine where to redirect
     const isAdminSection = window.location.pathname.toLowerCase().includes('/admin');
     
-    // If in admin section, use auth hook for proper logout
+    // Use the logout function from the auth context with the appropriate redirect path
     if (isAdminSection) {
-      // Import the AuthContext to use the logout function directly
-      import('../contexts/AuthContext').then(({ useAuth }) => {
-        const { logout } = useAuth();
-        logout('/admin/login');
-      });
+      logout('/admin/login');
     } else {
-      // Standard user logout - redirect to normal login
-      navigate('/login');
+      logout('/login');
     }
   };
 
