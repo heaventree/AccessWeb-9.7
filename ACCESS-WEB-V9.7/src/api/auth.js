@@ -64,7 +64,14 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     console.log("Login request received:", req.body);
-    const { email, password } = req.body;
+    // Add debugging to check what's actually coming in
+    console.log("Request headers:", req.headers);
+    console.log("Request content-type:", req.headers['content-type']);
+    console.log("Raw body:", req.body);
+    
+    // Handle both request formats for compatibility
+    const email = req.body && (req.body.email || req.body.username);
+    const password = req.body && req.body.password;
 
     // Validate input
     if (!email || !password) {

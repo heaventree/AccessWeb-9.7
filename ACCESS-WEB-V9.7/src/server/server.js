@@ -15,10 +15,19 @@ const PORT = process.env.SERVER_PORT || 3001;
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://your-app-domain.com'] 
-    : ['http://localhost:5000', 'http://localhost:3001', 'http://localhost:5001'],
+    : ['http://localhost:5000', 'http://localhost:3001', 'http://localhost:5001', '*'],
   credentials: true
 }));
+
+// Add middleware to log all requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+// Parse JSON and URL-encoded form data
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Database connection test

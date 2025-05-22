@@ -65,18 +65,37 @@ export async function login(email: string, password: string): Promise<LoginRespo
       );
     }
     
-    // Make login request
-    const response = await apiClient.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, {
-      email,
-      password
+    // Log the login attempt for debugging
+    console.log('Attempting login with:', { email, password: '********' });
+    
+    // Make login request directly to the API
+    const directResponse = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include'
     });
+    
+    console.log('Direct fetch response:', directResponse.status);
+    
+    if (!directResponse.ok) {
+      const errorText = await directResponse.text();
+      console.error('Login API error:', errorText);
+      throw new Error(`Login failed: ${directResponse.status} ${errorText}`);
+    }
+    
+    const responseData = await directResponse.json();
     
     // Reset any failed attempts
     AccountLockoutManager.resetLockout(email);
     
-    return response;
+    return responseData;
   } catch (error) {
     // Record failed attempt
+    console.error('Login error:', error);
+    
     if (
       error instanceof Error &&
       (error as any).type === ErrorType.AUTHENTICATION

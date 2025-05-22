@@ -99,8 +99,15 @@ class ApiClient {
    * @returns Response data
    */
   async post<T>(url: string, data?: any, options: RequestInit = {}): Promise<T> {
+    // Set content-type explicitly for consistency
+    const headers = new Headers(options.headers || {});
+    headers.set('Content-Type', 'application/json');
+    
+    console.log(`API Client sending POST to ${url}:`, data);
+    
     return this.request<T>(url, {
       ...options,
+      headers,
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined
     });
