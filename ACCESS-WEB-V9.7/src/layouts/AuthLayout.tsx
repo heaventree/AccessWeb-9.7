@@ -23,10 +23,15 @@ export const ProtectedRoute: React.FC<{ children?: React.ReactNode, allowedRoles
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  // If allowedRoles is specified, check if the user's role is in the allowedRoles list
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    // User doesn't have the required role, redirect to unauthorized page
+  // For admin routes, check the isAdmin flag rather than role
+  if (allowedRoles && allowedRoles.includes('admin') && !user.isAdmin) {
+    // User doesn't have admin privileges, redirect to unauthorized page
     return <Navigate to="/unauthorized" replace />;
+  }
+  
+  // For subscriber routes, anyone with a valid account can access (both subscribers and admins)
+  if (allowedRoles && allowedRoles.includes('subscriber') && !allowedRoles.includes('admin')) {
+    // No extra checks needed - all logged in users can access subscriber content
   }
   
   return <>{children || <Outlet />}</>;

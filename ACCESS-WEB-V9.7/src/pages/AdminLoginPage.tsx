@@ -22,15 +22,15 @@ export function AdminLoginPage() {
       const result = await login(username, password);
       
       if (result.success) {
-        // Only redirect to admin dashboard if user has admin role
-        if (result.user && result.user.role === 'admin') {
+        // Only redirect to admin dashboard if user has isAdmin flag set to true
+        if (result.user && result.user.isAdmin) {
           toast.success('Admin login successful');
           // Redirect to admin dashboard after successful login
           setTimeout(() => {
             navigate('/admin');
           }, 500);
         } else {
-          // User logged in but doesn't have admin role
+          // User logged in but doesn't have admin privileges
           setError('You do not have admin privileges. Please log in with an admin account.');
           setPassword('');
           

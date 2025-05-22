@@ -6,6 +6,7 @@ export interface User {
   email: string;
   name: string;
   role: 'admin' | 'subscriber' | 'user';
+  isAdmin?: boolean;  // Flag that determines admin access
   emailVerified: boolean;
   createdAt: string;
   subscription?: {
@@ -151,6 +152,7 @@ export function useAuth() {
         email: email,
         name: userRole === 'admin' ? 'Development Admin' : 'Development Subscriber',
         role: userRole,
+        isAdmin: isAdminLogin, // Set isAdmin flag based on login credentials
         emailVerified: true,
         createdAt: new Date().toISOString(),
         subscription: {
@@ -190,6 +192,7 @@ export function useAuth() {
         email: response.user.email,
         name: response.user.name,
         role: response.user.role as 'admin' | 'subscriber' | 'user',
+        isAdmin: response.user.isAdmin || false, // Set isAdmin flag from API response
         emailVerified: true, // Assume verified if they can log in
         createdAt: new Date().toISOString(), // Default to now
         // Add subscription info if available

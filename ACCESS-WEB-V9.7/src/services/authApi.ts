@@ -33,6 +33,7 @@ export interface LoginResponse {
     email: string;
     name: string;
     role: string;
+    isAdmin?: boolean; // Flag to determine admin access
   };
 }
 
