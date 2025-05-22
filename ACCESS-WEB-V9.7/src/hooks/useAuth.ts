@@ -141,71 +141,9 @@ export function useAuth() {
     email: string, 
     password: string
   ): Promise<{ success: boolean; error?: AuthError; verificationToken?: string; user?: User }> => {
-    if (DEVELOPMENT_MODE) {
-      // SIMPLIFIED ADMIN LOGIN APPROACH FOR DEVELOPMENT MODE
-      console.log("Development mode login attempt with:", email);
-      
-      // For admin login page, force admin login to work with any credentials
-      // This overrides the normal login flow to make admin login easier to test
-      const isAdminLoginPage = window.location.pathname.toLowerCase().includes('admin');
-      console.log("Is admin login page?", isAdminLoginPage);
-      
-      // If on admin page, any account with 'admin' should work
-      // Otherwise, only allow admin access based on the email containing 'admin'
-      const isAdminAccount = email.toLowerCase().includes('admin');
-      console.log("Email contains 'admin'?", isAdminAccount);
-      
-      // Simplified admin check - on admin login page, any credential works
-      // On other pages, only email with 'admin' gets admin role
-      const shouldHaveAdminRole = isAdminLoginPage || isAdminAccount;
-      
-      const userRole: 'admin' | 'subscriber' = shouldHaveAdminRole ? 'admin' : 'subscriber';
-      console.log("Assigned role:", userRole);
-      
-      // Create dev user object
-      const devUser: User = {
-        id: userRole === 'admin' ? 'dev-admin-1' : 'dev-subscriber-1',
-        email: email,
-        name: userRole === 'admin' ? 'Development Admin' : 'Development Subscriber',
-        role: userRole,
-        isAdmin: userRole === 'admin',
-        emailVerified: true,
-        createdAt: new Date().toISOString(),
-        subscription: {
-          plan: userRole === 'admin' ? 'enterprise' : 'professional',
-          status: 'active',
-          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        }
-      };
-      
-      // Save user info for development mode
-      localStorage.setItem('auth_token', 'dev-mode-token-access-web-v97');
-      localStorage.setItem('user', JSON.stringify(devUser));
-      localStorage.setItem('dev_role', userRole);
-      
-      // For admin page logins, if login has admin, it should work
-      // For non-admin pages, login should always work
-      if (!isAdminLoginPage || (isAdminLoginPage && isAdminAccount)) {
-        setIsAuthenticated(true);
-        setUser(devUser);
-        
-        console.log("Login successful in dev mode:", devUser);
-        return { 
-          success: true,
-          user: devUser
-        };
-      } else {
-        // If on admin login page but not using admin email, return error
-        console.log("Admin login failed - not admin email");
-        return {
-          success: false,
-          error: {
-            message: 'You do not have admin privileges. Please log in with an admin account.',
-            code: 'auth/invalid-admin'
-          }
-        };
-      }
-    }
+    // We will use a simpler approach that works the same in development and production
+    // We will check the database's isAdmin flag for determining admin privileges
+    // This way, the admin login is consistent across environments
     
     setLoading(true);
     setError(null);
@@ -223,7 +161,7 @@ export function useAuth() {
         email: response.user.email,
         name: response.user.name,
         role: response.user.role as 'admin' | 'subscriber' | 'user',
-        isAdmin: response.user.isAdmin || false, // Set isAdmin flag from API response
+        isAdmin: Boolean(response.user.isAdmin), // Ensure the isAdmin flag is properly set as boolean
         emailVerified: true, // Assume verified if they can log in
         createdAt: new Date().toISOString(), // Default to now
         // Add subscription info if available

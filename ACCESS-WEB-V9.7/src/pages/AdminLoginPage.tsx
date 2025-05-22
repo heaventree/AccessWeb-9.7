@@ -14,7 +14,6 @@ export function AdminLoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Admin login form submitted");
     setIsLoading(true);
     setError(null);
 
@@ -26,28 +25,22 @@ export function AdminLoginPage() {
     }
 
     try {
-      console.log("Attempting login with:", username);
+      // Use the provided email/username as is
+      const emailToUse = username.includes('@') ? username : `${username}@example.com`;
       
-      // For admin login, ensure that we're providing an admin email
-      // When in development mode, any email containing 'admin' will work
-      const emailToUse = username.includes('@') ? username : `${username}@admin.com`;
-      
-      // Use email/username for login
+      // Attempt login with the provided credentials
       const result = await login(emailToUse, password);
-      console.log("Login result:", result);
       
       if (result.success) {
-        // Only redirect to admin dashboard if user has isAdmin flag set to true
+        // Check if the user has admin privileges based on the isAdmin flag from the database
         if (result.user && result.user.isAdmin) {
-          console.log("Admin login successful, redirecting to dashboard");
           toast.success('Admin login successful');
           // Redirect to admin dashboard after successful login
           setTimeout(() => {
             navigate('/admin');
           }, 500);
         } else {
-          console.log("User logged in but lacks admin privileges");
-          // User logged in but doesn't have admin privileges
+          // User logged in but doesn't have admin privileges in the database
           setError('You do not have admin privileges. Please log in with an admin account.');
           setPassword('');
           
@@ -57,13 +50,11 @@ export function AdminLoginPage() {
           }, 100);
         }
       } else {
-        console.log("Login failed:", result.error);
         setError(result.error?.message || 'Invalid credentials');
         // Clear password field on error
         setPassword('');
       }
     } catch (error) {
-      console.error("Unexpected error during login:", error);
       setError('An unexpected error occurred. Please try again.');
       setPassword('');
     } finally {
