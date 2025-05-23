@@ -57,6 +57,9 @@ app.use('/api/auth', authRouter);
 // Pricing Plans Routes
 app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed
 app.get('/api/pricing-plans/:id', getPricingPlan); // Public endpoint - no auth needed
+app.post('/api/pricing-plans', createPricingPlan); // Admin create endpoint
+app.put('/api/pricing-plans/:id', updatePricingPlan); // Admin update endpoint
+app.delete('/api/pricing-plans/:id', deletePricingPlan); // Admin delete endpoint
 
 // Protected Admin-only pricing plan endpoints
 app.get('/api/admin/pricing-plans', requireAdmin, getAdminPricingPlans);

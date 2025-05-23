@@ -366,18 +366,28 @@ export function AdminPackages() {
                   Features
                 </label>
                 {formData.features.map((feature, index) => (
-                  <div key={index} className="flex mb-2">
+                  <div key={index} className="flex items-center mb-2 space-x-2">
                     <input
                       type="text"
-                      value={feature}
+                      value={feature.text}
                       onChange={(e) => handleFeatureChange(index, e.target.value)}
                       className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      placeholder="Feature description"
                       required
                     />
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={feature.available}
+                        onChange={(e) => handleFeatureAvailabilityChange(index, e.target.checked)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-1"
+                      />
+                      <span className="text-sm text-gray-600">Available</span>
+                    </label>
                     <button
                       type="button"
                       onClick={() => handleRemoveFeature(index)}
-                      className="ml-2 text-red-500 hover:text-red-700"
+                      className="text-red-500 hover:text-red-700"
                     >
                       <X className="h-5 w-5" />
                     </button>
