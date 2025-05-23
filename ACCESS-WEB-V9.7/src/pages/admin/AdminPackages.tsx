@@ -221,8 +221,9 @@ export function AdminPackages() {
         const data = await response.json();
 
         if (data.success) {
-          setPackages(packages.filter((p) => p.id !== id));
           toast.success("Package deleted successfully");
+          // Refetch packages to show updated list
+          await fetchPackages();
         } else {
           toast.error(data.message || "Failed to delete package");
         }
