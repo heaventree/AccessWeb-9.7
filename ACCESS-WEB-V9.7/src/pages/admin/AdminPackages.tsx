@@ -1,96 +1,102 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, X } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import { toast } from 'react-hot-toast';
-import type { Package } from '../../types';
 
-// Initial test data
-const initialPackages: Package[] = [
-  {
-    id: '1',
-    name: 'Basic',
-    price: 999,
-    description: 'Perfect for small websites and personal projects',
-    features: [
-      'Up to 5 pages per scan',
-      'Weekly automated scans',
-      'Basic accessibility reports',
-      'Email notifications',
-      'Standard support'
-    ],
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
-  },
-  {
-    id: '2',
-    name: 'Professional',
-    price: 2999,
-    description: 'Ideal for growing businesses and agencies',
-    features: [
-      'Up to 25 pages per scan',
-      'Daily automated scans',
-      'Advanced accessibility reports',
-      'Priority email support',
-      'Custom badge styles',
-      'API access',
-      'Multiple team members'
-    ],
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-02-15')
-  },
-  {
-    id: '3',
-    name: 'Enterprise',
-    price: 9999,
-    description: 'For large organizations with complex needs',
-    features: [
-      'Unlimited pages per scan',
-      'Real-time monitoring',
-      'Custom scan schedules',
-      'Dedicated support manager',
-      'Custom integrations',
-      'SLA guarantees',
-      'Advanced analytics',
-      'Multiple domains'
-    ],
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-03-01')
-  }
-];
+interface PricingPlan {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  period: string;
+  features: Array<{ text: string; available: boolean }>;
+  isPopular: boolean;
+  cta: string;
+  variant: string;
+  accentColor: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface PackageFormData {
   name: string;
-  price: number;
+  price: string;
+  period: string;
   description: string;
-  features: string[];
+  features: Array<{ text: string; available: boolean }>;
+  isPopular: boolean;
+  cta: string;
+  variant: string;
+  accentColor: string;
   isActive: boolean;
 }
 
 const initialFormData: PackageFormData = {
   name: '',
-  price: 0,
+  price: '',
+  period: 'month',
   description: '',
-  features: [''],
+  features: [{ text: '', available: true }],
+  isPopular: false,
+  cta: 'Get Started',
+  variant: 'outline',
+  accentColor: 'text-primary',
   isActive: true
 };
 
 export function AdminPackages() {
-  const [packages, setPackages] = useState<Package[]>(initialPackages);
+  const [packages, setPackages] = useState<PricingPlan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPackage, setEditingPackage] = useState<Package | null>(null);
+  const [editingPackage, setEditingPackage] = useState<PricingPlan | null>(null);
   const [formData, setFormData] = useState<PackageFormData>(initialFormData);
 
-  const handleOpenModal = (pkg?: Package) => {
+  // Fetch pricing plans from database
+  useEffect(() => {
+    fetchPackages();
+  }, []);
+
+  const fetchPackages = async () => {
+    try {
+      setLoading(true);
+      console.log('Admin: Fetching pricing plans from database...');
+      const response = await fetch('/api/pricing-plans');
+      const data = await response.json();
+      
+      console.log('Admin API Response:', data);
+      
+      if (data.success && data.data) {
+        console.log('Admin: Setting plans:', data.data);
+        setPackages(data.data);
+        setError(null);
+      } else {
+        console.error('Admin API returned error:', data);
+        setError('Failed to load pricing plans');
+      }
+    } catch (err) {
+      console.error('Admin: Error fetching pricing plans:', err);
+      setError('Failed to load pricing plans');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenModal = (pkg?: PricingPlan) => {
     if (pkg) {
       setEditingPackage(pkg);
       setFormData({
         name: pkg.name,
         price: pkg.price,
+        period: pkg.period,
         description: pkg.description,
         features: pkg.features,
+        isPopular: pkg.isPopular,
+        cta: pkg.cta,
+        variant: pkg.variant,
+        accentColor: pkg.accentColor,
         isActive: pkg.isActive
       });
     } else {
@@ -109,7 +115,7 @@ export function AdminPackages() {
   const handleAddFeature = () => {
     setFormData(prev => ({
       ...prev,
-      features: [...prev.features, '']
+      features: [...prev.features, { text: '', available: true }]
     }));
   };
 
@@ -120,10 +126,17 @@ export function AdminPackages() {
     }));
   };
 
-  const handleFeatureChange = (index: number, value: string) => {
+  const handleFeatureChange = (index: number, text: string) => {
     setFormData(prev => ({
       ...prev,
-      features: prev.features.map((feature, i) => i === index ? value : feature)
+      features: prev.features.map((feature, i) => i === index ? { ...feature, text } : feature)
+    }));
+  };
+
+  const handleFeatureAvailabilityChange = (index: number, available: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      features: prev.features.map((feature, i) => i === index ? { ...feature, available } : feature)
     }));
   };
 
@@ -181,47 +194,75 @@ export function AdminPackages() {
         </button>
       </div>
 
-      <div className="bg-white shadow-sm rounded-lg">
-        <div className="divide-y divide-gray-200">
-          {packages.map((pkg) => (
-            <div key={pkg.id} className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">{pkg.name}</h3>
-                  <p className="mt-1 text-sm text-gray-500">{pkg.description}</p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() => handleOpenModal(pkg)}
-                    className="text-gray-400 hover:text-gray-500"
-                  >
-                    <Edit2 className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(pkg.id)}
-                    className="text-red-400 hover:text-red-500"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-              <div className="mt-4">
-                <p className="text-2xl font-bold text-gray-900">
-                  ${(pkg.price / 100).toFixed(2)}
-                </p>
-                <ul className="mt-4 space-y-2">
-                  {pkg.features.map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="h-5 w-5 text-green-500 mr-2">•</span>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
+      {loading ? (
+        <div className="bg-white shadow-sm rounded-lg p-8 text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto" />
+          <p className="mt-4 text-gray-600">Loading pricing plans...</p>
         </div>
-      </div>
+      ) : error ? (
+        <div className="bg-white shadow-sm rounded-lg p-8 text-center">
+          <p className="text-red-600">{error}</p>
+          <button 
+            onClick={fetchPackages}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      ) : (
+        <div className="bg-white shadow-sm rounded-lg">
+          <div className="divide-y divide-gray-200">
+            {packages.map((pkg) => (
+              <div key={pkg.id} className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-medium text-gray-900">{pkg.name}</h3>
+                      {pkg.isPopular && (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                          Popular
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 text-sm text-gray-500">{pkg.description}</p>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={() => handleOpenModal(pkg)}
+                      className="text-gray-400 hover:text-gray-500"
+                    >
+                      <Edit2 className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(pkg.id.toString())}
+                      className="text-red-400 hover:text-red-500"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <p className="text-2xl font-bold text-gray-900">
+                    {pkg.price}/{pkg.period}
+                  </p>
+                  <ul className="mt-4 space-y-2">
+                    {pkg.features.map((feature, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className={`h-5 w-5 mr-2 ${feature.available ? 'text-green-500' : 'text-gray-400'}`}>
+                          {feature.available ? '✓' : '✗'}
+                        </span>
+                        <span className={feature.available ? 'text-gray-900' : 'text-gray-500'}>
+                          {feature.text}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <Dialog
         open={isModalOpen}
