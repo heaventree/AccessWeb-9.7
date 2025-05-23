@@ -24,12 +24,13 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Pricing plans table - matching the exact structure from pricing-section.tsx
+// Pricing plans table - updated for Stripe integration with numeric pricing
 export const pricingPlans = pgTable("pricing_plans", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
   description: text("description").notNull(),
-  price: varchar("price", { length: 20 }).notNull(), // Store as "$29" format
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Numeric price for Stripe
+  currency: varchar("currency", { length: 3 }).default("USD").notNull(), // Separate currency field
   period: varchar("period", { length: 20 }).default("month").notNull(),
   features: jsonb("features").notNull(), // Array of {text: string, available: boolean}
   isPopular: boolean("is_popular").default(false),
