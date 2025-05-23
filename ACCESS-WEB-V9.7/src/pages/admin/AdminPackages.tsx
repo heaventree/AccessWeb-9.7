@@ -7,7 +7,8 @@ interface PricingPlan {
   id: number;
   name: string;
   description: string;
-  price: string;
+  price: number;
+  currency: string;
   period: string;
   features: Array<{ text: string; available: boolean }>;
   isPopular: boolean;
@@ -22,7 +23,8 @@ interface PricingPlan {
 
 interface PackageFormData {
   name: string;
-  price: string;
+  price: number;
+  currency: string;
   period: string;
   description: string;
   features: Array<{ text: string; available: boolean }>;
@@ -35,7 +37,8 @@ interface PackageFormData {
 
 const initialFormData: PackageFormData = {
   name: '',
-  price: '',
+  price: 0,
+  currency: 'USD',
   period: 'month',
   description: '',
   features: [{ text: '', available: true }],
@@ -90,6 +93,7 @@ export function AdminPackages() {
       setFormData({
         name: pkg.name,
         price: pkg.price,
+        currency: pkg.currency,
         period: pkg.period,
         description: pkg.description,
         features: pkg.features,
@@ -146,36 +150,68 @@ export function AdminPackages() {
     try {
       if (editingPackage) {
         // Update existing package
-        const updatedPackage = {
-          ...editingPackage,
-          ...formData,
-          updatedAt: new Date()
-        };
-        setPackages(packages.map(p => p.id === editingPackage.id ? updatedPackage : p));
-        toast.success('Package updated successfully');
+        const response = await fetch(`/api/pricing-plans/${editingPackage.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          setPackages(packages.map(p => p.id === editingPackage.id ? data.data : p));
+          toast.success('Package updated successfully');
+        } else {
+          toast.error(data.message || 'Failed to update package');
+          return;
+        }
       } else {
         // Create new package
-        const newPackage: Package = {
-          id: Date.now().toString(),
-          ...formData,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-        setPackages([...packages, newPackage]);
-        toast.success('Package created successfully');
+        const response = await fetch('/api/pricing-plans', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          setPackages([...packages, data.data]);
+          toast.success('Package created successfully');
+        } else {
+          toast.error(data.message || 'Failed to create package');
+          return;
+        }
       }
       handleCloseModal();
+      fetchPackages(); // Refresh the list
     } catch (error) {
+      console.error('Error saving package:', error);
       toast.error('Failed to save package');
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this package?')) {
       try {
-        setPackages(packages.filter(p => p.id !== id));
-        toast.success('Package deleted successfully');
+        const response = await fetch(`/api/pricing-plans/${id}`, {
+          method: 'DELETE'
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          setPackages(packages.filter(p => p.id !== id));
+          toast.success('Package deleted successfully');
+        } else {
+          toast.error(data.message || 'Failed to delete package');
+        }
       } catch (error) {
+        console.error('Error deleting package:', error);
         toast.error('Failed to delete package');
       }
     }

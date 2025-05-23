@@ -20,3 +20,23 @@ model User {
   profileImageUrl String?
   isAdmin         Boolean   @default(false)
 }
+
+model PricingPlan {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  description String   @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  currency    String   @default("USD") @db.VarChar(3)
+  period      String   @default("month") @db.VarChar(20)
+  features    Json
+  isPopular   Boolean  @default(false) @map("is_popular")
+  cta         String   @default("Get Started") @db.VarChar(50)
+  variant     String   @default("outline") @db.VarChar(20)
+  accentColor String   @default("text-primary") @db.VarChar(50) @map("accent_color")
+  sortOrder   Int      @default(0) @map("sort_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("pricing_plans")
+}
