@@ -12,7 +12,7 @@ import {
   Globe
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { DebugUserInfo } from '../components/DebugUserInfo';
+
 
 // Mock data for the dashboard
 const subscription = {
@@ -271,9 +271,6 @@ export function SubscriptionDashboard() {
           </div>
         </div>
       </div>
-      
-      {/* Debug Component - Shows current user status */}
-      <DebugUserInfo />
     </div>
   );
 }
