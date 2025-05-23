@@ -48,12 +48,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkAuthStatus = async () => {
       try {
         const data = await authApi.getCurrentUser();
+        console.log('Auth status check response:', data);
+        
+        // Handle different response formats
         if (data && data.user) {
+          setUser(data.user);
+        } else if (data && data.id) {
+          // Direct user object
+          setUser(data);
+        } else if (data && data.success && data.user) {
           setUser(data.user);
         }
       } catch (err) {
         // User is not authenticated - that's fine
-        console.log('Not authenticated');
+        console.log('Not authenticated:', err);
+        setUser(null);
       } finally {
         setLoading(false);
       }
