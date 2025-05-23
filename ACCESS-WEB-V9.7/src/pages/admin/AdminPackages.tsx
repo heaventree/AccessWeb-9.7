@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
-import { Dialog } from '@headlessui/react';
-import { toast } from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { Plus, Edit2, Trash2, X } from "lucide-react";
+import { Dialog } from "@headlessui/react";
+import { toast } from "react-hot-toast";
 
 interface PricingPlan {
   id: number;
@@ -36,17 +36,17 @@ interface PackageFormData {
 }
 
 const initialFormData: PackageFormData = {
-  name: '',
+  name: "",
   price: 0,
-  currency: 'USD',
-  period: 'month',
-  description: '',
-  features: [{ text: '', available: true }],
+  currency: "USD",
+  period: "month",
+  description: "",
+  features: [{ text: "", available: true }],
   isPopular: false,
-  cta: 'Get Started',
-  variant: 'outline',
-  accentColor: 'text-primary',
-  isActive: true
+  cta: "Get Started",
+  variant: "outline",
+  accentColor: "text-primary",
+  isActive: true,
 };
 
 export function AdminPackages() {
@@ -54,7 +54,9 @@ export function AdminPackages() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPackage, setEditingPackage] = useState<PricingPlan | null>(null);
+  const [editingPackage, setEditingPackage] = useState<PricingPlan | null>(
+    null,
+  );
   const [formData, setFormData] = useState<PackageFormData>(initialFormData);
 
   // Fetch pricing plans from database
@@ -65,23 +67,23 @@ export function AdminPackages() {
   const fetchPackages = async () => {
     try {
       setLoading(true);
-      console.log('Admin: Fetching pricing plans from database...');
-      const response = await fetch('/api/pricing-plans');
+      console.log("Admin: Fetching pricing plans from database...");
+      const response = await fetch("/api/pricing-plans");
       const data = await response.json();
-      
-      console.log('Admin API Response:', data);
-      
+
+      console.log("Admin API Response:", data);
+
       if (data.success && data.data) {
-        console.log('Admin: Setting plans:', data.data);
+        console.log("Admin: Setting plans:", data.data);
         setPackages(data.data);
         setError(null);
       } else {
-        console.error('Admin API returned error:', data);
-        setError('Failed to load pricing plans');
+        console.error("Admin API returned error:", data);
+        setError("Failed to load pricing plans");
       }
     } catch (err) {
-      console.error('Admin: Error fetching pricing plans:', err);
-      setError('Failed to load pricing plans');
+      console.error("Admin: Error fetching pricing plans:", err);
+      setError("Failed to load pricing plans");
     } finally {
       setLoading(false);
     }
@@ -101,7 +103,7 @@ export function AdminPackages() {
         cta: pkg.cta,
         variant: pkg.variant,
         accentColor: pkg.accentColor,
-        isActive: pkg.isActive
+        isActive: pkg.isActive,
       });
     } else {
       setEditingPackage(null);
@@ -117,102 +119,116 @@ export function AdminPackages() {
   };
 
   const handleAddFeature = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      features: [...prev.features, { text: '', available: true }]
+      features: [...prev.features, { text: "", available: true }],
     }));
   };
 
   const handleRemoveFeature = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      features: prev.features.filter((_, i) => i !== index)
+      features: prev.features.filter((_, i) => i !== index),
     }));
   };
 
   const handleFeatureChange = (index: number, text: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      features: prev.features.map((feature, i) => i === index ? { ...feature, text } : feature)
+      features: prev.features.map((feature, i) =>
+        i === index ? { ...feature, text } : feature,
+      ),
     }));
   };
 
-  const handleFeatureAvailabilityChange = (index: number, available: boolean) => {
-    setFormData(prev => ({
+  const handleFeatureAvailabilityChange = (
+    index: number,
+    available: boolean,
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      features: prev.features.map((feature, i) => i === index ? { ...feature, available } : feature)
+      features: prev.features.map((feature, i) =>
+        i === index ? { ...feature, available } : feature,
+      ),
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log(formData, "formData");
+
     try {
       if (editingPackage) {
         // Update existing package
-        const response = await fetch(`/api/pricing-plans/${editingPackage.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
+        const response = await fetch(
+          `/api/pricing-plans/${editingPackage.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
           },
-          body: JSON.stringify(formData)
-        });
+        );
 
         const data = await response.json();
-        
+
         if (data.success) {
-          setPackages(packages.map(p => p.id === editingPackage.id ? data.data : p));
-          toast.success('Package updated successfully');
+          setPackages(
+            packages.map((p) => (p.id === editingPackage.id ? data.data : p)),
+          );
+          toast.success("Package updated successfully");
         } else {
-          toast.error(data.message || 'Failed to update package');
+          toast.error(data.message || "Failed to update package");
           return;
         }
       } else {
         // Create new package
-        const response = await fetch('/api/pricing-plans', {
-          method: 'POST',
+        const response = await fetch("/api/pricing-plans", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(formData),
         });
 
         const data = await response.json();
-        
+
         if (data.success) {
           setPackages([...packages, data.data]);
-          toast.success('Package created successfully');
+          toast.success("Package created successfully");
         } else {
-          toast.error(data.message || 'Failed to create package');
+          toast.error(data.message || "Failed to create package");
           return;
         }
       }
       handleCloseModal();
       fetchPackages(); // Refresh the list
     } catch (error) {
-      console.error('Error saving package:', error);
-      toast.error('Failed to save package');
+      console.error("Error saving package:", error);
+      toast.error("Failed to save package");
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm('Are you sure you want to delete this package?')) {
+    if (confirm("Are you sure you want to delete this package?")) {
       try {
         const response = await fetch(`/api/pricing-plans/${id}`, {
-          method: 'DELETE'
+          method: "DELETE",
         });
 
         const data = await response.json();
-        
+
         if (data.success) {
-          setPackages(packages.filter(p => p.id !== id));
-          toast.success('Package deleted successfully');
+          setPackages(packages.filter((p) => p.id !== id));
+          toast.success("Package deleted successfully");
         } else {
-          toast.error(data.message || 'Failed to delete package');
+          toast.error(data.message || "Failed to delete package");
         }
       } catch (error) {
-        console.error('Error deleting package:', error);
-        toast.error('Failed to delete package');
+        console.error("Error deleting package:", error);
+        toast.error("Failed to delete package");
       }
     }
   };
@@ -238,7 +254,7 @@ export function AdminPackages() {
       ) : error ? (
         <div className="bg-white shadow-sm rounded-lg p-8 text-center">
           <p className="text-red-600">{error}</p>
-          <button 
+          <button
             onClick={fetchPackages}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
@@ -253,14 +269,18 @@ export function AdminPackages() {
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-medium text-gray-900">{pkg.name}</h3>
+                      <h3 className="text-lg font-medium text-gray-900">
+                        {pkg.name}
+                      </h3>
                       {pkg.isPopular && (
                         <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
                           Popular
                         </span>
                       )}
                     </div>
-                    <p className="mt-1 text-sm text-gray-500">{pkg.description}</p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {pkg.description}
+                    </p>
                   </div>
                   <div className="flex items-center space-x-4">
                     <button
@@ -284,10 +304,18 @@ export function AdminPackages() {
                   <ul className="mt-4 space-y-2">
                     {pkg.features.map((feature, index) => (
                       <li key={index} className="flex items-start">
-                        <span className={`h-5 w-5 mr-2 ${feature.available ? 'text-green-500' : 'text-gray-400'}`}>
-                          {feature.available ? '✓' : '✗'}
+                        <span
+                          className={`h-5 w-5 mr-2 ${feature.available ? "text-green-500" : "text-gray-400"}`}
+                        >
+                          {feature.available ? "✓" : "✗"}
                         </span>
-                        <span className={feature.available ? 'text-gray-900' : 'text-gray-500'}>
+                        <span
+                          className={
+                            feature.available
+                              ? "text-gray-900"
+                              : "text-gray-500"
+                          }
+                        >
                           {feature.text}
                         </span>
                       </li>
@@ -311,7 +339,7 @@ export function AdminPackages() {
           <div className="relative bg-white rounded-lg max-w-2xl w-full p-6">
             <div className="flex justify-between items-center mb-6">
               <Dialog.Title className="text-xl font-semibold text-gray-900">
-                {editingPackage ? 'Edit Package' : 'Add New Package'}
+                {editingPackage ? "Edit Package" : "Add New Package"}
               </Dialog.Title>
               <button
                 onClick={handleCloseModal}
@@ -329,7 +357,9 @@ export function AdminPackages() {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   required
                 />
@@ -342,7 +372,12 @@ export function AdminPackages() {
                 <input
                   type="number"
                   value={formData.price}
-                  onChange={(e) => setFormData(prev => ({ ...prev, price: parseInt(e.target.value) }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      price: parseInt(e.target.value),
+                    }))
+                  }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   required
                 />
@@ -354,7 +389,12 @@ export function AdminPackages() {
                 </label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   rows={3}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   required
@@ -370,7 +410,9 @@ export function AdminPackages() {
                     <input
                       type="text"
                       value={feature.text}
-                      onChange={(e) => handleFeatureChange(index, e.target.value)}
+                      onChange={(e) =>
+                        handleFeatureChange(index, e.target.value)
+                      }
                       className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       placeholder="Feature description"
                       required
@@ -379,7 +421,12 @@ export function AdminPackages() {
                       <input
                         type="checkbox"
                         checked={feature.available}
-                        onChange={(e) => handleFeatureAvailabilityChange(index, e.target.checked)}
+                        onChange={(e) =>
+                          handleFeatureAvailabilityChange(
+                            index,
+                            e.target.checked,
+                          )
+                        }
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-1"
                       />
                       <span className="text-sm text-gray-600">Available</span>
@@ -406,7 +453,12 @@ export function AdminPackages() {
                 <input
                   type="checkbox"
                   checked={formData.isActive}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isActive: e.target.checked,
+                    }))
+                  }
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label className="ml-2 block text-sm text-gray-900">
@@ -426,7 +478,7 @@ export function AdminPackages() {
                   type="submit"
                   className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
                 >
-                  {editingPackage ? 'Update Package' : 'Create Package'}
+                  {editingPackage ? "Update Package" : "Create Package"}
                 </button>
               </div>
             </form>

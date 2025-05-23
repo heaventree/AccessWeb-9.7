@@ -1,65 +1,11 @@
-import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
-import { Dialog } from '@headlessui/react';
-import { toast } from 'react-hot-toast';
-import type { Package } from '../../types';
+import React, { useState } from "react";
+import { Plus, Edit2, Trash2, X } from "lucide-react";
+import { Dialog } from "@headlessui/react";
+import { toast } from "react-hot-toast";
+import type { Package } from "../../types";
 
 // Initial test data
-const initialPackages: Package[] = [
-  {
-    id: '1',
-    name: 'Basic',
-    price: 999,
-    description: 'Perfect for small websites and personal projects',
-    features: [
-      'Up to 5 pages per scan',
-      'Weekly automated scans',
-      'Basic accessibility reports',
-      'Email notifications',
-      'Standard support'
-    ],
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
-  },
-  {
-    id: '2',
-    name: 'Professional',
-    price: 2999,
-    description: 'Ideal for growing businesses and agencies',
-    features: [
-      'Up to 25 pages per scan',
-      'Daily automated scans',
-      'Advanced accessibility reports',
-      'Priority email support',
-      'Custom badge styles',
-      'API access',
-      'Multiple team members'
-    ],
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-02-15')
-  },
-  {
-    id: '3',
-    name: 'Enterprise',
-    price: 9999,
-    description: 'For large organizations with complex needs',
-    features: [
-      'Unlimited pages per scan',
-      'Real-time monitoring',
-      'Custom scan schedules',
-      'Dedicated support manager',
-      'Custom integrations',
-      'SLA guarantees',
-      'Advanced analytics',
-      'Multiple domains'
-    ],
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-03-01')
-  }
-];
+
 
 interface PackageFormData {
   name: string;
@@ -70,15 +16,15 @@ interface PackageFormData {
 }
 
 const initialFormData: PackageFormData = {
-  name: '',
+  name: "",
   price: 0,
-  description: '',
-  features: [''],
-  isActive: true
+  description: "",
+  features: [""],
+  isActive: true,
 };
 
 export function AdminPackages() {
-  const [packages, setPackages] = useState<Package[]>(initialPackages);
+  const [packages, setPackages] = useState<Package[]>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPackage, setEditingPackage] = useState<Package | null>(null);
   const [formData, setFormData] = useState<PackageFormData>(initialFormData);
@@ -91,7 +37,7 @@ export function AdminPackages() {
         price: pkg.price,
         description: pkg.description,
         features: pkg.features,
-        isActive: pkg.isActive
+        isActive: pkg.isActive,
       });
     } else {
       setEditingPackage(null);
@@ -107,23 +53,25 @@ export function AdminPackages() {
   };
 
   const handleAddFeature = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      features: [...prev.features, '']
+      features: [...prev.features, ""],
     }));
   };
 
   const handleRemoveFeature = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      features: prev.features.filter((_, i) => i !== index)
+      features: prev.features.filter((_, i) => i !== index),
     }));
   };
 
   const handleFeatureChange = (index: number, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      features: prev.features.map((feature, i) => i === index ? value : feature)
+      features: prev.features.map((feature, i) =>
+        i === index ? value : feature,
+      ),
     }));
   };
 
@@ -136,34 +84,38 @@ export function AdminPackages() {
         const updatedPackage = {
           ...editingPackage,
           ...formData,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         };
-        setPackages(packages.map(p => p.id === editingPackage.id ? updatedPackage : p));
-        toast.success('Package updated successfully');
+        setPackages(
+          packages.map((p) =>
+            p.id === editingPackage.id ? updatedPackage : p,
+          ),
+        );
+        toast.success("Package updated successfully");
       } else {
         // Create new package
         const newPackage: Package = {
           id: Date.now().toString(),
           ...formData,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         };
         setPackages([...packages, newPackage]);
-        toast.success('Package created successfully');
+        toast.success("Package created successfully");
       }
       handleCloseModal();
     } catch (error) {
-      toast.error('Failed to save package');
+      toast.error("Failed to save package");
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this package?')) {
+    if (confirm("Are you sure you want to delete this package?")) {
       try {
-        setPackages(packages.filter(p => p.id !== id));
-        toast.success('Package deleted successfully');
+        setPackages(packages.filter((p) => p.id !== id));
+        toast.success("Package deleted successfully");
       } catch (error) {
-        toast.error('Failed to delete package');
+        toast.error("Failed to delete package");
       }
     }
   };
@@ -187,8 +139,12 @@ export function AdminPackages() {
             <div key={pkg.id} className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900">{pkg.name}</h3>
-                  <p className="mt-1 text-sm text-gray-500">{pkg.description}</p>
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {pkg.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    {pkg.description}
+                  </p>
                 </div>
                 <div className="flex items-center space-x-4">
                   <button
@@ -234,7 +190,7 @@ export function AdminPackages() {
           <div className="relative bg-white rounded-lg max-w-2xl w-full p-6">
             <div className="flex justify-between items-center mb-6">
               <Dialog.Title className="text-xl font-semibold text-gray-900">
-                {editingPackage ? 'Edit Package' : 'Add New Package'}
+                {editingPackage ? "Edit Package" : "Add New Package"}
               </Dialog.Title>
               <button
                 onClick={handleCloseModal}
@@ -252,7 +208,9 @@ export function AdminPackages() {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   required
                 />
@@ -265,7 +223,12 @@ export function AdminPackages() {
                 <input
                   type="number"
                   value={formData.price}
-                  onChange={(e) => setFormData(prev => ({ ...prev, price: parseInt(e.target.value) }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      price: parseInt(e.target.value),
+                    }))
+                  }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   required
                 />
@@ -277,7 +240,12 @@ export function AdminPackages() {
                 </label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   rows={3}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   required
@@ -293,7 +261,9 @@ export function AdminPackages() {
                     <input
                       type="text"
                       value={feature}
-                      onChange={(e) => handleFeatureChange(index, e.target.value)}
+                      onChange={(e) =>
+                        handleFeatureChange(index, e.target.value)
+                      }
                       className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       required
                     />
@@ -319,7 +289,12 @@ export function AdminPackages() {
                 <input
                   type="checkbox"
                   checked={formData.isActive}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isActive: e.target.checked,
+                    }))
+                  }
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label className="ml-2 block text-sm text-gray-900">
@@ -339,7 +314,7 @@ export function AdminPackages() {
                   type="submit"
                   className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
                 >
-                  {editingPackage ? 'Update Package' : 'Create Package'}
+                  {editingPackage ? "Update Package" : "Create Package"}
                 </button>
               </div>
             </form>
