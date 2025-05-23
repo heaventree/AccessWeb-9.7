@@ -58,6 +58,10 @@ export const subscriptionsRelations = relations(subscriptions, ({ one, many }) =
     fields: [subscriptions.userId],
     references: [users.id]
   }),
+  pricingPlan: one(pricingPlans, {
+    fields: [subscriptions.planType],
+    references: [pricingPlans.slug]
+  }),
   invoices: many(invoices)
 }));
 
@@ -358,6 +362,41 @@ export const settings = pgTable('settings', {
   };
 });
 
+// Pricing Plans table
+export const pricingPlans = pgTable('pricing_plans', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 100 }).notNull(),
+  slug: varchar('slug', { length: 100 }).notNull().unique(),
+  description: text('description'),
+  price: numeric('price', { precision: 10, scale: 2 }).notNull(),
+  currency: varchar('currency', { length: 3 }).notNull().default('USD'),
+  billingPeriod: varchar('billing_period', { length: 20 }).notNull(), // 'monthly', 'yearly'
+  stripeProductId: varchar('stripe_product_id', { length: 255 }),
+  stripePriceId: varchar('stripe_price_id', { length: 255 }),
+  features: jsonb('features').$type<string[]>().notNull().default([]),
+  scanLimits: jsonb('scan_limits').$type<{
+    monthly: number;
+    concurrent: number;
+    pageDepth: number;
+  }>(),
+  isActive: boolean('is_active').notNull().default(true),
+  isPopular: boolean('is_popular').notNull().default(false),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+}, (table) => {
+  return {
+    slugIdx: index('pricing_plan_slug_idx').on(table.slug),
+    activeIdx: index('pricing_plan_active_idx').on(table.isActive),
+    sortOrderIdx: index('pricing_plan_sort_order_idx').on(table.sortOrder)
+  };
+});
+
+// Pricing Plans relations
+export const pricingPlansRelations = relations(pricingPlans, ({ many }) => ({
+  subscriptions: many(subscriptions)
+}));
+
 // Export types for use in application code
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -394,3 +433,6 @@ export type InsertNotification = typeof notifications.$inferInsert;
 
 export type Setting = typeof settings.$inferSelect;
 export type InsertSetting = typeof settings.$inferInsert;
+
+export type PricingPlan = typeof pricingPlans.$inferSelect;
+export type InsertPricingPlan = typeof pricingPlans.$inferInsert;
