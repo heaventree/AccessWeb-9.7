@@ -58,6 +58,8 @@ export function AdminPackages() {
     null,
   );
   const [formData, setFormData] = useState<PackageFormData>(initialFormData);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [packageToDelete, setPackageToDelete] = useState<PricingPlan | null>(null);
 
   // Fetch pricing plans from database
   useEffect(() => {
@@ -211,26 +213,37 @@ export function AdminPackages() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this package?")) {
-      try {
-        const response = await fetch(`/api/pricing-plans/${id}`, {
-          method: "DELETE",
-        });
+  const handleOpenDeleteModal = (pkg: PricingPlan) => {
+    setPackageToDelete(pkg);
+    setIsDeleteModalOpen(true);
+  };
 
-        const data = await response.json();
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setPackageToDelete(null);
+  };
 
-        if (data.success) {
-          toast.success("Package deleted successfully");
-          // Refetch packages to show updated list
-          await fetchPackages();
-        } else {
-          toast.error(data.message || "Failed to delete package");
-        }
-      } catch (error) {
-        console.error("Error deleting package:", error);
-        toast.error("Failed to delete package");
+  const handleConfirmDelete = async () => {
+    if (!packageToDelete) return;
+
+    try {
+      const response = await fetch(`/api/pricing-plans/${packageToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success("Package deleted successfully");
+        // Refetch packages to show updated list
+        await fetchPackages();
+        handleCloseDeleteModal();
+      } else {
+        toast.error(data.message || "Failed to delete package");
       }
+    } catch (error) {
+      console.error("Error deleting package:", error);
+      toast.error("Failed to delete package");
     }
   };
 
@@ -291,7 +304,7 @@ export function AdminPackages() {
                       <Edit2 className="h-5 w-5" />
                     </button>
                     <button
-                      onClick={() => handleDelete(pkg.id.toString())}
+                      onClick={() => handleOpenDeleteModal(pkg)}
                       className="text-red-400 hover:text-red-500"
                     >
                       <Trash2 className="h-5 w-5" />
@@ -483,6 +496,42 @@ export function AdminPackages() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={handleCloseDeleteModal}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+                <Trash2 className="h-6 w-6 text-red-600" />
+              </div>
+              
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 text-center mb-2">
+                Delete Package
+              </h3>
+              
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
+                Are you sure you want to delete "{packageToDelete?.name}"? This action cannot be undone.
+              </p>
+              
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleCloseDeleteModal}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmDelete}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </Dialog>
