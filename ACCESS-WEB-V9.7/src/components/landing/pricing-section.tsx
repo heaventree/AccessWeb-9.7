@@ -95,21 +95,27 @@ function PricingPlan({
 export default function PricingSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const [plans, setPlans] = useState([]);
+  const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch pricing plans from database
   useEffect(() => {
     const fetchPricingPlans = async () => {
       try {
         setLoading(true);
+        console.log('Fetching pricing plans from database...');
         const response = await fetch('/api/pricing-plans');
         const data = await response.json();
         
-        if (data.success) {
+        console.log('API Response:', data);
+        
+        if (data.success && data.data) {
+          console.log('Setting plans:', data.data);
           setPlans(data.data);
+          setError(null);
         } else {
+          console.error('API returned error:', data);
           setError('Failed to load pricing plans');
         }
       } catch (err) {
