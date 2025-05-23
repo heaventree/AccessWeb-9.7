@@ -91,43 +91,51 @@ export async function createPricingPlan(req, res) {
   try {
     const {
       name,
-      slug,
       description,
       price,
       currency = 'USD',
-      billingPeriod,
-      stripeProductId,
-      stripePriceId,
+      period = 'month',
       features = [],
-      scanLimits,
       isActive = true,
       isPopular = false,
-      sortOrder = 0
+      cta = 'Get Started',
+      variant = 'outline',
+      accentColor = 'text-primary'
     } = req.body;
 
+    console.log('Creating pricing plan with data:', req.body);
+
     // Validate required fields
-    if (!name || !slug || !price || !billingPeriod) {
+    if (!name || !price || !description) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: name, slug, price, billingPeriod'
+        message: 'Missing required fields: name, price, description'
       });
     }
+
+    // Get the highest sort order and add 1
+    const existingPlans = await db
+      .select({ sortOrder: pricingPlans.sortOrder })
+      .from(pricingPlans)
+      .orderBy(pricingPlans.sortOrder);
+    
+    const maxSortOrder = existingPlans.length > 0 ? Math.max(...existingPlans.map(p => p.sortOrder)) : 0;
+    const sortOrder = maxSortOrder + 1;
 
     const [newPlan] = await db
       .insert(pricingPlans)
       .values({
         name,
-        slug,
         description,
-        price: price.toString(),
+        price: parseFloat(price),
         currency,
-        billingPeriod,
-        stripeProductId,
-        stripePriceId,
+        period,
         features,
-        scanLimits,
         isActive,
         isPopular,
+        cta,
+        variant,
+        accentColor,
         sortOrder
       })
       .returning();
