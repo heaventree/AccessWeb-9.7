@@ -501,7 +501,7 @@ export function AdminPackages() {
       </Dialog>
 
       {/* Delete Confirmation Modal */}
-      <Dialog open={isDeleteModalOpen} onOpenChange={handleCloseDeleteModal}>
+      {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-md w-full">
             <div className="p-6">
@@ -534,7 +534,7 @@ export function AdminPackages() {
             </div>
           </div>
         </div>
-      </Dialog>
+      )}
     </div>
   );
 }
