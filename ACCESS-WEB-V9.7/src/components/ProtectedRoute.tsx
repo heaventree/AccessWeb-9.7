@@ -17,9 +17,9 @@ interface ProtectedRouteProps {
   children: ReactNode;
   
   /**
-   * Required role for access (optional)
+   * Whether admin access is required (optional)
    */
-  requiredRole?: string;
+  requireAdmin?: boolean;
   
   /**
    * Route to redirect to if unauthorized
@@ -44,7 +44,7 @@ interface ProtectedRouteProps {
  */
 export function ProtectedRoute({
   children,
-  requiredRole,
+  requireAdmin = false,
   redirectTo = '/login',
   authOnly = false,
   loadingComponent = <div className="p-4">Loading...</div>
@@ -57,11 +57,6 @@ export function ProtectedRoute({
   
   // Get authentication context
   const { user, isAuthenticated, loading: isLoading } = useAuth();
-  
-  // Simple role check function
-  const hasRole = (role: string) => {
-    return user?.role === role;
-  };
   
   // Get current location for redirection
   const location = useLocation();
@@ -79,15 +74,9 @@ export function ProtectedRoute({
     return <Navigate to={redirectUrl} replace />;
   }
   
-  // If role check is required and user doesn't have the role, redirect
-  if (requiredRole && !authOnly && !hasRole(requiredRole)) {
-    // Redirect to unauthorized page or throw error
-    if (redirectTo === '/unauthorized') {
-      return <Navigate to={redirectTo} replace />;
-    }
-    
-    // Throw authorization error
-    throw new Error(`User does not have the required role: ${requiredRole}. Access to this page requires additional permissions.`);
+  // If admin access is required and user is not admin, redirect to unauthorized
+  if (requireAdmin && !user.isAdmin) {
+    return <Navigate to="/unauthorized" replace />;
   }
   
   // User is authenticated and has required role, render children

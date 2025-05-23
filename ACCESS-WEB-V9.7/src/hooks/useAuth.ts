@@ -60,6 +60,7 @@ export function useAuth() {
         email: userRole === 'admin' ? 'admin@accessweb.dev' : 'subscriber@accessweb.dev',
         name: userRole === 'admin' ? 'Development Admin' : 'Development Subscriber',
         role: userRole,
+        isAdmin: userRole === 'admin', // Set isAdmin flag based on role
         emailVerified: true,
         createdAt: new Date().toISOString(),
         subscription: {
