@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Button } from "../../components/ui/button";
 import { Check, ArrowRight } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
@@ -95,61 +95,74 @@ function PricingPlan({
 export default function PricingSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  
-  const plans = [
-    {
-      name: "Starter",
-      description: "Perfect for small websites and blogs",
-      price: "$29",
-      period: "month",
-      features: [
-        { text: "Up to 100 pages scanned", available: true },
-        { text: "Weekly automated scans", available: true },
-        { text: "Basic compliance reporting", available: true },
-        { text: "Email support", available: true },
-        { text: "Automated fixes", available: false },
-        { text: "PDF export", available: false }
-      ],
-      cta: "Get Started",
-      variant: "outline" as const,
-      accentColor: "text-primary"
-    },
-    {
-      name: "Professional",
-      description: "For growing businesses and e-commerce",
-      price: "$49",
-      period: "month",
-      features: [
-        { text: "Up to 500 pages scanned", available: true },
-        { text: "Daily automated scans", available: true },
-        { text: "Advanced compliance reporting", available: true },
-        { text: "Automated fixes with suggestions", available: true },
-        { text: "Priority email and chat support", available: true },
-        { text: "PDF & CSV exports", available: true }
-      ],
-      isPopular: true,
-      cta: "Get Started",
-      variant: "primary" as const,
-      accentColor: "text-[#0fae96]"
-    },
-    {
-      name: "Enterprise",
-      description: "For large organizations with complex needs",
-      price: "$99",
-      period: "month",
-      features: [
-        { text: "Unlimited pages scanned", available: true },
-        { text: "Real-time compliance monitoring", available: true },
-        { text: "Custom reporting & dashboards", available: true },
-        { text: "Advanced API access", available: true },
-        { text: "Dedicated account manager", available: true },
-        { text: "Legal compliance documentation", available: true }
-      ],
-      cta: "Contact Sales",
-      variant: "outline" as const,
-      accentColor: "text-primary"
-    }
-  ];
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch pricing plans from database
+  useEffect(() => {
+    const fetchPricingPlans = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/pricing-plans');
+        const data = await response.json();
+        
+        if (data.success) {
+          setPlans(data.data);
+        } else {
+          setError('Failed to load pricing plans');
+        }
+      } catch (err) {
+        console.error('Error fetching pricing plans:', err);
+        setError('Failed to load pricing plans');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPricingPlans();
+  }, []);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <section id="pricing" className="py-24 md:py-32">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="bg-[#e0f5f1] dark:bg-[#0fae96]/20 text-[#0fae96] dark:text-[#5eead4] border-0 rounded-full px-4 py-1 mb-6">
+              Choose a package
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 dark:text-white">Simple, Transparent Pricing</h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Loading pricing plans...
+            </p>
+          </div>
+          <div className="flex justify-center">
+            <div className="animate-spin w-8 h-8 border-4 border-[#0fae96] border-t-transparent rounded-full"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <section id="pricing" className="py-24 md:py-32">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-0 rounded-full px-4 py-1 mb-6">
+              Error loading pricing
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 dark:text-white">Simple, Transparent Pricing</h2>
+            <p className="text-lg text-red-600 dark:text-red-400 max-w-2xl mx-auto">
+              {error}
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="pricing" className="py-24 md:py-32">
@@ -173,7 +186,7 @@ export default function PricingSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan, index) => (
             <PricingPlan
-              key={index}
+              key={plan.id || index}
               name={plan.name}
               description={plan.description}
               price={plan.price}

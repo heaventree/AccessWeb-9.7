@@ -10,6 +10,7 @@ import {
   updatePricingPlan, 
   deletePricingPlan 
 } from '../api/pricing-plans.js';
+import { requireAdmin } from '../middleware/adminAuth.js';
 import { PrismaClient } from '@prisma/client';
 
 // Create Prisma client
@@ -54,12 +55,14 @@ app.get('/api/health', async (req, res) => {
 app.use('/api/auth', authRouter);
 
 // Pricing Plans Routes
-app.get('/api/pricing-plans', getAllPricingPlans);
-app.get('/api/admin/pricing-plans', getAdminPricingPlans);
-app.get('/api/pricing-plans/:id', getPricingPlan);
-app.post('/api/admin/pricing-plans', createPricingPlan);
-app.put('/api/admin/pricing-plans/:id', updatePricingPlan);
-app.delete('/api/admin/pricing-plans/:id', deletePricingPlan);
+app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed
+app.get('/api/pricing-plans/:id', getPricingPlan); // Public endpoint - no auth needed
+
+// Protected Admin-only pricing plan endpoints
+app.get('/api/admin/pricing-plans', requireAdmin, getAdminPricingPlans);
+app.post('/api/admin/pricing-plans', requireAdmin, createPricingPlan);
+app.put('/api/admin/pricing-plans/:id', requireAdmin, updatePricingPlan);
+app.delete('/api/admin/pricing-plans/:id', requireAdmin, deletePricingPlan);
 
 // Start server
 app.listen(PORT, () => {

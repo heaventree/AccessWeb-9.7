@@ -2,11 +2,22 @@ import { db } from '../lib/db.js';
 import { pricingPlans } from '../shared/schema.js';
 import { eq, asc } from 'drizzle-orm';
 
-// Get all pricing plans (public endpoint)
+// Get all pricing plans (public endpoint) - for frontend pricing section
 export async function getAllPricingPlans(req, res) {
   try {
     const plans = await db
-      .select()
+      .select({
+        id: pricingPlans.id,
+        name: pricingPlans.name,
+        description: pricingPlans.description,
+        price: pricingPlans.price,
+        period: pricingPlans.period,
+        features: pricingPlans.features,
+        isPopular: pricingPlans.isPopular,
+        cta: pricingPlans.cta,
+        variant: pricingPlans.variant,
+        accentColor: pricingPlans.accentColor
+      })
       .from(pricingPlans)
       .where(eq(pricingPlans.isActive, true))
       .orderBy(asc(pricingPlans.sortOrder));
