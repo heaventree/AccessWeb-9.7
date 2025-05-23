@@ -60,13 +60,7 @@ export function ProtectedRoute({
   
   // Simple role check function
   const hasRole = (role: string) => {
-    if (role === 'admin') {
-      return user?.isAdmin === true;
-    }
-    if (role === 'subscriber') {
-      return user?.isAdmin === false;
-    }
-    return false;
+    return user?.role === role;
   };
   
   // Get current location for redirection

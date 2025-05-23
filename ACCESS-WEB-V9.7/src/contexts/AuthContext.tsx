@@ -19,7 +19,6 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
-  isAuthenticated: boolean;
   login: (email: string, password: string, options?: LoginOptions) => Promise<any>;
   register: (email: string, password: string, name?: string) => Promise<void>;
   logout: (redirectPath?: string) => Promise<void>;
@@ -31,7 +30,6 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   error: null,
-  isAuthenticated: false,
   login: async () => {},
   register: async () => {},
   logout: async () => {},
@@ -48,21 +46,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkAuthStatus = async () => {
       try {
         const data = await authApi.getCurrentUser();
-        console.log('Auth status check response:', data);
-        
-        // Handle different response formats
         if (data && data.user) {
-          setUser(data.user);
-        } else if (data && data.id) {
-          // Direct user object
-          setUser(data);
-        } else if (data && data.success && data.user) {
           setUser(data.user);
         }
       } catch (err) {
         // User is not authenticated - that's fine
-        console.log('Not authenticated:', err);
-        setUser(null);
+        console.log('Not authenticated');
       } finally {
         setLoading(false);
       }
@@ -145,16 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      loading, 
-      error, 
-      isAuthenticated: !!user,
-      login, 
-      register, 
-      logout, 
-      clearError 
-    }}>
+    <AuthContext.Provider value={{ user, loading, error, login, register, logout, clearError }}>
       {children}
     </AuthContext.Provider>
   );
