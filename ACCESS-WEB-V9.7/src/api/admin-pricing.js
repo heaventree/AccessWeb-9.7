@@ -38,6 +38,7 @@ export async function createAdminPricingPlan(req, res) {
     const maxSortOrder = existingPlans.length > 0 ? Math.max(...existingPlans.map(p => p.sortOrder)) : 0;
     const sortOrder = maxSortOrder + 1;
 
+    const now = new Date();
     const [newPlan] = await db
       .insert(pricingPlans)
       .values({
@@ -52,7 +53,9 @@ export async function createAdminPricingPlan(req, res) {
         cta,
         variant,
         accentColor,
-        sortOrder
+        sortOrder,
+        createdAt: now,
+        updatedAt: now
       })
       .returning();
 
