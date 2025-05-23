@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { Check, ArrowRight } from "lucide-react";
@@ -97,64 +97,69 @@ function PricingPlan({
 export function NewPricingPlans() {
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
   const { isAuthenticated } = useAuth();
-  
-  const plans = [
-    {
-      name: "Starter",
-      description: "Perfect for small websites and blogs",
-      price: billingInterval === 'monthly' ? "$29" : "$290",
-      period: billingInterval === 'monthly' ? "month" : "year",
-      features: [
-        { text: "Up to 100 pages scanned", available: true },
-        { text: "Weekly automated scans", available: true },
-        { text: "Basic compliance reporting", available: true },
-        { text: "Email support", available: true },
-        { text: "Automated fixes", available: false },
-        { text: "PDF export", available: false }
-      ],
-      cta: "Get Started",
-      ctaLink: isAuthenticated ? "/dashboard/billing" : "/signup?plan=starter",
-      variant: "outline" as const,
-      accentColor: "text-primary"
-    },
-    {
-      name: "Professional",
-      description: "For growing businesses and e-commerce",
-      price: billingInterval === 'monthly' ? "$49" : "$490",
-      period: billingInterval === 'monthly' ? "month" : "year",
-      features: [
-        { text: "Up to 500 pages scanned", available: true },
-        { text: "Daily automated scans", available: true },
-        { text: "Advanced compliance reporting", available: true },
-        { text: "Automated fixes with suggestions", available: true },
-        { text: "Priority email and chat support", available: true },
-        { text: "PDF & CSV exports", available: true }
-      ],
-      isPopular: true,
-      cta: "Get Started",
-      ctaLink: isAuthenticated ? "/dashboard/billing" : "/signup?plan=professional",
-      variant: "primary" as const,
-      accentColor: "text-[#0fae96]"
-    },
-    {
-      name: "Enterprise",
-      description: "For large organizations with complex needs",
-      price: billingInterval === 'monthly' ? "$99" : "$990",
-      period: billingInterval === 'monthly' ? "month" : "year",
-      features: [
-        { text: "Unlimited pages scanned", available: true },
-        { text: "Real-time compliance monitoring", available: true },
-        { text: "Custom reporting & dashboards", available: true },
-        { text: "Advanced API access", available: true },
-        { text: "Dedicated account manager", available: true },
-        { text: "Legal compliance documentation", available: true }
-      ],
-      cta: "Contact Sales",
-      ctaLink: "/contact",
-      variant: "outline" as const,
-      accentColor: "text-primary"
-    }
-  ];
+  const [plans, setPlans] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch pricing plans from database
+  useEffect(() => {
+    const fetchPricingPlans = async () => {
+      try {
+        setLoading(true);
+        console.log("Fetching pricing plans from database...");
+        const response = await fetch("/api/pricing-plans");
+        const data = await response.json();
+
+        console.log("API Response:", data);
+        if (data.success && data.data) {
+          // Transform the data to include dynamic pricing and CTA links
+          const transformedPlans = data.data.map((plan: any) => ({
+            ...plan,
+            price: billingInterval === 'monthly' ? `$${plan.price}` : `$${(parseFloat(plan.price) * 10).toFixed(0)}`,
+            period: billingInterval === 'monthly' ? "month" : "year",
+            ctaLink: isAuthenticated ? "/dashboard/billing" : `/signup?plan=${plan.name.toLowerCase()}`
+          }));
+          setPlans(transformedPlans);
+          setError(null);
+        } else {
+          console.error("API returned error:", data);
+          setError("Failed to load pricing plans");
+        }
+      } catch (err) {
+        console.error("Error fetching pricing plans:", err);
+        setError("Failed to load pricing plans");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPricingPlans();
+  }, [billingInterval, isAuthenticated]);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="py-12">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-[#0fae96] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading pricing plans...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="py-12">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+
 
   return (
     <div className="max-w-7xl mx-auto">
