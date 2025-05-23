@@ -24,20 +24,20 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Pricing plans table
+// Pricing plans table - matching the exact structure from pricing-section.tsx
 export const pricingPlans = pgTable("pricing_plans", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
-  slug: varchar("slug", { length: 100 }).unique().notNull(),
-  description: text("description"),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
-  billingPeriod: varchar("billing_period", { length: 20 }).default("monthly").notNull(),
-  features: jsonb("features").notNull(),
-  scanLimits: jsonb("scan_limits").notNull(),
-  isActive: boolean("is_active").default(true).notNull(),
-  isPopular: boolean("is_popular").default(false).notNull(),
+  description: text("description").notNull(),
+  price: varchar("price", { length: 20 }).notNull(), // Store as "$29" format
+  period: varchar("period", { length: 20 }).default("month").notNull(),
+  features: jsonb("features").notNull(), // Array of {text: string, available: boolean}
+  isPopular: boolean("is_popular").default(false),
+  cta: varchar("cta", { length: 50 }).default("Get Started").notNull(),
+  variant: varchar("variant", { length: 20 }).default("outline").notNull(), // "outline", "primary"
+  accentColor: varchar("accent_color", { length: 50 }).default("text-primary").notNull(),
   sortOrder: integer("sort_order").default(0).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
