@@ -50,8 +50,8 @@ export function useAuth() {
         localStorage.setItem('dev_role', roleParam);
       }
       
-      // Get stored role or default to admin
-      const storedRole = localStorage.getItem('dev_role') || 'admin';
+      // Get stored role or default to subscriber
+      const storedRole = localStorage.getItem('dev_role') || 'subscriber';
       
       // Create development user based on role
       const userRole: 'admin' | 'subscriber' = (storedRole === 'admin' ? 'admin' : 'subscriber');
