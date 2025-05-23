@@ -53,6 +53,7 @@ export function ProtectedRoute({
   // Get authentication context
   const { user, isAuthenticated, isLoading, hasRole } = useAuth();
   
+  
   // Get current location for redirection
   const location = useLocation();
   
