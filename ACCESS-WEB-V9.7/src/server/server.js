@@ -21,6 +21,7 @@ import {
   createPaymentIntent,
   getPaymentHistory
 } from '../api/subscriptions.js';
+import { handleStripeWebhook } from '../api/webhooks.js';
 import { requireAdmin } from '../middleware/adminAuth.js';
 import { requireAuth } from '../middleware/userAuth.js';
 import { PrismaClient } from '@prisma/client';
@@ -45,6 +46,9 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
+
+// Stripe webhook endpoint (must be before express.json() middleware)
+app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), handleStripeWebhook);
 
 // Parse JSON and URL-encoded form data
 app.use(express.json());
