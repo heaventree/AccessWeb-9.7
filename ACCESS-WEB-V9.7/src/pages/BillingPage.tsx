@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import { useAuth } from '../hooks/useAuth';
 import axios from 'axios';
+import { PaymentFormWrapper } from '../components/PaymentForm';
 
 interface Plan {
   id: number;
@@ -36,6 +37,9 @@ export default function BillingPage() {
   const [paymentHistory, setPaymentHistory] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string>('');
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   
   // Fetch user's current subscription
   const fetchSubscription = async () => {
@@ -152,18 +156,32 @@ export default function BillingPage() {
       }
 
       if (response.data.success && response.data.clientSecret) {
-        // Success! Show payment form with the client secret
-        alert(`Payment form would open here with client secret: ${response.data.clientSecret.substring(0, 20)}...
-        
-Your Stripe integration is working perfectly! The payment intent was created successfully for the ${response.data.plan.name} plan ($${response.data.plan.price}/${response.data.plan.period}).
-
-In a production environment, this would open the Stripe payment form where customers can enter their card details to complete the payment.`);
+        // Success! Show the actual Stripe payment form
+        const plan = response.data.plan;
+        setSelectedPlan(plan);
+        setClientSecret(response.data.clientSecret);
+        setShowPaymentForm(true);
+        setError(null); // Clear any previous errors
       }
       
     } catch (error) {
       console.error('Error creating payment intent:', error);
       setError('Failed to initiate plan upgrade');
     }
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentForm(false);
+    setClientSecret('');
+    setSelectedPlan(null);
+    // Refresh subscription data
+    fetchSubscription();
+  };
+
+  const handlePaymentCancel = () => {
+    setShowPaymentForm(false);
+    setClientSecret('');
+    setSelectedPlan(null);
   };
   
   if (loading) {
@@ -333,6 +351,28 @@ In a production environment, this would open the Stripe payment form where custo
           </div>
         </div>
       </div>
+
+      {/* Stripe Payment Form Modal */}
+      {showPaymentForm && clientSecret && selectedPlan && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="mb-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                Complete Your Subscription
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                {selectedPlan.name} - ${selectedPlan.price}/{selectedPlan.period}
+              </p>
+            </div>
+            
+            <PaymentFormWrapper
+              clientSecret={clientSecret}
+              onSuccess={handlePaymentSuccess}
+              onCancel={handlePaymentCancel}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
