@@ -87,11 +87,69 @@ export async function createPaymentIntent(req, res) {
       });
     }
 
-    // For now, we'll need Stripe keys to proceed
+    // Check if Stripe keys are available
+    if (!process.env.STRIPE_SECRET_KEY || !process.env.VITE_STRIPE_PUBLIC_KEY) {
+      return res.status(400).json({
+        success: false,
+        message: 'Stripe integration requires API keys. Please provide your Stripe credentials.',
+        requiresStripeKeys: true,
+        plan: plan
+      });
+    }
+
+    // Import Stripe dynamically
+    const { default: Stripe } = await import('stripe');
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2023-10-16',
+    });
+
+    // Get or create Stripe customer
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId));
+
+    let customerId = user.stripeCustomerId;
+
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.name,
+        metadata: {
+          userId: userId.toString()
+        }
+      });
+      
+      customerId = customer.id;
+      
+      // Update user with Stripe customer ID
+      await db
+        .update(users)
+        .set({
+          stripeCustomerId: customerId,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, userId));
+    }
+
+    // Create payment intent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(parseFloat(plan.price) * 100), // Convert to cents
+      currency: plan.currency.toLowerCase(),
+      customer: customerId,
+      metadata: {
+        planId: planId.toString(),
+        userId: userId.toString(),
+        planName: plan.name
+      },
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+
     res.json({
-      success: false,
-      message: 'Stripe integration requires API keys. Please provide your Stripe credentials.',
-      requiresStripeKeys: true,
+      success: true,
+      clientSecret: paymentIntent.client_secret,
       plan: plan
     });
 
