@@ -6,9 +6,7 @@ import { eq } from "drizzle-orm";
 export async function handleStripeWebhook(req, res) {
   try {
     const sig = req.headers["stripe-signature"];
-    const webhookSecret =
-      process.env.STRIPE_WEBHOOK_SECRET ||
-      "whsec_uSPjxZ7hMA51wobK7zhRWUmhV00JkoT7";
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
       console.error("Missing STRIPE_WEBHOOK_SECRET environment variable");
