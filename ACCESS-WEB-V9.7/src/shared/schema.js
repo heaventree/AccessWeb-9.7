@@ -12,22 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-// Users table
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  email: varchar("email", { length: 255 }).unique().notNull(),
-  password: varchar("password", { length: 255 }).notNull(),
-  firstName: varchar("first_name", { length: 100 }),
-  lastName: varchar("last_name", { length: 100 }),
-  isAdmin: boolean("is_admin").default(false).notNull(),
-  subscriptionPlan: varchar("subscription_plan", { length: 50 }).default("free"),
-  subscriptionStatus: varchar("subscription_status", { length: 20 }).default("active"),
-  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
-  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
-  currentPeriodEnd: timestamp("current_period_end"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+// Note: Users are handled by Prisma User model, not Drizzle
 
 // Pricing plans table - updated for Stripe integration with numeric pricing
 export const pricingPlans = pgTable("pricing_plans", {
@@ -51,7 +36,7 @@ export const pricingPlans = pgTable("pricing_plans", {
 // Payments table for tracking payment history
 export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
+  userId: integer("user_id").notNull(), // References Prisma User.id
   planId: integer("plan_id").references(() => pricingPlans.id).notNull(),
   stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
@@ -88,10 +73,7 @@ export const menuItems = pgTable("menu_items", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Define relations
-export const usersRelations = relations(users, ({ many }) => ({
-  // Add user relations here if needed
-}));
+// Define relations (Users handled by Prisma)
 
 export const pricingPlansRelations = relations(pricingPlans, ({ many }) => ({
   // Add pricing plan relations here if needed

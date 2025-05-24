@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { db } from "../server/db.js";
-import { users } from "../shared/schema.js";
+// Users are handled by Prisma User model
 import { eq } from "drizzle-orm";
 import { decode } from "punycode";
 

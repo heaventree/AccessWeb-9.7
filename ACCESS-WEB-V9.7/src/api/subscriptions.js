@@ -1,5 +1,5 @@
 import { db } from '../server/db.js';
-import { users, pricingPlans, payments } from '../shared/schema.js';
+import { pricingPlans, payments } from '../shared/schema.js';
 import { eq } from 'drizzle-orm';
 
 // Get user's current subscription

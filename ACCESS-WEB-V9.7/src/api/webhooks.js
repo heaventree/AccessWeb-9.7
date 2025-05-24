@@ -1,5 +1,5 @@
 import { db } from '../server/db.js';
-import { users, pricingPlans, payments } from '../shared/schema.js';
+import { pricingPlans, payments } from '../shared/schema.js';
 import { eq } from 'drizzle-orm';
 
 // Stripe webhook handler for payment events
@@ -92,28 +92,33 @@ async function handlePaymentSuccess(paymentIntent) {
       return;
     }
 
-    // Get user details
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, parseInt(userIdFromMetadata)));
+    // Get user details using Prisma
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(userIdFromMetadata) }
+    });
 
     if (!user) {
       console.error('User not found:', userIdFromMetadata);
+      await prisma.$disconnect();
       return;
     }
 
     // Update user subscription fields
-    await db
-      .update(users)
-      .set({
+    await prisma.user.update({
+      where: { id: parseInt(userIdFromMetadata) },
+      data: {
         subscriptionPlan: plan.name.toLowerCase(),
         subscriptionStatus: 'active',
         stripeSubscriptionId: paymentIntent.id,
         currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         updatedAt: new Date()
-      })
-      .where(eq(users.id, parseInt(userIdFromMetadata)));
+      }
+    });
+    
+    await prisma.$disconnect();
 
     // Record payment in history
     await db

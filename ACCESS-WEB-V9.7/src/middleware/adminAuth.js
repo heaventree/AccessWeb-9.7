@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { db } from "../lib/db.js";
-import { users } from "../shared/schema.js";
+// Users are handled by Prisma User model
 import { eq } from "drizzle-orm";
 
 // Middleware to verify admin authentication
@@ -25,15 +25,20 @@ export async function requireAdmin(req, res, next) {
       process.env.JWT_SECRET || "your-secret-key",
     );
 
-    // Get user from database and verify admin status
-    const [user] = await db
-      .select({
-        id: users.id,
-        email: users.email,
-        isAdmin: users.isAdmin,
-      })
-      .from(users)
-      .where(eq(users.id, decoded.userId));
+    // Get user from database using Prisma and verify admin status
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        email: true,
+        isAdmin: true
+      }
+    });
+    
+    await prisma.$disconnect();
 
     if (!user) {
       return res.status(401).json({
