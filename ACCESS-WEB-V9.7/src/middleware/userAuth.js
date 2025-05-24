@@ -1,10 +1,7 @@
 import jwt from "jsonwebtoken";
-import { db } from "../lib/db.js";
-// Users are handled by Prisma User model
-import { eq } from "drizzle-orm";
 
-// Middleware to verify admin authentication
-export async function requireAdmin(req, res, next) {
+// Middleware to verify user authentication (for any authenticated user)
+export async function requireAuth(req, res, next) {
   try {
     // Get token from authorization header or cookies
     const authHeader = req.headers.authorization;
@@ -15,7 +12,7 @@ export async function requireAdmin(req, res, next) {
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: "Access denied. Admin authentication required.",
+        message: "User not authenticated",
       });
     }
 
@@ -25,7 +22,8 @@ export async function requireAdmin(req, res, next) {
       process.env.JWT_SECRET || "your-secret-key",
     );
 
-    // Get user from database using Prisma and verify admin status
+    console.log("Decoded JWT:", decoded);
+    // Get user from database using Prisma
     const { PrismaClient } = await import('@prisma/client');
     const prisma = new PrismaClient();
     
@@ -34,7 +32,14 @@ export async function requireAdmin(req, res, next) {
       select: {
         id: true,
         email: true,
-        isAdmin: true
+        firstName: true,
+        lastName: true,
+        isAdmin: true,
+        subscriptionPlan: true,
+        subscriptionStatus: true,
+        stripeCustomerId: true,
+        stripeSubscriptionId: true,
+        currentPeriodEnd: true
       }
     });
     
@@ -43,14 +48,7 @@ export async function requireAdmin(req, res, next) {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Invalid token456. User not found.",
-      });
-    }
-
-    if (!user.isAdmin) {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied. Admin privileges required.",
+        message: "Invalid token!!!!. User not found.",
       });
     }
 
@@ -58,7 +56,7 @@ export async function requireAdmin(req, res, next) {
     req.user = user;
     next();
   } catch (error) {
-    console.error("Admin authentication error:", error);
+    console.error("User authentication error:", error);
 
     if (error.name === "JsonWebTokenError") {
       return res.status(401).json({

@@ -25,12 +25,14 @@ router.post('/register', async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Create user with free plan as default
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
-        name: name || null
+        name: name || null,
+        subscriptionPlan: 'free',
+        subscriptionStatus: 'active'
       }
     });
 
