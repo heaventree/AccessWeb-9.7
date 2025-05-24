@@ -19,20 +19,30 @@ export async function requireAuth(req, res, next) {
       });
     }
 
+    
+
     // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     
-    // Get user from database
-    const [user] = await db
-      .select({
-        id: users.id,
-        email: users.email,
-        firstName: users.firstName,
-        lastName: users.lastName,
-        isAdmin: users.isAdmin
-      })
-      .from(users)
-      .where(eq(users.id, decoded.userId));
+    // Get user from database using Prisma (matching your login system)
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        isAdmin: true,
+        subscriptionPlan: true,
+        subscriptionStatus: true,
+        currentPeriodEnd: true
+      }
+    });
+    
+    await prisma.$disconnect();
 
     if (!user) {
       return res.status(401).json({
