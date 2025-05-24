@@ -10,10 +10,7 @@ declare global {
 
 // Create a wrapper for the Stripe object
 const getStripe = () => {
-  if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-    throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
-  }
-  return window.Stripe?.(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+  return window.Stripe?.('pk_test_51RSAoIRftwXmfGNuaKIWny7kDT5j23o6Kc3UV5DJKeDmWYk8FF1CLI5hQT86025cD1jcKerrxTGtP5aCNLBoYHNY00O4m5paUZ');
 };
 
 interface PaymentFormWrapperProps {
