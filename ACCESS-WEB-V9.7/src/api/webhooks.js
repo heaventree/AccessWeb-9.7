@@ -1,12 +1,12 @@
 import { db } from '../server/db.js';
-import { users, pricingPlans, payments, subscriptions } from '../shared/schema.js';
+import { users, pricingPlans, payments } from '../shared/schema.js';
 import { eq } from 'drizzle-orm';
 
 // Stripe webhook handler for payment events
 export async function handleStripeWebhook(req, res) {
   try {
     const sig = req.headers['stripe-signature'];
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_uSPjxZ7hMA51wobK7zhRWUmhV00JkoT7';
     
     if (!webhookSecret) {
       console.error('Missing STRIPE_WEBHOOK_SECRET environment variable');
@@ -92,44 +92,31 @@ async function handlePaymentSuccess(paymentIntent) {
       return;
     }
 
-    // Create or update subscription
-    const subscriptionData = {
-      userId: parseInt(userIdFromMetadata),
-      planId: parseInt(planId),
-      status: 'active',
-      currentPeriodStart: new Date(),
-      currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-      stripeSubscriptionId: paymentIntent.id,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
+    // Update user subscription fields
     await db
-      .insert(subscriptions)
-      .values(subscriptionData)
-      .onConflictDoUpdate({
-        target: subscriptions.userId,
-        set: {
-          planId: parseInt(planId),
-          status: 'active',
-          currentPeriodStart: new Date(),
-          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          stripeSubscriptionId: paymentIntent.id,
-          updatedAt: new Date()
-        }
-      });
+      .update(users)
+      .set({
+        subscriptionPlan: plan.name.toLowerCase(),
+        subscriptionStatus: 'active',
+        stripeSubscriptionId: paymentIntent.id,
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, parseInt(userIdFromMetadata)));
 
     // Record payment in history
     await db
       .insert(payments)
       .values({
         userId: parseInt(userIdFromMetadata),
-        amount: paymentIntent.amount,
+        planId: parseInt(planId),
+        amount: (paymentIntent.amount / 100).toString(), // Convert from cents
         currency: paymentIntent.currency.toUpperCase(),
-        status: 'completed',
-        plan: planName || plan.name,
-        stripePaymentId: paymentIntent.id,
-        createdAt: new Date()
+        status: 'succeeded',
+        stripePaymentIntentId: paymentIntent.id,
+        paymentMethod: 'card',
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
 
     console.log(`✅ Successfully processed payment for user ${userIdFromMetadata}: ${plan.name} plan`);
@@ -152,12 +139,14 @@ async function handlePaymentFailure(paymentIntent) {
         .insert(payments)
         .values({
           userId: parseInt(userIdFromMetadata),
-          amount: paymentIntent.amount,
+          planId: parseInt(paymentIntent.metadata.planId || 0),
+          amount: (paymentIntent.amount / 100).toString(), // Convert from cents
           currency: paymentIntent.currency.toUpperCase(),
           status: 'failed',
-          plan: paymentIntent.metadata.planName || 'Unknown Plan',
-          stripePaymentId: paymentIntent.id,
-          createdAt: new Date()
+          stripePaymentIntentId: paymentIntent.id,
+          paymentMethod: 'card',
+          createdAt: new Date(),
+          updatedAt: new Date()
         });
       
       console.log(`❌ Recorded failed payment for user ${userIdFromMetadata}`);
