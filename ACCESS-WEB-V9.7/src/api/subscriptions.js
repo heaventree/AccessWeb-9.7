@@ -87,6 +87,10 @@ export async function createPaymentIntent(req, res) {
       });
     }
 
+    // Debug: Log environment variables (first 10 chars only for security)
+    console.log('STRIPE_SECRET_KEY loaded:', process.env.STRIPE_SECRET_KEY ? `${process.env.STRIPE_SECRET_KEY.substring(0, 10)}...` : 'NOT_FOUND');
+    console.log('VITE_STRIPE_PUBLIC_KEY loaded:', process.env.VITE_STRIPE_PUBLIC_KEY ? `${process.env.VITE_STRIPE_PUBLIC_KEY.substring(0, 10)}...` : 'NOT_FOUND');
+
     // Check if Stripe keys are available
     if (!process.env.STRIPE_SECRET_KEY || !process.env.VITE_STRIPE_PUBLIC_KEY) {
       return res.status(400).json({
