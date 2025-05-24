@@ -103,7 +103,7 @@ export async function createPaymentIntent(req, res) {
 
     // Import Stripe dynamically
     const { default: Stripe } = await import('stripe');
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    const stripe = new Stripe('sk_test_51RSAoIRftwXmfGNuiNvmy0w53pb928VhlSZfAuuuMvGVvszyu87FBzUAJQDjaxEBD84ZhUD0NdsaYiXBi7SH7qYZ00Me4Zsbp0', {
       apiVersion: '2023-10-16',
     });
 
