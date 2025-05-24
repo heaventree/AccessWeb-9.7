@@ -82,10 +82,9 @@ export async function createPaymentIntent(req, res) {
     }
 
     // Get the plan details from database
-    const [plan] = await db
-      .select()
-      .from(pricingPlans)
-      .where(eq(pricingPlans.id, planId));
+    const plan = await prisma.pricingPlan.findUnique({
+      where: { id: planId }
+    });
 
     if (!plan) {
       return res.status(404).json({
