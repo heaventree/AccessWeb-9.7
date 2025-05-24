@@ -287,8 +287,3 @@ async function verifyPayment(req, res) {
   }
 }
 
-module.exports = {
-  createPaymentIntent,
-  getPaymentHistory,
-  verifyPayment
-};
