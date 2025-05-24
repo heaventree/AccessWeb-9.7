@@ -186,3 +186,109 @@ export async function getPaymentHistory(req, res) {
     });
   }
 }
+
+// Verify payment after completion
+async function verifyPayment(req, res) {
+  try {
+    const { paymentIntentId } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+    }
+
+    // Import Stripe dynamically
+    const { default: Stripe } = await import('stripe');
+    const stripe = new Stripe('sk_test_51RSAoIRftwXmfGNuiNvmy0w53pb928VhlSZfAuuuMvGVvszyu87FBzUAJQDjaxEBD84ZhUD0NdsaYiXBi7SH7qYZ00Me4Zsbp0', {
+      apiVersion: '2023-10-16',
+    });
+
+    // Retrieve the payment intent from Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (paymentIntent.status === 'succeeded') {
+      // Payment was successful, create subscription record
+      const planId = paymentIntent.metadata.planId;
+      const planName = paymentIntent.metadata.planName;
+
+      // Get plan details
+      const [plan] = await db
+        .select()
+        .from(pricingPlans)
+        .where(eq(pricingPlans.id, parseInt(planId)));
+
+      if (plan) {
+        // Create or update subscription
+        await db
+          .insert(subscriptions)
+          .values({
+            userId: userId,
+            planId: parseInt(planId),
+            status: 'active',
+            currentPeriodStart: new Date(),
+            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+            stripeSubscriptionId: paymentIntent.id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          })
+          .onConflictDoUpdate({
+            target: subscriptions.userId,
+            set: {
+              planId: parseInt(planId),
+              status: 'active',
+              currentPeriodStart: new Date(),
+              currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              stripeSubscriptionId: paymentIntent.id,
+              updatedAt: new Date()
+            }
+          });
+
+        // Record payment in history
+        await db
+          .insert(payments)
+          .values({
+            userId: userId,
+            amount: paymentIntent.amount,
+            currency: paymentIntent.currency.toUpperCase(),
+            status: 'completed',
+            plan: planName || plan.name,
+            stripePaymentId: paymentIntent.id,
+            createdAt: new Date()
+          });
+      }
+
+      res.json({
+        success: true,
+        payment: {
+          id: paymentIntent.id,
+          amount: paymentIntent.amount,
+          currency: paymentIntent.currency,
+          status: paymentIntent.status,
+          planName: planName || plan?.name
+        }
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Payment not completed'
+      });
+    }
+
+  } catch (error) {
+    console.error('Error verifying payment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify payment',
+      error: error.message
+    });
+  }
+}
+
+module.exports = {
+  createPaymentIntent,
+  getPaymentHistory,
+  verifyPayment
+};
