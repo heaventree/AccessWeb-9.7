@@ -177,11 +177,27 @@ export async function getPaymentHistory(req, res) {
       });
     }
 
-    // Since we don't have a payments table yet, return empty array for now
-    // This will be populated by the webhook when payments are processed
+    // Get user's payment history from database
+    const paymentHistory = await prisma.paymentHistory.findMany({
+      where: { userId: userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        amount: true,
+        currency: true,
+        status: true,
+        planName: true,
+        stripePaymentId: true,
+        paymentMethod: true,
+        description: true,
+        receiptUrl: true,
+        createdAt: true
+      }
+    });
+
     res.json({
       success: true,
-      data: []
+      data: paymentHistory
     });
   } catch (error) {
     console.error('Error fetching payment history:', error);

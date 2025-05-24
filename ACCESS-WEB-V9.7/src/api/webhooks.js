@@ -120,20 +120,21 @@ async function handlePaymentSuccess(paymentIntent) {
     
     await prisma.$disconnect();
 
-    // Record payment in history
-    await db
-      .insert(payments)
-      .values({
+    // Record payment in history using Prisma
+    await prisma.paymentHistory.create({
+      data: {
         userId: parseInt(userIdFromMetadata),
-        planId: parseInt(planId),
-        amount: (paymentIntent.amount / 100).toString(), // Convert from cents
+        amount: paymentIntent.amount / 100, // Convert from cents to dollars
         currency: paymentIntent.currency.toUpperCase(),
         status: 'succeeded',
-        stripePaymentIntentId: paymentIntent.id,
+        planName: plan.name,
+        stripePaymentId: paymentIntent.id,
+        stripeCustomerId: paymentIntent.customer,
         paymentMethod: 'card',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      });
+        description: `Payment for ${plan.name} plan`,
+        receiptUrl: paymentIntent.charges?.data[0]?.receipt_url || null
+      }
+    });
 
     console.log(`✅ Successfully processed payment for user ${userIdFromMetadata}: ${plan.name} plan`);
     
