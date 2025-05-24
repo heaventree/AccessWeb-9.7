@@ -15,6 +15,11 @@ import {
   updateAdminPricingPlan,
   deleteAdminPricingPlan
 } from '../api/admin-pricing.js';
+import {
+  getUserSubscription,
+  createPaymentIntent,
+  getPaymentHistory
+} from '../api/subscriptions.js';
 import { requireAdmin } from '../middleware/adminAuth.js';
 import { PrismaClient } from '@prisma/client';
 
@@ -71,6 +76,11 @@ app.get('/api/admin/pricing-plans', requireAdmin, getAdminPricingPlans);
 app.post('/api/admin/pricing-plans', requireAdmin, createPricingPlan);
 app.put('/api/admin/pricing-plans/:id', requireAdmin, updatePricingPlan);
 app.delete('/api/admin/pricing-plans/:id', requireAdmin, deletePricingPlan);
+
+// Subscription Routes (protected for authenticated users)
+app.get('/api/subscription', getUserSubscription);
+app.post('/api/subscription/payment-intent', createPaymentIntent);
+app.get('/api/subscription/payment-history', getPaymentHistory);
 
 // Start server
 app.listen(PORT, () => {

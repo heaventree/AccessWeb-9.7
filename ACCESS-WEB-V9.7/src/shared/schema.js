@@ -20,6 +20,11 @@ export const users = pgTable("users", {
   firstName: varchar("first_name", { length: 100 }),
   lastName: varchar("last_name", { length: 100 }),
   isAdmin: boolean("is_admin").default(false).notNull(),
+  subscriptionPlan: varchar("subscription_plan", { length: 50 }).default("free"),
+  subscriptionStatus: varchar("subscription_status", { length: 20 }).default("active"),
+  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
+  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
+  currentPeriodEnd: timestamp("current_period_end"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -39,6 +44,20 @@ export const pricingPlans = pgTable("pricing_plans", {
   accentColor: varchar("accent_color", { length: 50 }).default("text-primary").notNull(),
   sortOrder: integer("sort_order").default(0).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Payments table for tracking payment history
+export const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  planId: integer("plan_id").references(() => pricingPlans.id).notNull(),
+  stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+  status: varchar("status", { length: 20 }).notNull(), // 'pending', 'succeeded', 'failed'
+  paymentMethod: varchar("payment_method", { length: 50 }), // 'card', 'bank_transfer', etc.
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
