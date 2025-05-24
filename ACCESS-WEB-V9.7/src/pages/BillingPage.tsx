@@ -1,199 +1,23 @@
 import { useState, useEffect } from 'react';
 import { PageHeader } from '../components/PageHeader';
+import { SubscriptionOverview } from '../components/subscription/SubscriptionOverview';
+import { useSubscription } from '../hooks/useSubscription';
 import { useAuth } from '../hooks/useAuth';
-import axios from 'axios';
-import { PaymentFormWrapper } from '../components/PaymentForm';
-
-interface Plan {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  period: string;
-  features: string[];
-  isPopular?: boolean;
-  cta?: string;
-}
-
-interface Subscription {
-  plan: string;
-  status: string;
-  currentPeriodEnd?: string;
-}
-
-interface Payment {
-  id: number;
-  amount: number;
-  currency: string;
-  status: string;
-  createdAt: string;
-  plan: string;
-}
 
 export default function BillingPage() {
+  const { invoices, loading: invoicesLoading, error: invoicesError, fetchInvoices } = useSubscription();
   const { user } = useAuth();
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [paymentHistory, setPaymentHistory] = useState<Payment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string>('');
-  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   
-  // Fetch user's current subscription
-  const fetchSubscription = async () => {
-    try {
-      const response = await axios.get('/api/subscription');
-      setSubscription(response.data.data);
-    } catch (error) {
-      console.error('Error fetching subscription:', error);
-      // Use default free plan for now
-      setSubscription({
-        plan: 'free',
-        status: 'active',
-        currentPeriodEnd: null
-      });
-    }
-  };
-
-  // Fetch available plans
-  const fetchPlans = async () => {
-    try {
-      const response = await axios.get('/api/pricing-plans');
-      setPlans(response.data.data || []);
-    } catch (error) {
-      console.error('Error fetching plans:', error);
-      // Use sample plans for demonstration
-      setPlans([
-        {
-          id: 1,
-          name: 'Basic',
-          description: 'Perfect for small teams getting started',
-          price: 29,
-          period: 'month',
-          features: [
-            'Up to 5 accessibility scans per month',
-            'Basic WCAG compliance reports',
-            'Email support',
-            'Mobile-friendly testing'
-          ],
-          isPopular: false,
-          cta: 'Start Basic Plan'
-        },
-        {
-          id: 2,
-          name: 'Professional',
-          description: 'Ideal for growing businesses',
-          price: 79,
-          period: 'month',
-          features: [
-            'Unlimited accessibility scans',
-            'Advanced WCAG compliance reports',
-            'Priority support',
-            'API access',
-            'Custom integrations',
-            'Team collaboration tools'
-          ],
-          isPopular: true,
-          cta: 'Start Professional Plan'
-        },
-        {
-          id: 3,
-          name: 'Enterprise',
-          description: 'For large organizations with advanced needs',
-          price: 199,
-          period: 'month',
-          features: [
-            'Everything in Professional',
-            'White-label reporting',
-            'Dedicated account manager',
-            'Custom compliance frameworks',
-            'On-premise deployment options',
-            'SLA guarantee'
-          ],
-          isPopular: false,
-          cta: 'Contact Sales'
-        }
-      ]);
-    }
-  };
-
-  // Fetch payment history
-  const fetchPaymentHistory = async () => {
-    try {
-      const response = await axios.get('/api/subscription/payment-history');
-      setPaymentHistory(response.data.data || []);
-    } catch (error) {
-      console.error('Error fetching payment history:', error);
-      // Empty payment history for now
-      setPaymentHistory([]);
-    }
-  };
-
+  const [showBillingPortal, setShowBillingPortal] = useState(false);
+  
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await Promise.all([
-        fetchSubscription(),
-        fetchPlans(),
-        fetchPaymentHistory()
-      ]);
-      setLoading(false);
-    };
-    
-    loadData();
-  }, []);
-
-  const handleUpgradePlan = async (planId: number) => {
-    try {
-      // Create payment intent with Stripe
-      const response = await axios.post('/api/subscription/payment-intent', { planId });
-      
-      if (response.data.requiresStripeKeys) {
-        setError('Stripe integration requires API keys. Please contact support to set up payments.');
-        return;
-      }
-
-      if (response.data.success && response.data.clientSecret) {
-        // Success! Show the actual Stripe payment form
-        const plan = response.data.plan;
-        setSelectedPlan(plan);
-        setClientSecret(response.data.clientSecret);
-        setShowPaymentForm(true);
-        setError(null); // Clear any previous errors
-      }
-      
-    } catch (error) {
-      console.error('Error creating payment intent:', error);
-      setError('Failed to initiate plan upgrade');
-    }
-  };
-
-  const handlePaymentSuccess = () => {
-    setShowPaymentForm(false);
-    setClientSecret('');
-    setSelectedPlan(null);
-    // Refresh subscription data
-    fetchSubscription();
-  };
-
-  const handlePaymentCancel = () => {
-    setShowPaymentForm(false);
-    setClientSecret('');
-    setSelectedPlan(null);
+    fetchInvoices();
+  }, [fetchInvoices]);
+  
+  const handleManageSubscription = () => {
+    setShowBillingPortal(true);
   };
   
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-12 h-12 border-4 border-[#0fae96] border-t-transparent rounded-full"></div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <PageHeader 
@@ -201,175 +25,168 @@ export default function BillingPage() {
         description="Manage your subscription and billing details"
       />
       
-      {error && (
-        <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
-          <p className="text-red-600">{error}</p>
-        </div>
-      )}
-      
-      {/* Current Subscription Status */}
-      {subscription && (
-        <div className="mt-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Current Plan</h3>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xl font-bold text-[#0fae96] capitalize">{subscription.plan} Plan</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Status: {subscription.status}</p>
-              {subscription.currentPeriodEnd && (
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Next billing: {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
-                </p>
-              )}
-            </div>
-            {subscription.plan === 'free' && (
-              <button 
-                onClick={() => document.getElementById('available-plans')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-[#0fae96] text-white px-6 py-2 rounded-full hover:bg-[#0fae96]/90 transition-colors"
-              >
-                Upgrade Plan
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-      
-      {/* Show available plans if user has free plan or no subscription */}
-      {subscription?.plan === 'free' || !subscription ? (
-        <div id="available-plans" className="mt-8">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Choose Your Plan</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {plans.filter(plan => plan.name !== 'Free').map((plan) => (
-              <div key={plan.id} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 relative">
-                {plan.isPopular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-[#0fae96] text-white px-4 py-1 rounded-full text-sm font-medium">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                
-                <div className="text-center">
-                  <h4 className="text-xl font-bold text-gray-900 dark:text-white">{plan.name}</h4>
-                  <p className="text-gray-600 dark:text-gray-300 mt-2">{plan.description}</p>
-                  
-                  <div className="mt-4">
-                    <span className="text-4xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
-                    <span className="text-gray-600 dark:text-gray-300">/{plan.period}</span>
-                  </div>
-                  
-                  <ul className="mt-6 space-y-3">
-                    {plan.features?.map((feature, index) => (
-                      <li key={index} className="flex items-center">
-                        <span className="mr-3 text-green-500">✓</span>
-                        <span className="text-sm text-gray-900 dark:text-white">
-                          {typeof feature === 'string' ? feature : feature.text || feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <button
-                    onClick={() => handleUpgradePlan(plan.id)}
-                    className={`mt-6 w-full py-3 px-4 rounded-full font-medium transition-colors ${
-                      plan.isPopular 
-                        ? 'bg-[#0fae96] text-white hover:bg-[#0fae96]/90' 
-                        : 'border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    {plan.cta || 'Get Started'}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : null}
-      
-      {/* Account Details and Payment History */}
-      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Account Details */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Account Details</h3>
-          </div>
-          
-          {user && (
-            <div className="px-6 py-4">
-              <dl className="grid grid-cols-1 gap-4">
-                <div>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">{user.name || 'Not provided'}</dd>
-                </div>
-                
-                <div>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">{user.email}</dd>
-                </div>
-                
-                <div>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Account Type</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white capitalize">
-                    {user.isAdmin ? 'Administrator' : 'Subscriber'}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          )}
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <SubscriptionOverview onManage={handleManageSubscription} />
         </div>
         
-        {/* Payment History */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Payment History</h3>
-          </div>
-          
-          <div className="px-6 py-4">
-            {paymentHistory.length === 0 ? (
-              <p className="text-gray-500 dark:text-gray-400 text-sm">No payment history available</p>
-            ) : (
-              <div className="space-y-3">
-                {paymentHistory.slice(0, 5).map((payment) => (
-                  <div key={payment.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-slate-700 last:border-b-0">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{payment.plan} Plan</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {new Date(payment.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        ${payment.amount} {payment.currency.toUpperCase()}
-                      </p>
-                      <p className={`text-xs ${payment.status === 'succeeded' ? 'text-green-600' : 'text-red-600'}`}>
-                        {payment.status}
-                      </p>
-                    </div>
+        <div className="lg:col-span-1">
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">Account Details</h3>
+            </div>
+            
+            {user && (
+              <div className="px-4 py-5 sm:p-6">
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Name</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{user.name}</dd>
                   </div>
-                ))}
+                  
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Email</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{user.email}</dd>
+                  </div>
+                  
+                  <div className="sm:col-span-2">
+                    <dt className="text-sm font-medium text-gray-500">Account Type</dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {user.role === 'admin' ? 'Administrator' : 'Standard User'}
+                    </dd>
+                  </div>
+                  
+                  <div className="sm:col-span-2">
+                    <dt className="text-sm font-medium text-gray-500">Account Created</dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {new Date(user.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </dd>
+                  </div>
+                </dl>
               </div>
             )}
           </div>
         </div>
       </div>
-
-      {/* Stripe Payment Form Modal */}
-      {showPaymentForm && clientSecret && selectedPlan && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4">
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Complete Your Subscription
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                {selectedPlan.name} - ${selectedPlan.price}/{selectedPlan.period}
-              </p>
+      
+      <div className="mt-8">
+        <h2 className="text-lg font-medium text-gray-900">Billing History</h2>
+        <div className="mt-4 bg-white shadow overflow-hidden sm:rounded-md">
+          {invoicesLoading ? (
+            <div className="px-4 py-16 text-center">
+              <div className="animate-pulse flex justify-center">
+                <div className="h-6 w-6 bg-gray-200 rounded-full"></div>
+              </div>
+              <p className="mt-2 text-sm text-gray-500">Loading invoice history...</p>
             </div>
-            
-            <PaymentFormWrapper
-              clientSecret={clientSecret}
-              onSuccess={handlePaymentSuccess}
-              onCancel={handlePaymentCancel}
-            />
+          ) : invoicesError ? (
+            <div className="px-4 py-6 text-center">
+              <p className="text-sm text-red-500">{invoicesError}</p>
+              <button
+                onClick={() => fetchInvoices()}
+                className="mt-2 text-sm text-blue-600 hover:text-blue-500"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : invoices.length === 0 ? (
+            <div className="px-4 py-6 text-center border-t border-gray-200">
+              <p className="text-sm text-gray-500">No invoices found.</p>
+            </div>
+          ) : (
+            <ul className="divide-y divide-gray-200">
+              {invoices.map((invoice) => (
+                <li key={invoice.id}>
+                  <div className="px-4 py-4 flex items-center sm:px-6">
+                    <div className="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
+                      <div>
+                        <div className="flex text-sm">
+                          <p className="font-medium text-blue-600 truncate">
+                            Invoice {invoice.number}
+                          </p>
+                          <p className="ml-1 flex-shrink-0 font-normal text-gray-500">
+                            from {new Date(invoice.date).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                        <div className="mt-2 flex">
+                          <div className="flex items-center text-sm text-gray-500">
+                            <p>
+                              ${invoice.amount} • {invoice.status}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex-shrink-0 sm:mt-0">
+                        <a
+                          href={invoice.pdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200"
+                        >
+                          Download
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+      
+      {showBillingPortal && (
+        <div className="fixed inset-0 overflow-y-auto z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-lg w-full">
+            <div className="px-4 pt-5 pb-4 sm:p-6">
+              <div className="sm:flex sm:items-start">
+                <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    Manage Billing
+                  </h3>
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-500">
+                      You'll be redirected to our secure payment portal where you can:
+                    </p>
+                    <ul className="mt-2 list-disc pl-5 text-sm text-gray-500">
+                      <li>Update your payment method</li>
+                      <li>Change your subscription plan</li>
+                      <li>Download past invoices</li>
+                      <li>Update billing information</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse bg-gray-50">
+              <button
+                type="button"
+                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                onClick={() => {
+                  // In a real application, we would redirect to the Stripe billing portal
+                  console.log('Redirecting to billing portal...');
+                  // In development mode, just close the modal
+                  setShowBillingPortal(false);
+                }}
+              >
+                Continue to Billing Portal
+              </button>
+              <button
+                type="button"
+                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                onClick={() => setShowBillingPortal(false)}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

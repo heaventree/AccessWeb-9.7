@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -16,14 +15,7 @@ import {
   updateAdminPricingPlan,
   deleteAdminPricingPlan
 } from '../api/admin-pricing.js';
-import {
-  getUserSubscription,
-  createPaymentIntent,
-  getPaymentHistory
-} from '../api/subscriptions.js';
-import { handleStripeWebhook } from '../api/webhooks.js';
 import { requireAdmin } from '../middleware/adminAuth.js';
-import { requireAuth } from '../middleware/userAuth.js';
 import { PrismaClient } from '@prisma/client';
 
 // Create Prisma client
@@ -46,9 +38,6 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
-
-// Stripe webhook endpoint (must be before express.json() middleware)
-app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), handleStripeWebhook);
 
 // Parse JSON and URL-encoded form data
 app.use(express.json());
@@ -82,11 +71,6 @@ app.get('/api/admin/pricing-plans', requireAdmin, getAdminPricingPlans);
 app.post('/api/admin/pricing-plans', requireAdmin, createPricingPlan);
 app.put('/api/admin/pricing-plans/:id', requireAdmin, updatePricingPlan);
 app.delete('/api/admin/pricing-plans/:id', requireAdmin, deletePricingPlan);
-
-// Subscription Routes (protected for authenticated users)
-app.get('/api/subscription', requireAuth, getUserSubscription);
-app.post('/api/subscription/payment-intent', requireAuth, createPaymentIntent);
-app.get('/api/subscription/payment-history', requireAuth, getPaymentHistory);
 
 // Start server
 app.listen(PORT, () => {

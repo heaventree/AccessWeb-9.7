@@ -12,7 +12,17 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-// Note: Users are handled by Prisma User model, not Drizzle
+// Users table
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).unique().notNull(),
+  password: varchar("password", { length: 255 }).notNull(),
+  firstName: varchar("first_name", { length: 100 }),
+  lastName: varchar("last_name", { length: 100 }),
+  isAdmin: boolean("is_admin").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
 // Pricing plans table - updated for Stripe integration with numeric pricing
 export const pricingPlans = pgTable("pricing_plans", {
@@ -29,20 +39,6 @@ export const pricingPlans = pgTable("pricing_plans", {
   accentColor: varchar("accent_color", { length: 50 }).default("text-primary").notNull(),
   sortOrder: integer("sort_order").default(0).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-// Payments table for tracking payment history
-export const payments = pgTable("payments", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(), // References Prisma User.id
-  planId: integer("plan_id").references(() => pricingPlans.id).notNull(),
-  stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }),
-  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
-  status: varchar("status", { length: 20 }).notNull(), // 'pending', 'succeeded', 'failed'
-  paymentMethod: varchar("payment_method", { length: 50 }), // 'card', 'bank_transfer', etc.
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -73,7 +69,10 @@ export const menuItems = pgTable("menu_items", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Define relations (Users handled by Prisma)
+// Define relations
+export const usersRelations = relations(users, ({ many }) => ({
+  // Add user relations here if needed
+}));
 
 export const pricingPlansRelations = relations(pricingPlans, ({ many }) => ({
   // Add pricing plan relations here if needed

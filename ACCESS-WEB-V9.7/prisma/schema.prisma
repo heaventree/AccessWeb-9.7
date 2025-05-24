@@ -11,26 +11,14 @@ datasource db {
 }
 
 model User {
-  id                   Int       @id @default(autoincrement())
-  email                String    @unique
-  password             String
-  name                 String?
-  firstName            String?   @map("first_name")
-  lastName             String?   @map("last_name")
-  createdAt            DateTime  @default(now()) @map("created_at")
-  updatedAt            DateTime? @updatedAt @map("updated_at")
-  profileImageUrl      String?   @map("profile_image_url")
-  isAdmin              Boolean   @default(false) @map("is_admin")
-  subscriptionPlan     String    @default("free") @map("subscription_plan")
-  subscriptionStatus   String    @default("active") @map("subscription_status")
-  stripeCustomerId     String?   @map("stripe_customer_id")
-  stripeSubscriptionId String?   @map("stripe_subscription_id")
-  currentPeriodEnd     DateTime? @map("current_period_end")
-
-  // Relations
-  paymentHistory PaymentHistory[]
-
-  @@map("User")
+  id              Int       @id @default(autoincrement())
+  email           String    @unique
+  password        String
+  name            String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  profileImageUrl String?
+  isAdmin         Boolean   @default(false)
 }
 
 model PricingPlan {
@@ -51,25 +39,4 @@ model PricingPlan {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("pricing_plans")
-}
-
-model PaymentHistory {
-  id                Int      @id @default(autoincrement())
-  userId            Int      @map("user_id")
-  amount            Decimal  @db.Decimal(10, 2)
-  currency          String   @default("USD") @db.VarChar(3)
-  status            String   @db.VarChar(20)
-  planName          String   @db.VarChar(100) @map("plan_name")
-  stripePaymentId   String   @unique @db.VarChar(255) @map("stripe_payment_id")
-  stripeCustomerId  String?  @db.VarChar(255) @map("stripe_customer_id")
-  paymentMethod     String?  @db.VarChar(50) @map("payment_method")
-  description       String?  @db.Text
-  receiptUrl        String?  @db.VarChar(500) @map("receipt_url")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-
-  // Relation to User
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("payment_history")
 }
