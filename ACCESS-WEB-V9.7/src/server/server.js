@@ -19,7 +19,8 @@ import {
 import {
   getUserSubscription,
   createPaymentIntent,
-  getPaymentHistory
+  getPaymentHistory,
+  verifyPayment
 } from '../api/subscriptions.js';
 import { requireAdmin } from '../middleware/adminAuth.js';
 import { requireAuth } from '../middleware/userAuth.js';
@@ -82,6 +83,7 @@ app.delete('/api/admin/pricing-plans/:id', requireAdmin, deletePricingPlan);
 // Subscription Routes (protected for authenticated users)
 app.get('/api/subscription', requireAuth, getUserSubscription);
 app.post('/api/subscription/payment-intent', requireAuth, createPaymentIntent);
+app.post('/api/subscription/verify-payment', requireAuth, verifyPayment);
 app.get('/api/subscription/payment-history', requireAuth, getPaymentHistory);
 
 // Start server
