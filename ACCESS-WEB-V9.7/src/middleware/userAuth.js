@@ -27,7 +27,8 @@ export async function requireAuth(req, res, next) {
       .select({
         id: users.id,
         email: users.email,
-        name: users.name,
+        firstName: users.firstName,
+        lastName: users.lastName,
         isAdmin: users.isAdmin
       })
       .from(users)
