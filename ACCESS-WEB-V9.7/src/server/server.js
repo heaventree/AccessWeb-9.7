@@ -21,6 +21,7 @@ import {
   getPaymentHistory
 } from '../api/subscriptions.js';
 import { requireAdmin } from '../middleware/adminAuth.js';
+import { requireAuth } from '../middleware/userAuth.js';
 import { PrismaClient } from '@prisma/client';
 
 // Create Prisma client
@@ -78,9 +79,9 @@ app.put('/api/admin/pricing-plans/:id', requireAdmin, updatePricingPlan);
 app.delete('/api/admin/pricing-plans/:id', requireAdmin, deletePricingPlan);
 
 // Subscription Routes (protected for authenticated users)
-app.get('/api/subscription', getUserSubscription);
-app.post('/api/subscription/payment-intent', createPaymentIntent);
-app.get('/api/subscription/payment-history', getPaymentHistory);
+app.get('/api/subscription', requireAuth, getUserSubscription);
+app.post('/api/subscription/payment-intent', requireAuth, createPaymentIntent);
+app.get('/api/subscription/payment-history', requireAuth, getPaymentHistory);
 
 // Start server
 app.listen(PORT, () => {
