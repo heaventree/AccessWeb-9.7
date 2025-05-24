@@ -76,7 +76,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       <form onSubmit={handleSubmit}>
         {(error || formError) && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-            {formError || error}
+            {formError || (typeof error === 'string' 
+              ? error 
+              : error?.message || 'An error occurred during registration. Please try again.')}
           </div>
         )}
         
