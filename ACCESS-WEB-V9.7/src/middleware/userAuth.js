@@ -1,8 +1,4 @@
 import jwt from "jsonwebtoken";
-import { db } from "../server/db.js";
-// Users are handled by Prisma User model
-import { eq } from "drizzle-orm";
-import { decode } from "punycode";
 
 // Middleware to verify user authentication (for any authenticated user)
 export async function requireAuth(req, res, next) {
@@ -38,7 +34,12 @@ export async function requireAuth(req, res, next) {
         email: true,
         firstName: true,
         lastName: true,
-        isAdmin: true
+        isAdmin: true,
+        subscriptionPlan: true,
+        subscriptionStatus: true,
+        stripeCustomerId: true,
+        stripeSubscriptionId: true,
+        currentPeriodEnd: true
       }
     });
     
