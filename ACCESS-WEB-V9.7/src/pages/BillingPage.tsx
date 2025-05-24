@@ -40,15 +40,11 @@ export default function BillingPage() {
   // Fetch user's current subscription
   const fetchSubscription = async () => {
     try {
-      const response = await axios.get('/api/subscription', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await axios.get('/api/subscription');
       setSubscription(response.data.data);
     } catch (error) {
       console.error('Error fetching subscription:', error);
-      setError('Failed to load subscription details');
+      // Don't set error for subscription as it's normal for new users to not have one
     }
   };
 
@@ -65,14 +61,11 @@ export default function BillingPage() {
   // Fetch payment history
   const fetchPaymentHistory = async () => {
     try {
-      const response = await axios.get('/api/subscription/payment-history', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await axios.get('/api/subscription/payment-history');
       setPaymentHistory(response.data.data || []);
     } catch (error) {
       console.error('Error fetching payment history:', error);
+      // Don't set error for payment history as it's normal for new users to not have any
     }
   };
 
@@ -93,14 +86,7 @@ export default function BillingPage() {
   const handleUpgradePlan = async (planId: number) => {
     try {
       // Create payment intent with Stripe
-      const response = await axios.post('/api/subscription/payment-intent', 
-        { planId }, 
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        }
-      );
+      const response = await axios.post('/api/subscription/payment-intent', { planId });
       
       if (response.data.requiresStripeKeys) {
         setError('Stripe integration requires API keys. Please contact support to set up payments.');
@@ -194,7 +180,9 @@ export default function BillingPage() {
                     {plan.features?.map((feature, index) => (
                       <li key={index} className="flex items-center">
                         <span className="mr-3 text-green-500">✓</span>
-                        <span className="text-sm text-gray-900 dark:text-white">{feature}</span>
+                        <span className="text-sm text-gray-900 dark:text-white">
+                          {typeof feature === 'string' ? feature : feature.text || feature}
+                        </span>
                       </li>
                     ))}
                   </ul>
