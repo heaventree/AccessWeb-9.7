@@ -150,7 +150,7 @@ function PaymentForm({ amount, onSuccess, onError, stripe, elements }: PaymentFo
         </div>
         <div className="bg-blue-50 p-4 rounded-lg mb-4">
           <p className="text-blue-800 font-medium">
-            Amount to pay: ${(amount / 100).toFixed(2)}
+            Amount to pay: ${amount && !isNaN(amount) ? (amount / 100).toFixed(2) : '0.00'}
           </p>
         </div>
       </div>

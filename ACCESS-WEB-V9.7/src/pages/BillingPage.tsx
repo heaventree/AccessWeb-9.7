@@ -396,8 +396,9 @@ export default function BillingPage() {
             
             <PaymentFormWrapper
               clientSecret={clientSecret}
+              amount={selectedPlan.price * 100} // Convert dollars to cents for Stripe
               onSuccess={handlePaymentSuccess}
-              onCancel={handlePaymentCancel}
+              onError={handlePaymentCancel}
             />
           </div>
         </div>
