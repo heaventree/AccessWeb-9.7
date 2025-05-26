@@ -3,6 +3,7 @@ import { PageHeader } from '../components/PageHeader';
 import { useAuth } from '../hooks/useAuth';
 import axios from 'axios';
 import { PaymentFormWrapper } from '../components/PaymentForm';
+import CancelSubscriptionModal from '../components/CancelSubscriptionModal';
 
 interface Plan {
   id: number;
@@ -40,6 +41,7 @@ export default function BillingPage() {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [clientSecret, setClientSecret] = useState<string>('');
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   
   // Fetch user's current subscription
   const fetchSubscription = async () => {
@@ -185,17 +187,13 @@ export default function BillingPage() {
   };
 
   const handleCancelSubscription = async () => {
-    if (!confirm('Are you sure you want to cancel your subscription? Your access will continue until the end of your current billing period.')) {
-      return;
-    }
-
     try {
       const response = await axios.post('/api/subscription/cancel');
       
       if (response.data.success) {
         // Refresh subscription data to show updated status
         fetchSubscription();
-        alert('Subscription cancelled successfully. Your access will continue until the end of the current billing period.');
+        setError(null);
       } else {
         setError(response.data.message || 'Failed to cancel subscription');
       }
@@ -253,8 +251,8 @@ export default function BillingPage() {
               )}
               {subscription.plan !== 'free' && subscription.status === 'active' && (
                 <button 
-                  onClick={handleCancelSubscription}
-                  className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition-colors"
+                  onClick={() => setShowCancelModal(true)}
+                  className="text-red-600 hover:text-red-700 text-sm font-medium transition-colors border border-red-200 hover:border-red-300 px-4 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10"
                 >
                   Cancel Subscription
                 </button>
@@ -404,6 +402,14 @@ export default function BillingPage() {
           </div>
         </div>
       )}
+
+      {/* Cancel Subscription Modal */}
+      <CancelSubscriptionModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleCancelSubscription}
+        subscription={subscription || { plan: '', currentPeriodEnd: '' }}
+      />
     </div>
   );
 }
