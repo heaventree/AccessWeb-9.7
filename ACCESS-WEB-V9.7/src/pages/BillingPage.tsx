@@ -247,7 +247,7 @@ export default function BillingPage() {
                 </div>
                 <div className="ml-3">
                   <h3 className="text-lg font-semibold text-red-800 dark:text-red-200">
-                    🚨 Subscription Expired
+                    Subscription Expired
                   </h3>
                   <p className="text-red-700 dark:text-red-300 mt-1">
                     Your subscription has expired. Upgrade now to continue accessing premium features.
@@ -267,7 +267,7 @@ export default function BillingPage() {
                 </div>
                 <div className="ml-3">
                   <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200">
-                    ⚠️ Subscription Cancelled
+                    Subscription Cancelled
                   </h3>
                   <p className="text-yellow-700 dark:text-yellow-300 mt-1">
                     Your subscription has been cancelled. You can continue to use premium features until your current billing period ends.
@@ -287,7 +287,7 @@ export default function BillingPage() {
                 </div>
                 <div className="ml-3">
                   <h3 className="text-lg font-semibold text-green-800 dark:text-green-200">
-                    ✅ Subscription Active
+                    Subscription Active
                   </h3>
                   <p className="text-green-700 dark:text-green-300 mt-1">
                     You have full access to all premium features and tools.
@@ -337,7 +337,7 @@ export default function BillingPage() {
                   ? 'text-green-600 dark:text-green-400 font-semibold'
                   : 'text-gray-600 dark:text-gray-300'
               }`}>
-                Status: {subscription.status === 'active' ? '🟢 Active' : subscription.status}
+                Status: {subscription.status}
               </p>
               {subscription.currentPeriodEnd && (
                 <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -360,7 +360,7 @@ export default function BillingPage() {
                       : 'bg-[#0fae96] text-white hover:bg-[#0fae96]/90'
                   }`}
                 >
-                  {subscription.status === 'expired' ? '🚀 Reactivate Now!' : 'Upgrade Plan'}
+                  {subscription.status === 'expired' ? 'Reactivate Now!' : 'Upgrade Plan'}
                 </button>
               )}
               {subscription.plan !== 'free' && subscription.status === 'active' && (
@@ -383,7 +383,7 @@ export default function BillingPage() {
             <div className="mb-8 p-6 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 border-2 border-orange-300 dark:border-orange-700 rounded-xl">
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-orange-800 dark:text-orange-200 mb-2">
-                  🔥 Reactivate Your Subscription
+                  Reactivate Your Subscription
                 </h2>
                 <p className="text-orange-700 dark:text-orange-300 text-lg">
                   Choose a plan below to restore full access to all premium features
@@ -412,7 +412,7 @@ export default function BillingPage() {
                         ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg animate-pulse'
                         : 'bg-[#0fae96] text-white'
                     }`}>
-                      {subscription?.status === 'expired' ? '⭐ BEST VALUE' : 'Most Popular'}
+                      {subscription?.status === 'expired' ? 'BEST VALUE' : 'Most Popular'}
                     </span>
                   </div>
                 )}
@@ -461,7 +461,7 @@ export default function BillingPage() {
                     }`}
                   >
                     {subscription?.status === 'expired' && plan.isPopular 
-                      ? '🚀 Reactivate Now!' 
+                      ? 'Reactivate Now!' 
                       : subscription?.status === 'expired' 
                         ? 'Choose This Plan' 
                         : plan.cta || 'Get Started'}
