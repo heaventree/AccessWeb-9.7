@@ -22,7 +22,7 @@ export interface AuthError {
 }
 
 // Create a constant for easier toggling in development
-export const DEVELOPMENT_MODE = true;
+export const DEVELOPMENT_MODE = false;
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
