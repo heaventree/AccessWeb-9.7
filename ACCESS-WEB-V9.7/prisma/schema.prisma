@@ -26,6 +26,8 @@ model User {
   stripeCustomerId     String?   @map("stripe_customer_id")
   stripeSubscriptionId String?   @map("stripe_subscription_id")
   currentPeriodEnd     DateTime? @map("current_period_end")
+  cancellationReason   String?   @map("cancellation_reason")
+  cancelledAt          DateTime? @map("cancelled_at")
 
   // Relations
   paymentHistory PaymentHistory[]

@@ -4,7 +4,7 @@ import { X, AlertTriangle, Calendar, Shield } from 'lucide-react';
 interface CancelSubscriptionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => Promise<void>;
+  onConfirm: (reason?: string) => Promise<void>;
   subscription: {
     plan: string;
     currentPeriodEnd?: string;
@@ -25,7 +25,7 @@ const CancelSubscriptionModal: React.FC<CancelSubscriptionModalProps> = ({
   const handleConfirm = async () => {
     setIsLoading(true);
     try {
-      await onConfirm();
+      await onConfirm(reason);
       onClose();
     } catch (error) {
       console.error('Error canceling subscription:', error);

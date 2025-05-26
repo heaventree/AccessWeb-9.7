@@ -186,9 +186,9 @@ export default function BillingPage() {
     setSelectedPlan(null);
   };
 
-  const handleCancelSubscription = async () => {
+  const handleCancelSubscription = async (reason?: string) => {
     try {
-      const response = await axios.post('/api/subscription/cancel');
+      const response = await axios.post('/api/subscription/cancel', { reason });
       
       if (response.data.success) {
         // Refresh subscription data to show updated status

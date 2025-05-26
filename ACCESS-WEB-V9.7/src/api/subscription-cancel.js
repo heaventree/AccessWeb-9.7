@@ -5,6 +5,7 @@ import { requireAuth } from '../middleware/userAuth.js';
 async function cancelSubscription(req, res) {
   try {
     const userId = req.user?.id;
+    const { reason } = req.body;
 
     if (!userId) {
       return res.status(401).json({
@@ -46,13 +47,21 @@ async function cancelSubscription(req, res) {
       }
     }
 
-    // Update user subscription status in database
+    // Update user subscription status in database and store cancellation reason
+    const updateData = {
+      subscriptionStatus: 'canceled',
+      updatedAt: new Date()
+    };
+
+    // Add cancellation reason if provided
+    if (reason) {
+      updateData.cancellationReason = reason;
+      updateData.cancelledAt = new Date();
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: {
-        subscriptionStatus: 'canceled',
-        updatedAt: new Date()
-      }
+      data: updateData
     });
 
     await prisma.$disconnect();
