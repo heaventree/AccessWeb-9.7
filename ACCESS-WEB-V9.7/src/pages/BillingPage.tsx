@@ -231,6 +231,8 @@ export default function BillingPage() {
         <div className={`mt-6 rounded-xl shadow-sm border p-6 ${
           subscription.status === 'expired' 
             ? 'bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border-red-200 dark:border-red-700'
+            : subscription.status === 'canceled'
+            ? 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-300 dark:border-yellow-700'
             : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700'
         }`}>
           {subscription.status === 'expired' && (
@@ -253,12 +255,36 @@ export default function BillingPage() {
             </div>
           )}
           
+          {subscription.status === 'canceled' && (
+            <div className="mb-6 p-4 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200">
+                    ⚠️ Subscription Cancelled
+                  </h3>
+                  <p className="text-yellow-700 dark:text-yellow-300 mt-1">
+                    Your subscription has been cancelled. You can continue to use premium features until your current billing period ends.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Current Plan</h3>
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3">
                 <p className={`text-xl font-bold capitalize ${
-                  subscription.status === 'expired' ? 'text-red-600 dark:text-red-400' : 'text-[#0fae96]'
+                  subscription.status === 'expired' 
+                    ? 'text-red-600 dark:text-red-400' 
+                    : subscription.status === 'canceled'
+                    ? 'text-yellow-600 dark:text-yellow-400'
+                    : 'text-[#0fae96]'
                 }`}>
                   {subscription.plan} Plan
                 </p>
@@ -267,17 +293,28 @@ export default function BillingPage() {
                     EXPIRED
                   </span>
                 )}
+                {subscription.status === 'canceled' && (
+                  <span className="px-3 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 rounded-full border border-yellow-300 dark:border-yellow-700 animate-pulse">
+                    CANCELLED
+                  </span>
+                )}
               </div>
               <p className={`text-sm ${
                 subscription.status === 'expired' 
                   ? 'text-red-600 dark:text-red-400 font-medium' 
+                  : subscription.status === 'canceled'
+                  ? 'text-yellow-600 dark:text-yellow-400 font-medium'
                   : 'text-gray-600 dark:text-gray-300'
               }`}>
                 Status: {subscription.status}
               </p>
               {subscription.currentPeriodEnd && (
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {subscription.status === 'expired' ? 'Expired on: ' : 'Next billing: '}
+                  {subscription.status === 'expired' 
+                    ? 'Expired on: ' 
+                    : subscription.status === 'canceled'
+                    ? 'Access ends on: '
+                    : 'Next billing: '}
                   {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
                 </p>
               )}
@@ -308,8 +345,8 @@ export default function BillingPage() {
         </div>
       )}
       
-      {/* Show available plans if user has free plan, no subscription, or expired subscription */}
-      {subscription?.plan === 'free' || !subscription || subscription?.status === 'expired' ? (
+      {/* Show available plans if user has free plan, no subscription, or expired subscription (but NOT cancelled) */}
+      {(subscription?.plan === 'free' || !subscription || subscription?.status === 'expired') && subscription?.status !== 'canceled' ? (
         <div id="available-plans" className="mt-8">
           {subscription?.status === 'expired' && (
             <div className="mb-8 p-6 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 border-2 border-orange-300 dark:border-orange-700 rounded-xl">
@@ -404,6 +441,26 @@ export default function BillingPage() {
           </div>
         </div>
       ) : null}
+      
+      {/* Message for cancelled subscriptions */}
+      {subscription?.status === 'canceled' && (
+        <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-xl">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-4">
+              <svg className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">
+              Subscription Management
+            </h3>
+            <p className="text-blue-700 dark:text-blue-300">
+              Your subscription is cancelled but still active until {subscription.currentPeriodEnd && new Date(subscription.currentPeriodEnd).toLocaleDateString()}.
+              You can choose a new plan after your current access period ends.
+            </p>
+          </div>
+        </div>
+      )}
       
       {/* Account Details and Payment History */}
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
