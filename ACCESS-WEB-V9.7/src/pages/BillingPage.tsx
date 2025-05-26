@@ -233,6 +233,8 @@ export default function BillingPage() {
             ? 'bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border-red-200 dark:border-red-700'
             : subscription.status === 'canceled'
             ? 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-300 dark:border-yellow-700'
+            : subscription.status === 'active'
+            ? 'bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 border-green-200 dark:border-green-700 shadow-lg'
             : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700'
         }`}>
           {subscription.status === 'expired' && (
@@ -275,19 +277,46 @@ export default function BillingPage() {
             </div>
           )}
           
+          {subscription.status === 'active' && (
+            <div className="mb-6 p-4 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-semibold text-green-800 dark:text-green-200">
+                    ✅ Subscription Active
+                  </h3>
+                  <p className="text-green-700 dark:text-green-300 mt-1">
+                    You have full access to all premium features and tools.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Current Plan</h3>
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <p className={`text-xl font-bold capitalize ${
+                <p className={`text-2xl font-bold capitalize ${
                   subscription.status === 'expired' 
                     ? 'text-red-600 dark:text-red-400' 
                     : subscription.status === 'canceled'
                     ? 'text-yellow-600 dark:text-yellow-400'
+                    : subscription.status === 'active'
+                    ? 'text-green-600 dark:text-green-400 bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent'
                     : 'text-[#0fae96]'
                 }`}>
                   {subscription.plan} Plan
                 </p>
+                {subscription.status === 'active' && (
+                  <span className="px-3 py-1 text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 rounded-full border border-green-200 dark:border-green-700 animate-pulse">
+                    ACTIVE
+                  </span>
+                )}
                 {subscription.status === 'expired' && (
                   <span className="px-3 py-1 text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 rounded-full border border-red-200 dark:border-red-700">
                     EXPIRED
@@ -299,14 +328,16 @@ export default function BillingPage() {
                   </span>
                 )}
               </div>
-              <p className={`text-sm ${
+              <p className={`text-sm font-medium ${
                 subscription.status === 'expired' 
-                  ? 'text-red-600 dark:text-red-400 font-medium' 
+                  ? 'text-red-600 dark:text-red-400' 
                   : subscription.status === 'canceled'
-                  ? 'text-yellow-600 dark:text-yellow-400 font-medium'
+                  ? 'text-yellow-600 dark:text-yellow-400'
+                  : subscription.status === 'active'
+                  ? 'text-green-600 dark:text-green-400 font-semibold'
                   : 'text-gray-600 dark:text-gray-300'
               }`}>
-                Status: {subscription.status}
+                Status: {subscription.status === 'active' ? '🟢 Active' : subscription.status}
               </p>
               {subscription.currentPeriodEnd && (
                 <p className="text-sm text-gray-600 dark:text-gray-300">
