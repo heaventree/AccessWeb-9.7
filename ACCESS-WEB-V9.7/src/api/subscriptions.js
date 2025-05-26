@@ -39,10 +39,10 @@ export async function getUserSubscription(req, res) {
     let needsUpdate = false;
     let updateData = {};
 
-    // Auto-expire subscription if past end date
+    // Auto-expire subscription if past end date (for both active and canceled subscriptions)
     if (userWithSubscription.currentPeriodEnd && 
         new Date(userWithSubscription.currentPeriodEnd) < now &&
-        userWithSubscription.subscriptionStatus === 'active') {
+        (userWithSubscription.subscriptionStatus === 'active' || userWithSubscription.subscriptionStatus === 'canceled')) {
       updateData.subscriptionStatus = 'expired';
       needsUpdate = true;
     }

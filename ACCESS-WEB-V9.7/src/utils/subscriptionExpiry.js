@@ -10,10 +10,12 @@ export async function checkAndExpireSubscriptions() {
   try {
     const now = new Date();
     
-    // Find all active subscriptions that have passed their end date
+    // Find all active and canceled subscriptions that have passed their end date
     const expiredSubscriptions = await prisma.user.findMany({
       where: {
-        subscriptionStatus: 'active',
+        subscriptionStatus: {
+          in: ['active', 'canceled']
+        },
         currentPeriodEnd: {
           lt: now
         }
