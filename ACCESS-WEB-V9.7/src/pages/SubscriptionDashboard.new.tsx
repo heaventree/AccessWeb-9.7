@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { useAuth } from '../hooks/useAuth';
 import {
   CreditCard,
   Settings,
@@ -96,6 +97,7 @@ const analyticsData = {
 export function SubscriptionDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const { user } = useAuth();
   
   // Navigation items
   const navigationItems = [
@@ -347,7 +349,7 @@ export function SubscriptionDashboard() {
                     </svg>
                   </span>
                   <span className="ml-2 hidden text-sm font-medium text-gray-700 md:block">
-                    John Doe
+                    {user?.name || user?.username || 'User'}
                   </span>
                 </div>
               </div>
