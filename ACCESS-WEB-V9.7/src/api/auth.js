@@ -209,14 +209,24 @@ router.post('/login', async (req, res) => {
 // Get current user
 router.get('/me', async (req, res) => {
   try {
-    // Get token from cookies
-    const token = req.cookies.accessToken;
+    // Get token from Authorization header or cookies
+    let token = req.cookies.accessToken;
+    
+    // If no cookie token, check Authorization header
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
+    
     if (!token) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    console.log('Decoded JWT:', decoded);
     
     // Get user
     const user = await prisma.user.findUnique({ 
@@ -227,9 +237,15 @@ router.get('/me', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Return user without password
+    // Return user without password, with proper role and admin status
     const { password, ...userWithoutPassword } = user;
-    return res.json({ user: userWithoutPassword });
+    const userResponse = {
+      ...userWithoutPassword,
+      role: user.isAdmin ? 'admin' : 'subscriber',
+      isAdmin: !!user.isAdmin
+    };
+    
+    return res.json({ user: userResponse });
   } catch (error) {
     console.error('Get user error:', error);
     return res.status(401).json({ error: 'Not authenticated' });
