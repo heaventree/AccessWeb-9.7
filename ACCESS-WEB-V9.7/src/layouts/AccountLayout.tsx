@@ -9,8 +9,11 @@ import {
   Gauge
 } from 'lucide-react';
 import { DashboardLayout } from './DashboardLayout';
+import { useAuth } from '../hooks/useAuth';
 
 export function AccountLayout() {
+  const { user } = useAuth();
+  
   const menuItems = [
     {
       path: "/my-account",
@@ -61,7 +64,7 @@ export function AccountLayout() {
       title="Account"
       showBackToHome={false}
       notifications={3}
-      userName="John Doe"
+      userName={user?.name || 'User'}
     />
   );
 }
