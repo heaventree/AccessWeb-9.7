@@ -383,34 +383,39 @@ export default function BillingPage() {
 
       {/* Stripe Payment Form Modal */}
       {showPaymentForm && clientSecret && selectedPlan && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4 relative">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto relative">
             {/* Close button */}
-            <button
-              onClick={() => setShowPaymentForm(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-              aria-label="Close payment form"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Complete Your Subscription
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                {selectedPlan.name} - ${selectedPlan.price}/{selectedPlan.period}
-              </p>
+            <div className="sticky top-0 bg-white dark:bg-slate-800 z-10 flex justify-end p-4 border-b border-gray-200 dark:border-slate-700">
+              <button
+                onClick={() => setShowPaymentForm(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
+                aria-label="Close payment form"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
             
-            <PaymentFormWrapper
-              clientSecret={clientSecret}
-              amount={selectedPlan.price * 100} // Convert dollars to cents for Stripe
-              onSuccess={handlePaymentSuccess}
-              onError={handlePaymentCancel}
-            />
+            {/* Modal Content */}
+            <div className="p-6 pb-8">
+              <div className="mb-6 text-center">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Complete Your Subscription
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-lg">
+                  {selectedPlan.name} - ${selectedPlan.price}/{selectedPlan.period}
+                </p>
+              </div>
+              
+              <PaymentFormWrapper
+                clientSecret={clientSecret}
+                amount={selectedPlan.price * 100} // Convert dollars to cents for Stripe
+                onSuccess={handlePaymentSuccess}
+                onError={handlePaymentCancel}
+              />
+            </div>
           </div>
         </div>
       )}
