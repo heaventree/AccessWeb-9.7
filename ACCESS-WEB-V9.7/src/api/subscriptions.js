@@ -34,18 +34,35 @@ export async function getUserSubscription(req, res) {
       });
     }
 
+    // Check if subscription has expired automatically
+    const now = new Date();
+    let needsUpdate = false;
+    let updateData = {};
+
+    // Auto-expire subscription if past end date
+    if (userWithSubscription.currentPeriodEnd && 
+        new Date(userWithSubscription.currentPeriodEnd) < now &&
+        userWithSubscription.subscriptionStatus === 'active') {
+      updateData.subscriptionStatus = 'expired';
+      needsUpdate = true;
+    }
+
     // If user has no subscription, assign free plan
     if (!userWithSubscription.subscriptionPlan) {
+      updateData.subscriptionPlan = 'free';
+      updateData.subscriptionStatus = 'active';
+      needsUpdate = true;
+    }
+
+    // Apply any needed updates
+    if (needsUpdate) {
       await prisma.user.update({
         where: { id: userId },
-        data: {
-          subscriptionPlan: 'free',
-          subscriptionStatus: 'active'
-        }
+        data: updateData
       });
       
-      userWithSubscription.subscriptionPlan = 'free';
-      userWithSubscription.subscriptionStatus = 'active';
+      // Update local object
+      Object.assign(userWithSubscription, updateData);
     }
 
     res.json({

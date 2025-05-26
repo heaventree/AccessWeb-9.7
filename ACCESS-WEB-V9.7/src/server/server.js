@@ -26,6 +26,7 @@ import { handleStripeWebhook } from '../api/webhooks.js';
 import { requireAdmin } from '../middleware/adminAuth.js';
 import { requireAuth } from '../middleware/userAuth.js';
 import { PrismaClient } from '@prisma/client';
+import { startSubscriptionExpiryChecker } from '../utils/subscriptionExpiry.js';
 
 // Create Prisma client
 const prisma = new PrismaClient();
@@ -93,4 +94,7 @@ app.post('/api/subscription/cancel', requireAuth, cancelSubscription);
 // Start server
 app.listen(PORT, () => {
   console.log(`API Server running on port ${PORT}`);
+  
+  // Start automatic subscription expiry checker
+  startSubscriptionExpiryChecker();
 });
