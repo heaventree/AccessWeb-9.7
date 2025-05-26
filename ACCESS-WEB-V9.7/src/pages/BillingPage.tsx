@@ -228,25 +228,71 @@ export default function BillingPage() {
       
       {/* Current Subscription Status */}
       {subscription && (
-        <div className="mt-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6">
+        <div className={`mt-6 rounded-xl shadow-sm border p-6 ${
+          subscription.status === 'expired' 
+            ? 'bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border-red-200 dark:border-red-700'
+            : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700'
+        }`}>
+          {subscription.status === 'expired' && (
+            <div className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-semibold text-red-800 dark:text-red-200">
+                    🚨 Subscription Expired
+                  </h3>
+                  <p className="text-red-700 dark:text-red-300 mt-1">
+                    Your subscription has expired. Upgrade now to continue accessing premium features.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Current Plan</h3>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xl font-bold text-[#0fae96] capitalize">{subscription.plan} Plan</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Status: {subscription.status}</p>
+              <div className="flex items-center gap-3">
+                <p className={`text-xl font-bold capitalize ${
+                  subscription.status === 'expired' ? 'text-red-600 dark:text-red-400' : 'text-[#0fae96]'
+                }`}>
+                  {subscription.plan} Plan
+                </p>
+                {subscription.status === 'expired' && (
+                  <span className="px-3 py-1 text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 rounded-full border border-red-200 dark:border-red-700">
+                    EXPIRED
+                  </span>
+                )}
+              </div>
+              <p className={`text-sm ${
+                subscription.status === 'expired' 
+                  ? 'text-red-600 dark:text-red-400 font-medium' 
+                  : 'text-gray-600 dark:text-gray-300'
+              }`}>
+                Status: {subscription.status}
+              </p>
               {subscription.currentPeriodEnd && (
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Next billing: {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                  {subscription.status === 'expired' ? 'Expired on: ' : 'Next billing: '}
+                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
                 </p>
               )}
             </div>
             <div className="flex gap-3">
-              {subscription.plan === 'free' && (
+              {(subscription.plan === 'free' || subscription.status === 'expired') && (
                 <button 
                   onClick={() => document.getElementById('available-plans')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="bg-[#0fae96] text-white px-6 py-2 rounded-full hover:bg-[#0fae96]/90 transition-colors"
+                  className={`px-6 py-3 rounded-full font-semibold transition-all transform hover:scale-105 ${
+                    subscription.status === 'expired'
+                      ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg hover:shadow-xl animate-pulse'
+                      : 'bg-[#0fae96] text-white hover:bg-[#0fae96]/90'
+                  }`}
                 >
-                  Upgrade Plan
+                  {subscription.status === 'expired' ? '🚀 Reactivate Now!' : 'Upgrade Plan'}
                 </button>
               )}
               {subscription.plan !== 'free' && subscription.status === 'active' && (
@@ -262,18 +308,50 @@ export default function BillingPage() {
         </div>
       )}
       
-      {/* Show available plans if user has free plan or no subscription */}
-      {subscription?.plan === 'free' || !subscription ? (
+      {/* Show available plans if user has free plan, no subscription, or expired subscription */}
+      {subscription?.plan === 'free' || !subscription || subscription?.status === 'expired' ? (
         <div id="available-plans" className="mt-8">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Choose Your Plan</h3>
+          {subscription?.status === 'expired' && (
+            <div className="mb-8 p-6 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 border-2 border-orange-300 dark:border-orange-700 rounded-xl">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-orange-800 dark:text-orange-200 mb-2">
+                  🔥 Reactivate Your Subscription
+                </h2>
+                <p className="text-orange-700 dark:text-orange-300 text-lg">
+                  Choose a plan below to restore full access to all premium features
+                </p>
+              </div>
+            </div>
+          )}
+          
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            {subscription?.status === 'expired' ? 'Choose Your Plan' : 'Choose Your Plan'}
+          </h3>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {plans.filter(plan => plan.name !== 'Free').map((plan) => (
-              <div key={plan.id} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 relative">
+              <div key={plan.id} className={`bg-white dark:bg-slate-800 rounded-xl shadow-sm border p-6 relative transition-all hover:shadow-lg ${
+                plan.isPopular 
+                  ? subscription?.status === 'expired'
+                    ? 'ring-4 ring-orange-400 shadow-xl transform scale-105 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20'
+                    : 'ring-2 ring-[#0fae96] border-[#0fae96]'
+                  : 'border-gray-200 dark:border-slate-700'
+              }`}>
                 {plan.isPopular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-[#0fae96] text-white px-4 py-1 rounded-full text-sm font-medium">
-                      Most Popular
+                    <span className={`px-4 py-1 rounded-full text-sm font-medium ${
+                      subscription?.status === 'expired'
+                        ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg animate-pulse'
+                        : 'bg-[#0fae96] text-white'
+                    }`}>
+                      {subscription?.status === 'expired' ? '⭐ BEST VALUE' : 'Most Popular'}
                     </span>
+                  </div>
+                )}
+                
+                {subscription?.status === 'expired' && plan.isPopular && (
+                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-bounce">
+                    URGENT!
                   </div>
                 )}
                 
@@ -284,6 +362,13 @@ export default function BillingPage() {
                   <div className="mt-4">
                     <span className="text-4xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
                     <span className="text-gray-600 dark:text-gray-300">/{plan.period}</span>
+                    {subscription?.status === 'expired' && plan.isPopular && (
+                      <div className="mt-1">
+                        <span className="text-sm text-red-600 dark:text-red-400 font-semibold">
+                          Limited Time: Reactivate Now!
+                        </span>
+                      </div>
+                    )}
                   </div>
                   
                   <ul className="mt-6 space-y-3">
@@ -299,13 +384,19 @@ export default function BillingPage() {
                   
                   <button
                     onClick={() => handleUpgradePlan(plan.id)}
-                    className={`mt-6 w-full py-3 px-4 rounded-full font-medium transition-colors ${
-                      plan.isPopular 
-                        ? 'bg-[#0fae96] text-white hover:bg-[#0fae96]/90' 
-                        : 'border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
+                    className={`mt-6 w-full py-3 px-4 rounded-full font-medium transition-all transform hover:scale-105 ${
+                      subscription?.status === 'expired' && plan.isPopular
+                        ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg hover:shadow-xl animate-pulse'
+                        : plan.isPopular 
+                          ? 'bg-[#0fae96] text-white hover:bg-[#0fae96]/90' 
+                          : 'border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
                     }`}
                   >
-                    {plan.cta || 'Get Started'}
+                    {subscription?.status === 'expired' && plan.isPopular 
+                      ? '🚀 Reactivate Now!' 
+                      : subscription?.status === 'expired' 
+                        ? 'Choose This Plan' 
+                        : plan.cta || 'Get Started'}
                   </button>
                 </div>
               </div>
