@@ -21,6 +21,7 @@ import {
   createPaymentIntent,
   getPaymentHistory
 } from '../api/subscriptions.js';
+import { cancelSubscription } from '../api/subscription-cancel.js';
 import { handleStripeWebhook } from '../api/webhooks.js';
 import { requireAdmin } from '../middleware/adminAuth.js';
 import { requireAuth } from '../middleware/userAuth.js';
@@ -87,6 +88,7 @@ app.delete('/api/admin/pricing-plans/:id', requireAdmin, deletePricingPlan);
 app.get('/api/subscription', requireAuth, getUserSubscription);
 app.post('/api/subscription/payment-intent', requireAuth, createPaymentIntent);
 app.get('/api/subscription/payment-history', requireAuth, getPaymentHistory);
+app.post('/api/subscription/cancel', requireAuth, cancelSubscription);
 
 // Start server
 app.listen(PORT, () => {

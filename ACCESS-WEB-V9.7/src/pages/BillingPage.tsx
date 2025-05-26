@@ -183,6 +183,27 @@ export default function BillingPage() {
     setClientSecret('');
     setSelectedPlan(null);
   };
+
+  const handleCancelSubscription = async () => {
+    if (!confirm('Are you sure you want to cancel your subscription? Your access will continue until the end of your current billing period.')) {
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/subscription/cancel');
+      
+      if (response.data.success) {
+        // Refresh subscription data to show updated status
+        fetchSubscription();
+        alert('Subscription cancelled successfully. Your access will continue until the end of the current billing period.');
+      } else {
+        setError(response.data.message || 'Failed to cancel subscription');
+      }
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
+      setError('Failed to cancel subscription. Please try again.');
+    }
+  };
   
   if (loading) {
     return (
@@ -221,14 +242,24 @@ export default function BillingPage() {
                 </p>
               )}
             </div>
-            {subscription.plan === 'free' && (
-              <button 
-                onClick={() => document.getElementById('available-plans')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-[#0fae96] text-white px-6 py-2 rounded-full hover:bg-[#0fae96]/90 transition-colors"
-              >
-                Upgrade Plan
-              </button>
-            )}
+            <div className="flex gap-3">
+              {subscription.plan === 'free' && (
+                <button 
+                  onClick={() => document.getElementById('available-plans')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="bg-[#0fae96] text-white px-6 py-2 rounded-full hover:bg-[#0fae96]/90 transition-colors"
+                >
+                  Upgrade Plan
+                </button>
+              )}
+              {subscription.plan !== 'free' && subscription.status === 'active' && (
+                <button 
+                  onClick={handleCancelSubscription}
+                  className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition-colors"
+                >
+                  Cancel Subscription
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
