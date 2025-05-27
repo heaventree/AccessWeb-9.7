@@ -16,7 +16,7 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
     setError(null);
 
     let processedUrl = url.trim();
-    
+
     try {
       // Validate URL format
       if (!/^https?:\/\//i.test(processedUrl)) {
@@ -25,7 +25,7 @@ export function URLInput({ onSubmit, isLoading, compact = false }: URLInputProps
 
       // Test if URL is valid
       new URL(processedUrl);
-      
+
       onSubmit(processedUrl);
     } catch (err) {
       setError('Please enter a valid URL (e.g., example.com)');
