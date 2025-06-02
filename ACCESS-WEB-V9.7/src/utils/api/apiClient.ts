@@ -99,17 +99,24 @@ class ApiClient {
    * @returns Response data
    */
   async post<T>(url: string, data?: any, options: RequestInit = {}): Promise<T> {
-    // Set content-type explicitly for consistency
+    // Ensure proper headers are set
     const headers = new Headers(options.headers || {});
-    headers.set('Content-Type', 'application/json');
+    if (!headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json');
+    }
     
+    // Log the request for debugging
     console.log(`API Client sending POST to ${url}:`, data);
+    console.log('Headers:', Object.fromEntries(headers.entries()));
+    
+    const requestBody = data ? JSON.stringify(data) : undefined;
+    console.log('Request body:', requestBody);
     
     return this.request<T>(url, {
       ...options,
       headers,
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined
+      body: requestBody
     });
   }
   
