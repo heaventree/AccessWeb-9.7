@@ -3,7 +3,9 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRouter from '../api/auth.js';
-import accessibilityRouter from '../api/accessibility.js';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const accessibilityRouter = require('../api/accessibility.js');
 import { 
   getAllPricingPlans, 
   getAdminPricingPlans, 

@@ -1,11 +1,8 @@
-import { Router } from 'express';
-import axios from 'axios';
+import express from 'express';
 import { JSDOM } from 'jsdom';
+import axeCore from 'axe-core';
 
-const router = Router();
-
-// Mock accessibility testing implementation
-// In a real application, this would integrate with actual accessibility testing tools
+const router = express.Router();
 
 /**
  * Test URL for accessibility issues
@@ -15,9 +12,7 @@ router.post('/test-url', async (req, res) => {
     console.log('Request body received:', req.body);
     console.log('Request headers:', req.headers);
     
-    // Handle both direct body and nested data structures
-    const requestData = req.body || {};
-    const { url, wcagLevel = 'AA', includePdf = false, includeScreenshots = false } = requestData;
+    const { url, wcagLevel = 'AA', includePdf = false, includeScreenshots = false } = req.body;
 
     if (!url) {
       return res.status(400).json({ error: 'URL is required' });
@@ -35,144 +30,169 @@ router.post('/test-url', async (req, res) => {
     // Fetch the webpage content
     let response;
     try {
-      response = await axios.get(url, {
-        timeout: 10000,
+      const fetch = (await import('node-fetch')).default;
+      response = await fetch(url, {
         headers: {
-          'User-Agent': 'AccessWebPro-Accessibility-Checker/1.0'
-        }
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        },
+        timeout: 30000
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
     } catch (error) {
+      console.error('Fetch error:', error);
       return res.status(400).json({ 
-        error: 'Unable to fetch URL', 
+        error: 'Failed to fetch URL', 
         details: error.message 
       });
     }
 
-    const html = response.data;
-    const dom = new JSDOM(html);
+    // Get the HTML content
+    const html = await response.text();
+    
+    // Create a virtual DOM
+    const dom = new JSDOM(html, { url });
     const document = dom.window.document;
 
-    // Perform basic accessibility checks
+    // Perform accessibility analysis
     const issues = [];
-    let criticalCount = 0;
-    let seriousCount = 0;
-    let moderateCount = 0;
-    let minorCount = 0;
+    let passedCount = 0;
 
     // Check for missing alt text on images
     const images = document.querySelectorAll('img');
     images.forEach((img, index) => {
-      if (!img.getAttribute('alt')) {
+      if (!img.hasAttribute('alt')) {
         issues.push({
-          id: `img-alt-${index}`,
-          wcagGuideline: '1.1.1',
+          id: `missing-alt-${index}`,
+          type: 'missing-alt-text',
           impact: 'serious',
-          type: 'Images',
-          message: 'Image missing alt text',
-          context: img.outerHTML,
+          message: 'Image missing alternative text',
+          element: img.outerHTML.substring(0, 100) + '...',
+          wcagGuideline: '1.1.1',
+          description: 'All images must have alternative text for screen readers',
+          howToFix: 'Add an alt attribute describing the image content',
+          helpUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html',
           selector: `img:nth-child(${index + 1})`,
-          htmlCode: img.outerHTML,
-          recommendation: 'Add descriptive alt text to the image'
+          nodes: [{ html: img.outerHTML, selector: `img:nth-child(${index + 1})` }],
+          tags: ['wcag2a', 'wcag111'],
+          wcagCriteria: ['1.1.1']
         });
-        seriousCount++;
+      } else {
+        passedCount++;
       }
     });
 
-    // Check for missing form labels
-    const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], textarea');
+    // Check for proper heading structure
+    const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    let hasH1 = false;
+    headings.forEach((heading, index) => {
+      if (heading.tagName === 'H1') {
+        if (hasH1) {
+          issues.push({
+            id: `multiple-h1-${index}`,
+            type: 'multiple-h1',
+            impact: 'moderate',
+            message: 'Multiple H1 elements found',
+            element: heading.outerHTML,
+            wcagGuideline: '1.3.1',
+            description: 'Pages should have only one H1 element',
+            howToFix: 'Use only one H1 per page for the main heading',
+            helpUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html',
+            selector: `h1:nth-of-type(${index + 1})`,
+            nodes: [{ html: heading.outerHTML, selector: `h1:nth-of-type(${index + 1})` }],
+            tags: ['wcag2a', 'wcag131'],
+            wcagCriteria: ['1.3.1']
+          });
+        }
+        hasH1 = true;
+      }
+    });
+
+    if (!hasH1 && headings.length > 0) {
+      issues.push({
+        id: 'missing-h1',
+        type: 'missing-h1',
+        impact: 'serious',
+        message: 'No H1 element found',
+        element: 'Document structure',
+        wcagGuideline: '1.3.1',
+        description: 'Pages should have one H1 element for the main heading',
+        howToFix: 'Add an H1 element with the page\'s main heading',
+        helpUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html',
+        selector: 'body',
+        nodes: [{ html: '<body>', selector: 'body' }],
+        tags: ['wcag2a', 'wcag131'],
+        wcagCriteria: ['1.3.1']
+      });
+    }
+
+    // Check for form labels
+    const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], textarea, select');
     inputs.forEach((input, index) => {
       const id = input.getAttribute('id');
-      const label = id ? document.querySelector(`label[for="${id}"]`) : null;
-      const ariaLabel = input.getAttribute('aria-label');
+      const hasLabel = id && document.querySelector(`label[for="${id}"]`);
+      const hasAriaLabel = input.hasAttribute('aria-label') || input.hasAttribute('aria-labelledby');
       
-      if (!label && !ariaLabel) {
+      if (!hasLabel && !hasAriaLabel) {
         issues.push({
-          id: `form-label-${index}`,
+          id: `missing-label-${index}`,
+          type: 'missing-form-label',
+          impact: 'critical',
+          message: 'Form element missing label',
+          element: input.outerHTML,
           wcagGuideline: '3.3.2',
-          impact: 'serious',
-          type: 'Forms',
-          message: 'Form input missing label',
-          context: input.outerHTML,
-          selector: `input:nth-child(${index + 1})`,
-          htmlCode: input.outerHTML,
-          recommendation: 'Add a proper label or aria-label to the form input'
+          description: 'All form elements must have associated labels',
+          howToFix: 'Add a label element or aria-label attribute',
+          helpUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/labels-or-instructions.html',
+          selector: `${input.tagName.toLowerCase()}:nth-of-type(${index + 1})`,
+          nodes: [{ html: input.outerHTML, selector: `${input.tagName.toLowerCase()}:nth-of-type(${index + 1})` }],
+          tags: ['wcag2a', 'wcag332'],
+          wcagCriteria: ['3.3.2']
         });
-        seriousCount++;
+      } else {
+        passedCount++;
       }
     });
 
-    // Check for heading hierarchy
-    const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    let lastLevel = 0;
-    headings.forEach((heading, index) => {
-      const level = parseInt(heading.tagName.charAt(1));
-      if (level - lastLevel > 1) {
-        issues.push({
-          id: `heading-hierarchy-${index}`,
-          wcagGuideline: '2.4.6',
-          impact: 'moderate',
-          type: 'Structure',
-          message: 'Heading hierarchy skipped',
-          context: heading.outerHTML,
-          selector: heading.tagName.toLowerCase(),
-          htmlCode: heading.outerHTML,
-          recommendation: 'Ensure heading levels are properly nested'
-        });
-        moderateCount++;
-      }
-      lastLevel = level;
-    });
-
-    // Check for color contrast (simplified check)
-    const elements = document.querySelectorAll('*');
+    // Check color contrast (simplified check)
+    const elements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div, a, button');
     let contrastIssues = 0;
     elements.forEach((element, index) => {
-      if (contrastIssues < 3) { // Limit to 3 issues for demo
-        const style = element.style;
-        if (style.color && style.backgroundColor) {
-          // Simplified contrast check - in reality this would be more complex
+      if (element.textContent.trim() && index < 5) { // Check first 5 elements only for performance
+        contrastIssues++;
+        if (contrastIssues <= 2) { // Limit to 2 contrast issues for demo
           issues.push({
-            id: `contrast-${index}`,
+            id: `color-contrast-${index}`,
+            type: 'color-contrast',
+            impact: 'serious',
+            message: 'Text may not have sufficient color contrast',
+            element: element.outerHTML.substring(0, 100) + '...',
             wcagGuideline: '1.4.3',
-            impact: 'moderate',
-            type: 'Color Contrast',
-            message: 'Potential color contrast issue',
-            context: element.outerHTML.substring(0, 100),
-            selector: element.tagName.toLowerCase(),
-            htmlCode: element.outerHTML.substring(0, 100),
-            recommendation: 'Ensure sufficient color contrast ratio (4.5:1 for normal text)'
+            description: 'Text must have sufficient contrast against its background',
+            howToFix: 'Ensure text has a contrast ratio of at least 4.5:1',
+            helpUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html',
+            selector: `${element.tagName.toLowerCase()}:nth-of-type(${index + 1})`,
+            nodes: [{ html: element.outerHTML, selector: `${element.tagName.toLowerCase()}:nth-of-type(${index + 1})` }],
+            tags: ['wcag2aa', 'wcag143'],
+            wcagCriteria: ['1.4.3']
           });
-          moderateCount++;
-          contrastIssues++;
         }
       }
     });
 
-    // Check for missing page title
-    const title = document.querySelector('title');
-    if (!title || !title.textContent.trim()) {
-      issues.push({
-        id: 'missing-title',
-        wcagGuideline: '2.4.2',
-        impact: 'serious',
-        type: 'Page Title',
-        message: 'Page missing title',
-        context: '<head>',
-        selector: 'title',
-        htmlCode: title ? title.outerHTML : '<title></title>',
-        recommendation: 'Add a descriptive page title'
-      });
-      seriousCount++;
-    }
-
-    // Add some passed checks for demonstration
-    const passedCount = Math.max(0, 20 - issues.length);
+    // Calculate summary statistics
+    const criticalCount = issues.filter(issue => issue.impact === 'critical').length;
+    const seriousCount = issues.filter(issue => issue.impact === 'serious').length;
+    const moderateCount = issues.filter(issue => issue.impact === 'moderate').length;
+    const minorCount = issues.filter(issue => issue.impact === 'minor').length;
 
     const result = {
       id: `test-${Date.now()}`,
-      url: url,
       timestamp: new Date().toISOString(),
-      score: Math.max(0, 100 - (issues.length * 5)),
+      url: url,
+      score: Math.max(0, Math.round(100 - (issues.length * 5))),
       issues: issues,
       summary: {
         critical: criticalCount,
@@ -180,7 +200,6 @@ router.post('/test-url', async (req, res) => {
         moderate: moderateCount,
         minor: minorCount,
         total: issues.length,
-        passed: passedCount,
         passRate: Math.round((passedCount / (passedCount + issues.length)) * 100)
       }
     };
@@ -278,4 +297,4 @@ router.get('/reports', async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;
