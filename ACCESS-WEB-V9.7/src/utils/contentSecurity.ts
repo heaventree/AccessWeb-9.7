@@ -127,7 +127,7 @@ export function buildCSPContent(): string {
       `img-src 'self' data: https:`,
       
       // Connect sources
-      `connect-src 'self' https://api.accessibility-checker.org`,
+      `connect-src 'self' https://api.accessibility-checker.org https://wave.webaim.org`,
       
       // Frame sources
       `frame-src 'self' https://js.stripe.com`,
