@@ -5,29 +5,19 @@ import { ResultsSummary } from '../components/ResultsSummary';
 import { IssuesList } from '../components/IssuesList';
 import { RegionSelector } from '../components/RegionSelector';
 import { EmbedBadge } from '../components/EmbedBadge';
-import { StructureAnalysisPanel } from '../components/StructureAnalysisPanel';
-import { ResponsiveAnalysisPanel } from '../components/ResponsiveAnalysisPanel';
-import { MediaAnalysisPanel } from '../components/MediaAnalysisPanel';
 import { testAccessibilityWithWave } from '../utils/accessibility/waveApiService';
 import { WebsiteConnectionError } from '../utils/websiteConnectionChecker';
-import { WebsiteConnectionError as WebsiteConnectionErrorComponent } from '../components/WebsiteConnectionError';
-import type { TestResult, AccessibilityIssue } from '../types';
+import type { TestResult } from '../types';
 import { exportToPDF } from '../utils/formats/pdfExport';
 import { normalizeUrl, httpsToHttp } from '../utils/urlUtils';
 import { 
   Download, 
   AlertTriangle, 
   CheckCircle, 
-  FileSearch,
   FileText,
-  Zap,
-  Globe,
-  Palette,
-  HelpCircle,
   Video,
-  Headphones,
-  Layout,
-  Smartphone
+  Palette,
+  HelpCircle
 } from 'lucide-react';
 
 type TabType = 'issues' | 'warnings' | 'passes' | 'contrast' | 'structure' | 'responsive' | 'media';
