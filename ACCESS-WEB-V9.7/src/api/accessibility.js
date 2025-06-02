@@ -4,15 +4,65 @@ import axeCore from 'axe-core';
 
 const router = express.Router();
 
+// Middleware to handle raw body parsing for text/plain requests
+const parseRawBody = (req, res, next) => {
+  if (req.headers['content-type'] === 'text/plain;charset=UTF-8') {
+    let rawBody = '';
+    req.on('data', chunk => {
+      rawBody += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        req.body = JSON.parse(rawBody);
+      } catch (e) {
+        req.body = { url: rawBody.trim() };
+      }
+      next();
+    });
+  } else {
+    next();
+  }
+};
+
 /**
  * Test URL for accessibility issues
  */
-router.post('/test-url', async (req, res) => {
+router.post('/test-url', parseRawBody, async (req, res) => {
   try {
     console.log('Request body received:', req.body);
     console.log('Request headers:', req.headers);
     
-    const { url, wcagLevel = 'AA', includePdf = false, includeScreenshots = false } = req.body;
+    // Handle case where body might be undefined or sent as text
+    let requestData = req.body;
+    
+    // If body is undefined, try to get data from raw body or query
+    if (!requestData || typeof requestData === 'string') {
+      // If it's a string, try to parse as JSON
+      if (typeof requestData === 'string') {
+        try {
+          requestData = JSON.parse(requestData);
+        } catch (e) {
+          console.log('Failed to parse body as JSON, treating as URL');
+          requestData = { url: requestData };
+        }
+      } else {
+        // Check if URL was sent as a query parameter or in headers
+        const urlFromQuery = req.query.url;
+        const urlFromHeader = req.headers['x-test-url'];
+        
+        if (urlFromQuery) {
+          requestData = { url: urlFromQuery };
+        } else if (urlFromHeader) {
+          requestData = { url: urlFromHeader };
+        } else {
+          return res.status(400).json({ error: 'URL is required' });
+        }
+      }
+    }
+    
+    console.log('Parsed request data:', requestData);
+    
+    const { url, wcagLevel = 'AA', includePdf = false, includeScreenshots = false } = requestData;
 
     if (!url) {
       return res.status(400).json({ error: 'URL is required' });
