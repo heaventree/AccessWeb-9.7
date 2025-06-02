@@ -136,28 +136,6 @@ export function WCAGCheckerPage() {
       handleSubmit(connectionError.url);
     }
   };
-            wcag22: true,
-            section508: selectedRegion === 'us',
-            eaa: selectedRegion === 'eu'
-          },
-          issues: [
-            {
-              id: 'color-contrast',
-              impact: 'serious',
-              description: 'Elements must have sufficient color contrast',
-              wcagCriteria: ['1.4.3'],
-              nodes: [
-                {
-                  html: '<button class="btn-primary">Submit</button>',
-                  selector: '#login-form .btn-primary',
-                  colorPairs: [
-                    { foreground: '#ffffff', background: '#6c757d', ratio: '3.1:1', required: '4.5:1' }
-                  ]
-                }
-              ]
-            }
-          ],
-          warnings: [
             {
               id: 'heading-order',
               impact: 'moderate',
