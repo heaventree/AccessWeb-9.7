@@ -8,7 +8,7 @@ import { EmbedBadge } from '../components/EmbedBadge';
 import { StructureAnalysisPanel } from '../components/StructureAnalysisPanel';
 import { ResponsiveAnalysisPanel } from '../components/ResponsiveAnalysisPanel';
 import { MediaAnalysisPanel } from '../components/MediaAnalysisPanel';
-import { testAccessibilityWithErrorHandling } from '../utils/accessibility/accessibilityTesterMock';
+import { testAccessibilityWithWave } from '../utils/accessibility/waveApiService';
 import { WebsiteConnectionError } from '../utils/websiteConnectionChecker';
 import { WebsiteConnectionError as WebsiteConnectionErrorComponent } from '../components/WebsiteConnectionError';
 import type { TestResult, AccessibilityIssue } from '../types';
@@ -190,7 +190,7 @@ export function WCAGCheckerPage() {
         } : {})
       };
 
-      const testResults = await testAccessibilityWithErrorHandling(normalizedUrl, selectedRegion, options);
+      const testResults = await testAccessibilityWithWave(normalizedUrl, selectedRegion, options);
       setResults(testResults);
       
       // Check for document-specific issues
