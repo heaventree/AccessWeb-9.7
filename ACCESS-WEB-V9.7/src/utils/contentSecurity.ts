@@ -115,7 +115,7 @@ export function buildCSPContent(): string {
       `default-src 'self'`,
       
       // Script sources
-      `script-src 'self' 'nonce-${nonce}' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://js.stripe.com https://replit.com https://*.replit.com`,
+      `script-src 'self' 'nonce-${nonce}' https://cdn.jsdelivr.net https://cdn.tailwindcss.com`,
       
       // Style sources
       `style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://fonts.googleapis.com`,
@@ -127,10 +127,10 @@ export function buildCSPContent(): string {
       `img-src 'self' data: https:`,
       
       // Connect sources
-      `connect-src 'self' https://api.accessibility-checker.org https://wave.webaim.org https://api.stripe.com https://*.replit.com`,
+      `connect-src 'self' https://api.accessibility-checker.org`,
       
       // Frame sources
-      `frame-src 'self' https://js.stripe.com https://hooks.stripe.com`,
+      `frame-src 'self' https://js.stripe.com`,
       
       // Media sources
       `media-src 'self'`,

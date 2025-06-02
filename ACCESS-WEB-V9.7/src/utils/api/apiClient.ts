@@ -228,12 +228,6 @@ class ApiClient {
     // Merge with default headers
     const headers = new Headers(this.config.defaultHeaders || {});
     
-    // Add authentication token if available
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-    
     // Add user-provided headers
     if (options.headers) {
       if (options.headers instanceof Headers) {
