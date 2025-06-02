@@ -19,7 +19,7 @@ export const securityHeadersMiddleware = (req: Request, res: Response, next: Nex
     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: https:",
-    "connect-src 'self' https://api.accessibility-checker.org https://api.stripe.com",
+    "connect-src 'self' https://api.accessibility-checker.org https://api.stripe.com https://wave.webaim.org",
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
     "media-src 'self'",
     "object-src 'none'",
