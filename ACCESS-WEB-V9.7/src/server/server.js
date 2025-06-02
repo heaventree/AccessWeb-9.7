@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRouter from '../api/auth.js';
+import accessibilityRouter from '../api/accessibility.js';
 import { 
   getAllPricingPlans, 
   getAdminPricingPlans, 
@@ -71,6 +72,7 @@ app.get('/api/health', async (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRouter);
+app.use('/api/accessibility', accessibilityRouter);
 
 // Pricing Plans Routes
 app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed

@@ -8,7 +8,7 @@ import { EmbedBadge } from '../components/EmbedBadge';
 import { StructureAnalysisPanel } from '../components/StructureAnalysisPanel';
 import { ResponsiveAnalysisPanel } from '../components/ResponsiveAnalysisPanel';
 import { MediaAnalysisPanel } from '../components/MediaAnalysisPanel';
-import { testAccessibilityWithErrorHandling } from '../utils/accessibility/accessibilityTesterMock';
+import { accessibilityApi } from '../services/api';
 import { WebsiteConnectionError } from '../utils/websiteConnectionChecker';
 import { WebsiteConnectionError as WebsiteConnectionErrorComponent } from '../components/WebsiteConnectionError';
 import type { TestResult, AccessibilityIssue } from '../types';
@@ -63,42 +63,79 @@ export function WCAGCheckerPage() {
     setResults(null);
     
     try {
-      // Special handling for heaventree10.com - provide test results for both HTTP and HTTPS
-      if (normalizedUrl.toLowerCase().includes('heaventree10.com')) {
-        const isHttps = normalizedUrl.toLowerCase().startsWith('https://');
-        console.log(`Handling heaventree10.com with protocol: ${isHttps ? 'HTTPS' : 'HTTP'}`);
-        
-        // Different scores and issues based on HTTP vs HTTPS
-        const score = isHttps ? 78 : 65;
-        const critical = isHttps ? 0 : 2;
-        const serious = isHttps ? 3 : 5;
-        
-        console.log(`Providing hardcoded ${isHttps ? 'HTTPS' : 'HTTP'} results for heaventree10.com`);
-        
-        // Create the test results with protocol-specific variations
-        const testResults = {
+      // Call the actual accessibility testing API
+      const apiResult = await accessibilityApi.testUrl(normalizedUrl, {
+        wcagLevel: 'AA',
+        includeScreenshots: false,
+        includePdf: enablePDFAccessibility
+      });
+
+      // Transform API result to match the frontend TestResult interface
+      const testResults: TestResult = {
+        url: normalizedUrl,
+        timestamp: apiResult.timestamp,
+        score: apiResult.score,
+        passCount: apiResult.summary.passed || 0,
+        warningCount: 5, // Default value
+        issueCount: apiResult.summary.total,
+        region: selectedRegion,
+        summary: {
+          critical: apiResult.summary.critical,
+          serious: apiResult.summary.serious,
+          moderate: apiResult.summary.moderate,
+          minor: apiResult.summary.minor,
+          warnings: 5,
+          passes: apiResult.summary.passed || 0,
+          pdfIssues: 0,
+          documentIssues: 0,
+          mediaIssues: 0,
+          audioIssues: 0,
+          videoIssues: 0
+        },
+        standards: {
+          wcag21: { aa: true, aaa: false },
+          wcag22: { aa: true, aaa: false },
+          section508: true,
+          en301549: true
+        },
+        issues: apiResult.issues.map(issue => ({
+          id: issue.id,
+          type: issue.type,
+          impact: issue.impact,
+          message: issue.message,
+          element: issue.selector,
+          wcagGuideline: issue.wcagGuideline,
+          description: issue.recommendation,
+          howToFix: issue.recommendation,
+          helpUrl: `https://www.w3.org/WAI/WCAG21/Understanding/${issue.wcagGuideline}.html`,
+          context: issue.context,
+          selector: issue.selector,
+          htmlCode: issue.htmlCode
+        }))
+      };
+
+      console.log('Accessibility test completed successfully');
+      setResults(testResults);
+    } catch (error) {
+      console.error('Accessibility test error:', error);
+      if (error instanceof WebsiteConnectionError) {
+        setConnectionError({
           url: normalizedUrl,
-          timestamp: new Date().toISOString(), // Use ISO string for timestamp
-          score: score,
-          passCount: isHttps ? 20 : 16,
-          warningCount: isHttps ? 4 : 6,
-          issueCount: isHttps ? 9 : 14,
-          region: selectedRegion,
-          summary: {
-            critical: critical,
-            serious: serious,
-            moderate: isHttps ? 2 : 4,
-            minor: isHttps ? 4 : 3,
-            warnings: isHttps ? 4 : 6,
-            passes: isHttps ? 20 : 16,
-            pdfIssues: 0,
-            documentIssues: 0,
-            mediaIssues: 0,
-            audioIssues: 0,
-            videoIssues: 0
-          },
-          standards: {
-            wcag21: true,
+          details: error.details
+        });
+      } else {
+        setError(error instanceof Error ? error.message : 'An error occurred during testing');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRetry = () => {
+    if (connectionError) {
+      handleSubmit(connectionError.url);
+    }
+  };
             wcag22: true,
             section508: selectedRegion === 'us',
             eaa: selectedRegion === 'eu'
