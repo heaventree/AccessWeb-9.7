@@ -12,7 +12,12 @@ const router = Router();
  */
 router.post('/test-url', async (req, res) => {
   try {
-    const { url, wcagLevel = 'AA', includePdf = false, includeScreenshots = false } = req.body;
+    console.log('Request body received:', req.body);
+    console.log('Request headers:', req.headers);
+    
+    // Handle both direct body and nested data structures
+    const requestData = req.body || {};
+    const { url, wcagLevel = 'AA', includePdf = false, includeScreenshots = false } = requestData;
 
     if (!url) {
       return res.status(400).json({ error: 'URL is required' });
