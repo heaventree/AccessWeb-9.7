@@ -235,6 +235,32 @@ export async function changePassword(
 }
 
 /**
+ * Get current user information
+ * @returns Current user data
+ */
+export async function me(): Promise<any> {
+  try {
+    const response = await fetch('/api/auth/me', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
+
+/**
  * Get current user's profile
  * @returns User profile
  */
@@ -260,6 +286,7 @@ export default {
   forgotPassword,
   resetPassword,
   changePassword,
+  me,
   getProfile,
   updateProfile
 };
