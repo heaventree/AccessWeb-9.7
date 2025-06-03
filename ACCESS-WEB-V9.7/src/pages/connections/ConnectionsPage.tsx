@@ -30,7 +30,7 @@ export function ConnectionsPage() {
 
   const fetchUserConnections = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/site-connections', {
+      const response = await fetch('/api/site-connections', {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
@@ -54,7 +54,7 @@ export function ConnectionsPage() {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/site-connections', {
+      const response = await fetch('/api/site-connections', {
         method: 'POST',
         credentials: 'include',
         headers: {
