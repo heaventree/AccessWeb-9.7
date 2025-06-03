@@ -70,12 +70,12 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// Import site connections router at the top
+import siteConnectionsRouter from './routes/siteConnections.js';
+
 // API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/accessibility', accessibilityRouter);
-
-// Site connections routes
-const siteConnectionsRouter = require('./routes/siteConnections.js');
 app.use('/api/site-connections', siteConnectionsRouter);
 
 // Pricing Plans Routes

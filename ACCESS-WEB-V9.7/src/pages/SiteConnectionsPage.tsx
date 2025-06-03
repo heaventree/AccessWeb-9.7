@@ -1,7 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Globe, Settings, Power, Key, Trash2, ExternalLink, Activity } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { apiRequest } from '../lib/api';
+// API request function for site connections
+const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
+  const token = localStorage.getItem('auth_token');
+  const response = await fetch(`/api${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : '',
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.statusText}`);
+  }
+
+  return await response.json();
+};
 
 interface SiteConnection {
   id: number;
