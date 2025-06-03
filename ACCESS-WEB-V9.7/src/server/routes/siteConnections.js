@@ -49,20 +49,30 @@ router.post('/', requireAuth, async (req, res) => {
     const { siteName, siteUrl, platform = 'wordpress' } = req.body;
 
     // Validate required fields
+    console.log('Validating fields - siteName:', siteName, 'siteUrl:', siteUrl, 'platform:', platform);
     if (!siteName || !siteUrl) {
+      console.log('Validation failed - missing required fields');
       return res.status(400).json({
         success: false,
         error: 'Site name and URL are required'
       });
     }
 
-    // Validate URL format
+    // Validate and normalize URL format
+    let normalizedUrl = siteUrl;
     try {
-      new URL(siteUrl);
-    } catch {
+      // If URL doesn't start with protocol, add https://
+      if (!siteUrl.startsWith('http://') && !siteUrl.startsWith('https://')) {
+        normalizedUrl = 'https://' + siteUrl;
+      }
+      console.log('Normalizing URL:', siteUrl, '->', normalizedUrl);
+      new URL(normalizedUrl);
+      console.log('URL validation passed for:', normalizedUrl);
+    } catch (error) {
+      console.log('URL validation failed for:', normalizedUrl, 'Error:', error.message);
       return res.status(400).json({
         success: false,
-        error: 'Invalid URL format'
+        error: 'Invalid URL format. Please enter a valid domain or URL.'
       });
     }
 
@@ -70,7 +80,7 @@ router.post('/', requireAuth, async (req, res) => {
     const existingConnection = await prisma.siteConnection.findFirst({
       where: {
         userId: userId,
-        siteUrl: siteUrl
+        siteUrl: normalizedUrl
       }
     });
 
@@ -86,7 +96,7 @@ router.post('/', requireAuth, async (req, res) => {
       data: {
         userId,
         siteName,
-        siteUrl,
+        siteUrl: normalizedUrl,
         platform,
         status: 'inactive',
         isActive: false,
