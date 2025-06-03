@@ -240,14 +240,12 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     const connectionId = parseInt(req.params.id);
 
     // Verify connection belongs to user
-    const [connection] = await db
-      .select()
-      .from(siteConnections)
-      .where(and(
-        eq(siteConnections.id, connectionId),
-        eq(siteConnections.userId, userId)
-      ))
-      .limit(1);
+    const connection = await prisma.siteConnection.findFirst({
+      where: {
+        id: connectionId,
+        userId: userId
+      }
+    });
 
     if (!connection) {
       return res.status(404).json({
@@ -257,9 +255,11 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     }
 
     // Delete connection
-    await db
-      .delete(siteConnections)
-      .where(eq(siteConnections.id, connectionId));
+    await prisma.siteConnection.delete({
+      where: {
+        id: connectionId
+      }
+    });
 
     console.log(`\n🗑️  SITE CONNECTION DELETED`);
     console.log(`════════════════════════════════`);
