@@ -56,8 +56,20 @@ export function ConnectionsPage() {
   };
 
   const handleSubmit = async () => {
+    // Enhanced validation
     if (!formData.type || !formData.name || !formData.url) {
       alert('Please fill in all fields');
+      return;
+    }
+
+    // Basic URL validation
+    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+    const isValidUrl = urlPattern.test(formData.url) || 
+                      urlPattern.test(`https://${formData.url}`) ||
+                      /^[\w\.-]+\.[\w]{2,}/.test(formData.url);
+    
+    if (!isValidUrl) {
+      alert('Please enter a valid URL or domain name (e.g., example.com or https://example.com)');
       return;
     }
 
@@ -75,9 +87,10 @@ export function ConnectionsPage() {
         fetchUserConnections();
         alert('Connection added successfully!');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding connection:', error);
-      alert('Error adding connection');
+      const errorMessage = error.response?.data?.error || 'Error adding connection. Please check your input and try again.';
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
