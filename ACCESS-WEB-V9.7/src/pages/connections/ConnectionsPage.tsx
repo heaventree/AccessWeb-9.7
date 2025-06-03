@@ -175,31 +175,50 @@ export function ConnectionsPage() {
   const getAllConnections = (): UnifiedConnection[] => {
     const allConnections: UnifiedConnection[] = [];
     
+    // Safely access userConnections with proper null checks
+    const safeUserConnections = Array.isArray(userConnections) ? userConnections : [];
+    
     // Add user's actual connections
-    userConnections.forEach(connection => {
+    safeUserConnections.forEach(connection => {
+      if (!connection || !connection.platform || !connection.siteName) return;
+      
       const integration = availableIntegrations.find(int => int.platform === connection.platform);
       allConnections.push({
-        ...connection,
-        isUserConnection: true,
-        name: connection.siteName,
-        description: connection.siteUrl,
+        id: connection.id || `user-${Math.random()}`,
+        platform: connection.platform || 'unknown',
+        name: connection.siteName || 'Unnamed Connection',
+        description: connection.siteUrl || 'No URL provided',
         icon: integration?.icon || Globe,
         path: `/my-account/connections/${connection.platform}`,
         status: connection.isActive ? 'Active' : 'Inactive',
-        features: integration?.features || [],
-        hasApiToken: !!connection.apiToken
+        features: Array.isArray(integration?.features) ? integration.features : [],
+        hasApiToken: !!(connection.apiToken),
+        isUserConnection: true,
+        isActive: connection.isActive || false,
+        apiToken: connection.apiToken || undefined
       });
     });
 
     // Add available integrations that user hasn't connected yet
     availableIntegrations.forEach(integration => {
-      const hasConnection = userConnections.some(conn => conn.platform === integration.platform);
+      if (!integration || !integration.platform) return;
+      
+      const hasConnection = safeUserConnections.some(conn => 
+        conn && conn.platform === integration.platform
+      );
+      
       if (!hasConnection) {
         allConnections.push({
-          ...integration,
-          isUserConnection: false,
+          id: integration.id || `integration-${integration.platform}`,
+          platform: integration.platform,
+          name: integration.name || 'Unknown Integration',
+          description: integration.description || '',
+          icon: integration.icon || Globe,
+          path: integration.path || `/my-account/connections/${integration.platform}`,
           status: 'Not Connected',
-          hasApiToken: false
+          features: Array.isArray(integration.features) ? integration.features : [],
+          hasApiToken: false,
+          isUserConnection: false
         });
       }
     });
