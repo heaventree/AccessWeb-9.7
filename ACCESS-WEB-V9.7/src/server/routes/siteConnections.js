@@ -175,9 +175,9 @@ router.post('/:id/generate-token', requireAuth, async (req, res) => {
 });
 
 // Toggle connection active status
-router.patch('/:id/toggle', authenticateToken, async (req, res) => {
+router.patch('/:id/toggle', requireAuth, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     const connectionId = parseInt(req.params.id);
 
     // Verify connection belongs to user
@@ -234,9 +234,9 @@ router.patch('/:id/toggle', authenticateToken, async (req, res) => {
 });
 
 // Delete site connection
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     const connectionId = parseInt(req.params.id);
 
     // Verify connection belongs to user
@@ -295,11 +295,11 @@ router.post('/webhook/scan', async (req, res) => {
     }
 
     // Find connection by API token
-    const [connection] = await db
-      .select()
-      .from(siteConnections)
-      .where(eq(siteConnections.apiToken, api_token))
-      .limit(1);
+    const connection = await prisma.siteConnection.findFirst({
+      where: {
+        apiToken: api_token
+      }
+    });
 
     if (!connection) {
       return res.status(401).json({
@@ -336,13 +336,15 @@ router.post('/webhook/scan', async (req, res) => {
     console.log(`════════════════════════════════\n`);
 
     // Update last scan time
-    await db
-      .update(siteConnections)
-      .set({
+    await prisma.siteConnection.update({
+      where: {
+        id: connection.id
+      },
+      data: {
         lastScanAt: new Date(),
         updatedAt: new Date()
-      })
-      .where(eq(siteConnections.id, connection.id));
+      }
+    });
 
     // TODO: Implement actual WCAG scanning logic here
     // For now, return mock scan results
