@@ -31,6 +31,7 @@ model User {
 
   // Relations
   paymentHistory PaymentHistory[]
+  siteConnections SiteConnection[]
 
   @@map("User")
 }
@@ -74,4 +75,27 @@ model PaymentHistory {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("payment_history")
+}
+
+model SiteConnection {
+  id              Int       @id @default(autoincrement())
+  userId          Int       @map("user_id")
+  siteName        String    @db.VarChar(100) @map("site_name")
+  siteUrl         String    @db.VarChar(255) @map("site_url")
+  platform        String    @default("wordpress") @db.VarChar(50)
+  apiToken        String?   @db.VarChar(255) @map("api_token")
+  status          String    @default("inactive") @db.VarChar(20)
+  isActive        Boolean   @default(false) @map("is_active")
+  lastScanAt      DateTime? @map("last_scan_at")
+  scanFrequency   String    @default("weekly") @db.VarChar(20) @map("scan_frequency")
+  autoScanEnabled Boolean   @default(false) @map("auto_scan_enabled")
+  webhookUrl      String?   @db.VarChar(255) @map("webhook_url")
+  config          Json?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relation to User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("site_connections")
 }

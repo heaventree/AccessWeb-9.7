@@ -1,11 +1,9 @@
 import express from 'express';
 import crypto from 'crypto';
-import { db } from '../db.js';
-import * as schema from '../../shared/schema.js';
-import { eq, and } from 'drizzle-orm';
+import { PrismaClient } from '@prisma/client';
 import { authenticateToken } from '../middleware/auth.js';
 
-const { siteConnections } = schema;
+const prisma = new PrismaClient();
 
 const router = express.Router();
 
@@ -19,11 +17,14 @@ router.get('/', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
     
-    const connections = await db
-      .select()
-      .from(siteConnections)
-      .where(eq(siteConnections.userId, userId))
-      .orderBy(siteConnections.createdAt);
+    const connections = await prisma.siteConnection.findMany({
+      where: {
+        userId: userId
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
 
     res.json({
       success: true,
@@ -63,16 +64,14 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 
     // Check if site already exists for this user
-    const existingConnection = await db
-      .select()
-      .from(siteConnections)
-      .where(and(
-        eq(siteConnections.userId, userId),
-        eq(siteConnections.siteUrl, siteUrl)
-      ))
-      .limit(1);
+    const existingConnection = await prisma.siteConnection.findFirst({
+      where: {
+        userId: userId,
+        siteUrl: siteUrl
+      }
+    });
 
-    if (existingConnection.length > 0) {
+    if (existingConnection) {
       return res.status(409).json({
         success: false,
         error: 'Site connection already exists'
@@ -80,9 +79,8 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 
     // Create new connection
-    const [newConnection] = await db
-      .insert(siteConnections)
-      .values({
+    const newConnection = await prisma.siteConnection.create({
+      data: {
         userId,
         siteName,
         siteUrl,
@@ -90,8 +88,8 @@ router.post('/', authenticateToken, async (req, res) => {
         status: 'inactive',
         isActive: false,
         autoScanEnabled: false
-      })
-      .returning();
+      }
+    });
 
     console.log(`\n🌐 NEW SITE CONNECTION CREATED`);
     console.log(`════════════════════════════════`);
@@ -124,14 +122,12 @@ router.post('/:id/generate-token', authenticateToken, async (req, res) => {
     const connectionId = parseInt(req.params.id);
 
     // Verify connection belongs to user
-    const [connection] = await db
-      .select()
-      .from(siteConnections)
-      .where(and(
-        eq(siteConnections.id, connectionId),
-        eq(siteConnections.userId, userId)
-      ))
-      .limit(1);
+    const connection = await prisma.siteConnection.findFirst({
+      where: {
+        id: connectionId,
+        userId: userId
+      }
+    });
 
     if (!connection) {
       return res.status(404).json({
@@ -144,14 +140,15 @@ router.post('/:id/generate-token', authenticateToken, async (req, res) => {
     const apiToken = generateApiToken();
 
     // Update connection with new token
-    const [updatedConnection] = await db
-      .update(siteConnections)
-      .set({
+    const updatedConnection = await prisma.siteConnection.update({
+      where: {
+        id: connectionId
+      },
+      data: {
         apiToken,
         updatedAt: new Date()
-      })
-      .where(eq(siteConnections.id, connectionId))
-      .returning();
+      }
+    });
 
     console.log(`\n🔑 API TOKEN GENERATED`);
     console.log(`════════════════════════════════`);
@@ -184,14 +181,12 @@ router.patch('/:id/toggle', authenticateToken, async (req, res) => {
     const connectionId = parseInt(req.params.id);
 
     // Verify connection belongs to user
-    const [connection] = await db
-      .select()
-      .from(siteConnections)
-      .where(and(
-        eq(siteConnections.id, connectionId),
-        eq(siteConnections.userId, userId)
-      ))
-      .limit(1);
+    const connection = await prisma.siteConnection.findFirst({
+      where: {
+        id: connectionId,
+        userId: userId
+      }
+    });
 
     if (!connection) {
       return res.status(404).json({
@@ -204,15 +199,16 @@ router.patch('/:id/toggle', authenticateToken, async (req, res) => {
     const newStatus = !connection.isActive;
     const statusText = newStatus ? 'active' : 'inactive';
 
-    const [updatedConnection] = await db
-      .update(siteConnections)
-      .set({
+    const updatedConnection = await prisma.siteConnection.update({
+      where: {
+        id: connectionId
+      },
+      data: {
         isActive: newStatus,
         status: statusText,
         updatedAt: new Date()
-      })
-      .where(eq(siteConnections.id, connectionId))
-      .returning();
+      }
+    });
 
     console.log(`\n⚡ CONNECTION STATUS UPDATED`);
     console.log(`════════════════════════════════`);
