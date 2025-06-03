@@ -1,9 +1,11 @@
 import express from 'express';
 import crypto from 'crypto';
 import { db } from '../db.js';
-import { siteConnections } from '../../shared/schema.js';
+import * as schema from '../../shared/schema.js';
 import { eq, and } from 'drizzle-orm';
 import { authenticateToken } from '../middleware/auth.js';
+
+const { siteConnections } = schema;
 
 const router = express.Router();
 
