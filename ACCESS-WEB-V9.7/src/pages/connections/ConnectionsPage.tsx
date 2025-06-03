@@ -330,7 +330,7 @@ export function ConnectionsPage() {
                 </div>
                 
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {connection.features.map((feature, index) => (
+                  {(connection.features || []).map((feature: string, index: number) => (
                     <div key={index} className="flex items-start">
                       <svg className="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
