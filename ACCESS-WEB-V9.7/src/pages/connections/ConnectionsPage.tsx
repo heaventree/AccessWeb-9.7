@@ -2,9 +2,20 @@ import { Link } from 'react-router-dom';
 import { Code, Store, Globe, ArrowRight, Plus, PlugZap } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
+interface SiteConnection {
+  id: number;
+  siteName: string;
+  siteUrl: string;
+  platform: string;
+  status: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export function ConnectionsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
-  const [userConnections, setUserConnections] = useState([]);
+  const [userConnections, setUserConnections] = useState<SiteConnection[]>([]);
   const [formData, setFormData] = useState({
     type: '',
     name: '',
@@ -19,19 +30,19 @@ export function ConnectionsPage() {
 
   const fetchUserConnections = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      if (!token) return;
+      const authData = getStoredAuth();
+      if (!authData) return;
       
       const response = await fetch('http://localhost:3001/api/site-connections', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${authData.token}`,
           'Content-Type': 'application/json'
         }
       });
       
       if (response.ok) {
-        const data = await response.json();
-        setUserConnections(data);
+        const result = await response.json();
+        setUserConnections(result.data || []);
       }
     } catch (error) {
       console.error('Error fetching connections:', error);
@@ -54,9 +65,9 @@ export function ConnectionsPage() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          name: formData.name,
-          url: formData.url,
-          type: formData.type
+          siteName: formData.name,
+          siteUrl: formData.url,
+          platform: formData.type
         })
       });
 
@@ -163,9 +174,9 @@ export function ConnectionsPage() {
                         <Globe className="h-6 w-6 text-green-600" />
                       </div>
                       <div className="ml-4">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">{connection.name}</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{connection.url}</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">Type: {connection.type}</p>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">{connection.siteName}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{connection.siteUrl}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">Type: {connection.platform}</p>
                       </div>
                     </div>
                     <div className="flex items-center">
