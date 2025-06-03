@@ -30,12 +30,9 @@ export function ConnectionsPage() {
 
   const fetchUserConnections = async () => {
     try {
-      const token = localStorage.getItem('auth_token') || localStorage.getItem('authToken') || sessionStorage.getItem('auth_token');
-      if (!token) return;
-      
       const response = await fetch('http://localhost:3001/api/site-connections', {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -57,11 +54,10 @@ export function ConnectionsPage() {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('auth_token') || localStorage.getItem('authToken') || sessionStorage.getItem('auth_token');
       const response = await fetch('http://localhost:3001/api/site-connections', {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({

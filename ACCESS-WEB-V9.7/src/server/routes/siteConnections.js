@@ -1,7 +1,7 @@
 import express from 'express';
 import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
-import { authenticateToken } from '../middleware/auth.js';
+import { requireAuth } from '../../middleware/userAuth.js';
 
 const prisma = new PrismaClient();
 
@@ -13,9 +13,9 @@ function generateApiToken() {
 }
 
 // Get all site connections for user
-router.get('/', authenticateToken, async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     
     const connections = await prisma.siteConnection.findMany({
       where: {
@@ -40,9 +40,9 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 // Create new site connection
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     const { siteName, siteUrl, platform = 'wordpress' } = req.body;
 
     // Validate required fields
@@ -116,9 +116,9 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 // Generate API token for site connection
-router.post('/:id/generate-token', authenticateToken, async (req, res) => {
+router.post('/:id/generate-token', requireAuth, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     const connectionId = parseInt(req.params.id);
 
     // Verify connection belongs to user
