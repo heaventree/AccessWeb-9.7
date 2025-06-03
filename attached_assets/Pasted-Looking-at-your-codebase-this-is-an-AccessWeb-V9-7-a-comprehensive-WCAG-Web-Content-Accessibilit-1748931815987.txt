@@ -1,0 +1,46 @@
+Looking at your codebase, this is an AccessWeb V9.7 - a comprehensive WCAG (Web Content Accessibility Guidelines) compliance testing and monitoring platform. Let me explain what this app does and where users input their websites for testing.
+
+What This App Does
+This is a professional accessibility compliance platform that:
+
+Tests websites for WCAG 2.1 AA+ compliance
+Provides automated accessibility scanning and reporting
+Offers real-time monitoring and alerts
+Generates detailed compliance reports with PDF export
+Provides automated fixes and recommendations
+Integrates with popular platforms (WordPress, Shopify, Custom APIs)
+Includes accessibility tools like color contrast checkers, alt text scanners, etc.
+Where Users Input Their Website URLs
+Based on the codebase structure, users can input their websites in several places:
+
+1. Main WCAG Checker Page (/checker)
+The primary entry point is the WCAG Checker page at /checker route, which uses the WCAGCheckerPage.tsx component.
+
+2. URL Input Component
+There's a dedicated URLInput.tsx component specifically for website URL input:
+
+ACCESS-WEB-V9.7/src/components/URLInput.tsx
+3. Dashboard Integration
+The main dashboard at /dashboard also includes quick access to website testing functionality.
+
+4. Landing Page CTA
+The landing page includes call-to-action sections where users can immediately start testing their websites.
+
+Key User Journey
+Users visit the homepage and see the main value proposition
+They click "Test Your Website" or navigate to /checker
+Enter their website URL in the URL input field
+Choose scan type (Quick scan, Full audit, etc.)
+Receive detailed WCAG compliance report with:
+Accessibility issues found
+Severity levels (Critical, Warning, Info)
+Specific WCAG criteria violations
+Suggested fixes and improvements
+Overall compliance score
+Additional Features Users Access
+Real-time monitoring for ongoing compliance
+API integrations for automated testing
+Team collaboration features
+Subscription plans for different usage levels
+Export capabilities (PDF reports, CSV data)
+The app is designed as a comprehensive accessibility testing platform that serves both individual developers and enterprise teams who need to ensure their websites meet accessibility standards and legal compliance requirements

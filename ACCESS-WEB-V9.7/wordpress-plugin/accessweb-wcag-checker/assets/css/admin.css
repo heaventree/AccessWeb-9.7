@@ -1,0 +1,553 @@
+/* AccessWeb WCAG Checker Admin Styles */
+
+.accessweb-wcag-wrap {
+    background: #f1f1f1;
+    margin: 20px 0 0 -20px;
+    padding: 0;
+}
+
+.accessweb-wcag-wrap h1 {
+    background: #fff;
+    margin: 0;
+    padding: 20px 30px;
+    border-bottom: 1px solid #ddd;
+    font-size: 24px;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.accessweb-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 30px;
+    text-align: center;
+}
+
+.accessweb-header h2 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    font-weight: 300;
+}
+
+.accessweb-header p {
+    margin: 0;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.accessweb-main-content {
+    display: flex;
+    gap: 30px;
+    padding: 30px;
+    background: #fff;
+    margin: 0 0 30px 0;
+}
+
+.accessweb-scan-form {
+    flex: 2;
+}
+
+.accessweb-sidebar {
+    flex: 1;
+    min-width: 300px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.form-group input[type="url"],
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input[type="url"]:focus,
+.form-group select:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 1px #667eea;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+    font-size: 12px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.pro-badge {
+    background: #ff6b35;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 10px;
+    text-transform: uppercase;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.form-actions .button-large {
+    padding: 12px 24px;
+    font-size: 16px;
+    height: auto;
+}
+
+.form-actions .dashicons {
+    margin-right: 8px;
+}
+
+/* Results Section */
+.accessweb-results {
+    background: #fff;
+    margin: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.results-header h3 {
+    margin: 0;
+    color: #23282d;
+}
+
+.results-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.results-summary {
+    display: flex;
+    align-items: center;
+    padding: 30px;
+    gap: 40px;
+}
+
+.score-card {
+    text-align: center;
+}
+
+.score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin: 0 auto 10px auto;
+}
+
+.score-number {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.score-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.issues-summary {
+    display: flex;
+    gap: 30px;
+    flex: 1;
+}
+
+.issue-type {
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    min-width: 80px;
+}
+
+.issue-type.critical {
+    background: #ffebee;
+    border: 1px solid #ef5350;
+}
+
+.issue-type.serious {
+    background: #fff3e0;
+    border: 1px solid #ff9800;
+}
+
+.issue-type.moderate {
+    background: #f3e5f5;
+    border: 1px solid #9c27b0;
+}
+
+.issue-type.minor {
+    background: #e8f5e8;
+    border: 1px solid #4caf50;
+}
+
+.issue-count {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.issue-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #666;
+}
+
+.results-details {
+    padding: 30px;
+}
+
+/* Loading Animation */
+.accessweb-loading {
+    text-align: center;
+    padding: 60px 30px;
+    background: #fff;
+    margin: 30px;
+    border-radius: 8px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Sidebar Cards */
+.info-card,
+.pro-features-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.info-card h3,
+.pro-features-card h3 {
+    margin: 0 0 15px 0;
+    color: #23282d;
+    font-size: 18px;
+}
+
+.info-card p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.info-card ul,
+.pro-features-card ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.info-card li,
+.pro-features-card li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 20px;
+}
+
+.info-card li:before,
+.pro-features-card li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #4caf50;
+    font-weight: 600;
+}
+
+.info-card li:last-child,
+.pro-features-card li:last-child {
+    border-bottom: none;
+}
+
+.pro-features-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.pro-features-card h3 {
+    color: white;
+}
+
+.pro-features-card li {
+    border-bottom-color: rgba(255,255,255,0.2);
+}
+
+.pro-features-card .button-primary {
+    margin-top: 20px;
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.3);
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.pro-features-card .button-primary:hover {
+    background: rgba(255,255,255,0.3);
+    color: white;
+}
+
+/* Reports Page */
+.accessweb-reports {
+    background: #fff;
+    margin: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.reports-header {
+    padding: 20px 30px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reports-filters {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.reports-table-container {
+    padding: 0;
+}
+
+.reports-table-container table {
+    margin: 0;
+}
+
+.no-reports {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Color Palette Page */
+.accessweb-color-palette {
+    background: #fff;
+    margin: 30px;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.color-tools {
+    display: flex;
+    gap: 20px;
+    align-items: end;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.base-color-picker,
+.harmony-selector {
+    flex: 1;
+}
+
+.base-color-picker label,
+.harmony-selector label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.base-color-picker {
+    display: flex;
+    flex-direction: column;
+}
+
+.base-color-picker input[type="color"] {
+    width: 60px;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.base-color-picker input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.harmony-selector select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.palette-results {
+    margin: 30px 0;
+    min-height: 200px;
+}
+
+.color-testing {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid #eee;
+}
+
+.color-test-area {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.test-sample {
+    flex: 2;
+    padding: 20px;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #ddd;
+}
+
+.contrast-info {
+    flex: 1;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.contrast-ratio,
+.wcag-compliance {
+    margin-bottom: 15px;
+}
+
+.compliance-level {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 12px;
+    margin-right: 10px;
+}
+
+.compliance-level.AA {
+    background: #4caf50;
+    color: white;
+}
+
+.compliance-level.AAA {
+    background: #2196f3;
+    color: white;
+}
+
+.compliance-level.Fail {
+    background: #f44336;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .accessweb-main-content {
+        flex-direction: column;
+    }
+    
+    .accessweb-sidebar {
+        min-width: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .accessweb-wcag-wrap {
+        margin-left: -10px;
+    }
+    
+    .accessweb-header,
+    .accessweb-main-content,
+    .accessweb-results,
+    .accessweb-loading,
+    .accessweb-reports,
+    .accessweb-color-palette {
+        margin: 15px;
+        padding: 20px;
+    }
+    
+    .results-summary {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .issues-summary {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .color-tools {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .color-test-area {
+        flex-direction: column;
+    }
+}
