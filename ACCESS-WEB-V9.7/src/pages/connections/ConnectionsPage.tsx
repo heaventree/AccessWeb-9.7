@@ -246,36 +246,86 @@ export function ConnectionsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className={`p-2 rounded-md ${
-                      connection.id === 'custom-api' ? 'bg-purple-100' : 
-                      connection.id === 'shopify' ? 'bg-green-100' : 
-                      connection.id === 'wordpress' ? 'bg-blue-100' : 'bg-gray-100'
+                      connection.platform === 'custom' ? 'bg-purple-100' : 
+                      connection.platform === 'shopify' ? 'bg-green-100' : 
+                      connection.platform === 'wordpress' ? 'bg-blue-100' : 'bg-gray-100'
                     }`}>
                       <connection.icon className={`h-6 w-6 ${
-                        connection.id === 'custom-api' ? 'text-purple-600' : 
-                        connection.id === 'shopify' ? 'text-green-600' : 
-                        connection.id === 'wordpress' ? 'text-blue-600' : 'text-gray-600'
+                        connection.platform === 'custom' ? 'text-purple-600' : 
+                        connection.platform === 'shopify' ? 'text-green-600' : 
+                        connection.platform === 'wordpress' ? 'text-blue-600' : 'text-gray-600'
                       }`} />
                     </div>
                     <div className="ml-4">
                       <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">{connection.name}</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">{connection.description}</p>
+                      {connection.isUserConnection && (
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
+                          API Token: {connection.hasApiToken ? 'Generated' : 'Not Generated'}
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <span className={`mr-4 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  <div className="flex items-center space-x-2">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       connection.status === 'Not Connected' 
                         ? 'bg-orange-100 text-orange-800'
-                        : 'bg-green-100 text-green-800'
+                        : connection.status === 'Active'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
                     }`}>
                       {connection.status}
                     </span>
-                    <Link
-                      to={connection.path}
-                      className={`inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600`}
-                    >
-                      Configure
-                      <ArrowRight className="ml-2 -mr-0.5 h-4 w-4" />
-                    </Link>
+                    
+                    {connection.isUserConnection ? (
+                      <div className="flex items-center space-x-2">
+                        {/* Toggle Active/Inactive */}
+                        <button
+                          onClick={() => toggleConnectionStatus(connection.id as number)}
+                          className={`px-2 py-1 text-xs rounded ${
+                            connection.isActive 
+                              ? 'bg-red-100 text-red-800 hover:bg-red-200' 
+                              : 'bg-green-100 text-green-800 hover:bg-green-200'
+                          }`}
+                        >
+                          {connection.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        
+                        {/* Generate/Remove API Token */}
+                        {connection.hasApiToken ? (
+                          <button
+                            onClick={() => deleteConnection(connection.id as number)}
+                            className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded hover:bg-red-200"
+                          >
+                            Remove
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => generateApiToken(connection.id as number)}
+                            disabled={generatingToken === connection.id}
+                            className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200 disabled:opacity-50"
+                          >
+                            {generatingToken === connection.id ? 'Generating...' : 'Generate Token'}
+                          </button>
+                        )}
+                        
+                        <Link
+                          to={connection.path}
+                          className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                        >
+                          Configure
+                          <ArrowRight className="ml-2 -mr-0.5 h-4 w-4" />
+                        </Link>
+                      </div>
+                    ) : (
+                      <Link
+                        to={connection.path}
+                        className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                      >
+                        Configure
+                        <ArrowRight className="ml-2 -mr-0.5 h-4 w-4" />
+                      </Link>
+                    )}
                   </div>
                 </div>
                 
