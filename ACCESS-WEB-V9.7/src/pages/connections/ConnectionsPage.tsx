@@ -10,8 +10,24 @@ interface SiteConnection {
   platform: string;
   status: string;
   isActive: boolean;
+  apiToken?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+interface UnifiedConnection {
+  id: string | number;
+  name: string;
+  description: string;
+  icon: any;
+  path: string;
+  platform: string;
+  status: string;
+  isUserConnection: boolean;
+  hasApiToken: boolean;
+  features: string[];
+  isActive?: boolean;
+  apiToken?: string;
 }
 
 export function ConnectionsPage() {
@@ -23,6 +39,7 @@ export function ConnectionsPage() {
     url: ''
   });
   const [loading, setLoading] = useState(false);
+  const [generatingToken, setGeneratingToken] = useState<number | null>(null);
 
   // Fetch user connections on component mount
   useEffect(() => {
@@ -55,7 +72,7 @@ export function ConnectionsPage() {
       if (response.status === 201) {
         setShowAddModal(false);
         setFormData({ type: '', name: '', url: '' });
-        fetchUserConnections(); // Refresh the list
+        fetchUserConnections();
         alert('Connection added successfully!');
       }
     } catch (error) {
@@ -66,14 +83,57 @@ export function ConnectionsPage() {
     }
   };
 
-  const connections = [
+  const generateApiToken = async (connectionId: number) => {
+    setGeneratingToken(connectionId);
+    try {
+      const response = await apiClient.post(`/site-connections/${connectionId}/generate-token`);
+      if (response.status === 200) {
+        fetchUserConnections();
+        alert('API token generated successfully!');
+      }
+    } catch (error) {
+      console.error('Error generating API token:', error);
+      alert('Error generating API token');
+    } finally {
+      setGeneratingToken(null);
+    }
+  };
+
+  const toggleConnectionStatus = async (connectionId: number) => {
+    try {
+      const response = await apiClient.patch(`/site-connections/${connectionId}/toggle`);
+      if (response.status === 200) {
+        fetchUserConnections();
+      }
+    } catch (error) {
+      console.error('Error toggling connection status:', error);
+      alert('Error updating connection status');
+    }
+  };
+
+  const deleteConnection = async (connectionId: number) => {
+    if (window.confirm('Are you sure you want to delete this connection?')) {
+      try {
+        const response = await apiClient.delete(`/site-connections/${connectionId}`);
+        if (response.status === 200) {
+          fetchUserConnections();
+          alert('Connection deleted successfully!');
+        }
+      } catch (error) {
+        console.error('Error deleting connection:', error);
+        alert('Error deleting connection');
+      }
+    }
+  };
+
+  const availableIntegrations = [
     {
       id: 'custom-api',
       name: 'Custom API',
       description: 'Configure custom API integration settings',
       icon: Code,
       path: '/my-account/connections/custom-api',
-      status: 'Not Connected',
+      platform: 'custom',
       features: [
         'RESTful API access',
         'Webhook notifications',
@@ -87,7 +147,7 @@ export function ConnectionsPage() {
       description: 'Connect your Shopify store',
       icon: Store,
       path: '/my-account/connections/shopify',
-      status: 'Not Connected',
+      platform: 'shopify',
       features: [
         'Theme accessibility testing',
         'Product page monitoring',
@@ -101,7 +161,7 @@ export function ConnectionsPage() {
       description: 'Connect your WordPress site',
       icon: Globe,
       path: '/my-account/connections/wordpress',
-      status: 'Not Connected',
+      platform: 'wordpress',
       features: [
         'Plugin-based integration',
         'Real-time monitoring',
@@ -110,6 +170,42 @@ export function ConnectionsPage() {
       ]
     }
   ];
+
+  // Merge user connections with available integrations
+  const getAllConnections = (): UnifiedConnection[] => {
+    const allConnections: UnifiedConnection[] = [];
+    
+    // Add user's actual connections
+    userConnections.forEach(connection => {
+      const integration = availableIntegrations.find(int => int.platform === connection.platform);
+      allConnections.push({
+        ...connection,
+        isUserConnection: true,
+        name: connection.siteName,
+        description: connection.siteUrl,
+        icon: integration?.icon || Globe,
+        path: `/my-account/connections/${connection.platform}`,
+        status: connection.isActive ? 'Active' : 'Inactive',
+        features: integration?.features || [],
+        hasApiToken: !!connection.apiToken
+      });
+    });
+
+    // Add available integrations that user hasn't connected yet
+    availableIntegrations.forEach(integration => {
+      const hasConnection = userConnections.some(conn => conn.platform === integration.platform);
+      if (!hasConnection) {
+        allConnections.push({
+          ...integration,
+          isUserConnection: false,
+          status: 'Not Connected',
+          hasApiToken: false
+        });
+      }
+    });
+
+    return allConnections;
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -135,55 +231,16 @@ export function ConnectionsPage() {
         </div>
       </div>
 
-      {/* User Connections Section */}
-      {userConnections.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
-          <div className="px-4 py-5 border-b border-gray-200 dark:border-gray-700 sm:px-6">
-            <h2 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 flex items-center">
-              <PlugZap className="h-5 w-5 mr-2 text-green-500" />
-              Your Connections
-            </h2>
-          </div>
-          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-            {userConnections.map((connection) => (
-              <li key={connection.id}>
-                <div className="px-4 py-4 sm:px-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="p-2 rounded-md bg-green-100">
-                        <Globe className="h-6 w-6 text-green-600" />
-                      </div>
-                      <div className="ml-4">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">{connection.siteName}</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{connection.siteUrl}</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">Type: {connection.platform}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center">
-                      <span className="mr-4 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Connected
-                      </span>
-                      <button className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                        Manage
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      
+      {/* All Connections - Unified List */}
       <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
         <div className="px-4 py-5 border-b border-gray-200 dark:border-gray-700 sm:px-6">
           <h2 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 flex items-center">
             <PlugZap className="h-5 w-5 mr-2 text-primary-500" />
-            Available Integrations
+            Your Connections & Available Integrations
           </h2>
         </div>
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-          {connections.map((connection) => (
+          {getAllConnections().map((connection) => (
             <li key={connection.id}>
               <div className="px-4 py-4 sm:px-6">
                 <div className="flex items-center justify-between">
