@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Code, Store, Globe, ArrowRight, Plus, PlugZap } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import apiClient from '../../lib/apiClient';
 
 interface SiteConnection {
   id: number;
@@ -30,17 +31,8 @@ export function ConnectionsPage() {
 
   const fetchUserConnections = async () => {
     try {
-      const response = await fetch('/api/site-connections', {
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        setUserConnections(result.data || []);
-      }
+      const response = await apiClient.get('/site-connections');
+      setUserConnections(response.data.data || []);
     } catch (error) {
       console.error('Error fetching connections:', error);
     }
@@ -54,25 +46,17 @@ export function ConnectionsPage() {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/site-connections', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          siteName: formData.name,
-          siteUrl: formData.url,
-          platform: formData.type
-        })
+      const response = await apiClient.post('/site-connections', {
+        siteName: formData.name,
+        siteUrl: formData.url,
+        platform: formData.type
       });
 
-      if (response.ok) {
+      if (response.status === 201) {
         setShowAddModal(false);
         setFormData({ type: '', name: '', url: '' });
         fetchUserConnections(); // Refresh the list
-      } else {
-        alert('Error adding connection');
+        alert('Connection added successfully!');
       }
     } catch (error) {
       console.error('Error adding connection:', error);

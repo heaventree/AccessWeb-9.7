@@ -42,6 +42,9 @@ router.get('/', requireAuth, async (req, res) => {
 // Create new site connection
 router.post('/', requireAuth, async (req, res) => {
   try {
+    console.log('POST /api/site-connections - Request body:', req.body);
+    console.log('POST /api/site-connections - User:', req.user);
+    
     const userId = req.user.id;
     const { siteName, siteUrl, platform = 'wordpress' } = req.body;
 
