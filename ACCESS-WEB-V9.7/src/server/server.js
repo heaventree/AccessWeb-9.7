@@ -36,10 +36,19 @@ const prisma = new PrismaClient();
 const app = express();
 const PORT = process.env.SERVER_PORT || 3001;
 
-// Middleware
+// Validate critical environment variables
+const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error('Missing required environment variables:', missingEnvVars);
+  console.error('Please set these environment variables in production');
+}
+
+// More permissive CORS for production debugging
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-app-domain.com'] 
+    ? true // Allow all origins temporarily for debugging
     : ['http://localhost:5000', 'http://localhost:3001', 'http://localhost:5001', '*'],
   credentials: true
 }));
@@ -97,9 +106,30 @@ app.post('/api/subscription/payment-intent', requireAuth, createPaymentIntent);
 app.get('/api/subscription/payment-history', requireAuth, getPaymentHistory);
 app.post('/api/subscription/cancel', requireAuth, cancelSubscription);
 
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  console.error('Stack:', err.stack);
+  console.error('Request:', {
+    method: req.method,
+    url: req.url,
+    headers: req.headers,
+    body: req.body
+  });
+  
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
+
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`API Server running on port ${PORT}`);
+  console.log('Environment:', process.env.NODE_ENV || 'development');
+  console.log('JWT_SECRET present:', !!process.env.JWT_SECRET);
+  console.log('DATABASE_URL present:', !!process.env.DATABASE_URL);
   
   // Start automatic subscription expiry checker
   startSubscriptionExpiryChecker();

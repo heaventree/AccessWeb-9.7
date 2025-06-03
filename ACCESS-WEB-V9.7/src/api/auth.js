@@ -65,23 +65,22 @@ router.post('/register', async (req, res) => {
 // Login user
 router.post('/login', async (req, res) => {
   try {
-    console.log("Login request received:", req.body);
-    // Add debugging to check what's actually coming in
-    console.log("Request headers:", req.headers);
-    console.log("Request content-type:", req.headers['content-type']);
-    console.log("Raw body:", req.body);
-    
+    console.log('Login request received:', { email: req.body.email, password: '********' });
+    console.log('Environment:', process.env.NODE_ENV || 'development');
+    console.log('JWT_SECRET available:', !!process.env.JWT_SECRET);
+    console.log('DATABASE_URL available:', !!process.env.DATABASE_URL);
+
     // Handle both request formats for compatibility
     const email = req.body && (req.body.email || req.body.username);
     const password = req.body && req.body.password;
-    
+
     // Check if this is an admin login attempt by:
     // 1. Checking if isAdminLogin is explicitly true in the options
     // 2. Or as a fallback, checking if the request is coming from an admin URL
     const isAdminLoginAttempt = 
       (req.body && req.body.isAdminLogin === true) ||
       (req.headers.referer && req.headers.referer.includes('/admin/login'));
-    
+
     console.log("Is admin login attempt:", isAdminLoginAttempt);
 
     // Validate input
@@ -94,6 +93,15 @@ router.post('/login', async (req, res) => {
           code: 'auth/missing-credentials'
         }
       });
+    }
+
+    // Test database connection first
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      console.log('Database connection successful');
+    } catch (dbError) {
+      console.error('Database connection failed:', dbError);
+      throw new Error('Database connection failed');
     }
 
     // Check if user exists
@@ -110,7 +118,7 @@ router.post('/login', async (req, res) => {
     }
 
     console.log("User found:", user.email, "isAdmin:", user.isAdmin);
-    
+
     // If trying to login as admin but user is not admin, reject the login
     if (isAdminLoginAttempt && !user.isAdmin) {
       console.log("Non-admin user trying to access admin login:", email);
@@ -122,7 +130,7 @@ router.post('/login', async (req, res) => {
         }
       });
     }
-    
+
     // If trying to login as regular user but user is admin, redirect to admin login
     if (!isAdminLoginAttempt && user.isAdmin) {
       console.log("Admin user trying to access regular login:", email);
@@ -170,10 +178,10 @@ router.post('/login', async (req, res) => {
 
     // Define user role and admin status
     const role = user.isAdmin ? 'admin' : 'subscriber';
-    
+
     // Format the user object to match what the frontend expects
     const { password: _, ...userWithoutPassword } = user;
-    
+
     // Return user data with token in the format expected by the frontend
     const response = { 
       success: true,
@@ -192,17 +200,37 @@ router.post('/login', async (req, res) => {
       },
       message: 'Logged in successfully' 
     };
-    
+
     console.log("Login successful. Response (without tokens):", {
       ...response,
       token: '[REDACTED]',
       refreshToken: '[REDACTED]'
     });
-    
+
     return res.json(response);
   } catch (error) {
-    console.error('Login error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('Login error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      code: error.code
+    });
+
+    // More specific error messages for debugging
+    let errorMessage = 'Internal server error';
+    if (error.message.includes('Database connection failed')) {
+      errorMessage = 'Database connection error';
+    } else if (error.message.includes('JWT')) {
+      errorMessage = 'Authentication configuration error';
+    } else if (error.code === 'P2002') {
+      errorMessage = 'Database constraint error';
+    }
+
+    res.status(500).json({
+      success: false,
+      message: errorMessage,
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
@@ -211,7 +239,7 @@ router.get('/me', async (req, res) => {
   try {
     // Get token from Authorization header or cookies
     let token = req.cookies.accessToken;
-    
+
     // If no cookie token, check Authorization header
     if (!token && req.headers.authorization) {
       const authHeader = req.headers.authorization;
@@ -219,7 +247,7 @@ router.get('/me', async (req, res) => {
         token = authHeader.substring(7);
       }
     }
-    
+
     if (!token) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
@@ -227,12 +255,12 @@ router.get('/me', async (req, res) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
     console.log('Decoded JWT:', decoded);
-    
+
     // Get user
     const user = await prisma.user.findUnique({ 
       where: { id: decoded.userId } 
     });
-    
+
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -244,7 +272,7 @@ router.get('/me', async (req, res) => {
       role: user.isAdmin ? 'admin' : 'subscriber',
       isAdmin: !!user.isAdmin
     };
-    
+
     return res.json({ user: userResponse });
   } catch (error) {
     console.error('Get user error:', error);
