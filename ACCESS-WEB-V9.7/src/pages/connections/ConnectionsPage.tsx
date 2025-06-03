@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Code, Store, Globe, ArrowRight, Plus, PlugZap } from 'lucide-react';
+import { useState } from 'react';
 
 export function ConnectionsPage() {
+  const [showAddModal, setShowAddModal] = useState(false);
   const connections = [
     {
       id: 'custom-api',
@@ -61,7 +63,10 @@ export function ConnectionsPage() {
         <div className="mb-4 sm:mb-0">
         </div>
         <div>
-          <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600">
+          <button 
+            onClick={() => setShowAddModal(true)}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600"
+          >
             <Plus className="h-4 w-4 mr-2" />
             Add New Connection
           </button>
@@ -130,6 +135,73 @@ export function ConnectionsPage() {
           ))}
         </ul>
       </div>
+
+      {/* Add New Connection Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+                Add New Connection
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Connection Type
+                  </label>
+                  <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
+                    <option value="">Select connection type</option>
+                    <option value="wordpress">WordPress Site</option>
+                    <option value="shopify">Shopify Store</option>
+                    <option value="custom">Custom API</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Site Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter site name"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Site URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://example.com"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-end mt-6 space-x-3">
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // TODO: Handle form submission
+                    setShowAddModal(false);
+                  }}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+                >
+                  Add Connection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
