@@ -29,7 +29,10 @@ export function WordPressSetup() {
         setLoading(true);
         const savedSettings = await wordPressAPI.getSettings();
         if (savedSettings) {
-          setSettings(savedSettings);
+          setSettings({
+            ...savedSettings,
+            excludedPaths: Array.isArray(savedSettings.excludedPaths) ? savedSettings.excludedPaths : []
+          });
         }
       } catch (error) {
         console.error('Failed to load settings:', error);
@@ -372,7 +375,7 @@ export function WordPressSetup() {
                 <textarea
                   id="excludedPaths"
                   rows={3}
-                  value={settings.excludedPaths.join('\n')}
+                  value={(settings.excludedPaths || []).join('\n')}
                   onChange={(e) => setSettings({ ...settings, excludedPaths: e.target.value.split('\n').filter(p => p.trim()) })}
                   className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border border-gray-300 rounded-md"
                   placeholder="/wp-admin/&#10;/wp-login.php&#10;/exclude-this-path"

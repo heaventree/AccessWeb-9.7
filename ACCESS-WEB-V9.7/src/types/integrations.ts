@@ -33,14 +33,18 @@ export interface ApiResponse {
  * WordPress Integration
  */
 export interface WordPressSettings {
-  siteUrl: string;
+  siteUrl?: string;
   apiKey: string;
   autofixEnabled?: boolean;
+  autoFix?: boolean;
   monitoringEnabled?: boolean;
   monitoringInterval?: number; // in minutes
   scanLevel?: AccessibilityLevel;
+  scanFrequency?: 'daily' | 'weekly' | 'monthly';
   notifyOnIssue?: boolean;
+  notifyAdmin?: boolean;
   emailNotifications?: string[];
+  excludedPaths?: string[];
 }
 
 export interface WordPressPluginResponse extends ApiResponse {
