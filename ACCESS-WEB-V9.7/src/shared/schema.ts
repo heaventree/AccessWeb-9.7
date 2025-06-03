@@ -30,7 +30,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   subscriptions: many(subscriptions),
   payments: many(payments),
   scans: many(scans),
-  content: many(content)
+  content: many(content),
+  siteConnections: many(siteConnections)
 }));
 
 // Subscriptions table
@@ -291,6 +292,40 @@ export const scansRelations = relations(scans, ({ one, many }) => ({
   issues: many(scanIssues)
 }));
 
+// Site connections table for WordPress and other integrations
+export const siteConnections = pgTable('site_connections', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  siteName: varchar('site_name', { length: 100 }).notNull(),
+  siteUrl: varchar('site_url', { length: 255 }).notNull(),
+  platform: varchar('platform', { length: 50 }).notNull().default('wordpress'), // wordpress, custom, shopify, etc.
+  apiToken: varchar('api_token', { length: 255 }),
+  status: varchar('status', { length: 20 }).notNull().default('inactive'), // active, inactive, error
+  isActive: boolean('is_active').notNull().default(false),
+  lastScanAt: timestamp('last_scan_at'),
+  scanFrequency: varchar('scan_frequency', { length: 20 }).default('weekly'), // daily, weekly, monthly
+  autoScanEnabled: boolean('auto_scan_enabled').notNull().default(false),
+  webhookUrl: varchar('webhook_url', { length: 255 }),
+  config: jsonb('config'), // Platform-specific configuration
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+}, (table) => {
+  return {
+    userIdIdx: index('site_connection_user_id_idx').on(table.userId),
+    apiTokenIdx: index('site_connection_api_token_idx').on(table.apiToken),
+    statusIdx: index('site_connection_status_idx').on(table.status)
+  };
+});
+
+// Site connection relations
+export const siteConnectionsRelations = relations(siteConnections, ({ one, many }) => ({
+  user: one(users, {
+    fields: [siteConnections.userId],
+    references: [users.id]
+  }),
+  scans: many(scans)
+}));
+
 // Scan issues table
 export const scanIssues = pgTable('scan_issues', {
   id: serial('id').primaryKey(),
@@ -427,6 +462,9 @@ export type InsertScan = typeof scans.$inferInsert;
 
 export type ScanIssue = typeof scanIssues.$inferSelect;
 export type InsertScanIssue = typeof scanIssues.$inferInsert;
+
+export type SiteConnection = typeof siteConnections.$inferSelect;
+export type InsertSiteConnection = typeof siteConnections.$inferInsert;
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;

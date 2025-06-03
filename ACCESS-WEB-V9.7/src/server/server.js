@@ -74,6 +74,10 @@ app.get('/api/health', async (req, res) => {
 app.use('/api/auth', authRouter);
 app.use('/api/accessibility', accessibilityRouter);
 
+// Site connections routes
+const siteConnectionsRouter = require('./routes/siteConnections.js');
+app.use('/api/site-connections', siteConnectionsRouter);
+
 // Pricing Plans Routes
 app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed
 app.get('/api/pricing-plans/:id', getPricingPlan); // Public endpoint - no auth needed
