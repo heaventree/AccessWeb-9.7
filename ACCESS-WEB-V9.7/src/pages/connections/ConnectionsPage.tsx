@@ -1,9 +1,80 @@
 import { Link } from 'react-router-dom';
 import { Code, Store, Globe, ArrowRight, Plus, PlugZap } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function ConnectionsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
+  const [userConnections, setUserConnections] = useState([]);
+  const [formData, setFormData] = useState({
+    type: '',
+    name: '',
+    url: ''
+  });
+  const [loading, setLoading] = useState(false);
+
+  // Fetch user connections on component mount
+  useEffect(() => {
+    fetchUserConnections();
+  }, []);
+
+  const fetchUserConnections = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+      
+      const response = await fetch('http://localhost:3001/api/site-connections', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUserConnections(data);
+      }
+    } catch (error) {
+      console.error('Error fetching connections:', error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.type || !formData.name || !formData.url) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch('http://localhost:3001/api/site-connections', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          url: formData.url,
+          type: formData.type
+        })
+      });
+
+      if (response.ok) {
+        setShowAddModal(false);
+        setFormData({ type: '', name: '', url: '' });
+        fetchUserConnections(); // Refresh the list
+      } else {
+        alert('Error adding connection');
+      }
+    } catch (error) {
+      console.error('Error adding connection:', error);
+      alert('Error adding connection');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const connections = [
     {
       id: 'custom-api',
@@ -72,6 +143,46 @@ export function ConnectionsPage() {
           </button>
         </div>
       </div>
+
+      {/* User Connections Section */}
+      {userConnections.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
+          <div className="px-4 py-5 border-b border-gray-200 dark:border-gray-700 sm:px-6">
+            <h2 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 flex items-center">
+              <PlugZap className="h-5 w-5 mr-2 text-green-500" />
+              Your Connections
+            </h2>
+          </div>
+          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+            {userConnections.map((connection) => (
+              <li key={connection.id}>
+                <div className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="p-2 rounded-md bg-green-100">
+                        <Globe className="h-6 w-6 text-green-600" />
+                      </div>
+                      <div className="ml-4">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">{connection.name}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{connection.url}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">Type: {connection.type}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="mr-4 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Connected
+                      </span>
+                      <button className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        Manage
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       
       <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
         <div className="px-4 py-5 border-b border-gray-200 dark:border-gray-700 sm:px-6">
@@ -150,7 +261,11 @@ export function ConnectionsPage() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Connection Type
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
+                  <select 
+                    value={formData.type}
+                    onChange={(e) => setFormData({...formData, type: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
+                  >
                     <option value="">Select connection type</option>
                     <option value="wordpress">WordPress Site</option>
                     <option value="shopify">Shopify Store</option>
@@ -165,6 +280,8 @@ export function ConnectionsPage() {
                   <input
                     type="text"
                     placeholder="Enter site name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                   />
                 </div>
@@ -176,6 +293,8 @@ export function ConnectionsPage() {
                   <input
                     type="url"
                     placeholder="https://example.com"
+                    value={formData.url}
+                    onChange={(e) => setFormData({...formData, url: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                   />
                 </div>
@@ -189,13 +308,11 @@ export function ConnectionsPage() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    // TODO: Handle form submission
-                    setShowAddModal(false);
-                  }}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50"
                 >
-                  Add Connection
+                  {loading ? 'Adding...' : 'Add Connection'}
                 </button>
               </div>
             </div>
