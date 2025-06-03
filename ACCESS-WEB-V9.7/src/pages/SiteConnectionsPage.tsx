@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Globe, Settings, Power, Key, Trash2, ExternalLink, Activity } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { getStoredAuth } from '../utils/auth';
 
 interface SiteConnection {
   id: number;
@@ -43,10 +44,23 @@ const SiteConnectionsPage: React.FC = () => {
 
   const fetchConnections = async () => {
     try {
-      const response = await apiRequest('/site-connections');
-      setConnections(response.data);
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/site-connections', {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setConnections(data.data || []);
     } catch (error) {
       console.error('Error fetching connections:', error);
+      setConnections([]);
     } finally {
       setLoading(false);
     }
@@ -57,12 +71,22 @@ const SiteConnectionsPage: React.FC = () => {
     setSubmitting(true);
 
     try {
-      const response = await apiRequest('/site-connections', {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/site-connections', {
         method: 'POST',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(formData)
       });
 
-      setConnections(prev => [...prev, response.data]);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setConnections(prev => [...prev, data.data]);
       setFormData({ siteName: '', siteUrl: '', platform: 'wordpress' });
       setShowAddForm(false);
     } catch (error) {
@@ -75,17 +99,27 @@ const SiteConnectionsPage: React.FC = () => {
 
   const handleGenerateToken = async (connectionId: number) => {
     try {
-      const response = await apiRequest(`/site-connections/${connectionId}/generate-token`, {
-        method: 'POST'
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch(`/api/site-connections/${connectionId}/generate-token`, {
+        method: 'POST',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
       setConnections(prev => 
         prev.map(conn => 
-          conn.id === connectionId ? response.data : conn
+          conn.id === connectionId ? data.data : conn
         )
       );
 
-      setSelectedConnection(response.data);
+      setSelectedConnection(data.data);
       setShowTokenModal(true);
     } catch (error) {
       console.error('Error generating token:', error);
@@ -95,13 +129,23 @@ const SiteConnectionsPage: React.FC = () => {
 
   const handleToggleConnection = async (connectionId: number) => {
     try {
-      const response = await apiRequest(`/site-connections/${connectionId}/toggle`, {
-        method: 'PATCH'
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch(`/api/site-connections/${connectionId}/toggle`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
       setConnections(prev => 
         prev.map(conn => 
-          conn.id === connectionId ? response.data : conn
+          conn.id === connectionId ? data.data : conn
         )
       );
     } catch (error) {
@@ -116,9 +160,18 @@ const SiteConnectionsPage: React.FC = () => {
     }
 
     try {
-      await apiRequest(`/site-connections/${connectionId}`, {
-        method: 'DELETE'
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch(`/api/site-connections/${connectionId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       setConnections(prev => prev.filter(conn => conn.id !== connectionId));
     } catch (error) {
