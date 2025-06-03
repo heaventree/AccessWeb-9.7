@@ -1,7 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Globe, Settings, Power, Key, Trash2, ExternalLink, Activity } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { getStoredAuth } from '../utils/auth';
+
+// Create a simple API client for site connections
+const createApiClient = () => {
+  const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
+    try {
+      // Ensure endpoint is a valid string
+      if (!endpoint || typeof endpoint !== 'string') {
+        throw new Error('Invalid endpoint URL');
+      }
+
+      const response = await fetch(endpoint, {
+        ...options,
+        credentials: 'include', // Include cookies for authentication
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API Error: ${response.status} - ${errorText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('API Request failed:', error);
+      throw error;
+    }
+  };
+
+  return {
+    get: (endpoint: string) => makeRequest(endpoint),
+    post: (endpoint: string, data?: any) => makeRequest(endpoint, {
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined,
+    }),
+    patch: (endpoint: string, data?: any) => makeRequest(endpoint, {
+      method: 'PATCH',
+      body: data ? JSON.stringify(data) : undefined,
+    }),
+    delete: (endpoint: string) => makeRequest(endpoint, { method: 'DELETE' }),
+  };
+};
+
+const api = createApiClient();
 
 interface SiteConnection {
   id: number;
@@ -44,19 +89,18 @@ const SiteConnectionsPage: React.FC = () => {
 
   const fetchConnections = async () => {
     try {
-      const token = localStorage.getItem('auth_token');
+      console.log('Testing direct fetch...');
       const response = await fetch('/api/site-connections', {
+        method: 'GET',
+        credentials: 'include',
         headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
           'Content-Type': 'application/json'
         }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Received data:', data);
       setConnections(data.data || []);
     } catch (error) {
       console.error('Error fetching connections:', error);
@@ -71,21 +115,7 @@ const SiteConnectionsPage: React.FC = () => {
     setSubmitting(true);
 
     try {
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch('/api/site-connections', {
-        method: 'POST',
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await api.post('/api/site-connections', formData);
       setConnections(prev => [...prev, data.data]);
       setFormData({ siteName: '', siteUrl: '', platform: 'wordpress' });
       setShowAddForm(false);
