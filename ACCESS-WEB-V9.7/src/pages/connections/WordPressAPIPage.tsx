@@ -11,7 +11,8 @@ interface SiteConnection {
   siteName: string;
   siteUrl: string;
   platform: string;
-  status: boolean;
+  status: string;
+  isActive: boolean;
   apiToken: string | null;
   scanFrequency: string;
   autoScanEnabled: boolean;
@@ -114,8 +115,8 @@ export function WordPressAPIPage() {
     try {
       const response = await apiClient.patch(`/site-connections/${connection.id}/toggle`);
       if (response.data.success) {
-        setConnection(prev => prev ? { ...prev, status: !prev.status } : null);
-        toast.success(`Connection ${connection.status ? 'deactivated' : 'activated'}`);
+        setConnection(prev => prev ? { ...prev, isActive: !prev.isActive } : null);
+        toast.success(`Connection ${connection.isActive ? 'deactivated' : 'activated'}`);
       }
     } catch (error) {
       console.error('Error toggling status:', error);
@@ -216,9 +217,9 @@ export function WordPressAPIPage() {
           
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
-              <div className={`w-3 h-3 rounded-full mr-2 ${connection.status ? 'bg-green-500' : 'bg-red-500'}`} />
-              <span className={`text-sm font-medium ${connection.status ? 'text-green-700' : 'text-red-700'}`}>
-                {connection.status ? 'Active' : 'Inactive'}
+              <div className={`w-3 h-3 rounded-full mr-2 ${connection.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
+              <span className={`text-sm font-medium ${connection.isActive ? 'text-green-700' : 'text-red-700'}`}>
+                {connection.isActive ? 'Active' : 'Inactive'}
               </span>
             </div>
             
@@ -226,7 +227,7 @@ export function WordPressAPIPage() {
               onClick={handleToggleStatus}
               disabled={updating}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                connection.status 
+                connection.isActive 
                   ? 'bg-red-100 text-red-700 hover:bg-red-200' 
                   : 'bg-green-100 text-green-700 hover:bg-green-200'
               } disabled:opacity-50`}
@@ -234,7 +235,7 @@ export function WordPressAPIPage() {
               {updating ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
               ) : (
-                connection.status ? 'Deactivate' : 'Activate'
+                connection.isActive ? 'Deactivate' : 'Activate'
               )}
             </button>
           </div>
@@ -513,8 +514,8 @@ export function WordPressAPIPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Status</span>
-                <span className={`text-sm font-medium ${connection.status ? 'text-green-600' : 'text-red-600'}`}>
-                  {connection.status ? 'Active' : 'Inactive'}
+                <span className={`text-sm font-medium ${connection.isActive ? 'text-green-600' : 'text-red-600'}`}>
+                  {connection.isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
               
