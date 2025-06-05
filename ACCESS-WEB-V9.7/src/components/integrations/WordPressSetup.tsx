@@ -50,7 +50,7 @@ export function WordPressSetup() {
       // Get the access token from cookie or localStorage
       const getAccessToken = () => {
         // Try localStorage first
-        let token = localStorage.getItem('access_token');
+        let token = localStorage.getItem('accessToken');
         if (token) return token;
         
         // Try getting from cookie
