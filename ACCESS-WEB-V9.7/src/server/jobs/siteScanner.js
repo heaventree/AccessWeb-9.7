@@ -193,6 +193,12 @@ class SiteScannerJobQueue {
         const cronExpression = frequencyToCron[connection.scanFrequency] || '0 9 * * 1'; // Default to weekly
         const jobKey = `scan-connection-${connection.id}`;
         
+        // Skip scheduling for testing frequency - manual triggers only
+        if (connection.scanFrequency === 'testing') {
+          console.log(`⏭️ [SITE-SCANNER] Skipping automated scheduling for ${connection.siteName} (testing mode - manual triggers only)`);
+          continue;
+        }
+        
         const jobData = {
           connectionId: connection.id,
           userId: connection.userId,
