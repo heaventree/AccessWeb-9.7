@@ -139,28 +139,19 @@ export function ConnectionsPage() {
     }
   };
 
-  const availableIntegrations = [
-    {
-      id: 'custom-api',
-      name: 'Custom API',
-      description: 'Configure custom API integration settings',
-      icon: Code,
-      path: '/my-account/connections/custom-api',
-      platform: 'custom',
+  // Platform configuration for icons and features (not static data)
+  const platformConfig = {
+    wordpress: {
+      icon: Globe,
       features: [
-        'RESTful API access',
-        'Webhook notifications',
-        'Detailed reporting',
-        'Custom implementation support'
+        'Plugin-based integration',
+        'Real-time monitoring',
+        'Auto-fix suggestions',
+        'Theme compatibility'
       ]
     },
-    {
-      id: 'shopify',
-      name: 'Shopify',
-      description: 'Connect your Shopify store',
+    shopify: {
       icon: Store,
-      path: '/my-account/connections/shopify',
-      platform: 'shopify',
       features: [
         'Theme accessibility testing',
         'Product page monitoring',
@@ -168,72 +159,43 @@ export function ConnectionsPage() {
         'Custom fixes for Shopify themes'
       ]
     },
-    {
-      id: 'wordpress',
-      name: 'WordPress',
-      description: 'Connect your WordPress site',
-      icon: Globe,
-      path: '/my-account/connections/wordpress',
-      platform: 'wordpress',
+    custom: {
+      icon: Code,
       features: [
-        'Plugin-based integration',
-        'Real-time monitoring',
-        'Auto-fix suggestions',
-        'Theme compatibility'
+        'RESTful API access',
+        'Webhook notifications',
+        'Detailed reporting',
+        'Custom implementation support'
       ]
     }
-  ];
+  };
 
-  // Merge user connections with available integrations
+  // Get only real database connections
   const getAllConnections = (): UnifiedConnection[] => {
     const allConnections: UnifiedConnection[] = [];
     
     // Safely access userConnections with proper null checks
     const safeUserConnections = Array.isArray(userConnections) ? userConnections : [];
     
-    // Add user's actual connections
+    // Add only user's actual connections from database
     safeUserConnections.forEach(connection => {
       if (!connection || !connection.platform || !connection.siteName) return;
       
-      const integration = availableIntegrations.find(int => int.platform === connection.platform);
+      const config = platformConfig[connection.platform as keyof typeof platformConfig];
       allConnections.push({
         id: connection.id || `user-${Math.random()}`,
         platform: connection.platform || 'unknown',
         name: connection.siteName || 'Unnamed Connection',
         description: connection.siteUrl || 'No URL provided',
-        icon: integration?.icon || Globe,
+        icon: config?.icon || Globe,
         path: `/my-account/connections/${connection.platform}/${connection.id}`,
         status: connection.isActive ? 'Active' : 'Inactive',
-        features: Array.isArray(integration?.features) ? integration.features : [],
+        features: config?.features || [],
         hasApiToken: !!(connection.apiToken),
         isUserConnection: true,
         isActive: connection.isActive || false,
         apiToken: connection.apiToken || undefined
       });
-    });
-
-    // Add available integrations that user hasn't connected yet
-    availableIntegrations.forEach(integration => {
-      if (!integration || !integration.platform) return;
-      
-      const hasConnection = safeUserConnections.some(conn => 
-        conn && conn.platform === integration.platform
-      );
-      
-      if (!hasConnection) {
-        allConnections.push({
-          id: integration.id || `integration-${integration.platform}`,
-          platform: integration.platform,
-          name: integration.name || 'Unknown Integration',
-          description: integration.description || '',
-          icon: integration.icon || Globe,
-          path: integration.path || `/my-account/connections/${integration.platform}`,
-          status: 'Not Connected',
-          features: Array.isArray(integration.features) ? integration.features : [],
-          hasApiToken: false,
-          isUserConnection: false
-        });
-      }
     });
 
     return allConnections;
@@ -243,10 +205,10 @@ export function ConnectionsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-          API Connections
+          Your Connected Sites
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-400">
-          Connect your platforms for seamless accessibility monitoring and automated fixes
+          Manage your connected websites and their accessibility monitoring settings
         </p>
       </div>
       <div className="sm:flex sm:justify-between sm:items-center mb-6">
