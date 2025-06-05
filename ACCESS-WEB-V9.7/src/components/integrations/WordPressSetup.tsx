@@ -47,10 +47,32 @@ export function WordPressSetup() {
   const handleGenerateApiKey = async () => {
     setGenerating(true);
     try {
+      // Get the access token from cookie or localStorage
+      const getAccessToken = () => {
+        // Try localStorage first
+        let token = localStorage.getItem('access_token');
+        if (token) return token;
+        
+        // Try getting from cookie
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+          const [name, value] = cookie.trim().split('=');
+          if (name === 'accessToken') {
+            return value;
+          }
+        }
+        return null;
+      };
+
+      const accessToken = getAccessToken();
+      if (!accessToken) {
+        throw new Error('Not authenticated. Please log in again.');
+      }
+
       // Check if we have existing WordPress site connections
       const connectionsResponse = await fetch('/api/site-connections', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          'Authorization': `Bearer ${accessToken}`
         }
       });
 
@@ -69,7 +91,7 @@ export function WordPressSetup() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+              'Authorization': `Bearer ${accessToken}`
             },
             body: JSON.stringify({
               siteName: 'WordPress Integration',
@@ -93,7 +115,7 @@ export function WordPressSetup() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            'Authorization': `Bearer ${accessToken}`
           }
         });
 

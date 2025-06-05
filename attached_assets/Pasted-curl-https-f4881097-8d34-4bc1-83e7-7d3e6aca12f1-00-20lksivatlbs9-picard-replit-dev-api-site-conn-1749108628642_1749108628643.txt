@@ -1,0 +1,99 @@
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/site-connections^" ^
+  -H ^"Accept: */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Authorization: Bearer null^" ^
+  -H ^"Connection: keep-alive^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0ODk1NzU3NywiZXhwIjoxNzQ5NTYyMzc3fQ.vSYDXI5aSWgEIP2m6KwkRR93zVkSuuuT8OyQOzLc7xI; __stripe_sid=76fef4ea-791a-4793-b7d0-55cd81dd0e531e51ec^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"If-None-Match: W/^\^"84c-bGAIUbzTQWr8r5+WxD2V8TPlUjc^\^"^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account/connections/wordpress^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"X-CSRF-Token: g^<k^x^8^a'xc1^L^%^f'P^$P^S^#C^o3l^Y^>^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/site-connections^" ^
+  -H ^"Accept: application/json, text/plain, */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Connection: keep-alive^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0ODk1NzU3NywiZXhwIjoxNzQ5NTYyMzc3fQ.vSYDXI5aSWgEIP2m6KwkRR93zVkSuuuT8OyQOzLc7xI; __stripe_sid=76fef4ea-791a-4793-b7d0-55cd81dd0e531e51ec^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account/connections^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/site-connections^" ^
+  -H ^"Accept: application/json, text/plain, */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Connection: keep-alive^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0ODk1NzU3NywiZXhwIjoxNzQ5NTYyMzc3fQ.vSYDXI5aSWgEIP2m6KwkRR93zVkSuuuT8OyQOzLc7xI; __stripe_sid=76fef4ea-791a-4793-b7d0-55cd81dd0e531e51ec^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"If-None-Match: W/^\^"84c-bGAIUbzTQWr8r5+WxD2V8TPlUjc^\^"^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account/connections^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://m.stripe.com/6^" ^
+  -H ^"accept: */*^" ^
+  -H ^"accept-language: en-US,en;q=0.9^" ^
+  -H ^"content-type: text/plain;charset=UTF-8^" ^
+  -b ^"m=87c1e850-67f6-4d20-b64b-422b77de33d1830ea5; private_machine_identifier=goGDBDU7mF1Nq1oIyh^%^2BtKwyfZz0XrTolsgdNFmArjpykU0j4wYNaD6yBtvw0EIkITX0^%^3D^" ^
+  -H ^"dnt: 1^" ^
+  -H ^"origin: https://m.stripe.network^" ^
+  -H ^"priority: u=1, i^" ^
+  -H ^"referer: https://m.stripe.network/^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" ^
+  -H ^"sec-fetch-dest: empty^" ^
+  -H ^"sec-fetch-mode: cors^" ^
+  -H ^"sec-fetch-site: cross-site^" ^
+  -H ^"sec-fetch-storage-access: active^" ^
+  -H ^"user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  --data-raw ^"JTdCJTIydjIlMjIlM0ExJTJDJTIyaWQlMjIlM0ElMjJmYzZjMDIyZmIyNmNmOGFkY2EwMzQ4MzViYjllMTg1ZiUyMiUyQyUyMnQlMjIlM0ExOS41JTJDJTIydGFnJTIyJTNBJTIyJTI0bnBtX3BhY2thZ2VfdmVyc2lvbiUyMiUyQyUyMnNyYyUyMiUzQSUyMmpzJTIyJTJDJTIyYSUyMiUzQW51bGwlMkMlMjJiJTIyJTNBJTdCJTIyYSUyMiUzQSUyMmh0dHBzJTNBJTJGJTJGUklLSkxOc255MHhuVkc4RTU4OFFCQnh5cGVBMENaWkQzOWFLZ092elpZby4tbjU2XzlCZHhIbE4zczZiQlJYU3pwMnpvOWJEMC1udHgzWWdTZVlvTWhVLlZpSi1iNVU0dDFHeG9pUm9sM2xwUXM3aUhzcU15cHh1U1Fzd1VxaTNSRG8uRlB4LWxYSy1lY3FGZWdLazlUbmVmN3hVWHVnU2paMndpd3pKWmpvZmtGQSUyRk9WemVvTlE0RGVSWktZZlUtOEtGNHlWNE5vbFFzOExuUlVmMWVEU1Q3N0ElMkZIX2dfSkxfZ2cxUE5idlNodFk3dVFUSl8yLTZ3YXFaeXBNUGZvLVR4SXkwJTJGZ3ZZX29iZF9acDBKNGRvd0V2ZHFXQjgyV2IxazRwS19GeVd1d0IwbkZxQSUyMiUyQyUyMmIlMjIlM0ElMjJodHRwcyUzQSUyRiUyRlJJS0pMTnNueTB4blZHOEU1ODhRQkJ4eXBlQTBDWlpEMzlhS2dPdnpaWW8uLW41Nl85QmR4SGxOM3M2YkJSWFN6cDJ6bzliRDAtbnR4M1lnU2VZb01oVS5WaUotYjVVNHQxR3hvaVJvbDNscFFzN2lIc3FNeXB4dVNRc3dVcWkzUkRvLkZQeC1sWEstZWNxRmVnS2s5VG5lZjd4VVh1Z1NqWjJ3aXd6Slpqb2ZrRkElMkZPVnplb05RNERlUlpLWWZVLThLRjR5VjROb2xRczhMblJVZjFlRFNUNzdBJTJGSF9nX0pMX2dnMVBOYnZTaHRZN3VRVEpfMi02d2FxWnlwTVBmby1UeEl5MCUyMiUyQyUyMmMlMjIlM0ElMjI3MS1vMlFEX0hDMGluMnUxZ2R6b0NMMUVSUGp6TElaMTdBYzZ0VHZYUS1BJTIyJTJDJTIyZCUyMiUzQSUyMmY1ODY1N2VjLWFjNWUtNDY5OC1hNzUzLWEzZTNiNWEyMWZjZjdmNzk1YiUyMiUyQyUyMmUlMjIlM0ElMjI3NmZlZjRlYS03OTFhLTQ3OTMtYjdkMC01NWNkODFkZDBlNTMxZTUxZWMlMjIlMkMlMjJmJTIyJTNBZmFsc2UlMkMlMjJnJTIyJTNBdHJ1ZSUyQyUyMmglMjIlM0F0cnVlJTJDJTIyaSUyMiUzQSU1QiUyMmxvY2F0aW9uJTIyJTVEJTJDJTIyaiUyMiUzQSU1QiU1RCUyQyUyMm4lMjIlM0EzNjMuNDAwMDAwMDM1NzYyOCUyQyUyMnUlMjIlM0ElMjJmNDg4MTA5Ny04ZDM0LTRiYzEtODNlNy03ZDNlNmFjYTEyZjEtMDAtMjBsa3NpdmF0bGJzOS5waWNhcmQucmVwbGl0LmRldiUyMiUyQyUyMnYlMjIlM0ElMjJmNDg4MTA5Ny04ZDM0LTRiYzEtODNlNy03ZDNlNmFjYTEyZjEtMDAtMjBsa3NpdmF0bGJzOS5waWNhcmQucmVwbGl0LmRldiUyMiUyQyUyMnclMjIlM0ElMjIxNzQ5MTA4NjA0MzY2JTNBNzFjM2JkOGIxOWZmNzRhZTA4N2JhYmE4NDVmZTJjMDM1YTc5YzM2NWQ4YWUyNGNlMGU3M2Q1M2Q5OTA4OWE1MCUyMiU3RCUyQyUyMmglMjIlM0ElMjIwOTkzNjlkZjE5ZTM4ZjgxYmIwMyUyMiU3RA==^" &
+curl ^"https://m.stripe.com/6^" ^
+  -H ^"accept: */*^" ^
+  -H ^"accept-language: en-US,en;q=0.9^" ^
+  -H ^"content-type: text/plain;charset=UTF-8^" ^
+  -b ^"m=87c1e850-67f6-4d20-b64b-422b77de33d1830ea5; private_machine_identifier=goGDBDU7mF1Nq1oIyh^%^2BtKwyfZz0XrTolsgdNFmArjpykU0j4wYNaD6yBtvw0EIkITX0^%^3D^" ^
+  -H ^"dnt: 1^" ^
+  -H ^"origin: https://m.stripe.network^" ^
+  -H ^"priority: u=1, i^" ^
+  -H ^"referer: https://m.stripe.network/^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" ^
+  -H ^"sec-fetch-dest: empty^" ^
+  -H ^"sec-fetch-mode: cors^" ^
+  -H ^"sec-fetch-site: cross-site^" ^
+  -H ^"sec-fetch-storage-access: active^" ^
+  -H ^"user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  --data-raw ^"JTdCJTIydjIlMjIlM0ExJTJDJTIyaWQlMjIlM0ElMjJmYzZjMDIyZmIyNmNmOGFkY2EwMzQ4MzViYjllMTg1ZiUyMiUyQyUyMnQlMjIlM0ExOC40JTJDJTIydGFnJTIyJTNBJTIyJTI0bnBtX3BhY2thZ2VfdmVyc2lvbiUyMiUyQyUyMnNyYyUyMiUzQSUyMmpzJTIyJTJDJTIyYSUyMiUzQW51bGwlMkMlMjJiJTIyJTNBJTdCJTIyYSUyMiUzQSUyMmh0dHBzJTNBJTJGJTJGUklLSkxOc255MHhuVkc4RTU4OFFCQnh5cGVBMENaWkQzOWFLZ092elpZby4tbjU2XzlCZHhIbE4zczZiQlJYU3pwMnpvOWJEMC1udHgzWWdTZVlvTWhVLlZpSi1iNVU0dDFHeG9pUm9sM2xwUXM3aUhzcU15cHh1U1Fzd1VxaTNSRG8uRlB4LWxYSy1lY3FGZWdLazlUbmVmN3hVWHVnU2paMndpd3pKWmpvZmtGQSUyRk9WemVvTlE0RGVSWktZZlUtOEtGNHlWNE5vbFFzOExuUlVmMWVEU1Q3N0ElMkZIX2dfSkxfZ2cxUE5idlNodFk3dVFUSl8yLTZ3YXFaeXBNUGZvLVR4SXkwJTJGZ3ZZX29iZF9acDBKNGRvd0V2ZHFXQjgyV2IxazRwS19GeVd1d0IwbkZxQSUyMiUyQyUyMmIlMjIlM0ElMjJodHRwcyUzQSUyRiUyRlJJS0pMTnNueTB4blZHOEU1ODhRQkJ4eXBlQTBDWlpEMzlhS2dPdnpaWW8uLW41Nl85QmR4SGxOM3M2YkJSWFN6cDJ6bzliRDAtbnR4M1lnU2VZb01oVS5WaUotYjVVNHQxR3hvaVJvbDNscFFzN2lIc3FNeXB4dVNRc3dVcWkzUkRvLkZQeC1sWEstZWNxRmVnS2s5VG5lZjd4VVh1Z1NqWjJ3aXd6Slpqb2ZrRkElMkZPVnplb05RNERlUlpLWWZVLThLRjR5VjROb2xRczhMblJVZjFlRFNUNzdBJTJGSF9nX0pMX2dnMVBOYnZTaHRZN3VRVEpfMi02d2FxWnlwTVBmby1UeEl5MCUyRmd2WV9vYmRfWnAwSjRkb3dFdmRxV0I4MldiMWs0cEtfRnlXdXdCMG5GcUElMjIlMkMlMjJjJTIyJTNBJTIyNzEtbzJRRF9IQzBpbjJ1MWdkem9DTDFFUlBqekxJWjE3QWM2dFR2WFEtQSUyMiUyQyUyMmQlMjIlM0ElMjJmNTg2NTdlYy1hYzVlLTQ2OTgtYTc1My1hM2UzYjVhMjFmY2Y3Zjc5NWIlMjIlMkMlMjJlJTIyJTNBJTIyNzZmZWY0ZWEtNzkxYS00NzkzLWI3ZDAtNTVjZDgxZGQwZTUzMWU1MWVjJTIyJTJDJTIyZiUyMiUzQWZhbHNlJTJDJTIyZyUyMiUzQXRydWUlMkMlMjJoJTIyJTNBdHJ1ZSUyQyUyMmklMjIlM0ElNUIlMjJsb2NhdGlvbiUyMiU1RCUyQyUyMmolMjIlM0ElNUIlNUQlMkMlMjJuJTIyJTNBMzYzLjQwMDAwMDAzNTc2MjglMkMlMjJ1JTIyJTNBJTIyZjQ4ODEwOTctOGQzNC00YmMxLTgzZTctN2QzZTZhY2ExMmYxLTAwLTIwbGtzaXZhdGxiczkucGljYXJkLnJlcGxpdC5kZXYlMjIlMkMlMjJ2JTIyJTNBJTIyZjQ4ODEwOTctOGQzNC00YmMxLTgzZTctN2QzZTZhY2ExMmYxLTAwLTIwbGtzaXZhdGxiczkucGljYXJkLnJlcGxpdC5kZXYlMjIlMkMlMjJ3JTIyJTNBJTIyMTc0OTEwODYxNDM2NCUzQTNhZWMzYWZmYjk4MzAxZDcwMDczMDg4YWFkZGUwYWExMDlkOWQwYjk1NGYyYzdmNGEwOTUzNTg2YzBkZDc1ZDYlMjIlN0QlMkMlMjJoJTIyJTNBJTIyYTdlNTVhMzBhYmQ2ZjlmMGI3MzElMjIlN0Q=^" &
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/site-connections^" ^
+  -H ^"Accept: */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Authorization: Bearer null^" ^
+  -H ^"Connection: keep-alive^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0ODk1NzU3NywiZXhwIjoxNzQ5NTYyMzc3fQ.vSYDXI5aSWgEIP2m6KwkRR93zVkSuuuT8OyQOzLc7xI; __stripe_sid=76fef4ea-791a-4793-b7d0-55cd81dd0e531e51ec^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"If-None-Match: W/^\^"84c-bGAIUbzTQWr8r5+WxD2V8TPlUjc^\^"^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account/connections/wordpress^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"X-CSRF-Token: g^<k^x^8^a'xc1^L^%^f'P^$P^S^#C^o3l^Y^>^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^"
