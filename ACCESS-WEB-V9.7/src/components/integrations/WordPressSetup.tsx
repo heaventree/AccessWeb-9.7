@@ -47,25 +47,95 @@ export function WordPressSetup() {
   const handleGenerateApiKey = async () => {
     setGenerating(true);
     try {
-      // Generate a cryptographically secure random API key
-      const buffer = new Uint8Array(32);
-      window.crypto.getRandomValues(buffer);
-      const key = Array.from(buffer)
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
+      // First check if we have a site connection ID
+      const storedConnectionId = localStorage.getItem('wordpress_connection_id');
       
-      // Save the new API key in settings
-      const newSettings = { ...settings, apiKey: key };
-      const result = await wordPressAPI.saveSettings(newSettings);
-      
-      if (result.success) {
-        setSettings(newSettings);
-        setNewApiKey(key);
-        toast.success('API key generated successfully');
+      if (storedConnectionId) {
+        // Use existing site connection to generate new token
+        const response = await fetch(`/api/site-connections/${storedConnectionId}/generate-token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          }
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          const newKey = result.data.apiToken;
+          
+          // Update local settings
+          const newSettings = { ...settings, apiKey: newKey };
+          setSettings(newSettings);
+          setNewApiKey(newKey);
+          
+          // Save settings locally
+          await wordPressAPI.saveSettings(newSettings);
+          
+          toast.success('API key generated successfully');
+        } else {
+          throw new Error('Failed to generate API key via site connection');
+        }
       } else {
-        throw new Error(result.message);
+        // Create new site connection for WordPress
+        const siteUrl = prompt('Enter your WordPress site URL:');
+        if (!siteUrl) {
+          throw new Error('Site URL is required');
+        }
+
+        const createResponse = await fetch('/api/site-connections', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+          body: JSON.stringify({
+            siteName: `WordPress Site (${new URL(siteUrl).hostname})`,
+            siteUrl,
+            platform: 'wordpress',
+            scanFrequency: 'weekly',
+            autoScanEnabled: true
+          })
+        });
+
+        if (createResponse.ok) {
+          const createResult = await createResponse.json();
+          const connectionId = createResult.data.id;
+          
+          // Store connection ID for future use
+          localStorage.setItem('wordpress_connection_id', connectionId.toString());
+          
+          // Generate token for new connection
+          const tokenResponse = await fetch(`/api/site-connections/${connectionId}/generate-token`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            }
+          });
+
+          if (tokenResponse.ok) {
+            const tokenResult = await tokenResponse.json();
+            const newKey = tokenResult.data.apiToken;
+            
+            // Update local settings
+            const newSettings = { ...settings, apiKey: newKey, siteUrl };
+            setSettings(newSettings);
+            setNewApiKey(newKey);
+            
+            // Save settings locally
+            await wordPressAPI.saveSettings(newSettings);
+            
+            toast.success('WordPress site connected and API key generated successfully');
+          } else {
+            throw new Error('Failed to generate API key for new site connection');
+          }
+        } else {
+          throw new Error('Failed to create site connection');
+        }
       }
     } catch (error) {
+      console.error('API key generation error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to generate API key');
     } finally {
       setGenerating(false);
