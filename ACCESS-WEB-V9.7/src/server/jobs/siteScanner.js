@@ -42,7 +42,13 @@ class SiteScannerJobQueue {
         await this.syncSchedules();
       }, SYNC_INTERVAL_MS);
 
+      // Set up 15-second testing interval for connections with testing frequency
+      this.testingInterval = setInterval(async () => {
+        await this.triggerTestingScans();
+      }, 15000);
+
       console.log(`⏰ [SITE-SCANNER] Schedule sync interval set to ${SYNC_INTERVAL_MS / 1000} seconds`);
+      console.log('⚡ [SITE-SCANNER] Testing interval set to 15 seconds');
       
     } catch (error) {
       console.error('❌ [SITE-SCANNER] Failed to initialize job queue:', error);
@@ -179,7 +185,7 @@ class SiteScannerJobQueue {
 
       // Convert scan frequency to cron expression
       const frequencyToCron = {
-        'testing': '*/1 * * * *',     // Every 1 minute (testing - closest valid cron)
+        'testing': '*/15 * * * * *',  // Every 15 seconds (6-field format for seconds)
         'daily': '0 9 * * *',         // Daily at 9 AM
         'weekly': '0 9 * * 1',        // Weekly on Monday at 9 AM  
         'monthly': '0 9 1 * *'        // Monthly on 1st at 9 AM
@@ -193,10 +199,9 @@ class SiteScannerJobQueue {
         const cronExpression = frequencyToCron[connection.scanFrequency] || '0 9 * * 1'; // Default to weekly
         const jobKey = `scan-connection-${connection.id}`;
         
-        // Skip scheduling for testing frequency - manual triggers only
+        // Special handling for testing frequency - use 15-second intervals
         if (connection.scanFrequency === 'testing') {
-          console.log(`⏭️ [SITE-SCANNER] Skipping automated scheduling for ${connection.siteName} (testing mode - manual triggers only)`);
-          continue;
+          console.log(`⚡ [SITE-SCANNER] Enabling 15-second testing schedule for ${connection.siteName}`);
         }
         
         const jobData = {
@@ -255,6 +260,49 @@ class SiteScannerJobQueue {
     }
   }
 
+  async triggerTestingScans() {
+    try {
+      const activeConnections = await db.select({
+        id: siteConnections.id,
+        userId: siteConnections.userId,
+        siteName: siteConnections.siteName,
+        siteUrl: siteConnections.siteUrl,
+        platform: siteConnections.platform,
+        scanFrequency: siteConnections.scanFrequency,
+        autoScanEnabled: siteConnections.autoScanEnabled,
+        user: {
+          email: users.email
+        }
+      }).from(siteConnections)
+        .innerJoin(users, eq(siteConnections.userId, users.id))
+        .where(and(
+          eq(siteConnections.autoScanEnabled, true),
+          eq(siteConnections.scanFrequency, 'testing'),
+          eq(siteConnections.status, 'active')
+        ));
+
+      for (const connection of activeConnections) {
+        const jobData = {
+          connectionId: connection.id,
+          userId: connection.userId,
+          siteName: connection.siteName,
+          siteUrl: connection.siteUrl,
+          platform: connection.platform,
+          frequency: 'testing-auto'
+        };
+
+        try {
+          await this.boss.send(JOB_QUEUE_NAME, jobData);
+          console.log(`⚡ [SITE-SCANNER] 15-second auto-scan triggered for ${connection.siteName}`);
+        } catch (error) {
+          console.error(`❌ [SITE-SCANNER] Failed to trigger testing scan for connection ${connection.id}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error('❌ [SITE-SCANNER] Testing scan trigger failed:', error);
+    }
+  }
+
   async getJobStats() {
     try {
       if (!this.boss) return null;
@@ -279,6 +327,10 @@ class SiteScannerJobQueue {
       
       if (this.syncInterval) {
         clearInterval(this.syncInterval);
+      }
+      
+      if (this.testingInterval) {
+        clearInterval(this.testingInterval);
       }
       
       if (this.boss) {
