@@ -19,6 +19,7 @@ export const JobQueueTester: React.FC<JobQueueTesterProps> = ({ connectionId = 8
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const [testCount, setTestCount] = useState(0);
   const [maxTests, setMaxTests] = useState(10);
+  const [scheduleStatus, setScheduleStatus] = useState<'stopped' | 'running' | 'loading'>('loading');
 
   const triggerScan = async (): Promise<TestResult> => {
     const startTime = Date.now();
@@ -88,6 +89,48 @@ export const JobQueueTester: React.FC<JobQueueTesterProps> = ({ connectionId = 8
       setIntervalId(null);
     }
     setIsRunning(false);
+  };
+
+  const stopSchedule = async () => {
+    setScheduleStatus('loading');
+    try {
+      await apiRequest('/api/scanner/schedule/stop', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      setScheduleStatus('stopped');
+    } catch (error) {
+      console.error('Failed to stop schedule:', error);
+      setScheduleStatus('running'); // Reset on error
+    }
+  };
+
+  const startSchedule = async () => {
+    setScheduleStatus('loading');
+    try {
+      await apiRequest('/api/scanner/schedule/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      setScheduleStatus('running');
+    } catch (error) {
+      console.error('Failed to start schedule:', error);
+      setScheduleStatus('stopped'); // Reset on error
+    }
+  };
+
+  const checkScheduleStatus = async () => {
+    try {
+      const response = await apiRequest('/api/scanner/schedule/status');
+      setScheduleStatus(response.running ? 'running' : 'stopped');
+    } catch (error) {
+      console.error('Failed to check schedule status:', error);
+      setScheduleStatus('stopped');
+    }
   };
 
   useEffect(() => {

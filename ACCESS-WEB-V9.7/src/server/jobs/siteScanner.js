@@ -262,24 +262,20 @@ class SiteScannerJobQueue {
 
   async triggerTestingScans() {
     try {
-      const activeConnections = await db.select({
-        id: siteConnections.id,
-        userId: siteConnections.userId,
-        siteName: siteConnections.siteName,
-        siteUrl: siteConnections.siteUrl,
-        platform: siteConnections.platform,
-        scanFrequency: siteConnections.scanFrequency,
-        autoScanEnabled: siteConnections.autoScanEnabled,
-        user: {
-          email: users.email
+      const activeConnections = await prisma.siteConnection.findMany({
+        where: {
+          autoScanEnabled: true,
+          scanFrequency: 'testing',
+          status: 'active'
+        },
+        include: {
+          user: {
+            select: {
+              email: true
+            }
+          }
         }
-      }).from(siteConnections)
-        .innerJoin(users, eq(siteConnections.userId, users.id))
-        .where(and(
-          eq(siteConnections.autoScanEnabled, true),
-          eq(siteConnections.scanFrequency, 'testing'),
-          eq(siteConnections.status, 'active')
-        ));
+      });
 
       for (const connection of activeConnections) {
         const jobData = {
