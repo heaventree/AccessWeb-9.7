@@ -146,7 +146,8 @@ export const authMiddleware = (req, res, next) => {
     if (tokenBlacklistService.isBlacklisted(decoded.jti)) {
       return res.status(401).json({ message: 'Token is no longer valid' });
     }
-    
+
+    console.log(decoded,'decoded')
     // Add user to request
     req.user = decoded;
     

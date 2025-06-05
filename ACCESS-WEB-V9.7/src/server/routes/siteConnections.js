@@ -1,7 +1,7 @@
-import express from 'express';
-import crypto from 'crypto';
-import { PrismaClient } from '@prisma/client';
-import { requireAuth } from '../../middleware/userAuth.js';
+import express from "express";
+import crypto from "crypto";
+import { PrismaClient } from "@prisma/client";
+import { requireAuth } from "../../middleware/userAuth.js";
 
 const prisma = new PrismaClient();
 
@@ -9,104 +9,122 @@ const prisma = new PrismaClient();
 const logger = {
   info: (message, data = null) => {
     const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] [SITE-CONNECTIONS] [INFO] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+    console.log(
+      `[${timestamp}] [SITE-CONNECTIONS] [INFO] ${message}`,
+      data ? JSON.stringify(data, null, 2) : "",
+    );
   },
   error: (message, error = null, context = null) => {
     const timestamp = new Date().toISOString();
     console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] ${message}`);
     if (error) {
-      console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] Stack:`, error.stack || error);
-      console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] Details:`, JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      console.error(
+        `[${timestamp}] [SITE-CONNECTIONS] [ERROR] Stack:`,
+        error.stack || error,
+      );
+      console.error(
+        `[${timestamp}] [SITE-CONNECTIONS] [ERROR] Details:`,
+        JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
+      );
     }
     if (context) {
-      console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] Context:`, JSON.stringify(context, null, 2));
+      console.error(
+        `[${timestamp}] [SITE-CONNECTIONS] [ERROR] Context:`,
+        JSON.stringify(context, null, 2),
+      );
     }
   },
   warn: (message, data = null) => {
     const timestamp = new Date().toISOString();
-    console.warn(`[${timestamp}] [SITE-CONNECTIONS] [WARN] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+    console.warn(
+      `[${timestamp}] [SITE-CONNECTIONS] [WARN] ${message}`,
+      data ? JSON.stringify(data, null, 2) : "",
+    );
   },
   debug: (message, data = null) => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       const timestamp = new Date().toISOString();
-      console.log(`[${timestamp}] [SITE-CONNECTIONS] [DEBUG] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+      console.log(
+        `[${timestamp}] [SITE-CONNECTIONS] [DEBUG] ${message}`,
+        data ? JSON.stringify(data, null, 2) : "",
+      );
     }
-  }
+  },
 };
 
 const router = express.Router();
 
 // Generate secure API token
 function generateApiToken() {
-  return 'aweb_' + crypto.randomBytes(32).toString('hex');
+  return "aweb_" + crypto.randomBytes(32).toString("hex");
 }
 
 // Get all site connections for user
-router.get('/', requireAuth, async (req, res) => {
+router.get("/", requireAuth, async (req, res) => {
   try {
     const userId = req.user.id;
-    
-    logger.info('Fetching site connections', { userId });
-    
+    console.log("user->>>>>>>>>>>>>>>>>>", req.user);
+    logger.info("Fetching site connections", { userId });
+
     const connections = await prisma.siteConnection.findMany({
       where: {
-        userId: userId
+        userId: userId,
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
-    logger.info('Site connections fetched successfully', { 
-      userId, 
-      count: connections.length 
+    logger.info("Site connections fetched successfully", {
+      userId,
+      count: connections.length,
     });
 
     res.json({
       success: true,
-      data: connections
+      data: connections,
     });
   } catch (error) {
-    logger.error('Error fetching site connections', error, { 
+    logger.error("Error fetching site connections", error, {
       userId: req.user?.id,
       requestUrl: req.url,
-      method: req.method
+      method: req.method,
     });
-    
+
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch site connections'
+      error: "Failed to fetch site connections",
     });
   }
 });
 
 // Create new site connection
-router.post('/', requireAuth, async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
   try {
     const userId = req.user.id;
-    const { siteName, siteUrl, platform = 'wordpress' } = req.body;
+    const { siteName, siteUrl, platform = "wordpress" } = req.body;
 
-    logger.info('Creating new site connection', {
+    logger.info("Creating new site connection", {
       userId,
       requestBody: req.body,
       userInfo: {
         id: req.user.id,
-        email: req.user.email
-      }
+        email: req.user.email,
+      },
     });
 
     // Validate required fields
     if (!siteName || !siteUrl) {
-      logger.warn('Validation failed - missing required fields', {
+      logger.warn("Validation failed - missing required fields", {
         userId,
         siteName: !!siteName,
         siteUrl: !!siteUrl,
-        platform
+        platform,
       });
-      
+
       return res.status(400).json({
         success: false,
-        error: 'Site name and URL are required'
+        error: "Site name and URL are required",
       });
     }
 
@@ -114,51 +132,50 @@ router.post('/', requireAuth, async (req, res) => {
     let normalizedUrl = siteUrl;
     try {
       // If URL doesn't start with protocol, add https://
-      if (!siteUrl.startsWith('http://') && !siteUrl.startsWith('https://')) {
-        normalizedUrl = 'https://' + siteUrl;
+      if (!siteUrl.startsWith("http://") && !siteUrl.startsWith("https://")) {
+        normalizedUrl = "https://" + siteUrl;
       }
-      
-      logger.debug('Normalizing URL', {
-        originalUrl: siteUrl,
-        normalizedUrl: normalizedUrl
-      });
-      
-      new URL(normalizedUrl);
-      logger.debug('URL validation passed', { normalizedUrl });
-      
-    } catch (error) {
-      logger.error('URL validation failed', error, {
+
+      logger.debug("Normalizing URL", {
         originalUrl: siteUrl,
         normalizedUrl: normalizedUrl,
-        userId
       });
-      
+
+      new URL(normalizedUrl);
+      logger.debug("URL validation passed", { normalizedUrl });
+    } catch (error) {
+      logger.error("URL validation failed", error, {
+        originalUrl: siteUrl,
+        normalizedUrl: normalizedUrl,
+        userId,
+      });
+
       return res.status(400).json({
         success: false,
-        error: 'Invalid URL format. Please enter a valid domain or URL.'
+        error: "Invalid URL format. Please enter a valid domain or URL.",
       });
     }
 
     // Check if site already exists for this user
-    logger.debug('Checking for existing connection', { userId, normalizedUrl });
-    
+    logger.debug("Checking for existing connection", { userId, normalizedUrl });
+
     const existingConnection = await prisma.siteConnection.findFirst({
       where: {
         userId: userId,
-        siteUrl: normalizedUrl
-      }
+        siteUrl: normalizedUrl,
+      },
     });
 
     if (existingConnection) {
-      logger.warn('Duplicate site connection attempt', {
+      logger.warn("Duplicate site connection attempt", {
         userId,
         normalizedUrl,
-        existingConnectionId: existingConnection.id
+        existingConnectionId: existingConnection.id,
       });
-      
+
       return res.status(409).json({
         success: false,
-        error: 'Site connection already exists'
+        error: "Site connection already exists",
       });
     }
 
@@ -169,67 +186,67 @@ router.post('/', requireAuth, async (req, res) => {
         siteName,
         siteUrl: normalizedUrl,
         platform,
-        status: 'inactive',
+        status: "inactive",
         isActive: false,
-        autoScanEnabled: false
-      }
+        autoScanEnabled: false,
+      },
     });
 
-    logger.info('Site connection created successfully', {
+    logger.info("Site connection created successfully", {
       connectionId: newConnection.id,
       userId,
       siteName,
       siteUrl: normalizedUrl,
       platform,
-      status: 'inactive'
+      status: "inactive",
     });
 
     res.status(201).json({
       success: true,
       data: newConnection,
-      message: 'Site connection created successfully'
+      message: "Site connection created successfully",
     });
   } catch (error) {
-    logger.error('Error creating site connection', error, {
+    logger.error("Error creating site connection", error, {
       userId: req.user?.id,
       requestBody: req.body,
       method: req.method,
-      url: req.url
+      url: req.url,
     });
-    
+
     res.status(500).json({
       success: false,
-      error: 'Failed to create site connection'
+      error: "Failed to create site connection",
     });
   }
 });
 
 // Generate API token for site connection
-router.post('/:id/generate-token', requireAuth, async (req, res) => {
+router.post("/:id/generate-token", requireAuth, async (req, res) => {
   try {
     const userId = req.user.id;
     const connectionId = parseInt(req.params.id);
 
-    logger.info('Generating API token', { userId, connectionId });
+    logger.info("Generating API token", { userId, connectionId });
 
     // Verify connection belongs to user
     const connection = await prisma.siteConnection.findFirst({
       where: {
         id: connectionId,
-        userId: userId
-      }
+        userId: userId,
+      },
     });
 
     if (!connection) {
-      logger.warn('Site connection not found for token generation', {
+      logger.warn("Site connection not found for token generation", {
         userId,
         connectionId,
-        requestedBy: req.user.email
+        requestedBy: req.user.email,
       });
-      
+
       return res.status(404).json({
         success: false,
-        error: 'Site connection not found'
+        error: "Site connection not found",
       });
     }
 
@@ -239,45 +256,45 @@ router.post('/:id/generate-token', requireAuth, async (req, res) => {
     // Update connection with new token
     const updatedConnection = await prisma.siteConnection.update({
       where: {
-        id: connectionId
+        id: connectionId,
       },
       data: {
         apiToken,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
-    logger.info('API token generated successfully', {
+    logger.info("API token generated successfully", {
       connectionId,
       userId,
       siteName: connection.siteName,
       siteUrl: connection.siteUrl,
       platform: connection.platform,
-      tokenPrefix: apiToken.substring(0, 10)
+      tokenPrefix: apiToken.substring(0, 10),
     });
 
     res.json({
       success: true,
       data: updatedConnection,
-      message: 'API token generated successfully'
+      message: "API token generated successfully",
     });
   } catch (error) {
-    logger.error('Error generating API token', error, {
+    logger.error("Error generating API token", error, {
       userId: req.user?.id,
       connectionId: req.params.id,
       method: req.method,
-      url: req.url
+      url: req.url,
     });
-    
+
     res.status(500).json({
       success: false,
-      error: 'Failed to generate API token'
+      error: "Failed to generate API token",
     });
   }
 });
 
 // Toggle connection active status
-router.patch('/:id/toggle', requireAuth, async (req, res) => {
+router.patch("/:id/toggle", requireAuth, async (req, res) => {
   try {
     const userId = req.user.id;
     const connectionId = parseInt(req.params.id);
@@ -286,33 +303,33 @@ router.patch('/:id/toggle', requireAuth, async (req, res) => {
     const connection = await prisma.siteConnection.findFirst({
       where: {
         id: connectionId,
-        userId: userId
-      }
+        userId: userId,
+      },
     });
 
     if (!connection) {
       return res.status(404).json({
         success: false,
-        error: 'Site connection not found'
+        error: "Site connection not found",
       });
     }
 
     // Toggle active status
     const newStatus = !connection.isActive;
-    const statusText = newStatus ? 'active' : 'inactive';
+    const statusText = newStatus ? "active" : "inactive";
 
     const updatedConnection = await prisma.siteConnection.update({
       where: {
-        id: connectionId
+        id: connectionId,
       },
       data: {
         isActive: newStatus,
         status: statusText,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
-    logger.info('Connection status toggled', {
+    logger.info("Connection status toggled", {
       connectionId,
       userId,
       siteName: connection.siteName,
@@ -320,31 +337,31 @@ router.patch('/:id/toggle', requireAuth, async (req, res) => {
       previousStatus: connection.isActive,
       newStatus: newStatus,
       statusText: statusText,
-      autoScanEnabled: connection.autoScanEnabled
+      autoScanEnabled: connection.autoScanEnabled,
     });
 
     res.json({
       success: true,
       data: updatedConnection,
-      message: `Connection ${statusText}`
+      message: `Connection ${statusText}`,
     });
   } catch (error) {
-    logger.error('Error toggling connection status', error, {
+    logger.error("Error toggling connection status", error, {
       userId: req.user?.id,
       connectionId: req.params.id,
       method: req.method,
-      url: req.url
+      url: req.url,
     });
-    
+
     res.status(500).json({
       success: false,
-      error: 'Failed to update connection status'
+      error: "Failed to update connection status",
     });
   }
 });
 
 // Delete site connection
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete("/:id", requireAuth, async (req, res) => {
   try {
     const userId = req.user.id;
     const connectionId = parseInt(req.params.id);
@@ -353,81 +370,81 @@ router.delete('/:id', requireAuth, async (req, res) => {
     const connection = await prisma.siteConnection.findFirst({
       where: {
         id: connectionId,
-        userId: userId
-      }
+        userId: userId,
+      },
     });
 
     if (!connection) {
       return res.status(404).json({
         success: false,
-        error: 'Site connection not found'
+        error: "Site connection not found",
       });
     }
 
     // Delete connection
     await prisma.siteConnection.delete({
       where: {
-        id: connectionId
-      }
+        id: connectionId,
+      },
     });
 
-    logger.info('Site connection deleted', {
+    logger.info("Site connection deleted", {
       connectionId,
       userId,
       siteName: connection.siteName,
       siteUrl: connection.siteUrl,
-      platform: connection.platform
+      platform: connection.platform,
     });
 
     res.json({
       success: true,
-      message: 'Site connection deleted successfully'
+      message: "Site connection deleted successfully",
     });
   } catch (error) {
-    logger.error('Error deleting site connection', error, {
+    logger.error("Error deleting site connection", error, {
       userId: req.user?.id,
       connectionId: req.params.id,
       method: req.method,
-      url: req.url
+      url: req.url,
     });
-    
+
     res.status(500).json({
       success: false,
-      error: 'Failed to delete site connection'
+      error: "Failed to delete site connection",
     });
   }
 });
 
 // WordPress plugin webhook endpoint (public endpoint with API token auth)
-router.post('/webhook/scan', async (req, res) => {
+router.post("/webhook/scan", async (req, res) => {
   try {
-    const { api_token, url, trigger_type = 'manual' } = req.body;
+    const { api_token, url, trigger_type = "manual" } = req.body;
 
     if (!api_token) {
       return res.status(401).json({
         success: false,
-        error: 'API token required'
+        error: "API token required",
       });
     }
 
     // Find connection by API token
     const connection = await prisma.siteConnection.findFirst({
       where: {
-        apiToken: api_token
-      }
+        apiToken: api_token,
+      },
     });
 
     if (!connection) {
       return res.status(401).json({
         success: false,
-        error: 'Invalid API token'
+        error: "Invalid API token",
       });
     }
 
     if (!connection.isActive) {
       return res.status(403).json({
         success: false,
-        error: 'Connection is not active'
+        error: "Connection is not active",
       });
     }
 
@@ -454,12 +471,12 @@ router.post('/webhook/scan', async (req, res) => {
     // Update last scan time
     await prisma.siteConnection.update({
       where: {
-        id: connection.id
+        id: connection.id,
       },
       data: {
         lastScanAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     // TODO: Implement actual WCAG scanning logic here
@@ -472,25 +489,25 @@ router.post('/webhook/scan', async (req, res) => {
         critical: Math.floor(Math.random() * 3),
         serious: Math.floor(Math.random() * 4),
         moderate: Math.floor(Math.random() * 3),
-        minor: Math.floor(Math.random() * 5)
+        minor: Math.floor(Math.random() * 5),
       },
       scanTime: new Date().toISOString(),
       connection: {
         id: connection.id,
-        siteName: connection.siteName
-      }
+        siteName: connection.siteName,
+      },
     };
 
     res.json({
       success: true,
-      message: 'WCAG scan completed successfully',
-      data: mockResults
+      message: "WCAG scan completed successfully",
+      data: mockResults,
     });
   } catch (error) {
-    console.error('Error processing WordPress webhook:', error);
+    console.error("Error processing WordPress webhook:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to process scan request'
+      error: "Failed to process scan request",
     });
   }
 });
