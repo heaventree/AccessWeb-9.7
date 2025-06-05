@@ -83,16 +83,27 @@ router.get('/', requireAuth, async (req, res) => {
 // Create new site connection
 router.post('/', requireAuth, async (req, res) => {
   try {
-    console.log('POST /api/site-connections - Request body:', req.body);
-    console.log('POST /api/site-connections - User:', req.user);
-    
     const userId = req.user.id;
     const { siteName, siteUrl, platform = 'wordpress' } = req.body;
 
+    logger.info('Creating new site connection', {
+      userId,
+      requestBody: req.body,
+      userInfo: {
+        id: req.user.id,
+        email: req.user.email
+      }
+    });
+
     // Validate required fields
-    console.log('Validating fields - siteName:', siteName, 'siteUrl:', siteUrl, 'platform:', platform);
     if (!siteName || !siteUrl) {
-      console.log('Validation failed - missing required fields');
+      logger.warn('Validation failed - missing required fields', {
+        userId,
+        siteName: !!siteName,
+        siteUrl: !!siteUrl,
+        platform
+      });
+      
       return res.status(400).json({
         success: false,
         error: 'Site name and URL are required'
@@ -106,11 +117,22 @@ router.post('/', requireAuth, async (req, res) => {
       if (!siteUrl.startsWith('http://') && !siteUrl.startsWith('https://')) {
         normalizedUrl = 'https://' + siteUrl;
       }
-      console.log('Normalizing URL:', siteUrl, '->', normalizedUrl);
+      
+      logger.debug('Normalizing URL', {
+        originalUrl: siteUrl,
+        normalizedUrl: normalizedUrl
+      });
+      
       new URL(normalizedUrl);
-      console.log('URL validation passed for:', normalizedUrl);
+      logger.debug('URL validation passed', { normalizedUrl });
+      
     } catch (error) {
-      console.log('URL validation failed for:', normalizedUrl, 'Error:', error.message);
+      logger.error('URL validation failed', error, {
+        originalUrl: siteUrl,
+        normalizedUrl: normalizedUrl,
+        userId
+      });
+      
       return res.status(400).json({
         success: false,
         error: 'Invalid URL format. Please enter a valid domain or URL.'
@@ -118,6 +140,8 @@ router.post('/', requireAuth, async (req, res) => {
     }
 
     // Check if site already exists for this user
+    logger.debug('Checking for existing connection', { userId, normalizedUrl });
+    
     const existingConnection = await prisma.siteConnection.findFirst({
       where: {
         userId: userId,
@@ -126,6 +150,12 @@ router.post('/', requireAuth, async (req, res) => {
     });
 
     if (existingConnection) {
+      logger.warn('Duplicate site connection attempt', {
+        userId,
+        normalizedUrl,
+        existingConnectionId: existingConnection.id
+      });
+      
       return res.status(409).json({
         success: false,
         error: 'Site connection already exists'
@@ -145,15 +175,14 @@ router.post('/', requireAuth, async (req, res) => {
       }
     });
 
-    console.log(`\n🌐 NEW SITE CONNECTION CREATED`);
-    console.log(`════════════════════════════════`);
-    console.log(`📝 Site Name: ${siteName}`);
-    console.log(`🔗 URL: ${siteUrl}`);
-    console.log(`⚙️  Platform: ${platform}`);
-    console.log(`👤 User ID: ${userId}`);
-    console.log(`🆔 Connection ID: ${newConnection.id}`);
-    console.log(`📊 Status: INACTIVE (awaiting configuration)`);
-    console.log(`════════════════════════════════\n`);
+    logger.info('Site connection created successfully', {
+      connectionId: newConnection.id,
+      userId,
+      siteName,
+      siteUrl: normalizedUrl,
+      platform,
+      status: 'inactive'
+    });
 
     res.status(201).json({
       success: true,
@@ -161,7 +190,13 @@ router.post('/', requireAuth, async (req, res) => {
       message: 'Site connection created successfully'
     });
   } catch (error) {
-    console.error('Error creating site connection:', error);
+    logger.error('Error creating site connection', error, {
+      userId: req.user?.id,
+      requestBody: req.body,
+      method: req.method,
+      url: req.url
+    });
+    
     res.status(500).json({
       success: false,
       error: 'Failed to create site connection'
@@ -175,6 +210,8 @@ router.post('/:id/generate-token', requireAuth, async (req, res) => {
     const userId = req.user.id;
     const connectionId = parseInt(req.params.id);
 
+    logger.info('Generating API token', { userId, connectionId });
+
     // Verify connection belongs to user
     const connection = await prisma.siteConnection.findFirst({
       where: {
@@ -184,6 +221,12 @@ router.post('/:id/generate-token', requireAuth, async (req, res) => {
     });
 
     if (!connection) {
+      logger.warn('Site connection not found for token generation', {
+        userId,
+        connectionId,
+        requestedBy: req.user.email
+      });
+      
       return res.status(404).json({
         success: false,
         error: 'Site connection not found'
@@ -204,15 +247,14 @@ router.post('/:id/generate-token', requireAuth, async (req, res) => {
       }
     });
 
-    console.log(`\n🔑 API TOKEN GENERATED`);
-    console.log(`════════════════════════════════`);
-    console.log(`📝 Site: ${connection.siteName}`);
-    console.log(`🔗 URL: ${connection.siteUrl}`);
-    console.log(`🔐 Token: ${apiToken.substring(0, 20)}...`);
-    console.log(`⚙️  Platform: ${connection.platform}`);
-    console.log(`🆔 Connection ID: ${connectionId}`);
-    console.log(`✅ Ready for WordPress plugin configuration`);
-    console.log(`════════════════════════════════\n`);
+    logger.info('API token generated successfully', {
+      connectionId,
+      userId,
+      siteName: connection.siteName,
+      siteUrl: connection.siteUrl,
+      platform: connection.platform,
+      tokenPrefix: apiToken.substring(0, 10)
+    });
 
     res.json({
       success: true,
@@ -220,7 +262,13 @@ router.post('/:id/generate-token', requireAuth, async (req, res) => {
       message: 'API token generated successfully'
     });
   } catch (error) {
-    console.error('Error generating API token:', error);
+    logger.error('Error generating API token', error, {
+      userId: req.user?.id,
+      connectionId: req.params.id,
+      method: req.method,
+      url: req.url
+    });
+    
     res.status(500).json({
       success: false,
       error: 'Failed to generate API token'
