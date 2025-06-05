@@ -16,7 +16,7 @@ router.use(authenticateToken);
 router.post('/trigger/:connectionId', logRequest, async (req, res) => {
   try {
     const { connectionId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     console.log(`🔍 [SCANNER] Manual scan trigger requested for connection ${connectionId} by user ${userId}`);
 
@@ -38,10 +38,8 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
       });
     }
 
-    // Import the job queue system
-    const { SiteScannerJobQueue } = await import('../jobs/siteScanner.js');
-    const jobQueue = new SiteScannerJobQueue();
-    await jobQueue.initialize();
+    // Import the job queue singleton
+    const siteScannerQueue = (await import('../jobs/siteScanner.js')).default;
 
     // Trigger immediate scan job
     const jobData = {
@@ -54,7 +52,7 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
       triggeredBy: 'user'
     };
 
-    const jobId = await jobQueue.triggerManualScan(jobData);
+    const jobId = await siteScannerQueue.triggerManualScan(jobData);
 
     console.log(`✅ [SCANNER] Manual scan job ${jobId} queued for ${connection.siteName}`);
 
@@ -87,7 +85,7 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
 router.get('/history/:connectionId', logRequest, async (req, res) => {
   try {
     const { connectionId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const { limit = 10, offset = 0 } = req.query;
 
     // Verify the connection belongs to the authenticated user
@@ -144,7 +142,7 @@ router.get('/history/:connectionId', logRequest, async (req, res) => {
 router.get('/status/:connectionId', logRequest, async (req, res) => {
   try {
     const { connectionId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     // Verify the connection belongs to the authenticated user
     const connection = await prisma.siteConnection.findFirst({
