@@ -141,6 +141,9 @@ import siteConnectionsRouter from './routes/siteConnections.js';
 // Import scanner routes
 import scannerRouter from './routes/scanner.js';
 
+// Import and initialize job queue system
+import siteScannerQueue from './jobs/siteScanner.js';
+
 // API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/accessibility', accessibilityRouter);
@@ -284,11 +287,11 @@ app.listen(PORT, '0.0.0.0', async () => {
     logger.error('Failed to start subscription expiry checker', error);
   }
   
-  // Initialize site scanner job queue (temporarily disabled)
-  // try {
-  //   await siteScannerQueue.initialize();
-  //   logger.info('Site scanner job queue initialized successfully');
-  // } catch (error) {
-  //   logger.error('Failed to initialize site scanner job queue', error);
-  // }
+  // Initialize site scanner job queue
+  try {
+    await siteScannerQueue.initialize();
+    logger.info('Site scanner job queue initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize site scanner job queue', error);
+  }
 });

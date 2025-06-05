@@ -40,6 +40,11 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
 
     // Import the job queue singleton
     const siteScannerQueue = (await import('../jobs/siteScanner.js')).default;
+    
+    // Ensure job queue is initialized
+    if (!siteScannerQueue.boss) {
+      await siteScannerQueue.initialize();
+    }
 
     // Trigger immediate scan job
     const jobData = {
