@@ -140,6 +140,7 @@ function App() {
               <Route path="/tools/image-alt-scanner" element={<><Navigation /><main id="main-content"><ImageAltScannerPage /></main><Footer /><BackToTop /></>} />
               <Route path="/ui-demo" element={<><Navigation /><main id="main-content"><UiDemo /></main><Footer /><BackToTop /></>} />
               <Route path="/integrations" element={<><Navigation /><main id="main-content"><Integrations /></main><Footer /><BackToTop /></>} />
+              <Route path="/connections" element={<ProtectedRoute><><Navigation /><main id="main-content"><ConnectionsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               <Route path="/site-connections" element={<ProtectedRoute><><Navigation /><main id="main-content"><SiteConnectionsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               
               {/* Auth Routes */}

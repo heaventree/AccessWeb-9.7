@@ -312,14 +312,16 @@ router.patch('/:id/toggle', requireAuth, async (req, res) => {
       }
     });
 
-    console.log(`\n⚡ CONNECTION STATUS UPDATED`);
-    console.log(`════════════════════════════════`);
-    console.log(`📝 Site: ${connection.siteName}`);
-    console.log(`🔗 URL: ${connection.siteUrl}`);
-    console.log(`📊 Status: ${statusText.toUpperCase()}`);
-    console.log(`🔄 Auto-scan: ${connection.autoScanEnabled ? 'ENABLED' : 'DISABLED'}`);
-    console.log(`🆔 Connection ID: ${connectionId}`);
-    console.log(`════════════════════════════════\n`);
+    logger.info('Connection status toggled', {
+      connectionId,
+      userId,
+      siteName: connection.siteName,
+      siteUrl: connection.siteUrl,
+      previousStatus: connection.isActive,
+      newStatus: newStatus,
+      statusText: statusText,
+      autoScanEnabled: connection.autoScanEnabled
+    });
 
     res.json({
       success: true,
@@ -327,7 +329,13 @@ router.patch('/:id/toggle', requireAuth, async (req, res) => {
       message: `Connection ${statusText}`
     });
   } catch (error) {
-    console.error('Error toggling connection status:', error);
+    logger.error('Error toggling connection status', error, {
+      userId: req.user?.id,
+      connectionId: req.params.id,
+      method: req.method,
+      url: req.url
+    });
+    
     res.status(500).json({
       success: false,
       error: 'Failed to update connection status'
@@ -363,20 +371,26 @@ router.delete('/:id', requireAuth, async (req, res) => {
       }
     });
 
-    console.log(`\n🗑️  SITE CONNECTION DELETED`);
-    console.log(`════════════════════════════════`);
-    console.log(`📝 Site: ${connection.siteName}`);
-    console.log(`🔗 URL: ${connection.siteUrl}`);
-    console.log(`🆔 Connection ID: ${connectionId}`);
-    console.log(`👤 User ID: ${userId}`);
-    console.log(`════════════════════════════════\n`);
+    logger.info('Site connection deleted', {
+      connectionId,
+      userId,
+      siteName: connection.siteName,
+      siteUrl: connection.siteUrl,
+      platform: connection.platform
+    });
 
     res.json({
       success: true,
       message: 'Site connection deleted successfully'
     });
   } catch (error) {
-    console.error('Error deleting site connection:', error);
+    logger.error('Error deleting site connection', error, {
+      userId: req.user?.id,
+      connectionId: req.params.id,
+      method: req.method,
+      url: req.url
+    });
+    
     res.status(500).json({
       success: false,
       error: 'Failed to delete site connection'
