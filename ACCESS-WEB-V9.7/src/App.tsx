@@ -159,6 +159,7 @@ function App() {
                 <Route path="connections/custom-api" element={<CustomAPIPage />} />
                 <Route path="connections/shopify" element={<ShopifyAPIPage />} />
                 <Route path="connections/wordpress" element={<WordPressAPIPage />} />
+                <Route path="connections/wordpress/:id" element={<WordPressAPIPage />} />
                 <Route path="billing" element={<BillingPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="team" element={<TeamPage />} />

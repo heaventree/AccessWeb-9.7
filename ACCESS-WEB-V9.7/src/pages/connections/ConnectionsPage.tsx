@@ -202,7 +202,7 @@ export function ConnectionsPage() {
         name: connection.siteName || 'Unnamed Connection',
         description: connection.siteUrl || 'No URL provided',
         icon: integration?.icon || Globe,
-        path: `/my-account/connections/${connection.platform}`,
+        path: `/my-account/connections/${connection.platform}/${connection.id}`,
         status: connection.isActive ? 'Active' : 'Inactive',
         features: Array.isArray(integration?.features) ? integration.features : [],
         hasApiToken: !!(connection.apiToken),

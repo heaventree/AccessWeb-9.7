@@ -221,6 +221,65 @@ router.post("/", requireAuth, async (req, res) => {
   }
 });
 
+// Get individual site connection
+router.get("/:id", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const connectionId = parseInt(req.params.id);
+
+    logger.info("Fetching individual site connection", { userId, connectionId });
+
+    // Verify connection belongs to user
+    const connection = await prisma.siteConnection.findFirst({
+      where: {
+        id: connectionId,
+        userId: userId,
+      },
+    });
+
+    if (!connection) {
+      logger.warn("Site connection not found", {
+        userId,
+        connectionId,
+        requestedBy: req.user.email,
+      });
+
+      return res.status(404).json({
+        success: false,
+        error: "Site connection not found",
+      });
+    }
+
+    logger.info("Site connection fetched successfully", {
+      connectionId,
+      userId,
+      siteName: connection.siteName,
+      siteUrl: connection.siteUrl,
+      platform: connection.platform,
+      status: connection.status ? "active" : "inactive",
+      hasApiToken: !!connection.apiToken,
+    });
+
+    res.json({
+      success: true,
+      data: connection,
+      message: "Site connection fetched successfully",
+    });
+  } catch (error) {
+    logger.error("Error fetching site connection", error, {
+      userId: req.user?.id,
+      connectionId: req.params.id,
+      method: req.method,
+      url: req.url,
+    });
+
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch site connection",
+    });
+  }
+});
+
 // Generate API token for site connection
 router.post("/:id/generate-token", requireAuth, async (req, res) => {
   try {
@@ -289,6 +348,81 @@ router.post("/:id/generate-token", requireAuth, async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Failed to generate API token",
+    });
+  }
+});
+
+// Update site connection settings
+router.patch("/:id", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const connectionId = parseInt(req.params.id);
+    const { scanFrequency, autoScanEnabled, siteName, siteUrl } = req.body;
+
+    logger.info("Updating site connection", { userId, connectionId, updateData: req.body });
+
+    // Verify connection belongs to user
+    const connection = await prisma.siteConnection.findFirst({
+      where: {
+        id: connectionId,
+        userId: userId,
+      },
+    });
+
+    if (!connection) {
+      logger.warn("Site connection not found for update", {
+        userId,
+        connectionId,
+        requestedBy: req.user.email,
+      });
+
+      return res.status(404).json({
+        success: false,
+        error: "Site connection not found",
+      });
+    }
+
+    // Update connection
+    const updatedConnection = await prisma.siteConnection.update({
+      where: {
+        id: connectionId,
+      },
+      data: {
+        ...(scanFrequency && { scanFrequency }),
+        ...(typeof autoScanEnabled === 'boolean' && { autoScanEnabled }),
+        ...(siteName && { siteName }),
+        ...(siteUrl && { siteUrl }),
+        updatedAt: new Date(),
+      },
+    });
+
+    logger.info("Site connection updated successfully", {
+      connectionId,
+      userId,
+      siteName: updatedConnection.siteName,
+      siteUrl: updatedConnection.siteUrl,
+      platform: updatedConnection.platform,
+      scanFrequency: updatedConnection.scanFrequency,
+      autoScanEnabled: updatedConnection.autoScanEnabled,
+    });
+
+    res.json({
+      success: true,
+      data: updatedConnection,
+      message: "Site connection updated successfully",
+    });
+  } catch (error) {
+    logger.error("Error updating site connection", error, {
+      userId: req.user?.id,
+      connectionId: req.params.id,
+      requestBody: req.body,
+      method: req.method,
+      url: req.url,
+    });
+
+    res.status(500).json({
+      success: false,
+      error: "Failed to update site connection",
     });
   }
 });
