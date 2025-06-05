@@ -48,6 +48,7 @@ import {
   createPaymentIntent,
   getPaymentHistory
 } from '../api/subscriptions.js';
+import siteScannerQueue from './jobs/siteScanner.js';
 import { cancelSubscription } from '../api/subscription-cancel.js';
 import { handleStripeWebhook } from '../api/webhooks.js';
 import { requireAdmin } from '../middleware/adminAuth.js';
@@ -161,6 +162,55 @@ app.post('/api/subscription/payment-intent', requireAuth, createPaymentIntent);
 app.get('/api/subscription/payment-history', requireAuth, getPaymentHistory);
 app.post('/api/subscription/cancel', requireAuth, cancelSubscription);
 
+// Site Scanner Job Queue Routes
+app.get('/api/scanner/stats', requireAuth, async (req, res) => {
+  try {
+    const stats = await siteScannerQueue.getJobStats();
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    logger.error('Failed to get scanner stats', error);
+    res.status(500).json({ success: false, error: 'Failed to get scanner stats' });
+  }
+});
+
+app.post('/api/scanner/trigger/:connectionId', requireAuth, async (req, res) => {
+  try {
+    const connectionId = parseInt(req.params.connectionId);
+    const userId = req.user.id;
+    
+    // Verify connection belongs to user
+    const connection = await prisma.siteConnection.findFirst({
+      where: { id: connectionId, userId: userId }
+    });
+    
+    if (!connection) {
+      return res.status(404).json({ success: false, error: 'Site connection not found' });
+    }
+    
+    // Trigger immediate scan
+    const jobData = {
+      connectionId: connection.id,
+      userId: connection.userId,
+      siteName: connection.siteName,
+      siteUrl: connection.siteUrl,
+      platform: connection.platform,
+      frequency: 'manual'
+    };
+    
+    await siteScannerQueue.boss.send('site-accessibility-scan', jobData);
+    
+    res.json({ 
+      success: true, 
+      message: 'Manual scan triggered successfully',
+      data: { connectionId, siteName: connection.siteName }
+    });
+    
+  } catch (error) {
+    logger.error('Failed to trigger manual scan', error);
+    res.status(500).json({ success: false, error: 'Failed to trigger scan' });
+  }
+});
+
 // Global error handler with enhanced logging
 app.use((err, req, res, next) => {
   logger.error('Unhandled application error', {
@@ -207,7 +257,7 @@ process.on('uncaughtException', (error) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
   logger.info(`API Server running on port ${PORT}`, {
     environment: process.env.NODE_ENV || 'development',
     port: PORT,
@@ -228,5 +278,13 @@ app.listen(PORT, '0.0.0.0', () => {
     logger.info('Subscription expiry checker started successfully');
   } catch (error) {
     logger.error('Failed to start subscription expiry checker', error);
+  }
+  
+  // Initialize site scanner job queue
+  try {
+    await siteScannerQueue.initialize();
+    logger.info('Site scanner job queue initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize site scanner job queue', error);
   }
 });
