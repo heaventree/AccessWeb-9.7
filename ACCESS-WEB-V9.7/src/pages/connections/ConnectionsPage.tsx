@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Code, Store, Globe, ArrowRight, Plus, PlugZap } from 'lucide-react';
+import { Code, Store, Globe, ArrowRight, Plus, PlugZap, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import apiClient from '../../lib/apiClient';
 
@@ -233,8 +233,74 @@ export function ConnectionsPage() {
             Your Connections & Available Integrations
           </h2>
         </div>
-        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-          {getAllConnections().map((connection) => (
+        
+        {getAllConnections().length === 0 ? (
+          // Empty State
+          <div className="text-center py-16 px-6">
+            <div className="mx-auto mb-6">
+              <div className="relative">
+                <div className="mx-auto h-24 w-24 rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center mb-6">
+                  <PlugZap className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div className="absolute -top-1 -right-1">
+                  <div className="h-6 w-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                    <Plus className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
+              No connections yet
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
+              Connect your websites to start monitoring their accessibility and get automated insights and improvements.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+              <button 
+                onClick={() => setShowAddModal(true)}
+                className="inline-flex items-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Add Your First Connection
+              </button>
+              
+              <button className="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                <FileText className="h-5 w-5 mr-2" />
+                View Documentation
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+              <div className="text-center">
+                <div className="mx-auto h-12 w-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
+                  <Globe className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">WordPress Sites</h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Plugin-based integration with real-time monitoring</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="mx-auto h-12 w-12 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center mb-3">
+                  <Store className="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Shopify Stores</h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Theme accessibility testing and optimization</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="mx-auto h-12 w-12 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center mb-3">
+                  <Code className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Custom APIs</h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400">RESTful API access with custom implementation</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+            {getAllConnections().map((connection) => (
             <li key={connection.id}>
               <div className="px-4 py-4 sm:px-6">
                 <div className="flex items-center justify-between">
@@ -336,7 +402,8 @@ export function ConnectionsPage() {
               </div>
             </li>
           ))}
-        </ul>
+          </ul>
+        )}
       </div>
 
       {/* Add New Connection Modal */}
