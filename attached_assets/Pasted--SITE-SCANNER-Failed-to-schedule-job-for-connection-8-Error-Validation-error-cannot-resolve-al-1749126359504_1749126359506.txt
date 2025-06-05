@@ -1,0 +1,28 @@
+❌ [SITE-SCANNER] Failed to schedule job for connection 8: Error: Validation error, cannot resolve alias "obj"
+    at /home/runner/workspace/node_modules/cron-parser/lib/expression.js:169:17
+    at String.replace (<anonymous>)
+    at Function._parseField (/home/runner/workspace/node_modules/cron-parser/lib/expression.js:163:21)
+    at parse (/home/runner/workspace/node_modules/cron-parser/lib/expression.js:885:36)
+    at Function.parse (/home/runner/workspace/node_modules/cron-parser/lib/expression.js:938:10)
+    at Function.parseExpression (/home/runner/workspace/node_modules/cron-parser/lib/parser.js:41:25)
+    at Timekeeper.schedule (/home/runner/workspace/node_modules/pg-boss/src/timekeeper.js:174:16)
+    at <computed> [as schedule] (/home/runner/workspace/node_modules/pg-boss/src/index.js:105:43)
+    at SiteScannerJobQueue.syncSchedules (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/jobs/siteScanner.js:207:27)
+    at async SiteScannerJobQueue.initialize (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/jobs/siteScanner.js:38:7)
+✅ [SITE-SCANNER] Schedule sync completed - Active jobs: 0
+⏰ [SITE-SCANNER] Schedule sync interval set to 300 seconds
+[2025-06-05T12:20:52.157Z] [INFO] Site scanner job queue initialized successfully 
+🔄 [SITE-SCANNER] Syncing schedules with database...
+📋 [SITE-SCANNER] Found 1 active connections with auto-scan enabled
+❌ [SITE-SCANNER] Failed to schedule job for connection 8: Error: Validation error, cannot resolve alias "obj"
+    at /home/runner/workspace/node_modules/cron-parser/lib/expression.js:169:17
+    at String.replace (<anonymous>)
+    at Function._parseField (/home/runner/workspace/node_modules/cron-parser/lib/expression.js:163:21)
+    at parse (/home/runner/workspace/node_modules/cron-parser/lib/expression.js:885:36)
+    at Function.parse (/home/runner/workspace/node_modules/cron-parser/lib/expression.js:938:10)
+    at Function.parseExpression (/home/runner/workspace/node_modules/cron-parser/lib/parser.js:41:25)
+    at Timekeeper.schedule (/home/runner/workspace/node_modules/pg-boss/src/timekeeper.js:174:16)
+    at <computed> [as schedule] (/home/runner/workspace/node_modules/pg-boss/src/index.js:105:43)
+    at SiteScannerJobQueue.syncSchedules (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/jobs/siteScanner.js:207:27)
+    at async Timeout._onTimeout (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/jobs/siteScanner.js:42:9)
+✅ [SITE-SCANNER] Schedule sync completed - Active jobs: 0

@@ -179,7 +179,7 @@ class SiteScannerJobQueue {
 
       // Convert scan frequency to cron expression
       const frequencyToCron = {
-        'testing': '*/15 * * * *',    // Every 15 seconds (for testing) - using 5-field format
+        'testing': '*/1 * * * *',     // Every 1 minute (testing - closest valid cron)
         'daily': '0 9 * * *',         // Daily at 9 AM
         'weekly': '0 9 * * 1',        // Weekly on Monday at 9 AM  
         'monthly': '0 9 1 * *'        // Monthly on 1st at 9 AM
