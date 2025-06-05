@@ -189,4 +189,93 @@ router.get('/status/:connectionId', logRequest, async (req, res) => {
   }
 });
 
+/**
+ * Stop the 15-second testing schedule
+ * POST /api/scanner/schedule/stop
+ */
+router.post('/schedule/stop', logRequest, async (req, res) => {
+  try {
+    const siteScannerQueue = (await import('../jobs/siteScanner.js')).default;
+    
+    if (!siteScannerQueue.boss) {
+      await siteScannerQueue.initialize();
+    }
+
+    siteScannerQueue.stopTestingSchedule();
+    
+    console.log('🛑 [SCANNER] 15-second testing schedule stopped by user');
+    
+    res.json({
+      success: true,
+      message: 'Testing schedule stopped successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ [SCANNER] Error stopping schedule:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to stop testing schedule'
+    });
+  }
+});
+
+/**
+ * Start the 15-second testing schedule
+ * POST /api/scanner/schedule/start
+ */
+router.post('/schedule/start', logRequest, async (req, res) => {
+  try {
+    const siteScannerQueue = (await import('../jobs/siteScanner.js')).default;
+    
+    if (!siteScannerQueue.boss) {
+      await siteScannerQueue.initialize();
+    }
+
+    siteScannerQueue.startTestingSchedule();
+    
+    console.log('▶️ [SCANNER] 15-second testing schedule started by user');
+    
+    res.json({
+      success: true,
+      message: 'Testing schedule started successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ [SCANNER] Error starting schedule:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to start testing schedule'
+    });
+  }
+});
+
+/**
+ * Get testing schedule status
+ * GET /api/scanner/schedule/status
+ */
+router.get('/schedule/status', logRequest, async (req, res) => {
+  try {
+    const siteScannerQueue = (await import('../jobs/siteScanner.js')).default;
+    
+    if (!siteScannerQueue.boss) {
+      await siteScannerQueue.initialize();
+    }
+
+    const isRunning = siteScannerQueue.isTestingScheduleRunning();
+    
+    res.json({
+      success: true,
+      running: isRunning,
+      interval: '15 seconds'
+    });
+
+  } catch (error) {
+    console.error('❌ [SCANNER] Error checking schedule status:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to check schedule status'
+    });
+  }
+});
+
 export default router;

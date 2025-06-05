@@ -134,6 +134,7 @@ export const JobQueueTester: React.FC<JobQueueTesterProps> = ({ connectionId = 8
   };
 
   useEffect(() => {
+    checkScheduleStatus();
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
@@ -211,6 +212,43 @@ export const JobQueueTester: React.FC<JobQueueTesterProps> = ({ connectionId = 8
         >
           {isRunning ? 'Stop Testing' : 'Start Testing'}
         </button>
+      </div>
+
+      <div className="bg-gray-50 p-4 rounded-lg mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-sm font-medium text-gray-900">15-Second Auto Schedule</h4>
+            <p className="text-xs text-gray-600">Controls the automated 15-second testing schedule</p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+              scheduleStatus === 'running' 
+                ? 'bg-green-100 text-green-800' 
+                : scheduleStatus === 'stopped'
+                ? 'bg-red-100 text-red-800'
+                : 'bg-yellow-100 text-yellow-800'
+            }`}>
+              {scheduleStatus === 'loading' ? 'Loading...' : scheduleStatus === 'running' ? 'Running' : 'Stopped'}
+            </div>
+            {scheduleStatus === 'running' ? (
+              <button
+                onClick={stopSchedule}
+                disabled={scheduleStatus === 'loading'}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md font-medium disabled:opacity-50"
+              >
+                Stop Schedule
+              </button>
+            ) : (
+              <button
+                onClick={startSchedule}
+                disabled={scheduleStatus === 'loading'}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-md font-medium disabled:opacity-50"
+              >
+                Start Schedule
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="border border-gray-200 rounded-lg">

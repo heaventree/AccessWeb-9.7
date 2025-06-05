@@ -299,6 +299,27 @@ class SiteScannerJobQueue {
     }
   }
 
+  stopTestingSchedule() {
+    if (this.testingIntervalId) {
+      clearInterval(this.testingIntervalId);
+      this.testingIntervalId = null;
+      console.log('🛑 [SITE-SCANNER] 15-second testing schedule stopped');
+    }
+  }
+
+  startTestingSchedule() {
+    if (!this.testingIntervalId) {
+      this.testingIntervalId = setInterval(() => {
+        this.triggerTestingScans();
+      }, TESTING_INTERVAL_MS);
+      console.log('▶️ [SITE-SCANNER] 15-second testing schedule started');
+    }
+  }
+
+  isTestingScheduleRunning() {
+    return this.testingIntervalId !== null;
+  }
+
   async getJobStats() {
     try {
       if (!this.boss) return null;
