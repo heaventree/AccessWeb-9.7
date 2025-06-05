@@ -179,9 +179,10 @@ class SiteScannerJobQueue {
 
       // Convert scan frequency to cron expression
       const frequencyToCron = {
-        'daily': '0 9 * * *',     // Daily at 9 AM
-        'weekly': '0 9 * * 1',    // Weekly on Monday at 9 AM  
-        'monthly': '0 9 1 * *'    // Monthly on 1st at 9 AM
+        'testing': '*/15 * * * * *',  // Every 15 seconds (for testing)
+        'daily': '0 9 * * *',         // Daily at 9 AM
+        'weekly': '0 9 * * 1',        // Weekly on Monday at 9 AM  
+        'monthly': '0 9 1 * *'        // Monthly on 1st at 9 AM
       };
 
       // Track current connections for cleanup
@@ -283,6 +284,30 @@ class SiteScannerJobQueue {
       console.log('✅ [SITE-SCANNER] Job queue shutdown completed');
     } catch (error) {
       console.error('❌ [SITE-SCANNER] Error during shutdown:', error);
+    }
+  }
+
+  // Manual scan trigger method
+  async triggerManualScan(jobData) {
+    try {
+      if (!this.boss) {
+        throw new Error('Job queue not initialized');
+      }
+
+      // Queue immediate manual scan job with high priority
+      const jobId = await this.boss.send(JOB_QUEUE_NAME, jobData, {
+        priority: 10, // High priority for manual scans
+        retryLimit: 2,
+        retryDelay: 5000,
+        expireInMinutes: 5
+      });
+
+      console.log(`🚀 [SITE-SCANNER] Manual scan job ${jobId} queued for ${jobData.siteName}`);
+      return jobId;
+
+    } catch (error) {
+      console.error('❌ [SITE-SCANNER] Failed to trigger manual scan:', error);
+      throw error;
     }
   }
 

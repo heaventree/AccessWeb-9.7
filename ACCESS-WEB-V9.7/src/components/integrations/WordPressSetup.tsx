@@ -416,8 +416,7 @@ export function WordPressSetup() {
                   className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                   style={{ maxWidth: '280px' }}
                 >
-                  <option value="realtime">Real-time</option>
-                  <option value="hourly">Hourly</option>
+                  <option value="testing">Testing (15 seconds)</option>
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>

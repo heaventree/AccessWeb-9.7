@@ -138,10 +138,14 @@ app.get('/api/health', async (req, res) => {
 // Import site connections router at the top
 import siteConnectionsRouter from './routes/siteConnections.js';
 
+// Import scanner routes
+import scannerRouter from './routes/scanner.js';
+
 // API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/accessibility', accessibilityRouter);
 app.use('/api/site-connections', siteConnectionsRouter);
+app.use('/api/scanner', scannerRouter);
 
 // Pricing Plans Routes
 app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed

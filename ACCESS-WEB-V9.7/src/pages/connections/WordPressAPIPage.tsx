@@ -458,6 +458,7 @@ export function WordPressAPIPage() {
                       onChange={(e) => setSettings({ ...settings, scanFrequency: e.target.value })}
                       className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                     >
+                      <option value="testing">Testing (15 seconds)</option>
                       <option value="daily">Daily</option>
                       <option value="weekly">Weekly</option>
                       <option value="monthly">Monthly</option>
