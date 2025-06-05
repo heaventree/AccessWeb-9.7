@@ -118,9 +118,10 @@ export function WordPressAPIPage() {
         setConnection(prev => prev ? { ...prev, isActive: !prev.isActive } : null);
         toast.success(`Connection ${connection.isActive ? 'deactivated' : 'activated'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error toggling status:', error);
-      toast.error('Failed to update connection status');
+      const errorMessage = error.response?.data?.error || 'Failed to update connection status';
+      toast.error(errorMessage);
     } finally {
       setUpdating(false);
     }

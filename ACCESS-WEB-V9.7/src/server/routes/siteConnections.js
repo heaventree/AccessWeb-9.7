@@ -448,6 +448,14 @@ router.patch("/:id/toggle", requireAuth, async (req, res) => {
       });
     }
 
+    // Check if trying to activate without API key
+    if (!connection.isActive && !connection.apiToken) {
+      return res.status(400).json({
+        success: false,
+        error: "Cannot activate connection without an API key. Please generate an API key first.",
+      });
+    }
+
     // Toggle active status
     const newStatus = !connection.isActive;
     const statusText = newStatus ? "active" : "inactive";
