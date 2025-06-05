@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Globe, Key, Download, FileText, Settings, Activity, RefreshCw, CheckCircle, AlertCircle, Info, HelpCircle, Book } from 'lucide-react';
+import { ArrowLeft, Globe, Key, Download, FileText, Settings, Activity, RefreshCw, CheckCircle, AlertCircle, Info, HelpCircle, Book, Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import apiClient from '../../lib/apiClient';
 import { motion } from 'framer-motion';
@@ -26,6 +26,7 @@ export function WordPressAPIPage() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [scanningInProgress, setScanningInProgress] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [settings, setSettings] = useState({
@@ -149,6 +150,24 @@ export function WordPressAPIPage() {
       toast.error('Failed to update settings');
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handleTriggerManualScan = async () => {
+    if (!connection) return;
+    
+    setScanningInProgress(true);
+    try {
+      const response = await apiClient.post(`/scanner/trigger/${connection.id}`);
+      if (response.data.success) {
+        toast.success('Accessibility scan started! Results will be available shortly.');
+      }
+    } catch (error: any) {
+      console.error('Error triggering scan:', error);
+      const errorMessage = error.response?.data?.error || 'Failed to trigger accessibility scan';
+      toast.error(errorMessage);
+    } finally {
+      setScanningInProgress(false);
     }
   };
 
@@ -342,23 +361,43 @@ export function WordPressAPIPage() {
                     </div>
                   </div>
                   
-                  <button
-                    onClick={handleGenerateApiKey}
-                    disabled={generating}
-                    className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    {generating ? (
-                      <>
-                        <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
-                        Regenerating...
-                      </>
-                    ) : (
-                      <>
-                        <RefreshCw className="-ml-1 mr-2 h-5 w-5" />
-                        Regenerate API Key
-                      </>
-                    )}
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button
+                      onClick={handleTriggerManualScan}
+                      disabled={scanningInProgress}
+                      className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                    >
+                      {scanningInProgress ? (
+                        <>
+                          <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                          Scanning...
+                        </>
+                      ) : (
+                        <>
+                          <Search className="-ml-1 mr-2 h-5 w-5" />
+                          Run Accessibility Scan
+                        </>
+                      )}
+                    </button>
+                    
+                    <button
+                      onClick={handleGenerateApiKey}
+                      disabled={generating}
+                      className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      {generating ? (
+                        <>
+                          <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                          Regenerating...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="-ml-1 mr-2 h-5 w-5" />
+                          Regenerate API Key
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-8">
