@@ -69,76 +69,93 @@ export function WordPressSetup() {
         throw new Error('Not authenticated. Please log in again.');
       }
 
+      console.log('Starting WordPress API key generation...');
+      
       // Check if we have existing WordPress site connections
+      console.log('Fetching existing site connections...');
       const connectionsResponse = await fetch('/api/site-connections', {
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }
       });
 
-      if (connectionsResponse.ok) {
-        const connectionsResult = await connectionsResponse.json();
-        const wordpressConnections = connectionsResult.data.filter(conn => conn.platform === 'wordpress');
-        
-        let connectionId;
-        
-        if (wordpressConnections.length > 0) {
-          // Use the first WordPress connection
-          connectionId = wordpressConnections[0].id;
-        } else {
-          // Create a default WordPress connection
-          const createResponse = await fetch('/api/site-connections', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-              siteName: 'WordPress Integration',
-              siteUrl: 'https://your-wordpress-site.com',
-              platform: 'wordpress',
-              scanFrequency: 'weekly',
-              autoScanEnabled: true
-            })
-          });
+      if (!connectionsResponse.ok) {
+        const errorText = await connectionsResponse.text();
+        console.error('Failed to fetch connections:', connectionsResponse.status, errorText);
+        throw new Error(`Failed to fetch site connections: ${connectionsResponse.status}`);
+      }
 
-          if (createResponse.ok) {
-            const createResult = await createResponse.json();
-            connectionId = createResult.data.id;
-          } else {
-            throw new Error('Failed to create WordPress connection');
-          }
-        }
-
-        // Generate API token using the backend API
-        const tokenResponse = await fetch(`/api/site-connections/${connectionId}/generate-token`, {
+      const connectionsResult = await connectionsResponse.json();
+      console.log('Connections fetched:', connectionsResult);
+      
+      const wordpressConnections = connectionsResult.data.filter(conn => conn.platform === 'wordpress');
+      console.log('WordPress connections found:', wordpressConnections.length);
+      
+      let connectionId;
+      
+      if (wordpressConnections.length > 0) {
+        // Use the first WordPress connection
+        connectionId = wordpressConnections[0].id;
+        console.log('Using existing WordPress connection ID:', connectionId);
+      } else {
+        // Create a default WordPress connection
+        console.log('Creating new WordPress connection...');
+        const createResponse = await fetch('/api/site-connections', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`
-          }
+          },
+          body: JSON.stringify({
+            siteName: 'WordPress Integration',
+            siteUrl: 'https://your-wordpress-site.com',
+            platform: 'wordpress',
+            scanFrequency: 'weekly',
+            autoScanEnabled: true
+          })
         });
 
-        if (tokenResponse.ok) {
-          const tokenResult = await tokenResponse.json();
-          const newKey = tokenResult.data.apiToken;
-          
-          // Update local settings
-          const newSettings = { ...settings, apiKey: newKey };
-          setSettings(newSettings);
-          setNewApiKey(newKey);
-          
-          // Save settings locally
-          await wordPressAPI.saveSettings(newSettings);
-          
-          toast.success('API key generated successfully');
-        } else {
-          const errorData = await tokenResponse.json();
-          throw new Error(errorData.error || 'Failed to generate API key');
+        if (!createResponse.ok) {
+          const errorText = await createResponse.text();
+          console.error('Failed to create connection:', createResponse.status, errorText);
+          throw new Error(`Failed to create WordPress connection: ${createResponse.status}`);
         }
-      } else {
-        throw new Error('Failed to fetch site connections');
+
+        const createResult = await createResponse.json();
+        connectionId = createResult.data.id;
+        console.log('Created new WordPress connection ID:', connectionId);
       }
+
+      // Generate API token using the backend API
+      console.log(`Generating API token for connection ${connectionId}...`);
+      const tokenResponse = await fetch(`/api/site-connections/${connectionId}/generate-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+
+      if (!tokenResponse.ok) {
+        const errorText = await tokenResponse.text();
+        console.error('Failed to generate token:', tokenResponse.status, errorText);
+        throw new Error(`Failed to generate API token: ${tokenResponse.status}`);
+      }
+
+      const tokenResult = await tokenResponse.json();
+      console.log('Token generated successfully');
+      
+      const newKey = tokenResult.data.apiToken;
+      
+      // Update local settings
+      const newSettings = { ...settings, apiKey: newKey };
+      setSettings(newSettings);
+      setNewApiKey(newKey);
+      
+      // Save settings locally
+      await wordPressAPI.saveSettings(newSettings);
+      
+      toast.success('API key generated successfully');
     } catch (error) {
       console.error('API key generation error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to generate API key');
