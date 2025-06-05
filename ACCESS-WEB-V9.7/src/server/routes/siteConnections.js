@@ -5,6 +5,35 @@ import { requireAuth } from '../../middleware/userAuth.js';
 
 const prisma = new PrismaClient();
 
+// Enhanced logging utility for site connections
+const logger = {
+  info: (message, data = null) => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] [SITE-CONNECTIONS] [INFO] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+  },
+  error: (message, error = null, context = null) => {
+    const timestamp = new Date().toISOString();
+    console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] ${message}`);
+    if (error) {
+      console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] Stack:`, error.stack || error);
+      console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] Details:`, JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+    }
+    if (context) {
+      console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] Context:`, JSON.stringify(context, null, 2));
+    }
+  },
+  warn: (message, data = null) => {
+    const timestamp = new Date().toISOString();
+    console.warn(`[${timestamp}] [SITE-CONNECTIONS] [WARN] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+  },
+  debug: (message, data = null) => {
+    if (process.env.NODE_ENV === 'development') {
+      const timestamp = new Date().toISOString();
+      console.log(`[${timestamp}] [SITE-CONNECTIONS] [DEBUG] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+    }
+  }
+};
+
 const router = express.Router();
 
 // Generate secure API token
@@ -17,6 +46,8 @@ router.get('/', requireAuth, async (req, res) => {
   try {
     const userId = req.user.id;
     
+    logger.info('Fetching site connections', { userId });
+    
     const connections = await prisma.siteConnection.findMany({
       where: {
         userId: userId
@@ -26,12 +57,22 @@ router.get('/', requireAuth, async (req, res) => {
       }
     });
 
+    logger.info('Site connections fetched successfully', { 
+      userId, 
+      count: connections.length 
+    });
+
     res.json({
       success: true,
       data: connections
     });
   } catch (error) {
-    console.error('Error fetching site connections:', error);
+    logger.error('Error fetching site connections', error, { 
+      userId: req.user?.id,
+      requestUrl: req.url,
+      method: req.method
+    });
+    
     res.status(500).json({
       success: false,
       error: 'Failed to fetch site connections'

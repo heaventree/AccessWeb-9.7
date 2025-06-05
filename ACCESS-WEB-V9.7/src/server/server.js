@@ -4,6 +4,32 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRouter from '../api/auth.js';
 import accessibilityRouter from '../api/accessibility.js';
+
+// Enhanced logging utility
+const logger = {
+  info: (message, data = null) => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] [INFO] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+  },
+  error: (message, error = null) => {
+    const timestamp = new Date().toISOString();
+    console.error(`[${timestamp}] [ERROR] ${message}`);
+    if (error) {
+      console.error(`[${timestamp}] [ERROR] Stack:`, error.stack || error);
+      console.error(`[${timestamp}] [ERROR] Details:`, JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+    }
+  },
+  warn: (message, data = null) => {
+    const timestamp = new Date().toISOString();
+    console.warn(`[${timestamp}] [WARN] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+  },
+  debug: (message, data = null) => {
+    if (process.env.NODE_ENV === 'development') {
+      const timestamp = new Date().toISOString();
+      console.log(`[${timestamp}] [DEBUG] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+    }
+  }
+};
 import { 
   getAllPricingPlans, 
   getAdminPricingPlans, 
@@ -41,8 +67,8 @@ const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
-  console.error('Missing required environment variables:', missingEnvVars);
-  console.error('Please set these environment variables in production');
+  logger.error('Missing required environment variables', { missing: missingEnvVars });
+  logger.error('Please set these environment variables in production');
 }
 
 // More permissive CORS for production debugging
@@ -53,9 +79,37 @@ app.use(cors({
   credentials: true
 }));
 
-// Add middleware to log all requests
+// Enhanced request logging middleware
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
+  const startTime = Date.now();
+  
+  // Log incoming request
+  logger.info(`${req.method} ${req.url}`, {
+    ip: req.ip,
+    userAgent: req.get('User-Agent'),
+    body: req.method === 'POST' || req.method === 'PUT' ? req.body : undefined
+  });
+  
+  // Log response
+  const originalSend = res.send;
+  res.send = function(body) {
+    const duration = Date.now() - startTime;
+    logger.info(`${req.method} ${req.url} - ${res.statusCode}`, {
+      duration: `${duration}ms`,
+      statusCode: res.statusCode
+    });
+    
+    if (res.statusCode >= 400) {
+      logger.error(`Request failed: ${req.method} ${req.url}`, {
+        statusCode: res.statusCode,
+        body: body,
+        duration: `${duration}ms`
+      });
+    }
+    
+    return originalSend.call(this, body);
+  };
+  
   next();
 });
 
@@ -72,9 +126,10 @@ app.get('/api/health', async (req, res) => {
   try {
     // Test database connection
     await prisma.$queryRaw`SELECT 1`;
+    logger.info('Health check passed - database connected');
     res.json({ status: 'ok', database: 'connected' });
   } catch (error) {
-    console.error('Database connection error:', error);
+    logger.error('Database connection error during health check', error);
     res.status(500).json({ status: 'error', database: 'disconnected', error: String(error) });
   }
 });
@@ -106,31 +161,72 @@ app.post('/api/subscription/payment-intent', requireAuth, createPaymentIntent);
 app.get('/api/subscription/payment-history', requireAuth, getPaymentHistory);
 app.post('/api/subscription/cancel', requireAuth, cancelSubscription);
 
-// Global error handler
+// Global error handler with enhanced logging
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
-  console.error('Stack:', err.stack);
-  console.error('Request:', {
-    method: req.method,
-    url: req.url,
-    headers: req.headers,
-    body: req.body
+  logger.error('Unhandled application error', {
+    error: err.message,
+    stack: err.stack,
+    request: {
+      method: req.method,
+      url: req.url,
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      headers: req.headers,
+      body: req.body,
+      params: req.params,
+      query: req.query
+    }
   });
   
   res.status(500).json({
     success: false,
     message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
+    timestamp: new Date().toISOString()
   });
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Promise Rejection', {
+    reason: reason,
+    promise: promise,
+    stack: reason?.stack
+  });
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught Exception', {
+    error: error.message,
+    stack: error.stack
+  });
+  
+  // Graceful shutdown
+  process.exit(1);
 });
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`API Server running on port ${PORT}`);
-  console.log('Environment:', process.env.NODE_ENV || 'development');
-  console.log('JWT_SECRET present:', !!process.env.JWT_SECRET);
-  console.log('DATABASE_URL present:', !!process.env.DATABASE_URL);
+  logger.info(`API Server running on port ${PORT}`, {
+    environment: process.env.NODE_ENV || 'development',
+    port: PORT,
+    host: '0.0.0.0',
+    timestamp: new Date().toISOString()
+  });
+  
+  logger.info('Environment configuration', {
+    nodeEnv: process.env.NODE_ENV || 'development',
+    jwtSecretPresent: !!process.env.JWT_SECRET,
+    databaseUrlPresent: !!process.env.DATABASE_URL,
+    stripeKeysPresent: !!(process.env.STRIPE_SECRET_KEY && process.env.VITE_STRIPE_PUBLIC_KEY)
+  });
   
   // Start automatic subscription expiry checker
-  startSubscriptionExpiryChecker();
+  try {
+    startSubscriptionExpiryChecker();
+    logger.info('Subscription expiry checker started successfully');
+  } catch (error) {
+    logger.error('Failed to start subscription expiry checker', error);
+  }
 });
