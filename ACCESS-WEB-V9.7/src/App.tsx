@@ -82,6 +82,7 @@ import { HelpArticle } from './pages/HelpArticle';
 import { KnowledgeBasePage } from './pages/KnowledgeBasePage';
 import { UiDemo } from './pages/UiDemo';
 import { AltTextGuide } from './pages/help/AltTextGuide';
+import JobQueueTestPage from './pages/testing/JobQueueTestPage';
 
 import { ErrorPage } from './components/ErrorPage';
 import AccessibilityTipsPage from './pages/help/AccessibilityTipsPage';
@@ -184,6 +185,7 @@ function App() {
               <Route path="/help/accessibility-tips" element={<><Navigation /><main id="main-content"><AccessibilityTipsPage /></main><Footer /><BackToTop /></>} />
               <Route path="/help/accessibility-demo" element={<><Navigation /><main id="main-content"><AccessibilityTipsDemo /></main><Footer /><BackToTop /></>} />
               <Route path="/help/:slug" element={<><Navigation /><main id="main-content"><HelpArticle /></main><Footer /><BackToTop /></>} />
+              <Route path="/testing/job-queue" element={<><Navigation /><main id="main-content"><JobQueueTestPage /></main><Footer /><BackToTop /></>} />
               {/* For backward compatibility */}
               <Route path="/signup" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
 

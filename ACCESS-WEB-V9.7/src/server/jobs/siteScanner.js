@@ -311,7 +311,7 @@ class SiteScannerJobQueue {
     if (!this.testingIntervalId) {
       this.testingIntervalId = setInterval(() => {
         this.triggerTestingScans();
-      }, TESTING_INTERVAL_MS);
+      }, 15000); // 15 seconds in milliseconds
       console.log('▶️ [SITE-SCANNER] 15-second testing schedule started');
     }
   }
