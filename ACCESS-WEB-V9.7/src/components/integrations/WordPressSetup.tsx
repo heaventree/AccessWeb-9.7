@@ -47,12 +47,49 @@ export function WordPressSetup() {
   const handleGenerateApiKey = async () => {
     setGenerating(true);
     try {
-      // First check if we have a site connection ID
-      const storedConnectionId = localStorage.getItem('wordpress_connection_id');
-      
-      if (storedConnectionId) {
-        // Use existing site connection to generate new token
-        const response = await fetch(`/api/site-connections/${storedConnectionId}/generate-token`, {
+      // Check if we have existing WordPress site connections
+      const connectionsResponse = await fetch('/api/site-connections', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        }
+      });
+
+      if (connectionsResponse.ok) {
+        const connectionsResult = await connectionsResponse.json();
+        const wordpressConnections = connectionsResult.data.filter(conn => conn.platform === 'wordpress');
+        
+        let connectionId;
+        
+        if (wordpressConnections.length > 0) {
+          // Use the first WordPress connection
+          connectionId = wordpressConnections[0].id;
+        } else {
+          // Create a default WordPress connection
+          const createResponse = await fetch('/api/site-connections', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            },
+            body: JSON.stringify({
+              siteName: 'WordPress Integration',
+              siteUrl: 'https://your-wordpress-site.com',
+              platform: 'wordpress',
+              scanFrequency: 'weekly',
+              autoScanEnabled: true
+            })
+          });
+
+          if (createResponse.ok) {
+            const createResult = await createResponse.json();
+            connectionId = createResult.data.id;
+          } else {
+            throw new Error('Failed to create WordPress connection');
+          }
+        }
+
+        // Generate API token using the backend API
+        const tokenResponse = await fetch(`/api/site-connections/${connectionId}/generate-token`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -60,9 +97,9 @@ export function WordPressSetup() {
           }
         });
 
-        if (response.ok) {
-          const result = await response.json();
-          const newKey = result.data.apiToken;
+        if (tokenResponse.ok) {
+          const tokenResult = await tokenResponse.json();
+          const newKey = tokenResult.data.apiToken;
           
           // Update local settings
           const newSettings = { ...settings, apiKey: newKey };
@@ -74,65 +111,11 @@ export function WordPressSetup() {
           
           toast.success('API key generated successfully');
         } else {
-          throw new Error('Failed to generate API key via site connection');
+          const errorData = await tokenResponse.json();
+          throw new Error(errorData.error || 'Failed to generate API key');
         }
       } else {
-        // Create new site connection for WordPress
-        const siteUrl = prompt('Enter your WordPress site URL:');
-        if (!siteUrl) {
-          throw new Error('Site URL is required');
-        }
-
-        const createResponse = await fetch('/api/site-connections', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          },
-          body: JSON.stringify({
-            siteName: `WordPress Site (${new URL(siteUrl).hostname})`,
-            siteUrl,
-            platform: 'wordpress',
-            scanFrequency: 'weekly',
-            autoScanEnabled: true
-          })
-        });
-
-        if (createResponse.ok) {
-          const createResult = await createResponse.json();
-          const connectionId = createResult.data.id;
-          
-          // Store connection ID for future use
-          localStorage.setItem('wordpress_connection_id', connectionId.toString());
-          
-          // Generate token for new connection
-          const tokenResponse = await fetch(`/api/site-connections/${connectionId}/generate-token`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-            }
-          });
-
-          if (tokenResponse.ok) {
-            const tokenResult = await tokenResponse.json();
-            const newKey = tokenResult.data.apiToken;
-            
-            // Update local settings
-            const newSettings = { ...settings, apiKey: newKey, siteUrl };
-            setSettings(newSettings);
-            setNewApiKey(newKey);
-            
-            // Save settings locally
-            await wordPressAPI.saveSettings(newSettings);
-            
-            toast.success('WordPress site connected and API key generated successfully');
-          } else {
-            throw new Error('Failed to generate API key for new site connection');
-          }
-        } else {
-          throw new Error('Failed to create site connection');
-        }
+        throw new Error('Failed to fetch site connections');
       }
     } catch (error) {
       console.error('API key generation error:', error);
