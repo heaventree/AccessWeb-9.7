@@ -1,13 +1,13 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authenticateUser } from '../middleware/auth.js';
+import { authenticateToken } from '../middleware/auth.js';
 import { logRequest } from '../utils/logger.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Apply authentication middleware to all scanner routes
-router.use(authenticateUser);
+router.use(authenticateToken);
 
 /**
  * Trigger manual accessibility scan for a specific site connection
