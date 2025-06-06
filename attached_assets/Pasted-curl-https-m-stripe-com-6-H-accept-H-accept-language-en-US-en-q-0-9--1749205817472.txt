@@ -1,0 +1,168 @@
+curl ^"https://m.stripe.com/6^" ^
+  -H ^"accept: */*^" ^
+  -H ^"accept-language: en-US,en;q=0.9^" ^
+  -H ^"content-type: text/plain;charset=UTF-8^" ^
+  -b ^"m=87c1e850-67f6-4d20-b64b-422b77de33d1830ea5; private_machine_identifier=goGDBDU7mF1Nq1oIyh^%^2BtKwyfZz0XrTolsgdNFmArjpykU0j4wYNaD6yBtvw0EIkITX0^%^3D^" ^
+  -H ^"dnt: 1^" ^
+  -H ^"origin: https://m.stripe.network^" ^
+  -H ^"priority: u=1, i^" ^
+  -H ^"referer: https://m.stripe.network/^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" ^
+  -H ^"sec-fetch-dest: empty^" ^
+  -H ^"sec-fetch-mode: cors^" ^
+  -H ^"sec-fetch-site: cross-site^" ^
+  -H ^"sec-fetch-storage-access: active^" ^
+  -H ^"user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  --data-raw ^"JTdCJTIydjIlMjIlM0ExJTJDJTIyaWQlMjIlM0ElMjJhMTFiNDRiOGExNzI3YjdkMGE2NjEwNmViNDcyYTQxNyUyMiUyQyUyMnQlMjIlM0EyNy41JTJDJTIydGFnJTIyJTNBJTIyJTI0bnBtX3BhY2thZ2VfdmVyc2lvbiUyMiUyQyUyMnNyYyUyMiUzQSUyMmpzJTIyJTJDJTIyYSUyMiUzQW51bGwlMkMlMjJiJTIyJTNBJTdCJTIyYSUyMiUzQSUyMmh0dHBzJTNBJTJGJTJGUklLSkxOc255MHhuVkc4RTU4OFFCQnh5cGVBMENaWkQzOWFLZ092elpZby4tbjU2XzlCZHhIbE4zczZiQlJYU3pwMnpvOWJEMC1udHgzWWdTZVlvTWhVLlZpSi1iNVU0dDFHeG9pUm9sM2xwUXM3aUhzcU15cHh1U1Fzd1VxaTNSRG8uRlB4LWxYSy1lY3FGZWdLazlUbmVmN3hVWHVnU2paMndpd3pKWmpvZmtGQSUyRk9WemVvTlE0RGVSWktZZlUtOEtGNHlWNE5vbFFzOExuUlVmMWVEU1Q3N0ElMjIlMkMlMjJiJTIyJTNBJTIyaHR0cHMlM0ElMkYlMkZSSUtKTE5zbnkweG5WRzhFNTg4UUJCeHlwZUEwQ1paRDM5YUtnT3Z6WllvLi1uNTZfOUJkeEhsTjNzNmJCUlhTenAyem85YkQwLW50eDNZZ1NlWW9NaFUuVmlKLWI1VTR0MUd4b2lSb2wzbHBRczdpSHNxTXlweHVTUXN3VXFpM1JEby5GUHgtbFhLLWVjcUZlZ0trOVRuZWY3eFVYdWdTaloyd2l3ekpaam9ma0ZBJTJGT1Z6ZW9OUTREZVJaS1lmVS04S0Y0eVY0Tm9sUXM4TG5SVWYxZURTVDc3QSUyMiUyQyUyMmMlMjIlM0ElMjI3MS1vMlFEX0hDMGluMnUxZ2R6b0NMMUVSUGp6TElaMTdBYzZ0VHZYUS1BJTIyJTJDJTIyZCUyMiUzQSUyMmY1ODY1N2VjLWFjNWUtNDY5OC1hNzUzLWEzZTNiNWEyMWZjZjdmNzk1YiUyMiUyQyUyMmUlMjIlM0ElMjJkODY4MWM3MS01MTlkLTQwYmYtYjE0OC03YjQxZDQ4Mjg0NjE4MjhkMTclMjIlMkMlMjJmJTIyJTNBZmFsc2UlMkMlMjJnJTIyJTNBdHJ1ZSUyQyUyMmglMjIlM0F0cnVlJTJDJTIyaSUyMiUzQSU1QiUyMmxvY2F0aW9uJTIyJTVEJTJDJTIyaiUyMiUzQSU1QiU1RCUyQyUyMm4lMjIlM0E0MiUyQyUyMnUlMjIlM0ElMjJmNDg4MTA5Ny04ZDM0LTRiYzEtODNlNy03ZDNlNmFjYTEyZjEtMDAtMjBsa3NpdmF0bGJzOS5waWNhcmQucmVwbGl0LmRldiUyMiUyQyUyMnYlMjIlM0ElMjJmNDg4MTA5Ny04ZDM0LTRiYzEtODNlNy03ZDNlNmFjYTEyZjEtMDAtMjBsa3NpdmF0bGJzOS5waWNhcmQucmVwbGl0LmRldiUyMiUyQyUyMnclMjIlM0ElMjIxNzQ5MjA1NzUxNzYyJTNBYTZlMDc1MjUwNTUwNjRmOGM1ZTUzMzVjZWQxNzExMDRlYjU3ZDE4YmRiNmU1YjNiOWU5ZjRlZjk0NWU5MDY3YyUyMiU3RCUyQyUyMmglMjIlM0ElMjIyNjVkN2NiOWI3NTBhZTAwYTI1MyUyMiU3RA==^" &
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/auth/me^" ^
+  -H ^"Accept: application/json, text/plain, */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y^" ^
+  -H ^"Connection: keep-alive^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y; __stripe_sid=d8681c71-519d-40bf-b148-7b41d4828461828d17^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"If-None-Match: W/^\^"1e3-rircDNmm/qbDsWhgW/MGODqooVU^\^"^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/auth/me^" ^
+  -H ^"Accept: application/json, text/plain, */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y^" ^
+  -H ^"Connection: keep-alive^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y; __stripe_sid=d8681c71-519d-40bf-b148-7b41d4828461828d17^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"If-None-Match: W/^\^"1e3-rircDNmm/qbDsWhgW/MGODqooVU^\^"^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/auth/me^" ^
+  -H ^"Accept: application/json, text/plain, */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y^" ^
+  -H ^"Connection: keep-alive^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y; __stripe_sid=d8681c71-519d-40bf-b148-7b41d4828461828d17^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"If-None-Match: W/^\^"1e3-rircDNmm/qbDsWhgW/MGODqooVU^\^"^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/auth/me^" ^
+  -H ^"Accept: application/json, text/plain, */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y^" ^
+  -H ^"Connection: keep-alive^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y; __stripe_sid=d8681c71-519d-40bf-b148-7b41d4828461828d17^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"If-None-Match: W/^\^"1e3-rircDNmm/qbDsWhgW/MGODqooVU^\^"^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/scanner/recent-scans?limit=5^" ^
+  -H ^"Accept: */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y^" ^
+  -H ^"Connection: keep-alive^" ^
+  -H ^"Content-Type: application/json^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y; __stripe_sid=d8681c71-519d-40bf-b148-7b41d4828461828d17^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"X-CSRF-Token: g^<k^x^8^a'xc1^L^%^f'P^$P^S^#C^o3l^Y^>^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/scanner/stats^" ^
+  -H ^"Accept: */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y^" ^
+  -H ^"Connection: keep-alive^" ^
+  -H ^"Content-Type: application/json^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y; __stripe_sid=d8681c71-519d-40bf-b148-7b41d4828461828d17^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"X-CSRF-Token: g^<k^x^8^a'xc1^L^%^f'P^$P^S^#C^o3l^Y^>^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/scanner/recent-scans?limit=5^" ^
+  -H ^"Accept: */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y^" ^
+  -H ^"Connection: keep-alive^" ^
+  -H ^"Content-Type: application/json^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y; __stripe_sid=d8681c71-519d-40bf-b148-7b41d4828461828d17^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"X-CSRF-Token: g^<k^x^8^a'xc1^L^%^f'P^$P^S^#C^o3l^Y^>^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/scanner/stats^" ^
+  -H ^"Accept: */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y^" ^
+  -H ^"Connection: keep-alive^" ^
+  -H ^"Content-Type: application/json^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0OTExMzkyMCwiZXhwIjoxNzQ5NzE4NzIwfQ.KpwZlTnGiOe7GEJF47L_20QCBAEA2FrJ3ZOh9F10V5Y; __stripe_sid=d8681c71-519d-40bf-b148-7b41d4828461828d17^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  -H ^"X-CSRF-Token: g^<k^x^8^a'xc1^L^%^f'P^$P^S^#C^o3l^Y^>^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://m.stripe.com/6^" ^
+  -H ^"accept: */*^" ^
+  -H ^"accept-language: en-US,en;q=0.9^" ^
+  -H ^"content-type: text/plain;charset=UTF-8^" ^
+  -b ^"m=87c1e850-67f6-4d20-b64b-422b77de33d1830ea5; private_machine_identifier=goGDBDU7mF1Nq1oIyh^%^2BtKwyfZz0XrTolsgdNFmArjpykU0j4wYNaD6yBtvw0EIkITX0^%^3D^" ^
+  -H ^"dnt: 1^" ^
+  -H ^"origin: https://m.stripe.network^" ^
+  -H ^"priority: u=1, i^" ^
+  -H ^"referer: https://m.stripe.network/^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"137^\^", ^\^"Chromium^\^";v=^\^"137^\^", ^\^"Not/A)Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" ^
+  -H ^"sec-fetch-dest: empty^" ^
+  -H ^"sec-fetch-mode: cors^" ^
+  -H ^"sec-fetch-site: cross-site^" ^
+  -H ^"sec-fetch-storage-access: active^" ^
+  -H ^"user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36^" ^
+  --data-raw ^"JTdCJTIybXVpZCUyMiUzQSUyMmY1ODY1N2VjLWFjNWUtNDY5OC1hNzUzLWEzZTNiNWEyMWZjZjdmNzk1YiUyMiUyQyUyMnNpZCUyMiUzQSUyMmQ4NjgxYzcxLTUxOWQtNDBiZi1iMTQ4LTdiNDFkNDgyODQ2MTgyOGQxNyUyMiUyQyUyMnVybCUyMiUzQSUyMmh0dHBzJTNBJTJGJTJGUklLSkxOc255MHhuVkc4RTU4OFFCQnh5cGVBMENaWkQzOWFLZ092elpZby4tbjU2XzlCZHhIbE4zczZiQlJYU3pwMnpvOWJEMC1udHgzWWdTZVlvTWhVLlZpSi1iNVU0dDFHeG9pUm9sM2xwUXM3aUhzcU15cHh1U1Fzd1VxaTNSRG8uRlB4LWxYSy1lY3FGZWdLazlUbmVmN3hVWHVnU2paMndpd3pKWmpvZmtGQSUyRk9WemVvTlE0RGVSWktZZlUtOEtGNHlWNE5vbFFzOExuUlVmMWVEU1Q3N0ElMjIlMkMlMjJzb3VyY2UlMjIlM0ElMjJtb3VzZS10aW1pbmdzLTEwJTIyJTJDJTIyZGF0YSUyMiUzQSU1QjEyMzcyJTJDNDY3MyUyQzElMkM3JTJDNSUyQzglMkM4JTJDOSUyQzclMkM5JTVEJTdE^"
