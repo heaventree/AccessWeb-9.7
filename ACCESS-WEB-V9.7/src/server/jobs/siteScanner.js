@@ -214,7 +214,7 @@ class SiteScannerJobQueue {
 
       // Convert scan frequency to cron expression
       const frequencyToCron = {
-        'testing': '*/15 * * * * *',  // Every 15 seconds (6-field format for seconds)
+        'testing': '*/1 * * * *',     // Every minute for testing
         'daily': '0 9 * * *',         // Daily at 9 AM
         'weekly': '0 9 * * 1',        // Weekly on Monday at 9 AM  
         'monthly': '0 9 1 * *'        // Monthly on 1st at 9 AM
@@ -228,9 +228,11 @@ class SiteScannerJobQueue {
         const cronExpression = frequencyToCron[connection.scanFrequency] || '0 9 * * 1'; // Default to weekly
         const jobKey = `scan-connection-${connection.id}`;
         
-        // Special handling for testing frequency - use 15-second intervals
+        // Special handling for testing frequency - use 15-second intervals only
         if (connection.scanFrequency === 'testing') {
-          console.log(`⚡ [SITE-SCANNER] Enabling 15-second testing schedule for ${connection.siteName}`);
+          console.log(`⚡ [SITE-SCANNER] Testing frequency detected for ${connection.siteName} - using 15-second interval trigger`);
+          // Testing frequency uses interval-based scanning, not cron scheduling
+          continue;
         }
         
         const jobData = {
@@ -243,7 +245,7 @@ class SiteScannerJobQueue {
         };
 
         try {
-          // Schedule recurring job
+          // Schedule recurring job for non-testing frequencies
           await this.boss.schedule(
             JOB_QUEUE_NAME,
             jobData,
