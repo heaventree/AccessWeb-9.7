@@ -1,5 +1,6 @@
 import PgBoss from 'pg-boss';
 import { PrismaClient } from '@prisma/client';
+import { accessibilityScanner } from '../services/accessibilityScanner.js';
 
 const prisma = new PrismaClient();
 

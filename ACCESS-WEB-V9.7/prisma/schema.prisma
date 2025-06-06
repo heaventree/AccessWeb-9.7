@@ -96,6 +96,32 @@ model SiteConnection {
 
   // Relation to User
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  scanResults ScanResult[]
 
   @@map("site_connections")
+}
+
+model ScanResult {
+  id                Int       @id @default(autoincrement())
+  siteConnectionId  Int       @map("site_connection_id")
+  scanType          String    @default("accessibility") @db.VarChar(50) @map("scan_type")
+  scanUrl           String    @db.VarChar(500) @map("scan_url")
+  scanStatus        String    @default("completed") @db.VarChar(20) @map("scan_status")
+  errorCount        Int       @default(0) @map("error_count")
+  warningCount      Int       @default(0) @map("warning_count")
+  noticeCount       Int       @default(0) @map("notice_count")
+  score             Float?    @db.Real
+  rawResults        Json      @map("raw_results")
+  scanDuration      Int?      @map("scan_duration") // in milliseconds
+  userAgent         String?   @db.VarChar(255) @map("user_agent")
+  screenCapture     String?   @db.VarChar(500) @map("screen_capture")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Relation to SiteConnection
+  siteConnection SiteConnection @relation(fields: [siteConnectionId], references: [id], onDelete: Cascade)
+
+  @@map("scan_results")
 }
