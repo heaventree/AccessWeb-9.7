@@ -341,4 +341,111 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
   }
 });
 
+/**
+ * Get recent scan results
+ * GET /api/scanner/recent-scans
+ */
+router.get('/recent-scans', logRequest, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const limit = parseInt(req.query.limit) || 5;
+
+    const recentScans = await prisma.scanResult.findMany({
+      where: {
+        siteConnection: {
+          userId: userId
+        }
+      },
+      include: {
+        siteConnection: {
+          select: {
+            siteName: true,
+            siteUrl: true,
+            platform: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: limit
+    });
+
+    const formattedScans = recentScans.map(scan => ({
+      id: scan.id,
+      url: scan.scanUrl,
+      siteName: scan.siteConnection.siteName,
+      score: scan.score,
+      errorCount: scan.errorCount,
+      warningCount: scan.warningCount,
+      noticeCount: scan.noticeCount,
+      scanStatus: scan.scanStatus,
+      scanDuration: scan.scanDuration,
+      createdAt: scan.createdAt,
+      platform: scan.siteConnection.platform,
+      issues: scan.errorCount + scan.warningCount
+    }));
+
+    res.json({
+      success: true,
+      data: formattedScans
+    });
+
+  } catch (error) {
+    console.error('❌ [SCANNER] Error fetching recent scans:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch recent scans'
+    });
+  }
+});
+
+/**
+ * Get detailed scan result
+ * GET /api/scanner/scan-details/:scanId
+ */
+router.get('/scan-details/:scanId', logRequest, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const scanId = parseInt(req.params.scanId);
+
+    const scanResult = await prisma.scanResult.findFirst({
+      where: {
+        id: scanId,
+        siteConnection: {
+          userId: userId
+        }
+      },
+      include: {
+        siteConnection: {
+          select: {
+            siteName: true,
+            siteUrl: true,
+            platform: true
+          }
+        }
+      }
+    });
+
+    if (!scanResult) {
+      return res.status(404).json({
+        success: false,
+        error: 'Scan result not found or not accessible'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: scanResult
+    });
+
+  } catch (error) {
+    console.error('❌ [SCANNER] Error fetching scan details:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch scan details'
+    });
+  }
+});
+
 export default router;

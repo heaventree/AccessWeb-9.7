@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import {
   CreditCard,
@@ -9,40 +10,113 @@ import {
   RefreshCw,
   Shield,
   Layers,
-  Globe
+  Globe,
+  Eye,
+  AlertTriangle,
+  CheckCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ScanResultModal from '../components/ScanResultModal';
 
 
-// Mock data for the dashboard
-const subscription = {
-  plan: 'Professional',
-  status: 'active',
-  nextBilling: new Date(2024, 2, 15),
-  paymentMethod: '**** **** **** 4242',
-  usageStats: {
-    scansThisMonth: 45,
-    totalScans: 156,
-    pagesScanned: 225,
-    teamMembers: 3
-  },
-  recentScans: [
-    {
-      id: 1,
-      url: 'https://example.com',
-      date: new Date(2024, 1, 28),
-      issues: 12
-    },
-    {
-      id: 2,
-      url: 'https://test.com',
-      date: new Date(2024, 1, 27),
-      issues: 5
-    }
-  ]
-};
+interface ScanResult {
+  id: number;
+  url: string;
+  siteName: string;
+  score: number;
+  errorCount: number;
+  warningCount: number;
+  noticeCount: number;
+  scanStatus: string;
+  scanDuration: number;
+  createdAt: string;
+  platform: string;
+  issues: number;
+  rawResults?: any;
+}
 
 export function SubscriptionDashboard() {
+  const [recentScans, setRecentScans] = useState<ScanResult[]>([]);
+  const [selectedScan, setSelectedScan] = useState<ScanResult | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    scansThisMonth: 0,
+    totalScans: 0,
+    pagesScanned: 0,
+    teamMembers: 0
+  });
+
+  const subscription = {
+    plan: 'Professional',
+    status: 'active',
+    nextBilling: new Date(2024, 2, 15),
+    paymentMethod: '**** **** **** 4242'
+  };
+
+  // API client for making authenticated requests
+  const apiRequest = async (method: string, endpoint: string) => {
+    const token = localStorage.getItem('accessToken');
+    const response = await fetch(`http://localhost:3001${endpoint}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+    }
+
+    return await response.json();
+  };
+
+  useEffect(() => {
+    fetchRecentScans();
+    fetchStats();
+  }, []);
+
+  const fetchRecentScans = async () => {
+    try {
+      const response = await apiRequest('GET', '/api/scanner/recent-scans?limit=5');
+      setRecentScans(response.data);
+    } catch (error) {
+      console.error('Failed to fetch recent scans:', error);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const response = await apiRequest('GET', '/api/scanner/stats');
+      setStats(response.data);
+    } catch (error) {
+      console.error('Failed to fetch scanner stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewResult = async (scan: ScanResult) => {
+    try {
+      const response = await apiRequest('GET', `/api/scanner/scan-details/${scan.id}`);
+      setSelectedScan(response.data);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('Failed to fetch scan details:', error);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), 'MMM d, yyyy');
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return 'text-green-600';
+    if (score >= 70) return 'text-yellow-600';
+    return 'text-red-600';
+  };
   return (
     <div className="py-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
