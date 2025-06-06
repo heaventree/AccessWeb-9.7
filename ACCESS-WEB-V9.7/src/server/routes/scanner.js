@@ -294,7 +294,7 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
       where: {
         id: parseInt(connectionId),
         userId: userId,
-        isActive: true
+        status: 'active'
       }
     });
 
