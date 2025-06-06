@@ -335,15 +335,16 @@ class SiteScannerJobQueue {
         };
 
         try {
-          const jobId = await this.boss.send(JOB_QUEUE_NAME, jobData);
-          console.log(`⚡ [SITE-SCANNER] 15-second auto-scan triggered for ${connection.siteName} (Job ID: ${jobId})`);
+          // Direct scan execution instead of queuing for testing frequency
+          console.log(`🔍 [SITE-SCANNER] Executing direct scan for ${connection.siteName}`);
           
-          // Check job queue status immediately after sending
-          const queueStatus = await this.boss.getQueueSize(JOB_QUEUE_NAME);
-          console.log(`📋 [SITE-SCANNER] Queue size after job send: ${queueStatus}`);
+          // Execute scan immediately instead of queuing
+          await this.performAccessibilityScan(connection.id, connection.siteUrl, connection.platform);
+          
+          console.log(`✅ [SITE-SCANNER] Direct scan completed for ${connection.siteName}`);
           
         } catch (error) {
-          console.error(`❌ [SITE-SCANNER] Failed to trigger testing scan for connection ${connection.id}:`, error);
+          console.error(`❌ [SITE-SCANNER] Failed to execute direct scan for connection ${connection.id}:`, error);
         }
       }
     } catch (error) {
