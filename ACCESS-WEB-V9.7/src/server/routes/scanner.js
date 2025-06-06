@@ -293,8 +293,7 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
     const connection = await prisma.siteConnection.findFirst({
       where: {
         id: parseInt(connectionId),
-        userId: userId,
-        status: 'active'
+        userId: userId
       }
     });
 
