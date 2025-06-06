@@ -147,6 +147,11 @@ export default {
  * Addresses the CSP violations for Stripe integration
  */
 export const generateContentSecurityPolicy = () => {
+  const isDevMode = isDevelopment();
+  const connectSrc = isDevMode 
+    ? "'self' http://localhost:3001 https://api.accessibility-checker.org https://api.stripe.com"
+    : "'self' https://api.accessibility-checker.org https://api.stripe.com";
+    
   return {
     'Content-Security-Policy': 
       "default-src 'self'; " +
@@ -154,14 +159,14 @@ export const generateContentSecurityPolicy = () => {
       "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://fonts.googleapis.com; " +
       "font-src 'self' https://fonts.gstatic.com; " +
       "img-src 'self' data: https:; " +
-      "connect-src 'self' https://api.accessibility-checker.org https://api.stripe.com; " +
+      `connect-src ${connectSrc}; ` +
       "frame-src 'self' https://js.stripe.com https://hooks.stripe.com; " +
       "media-src 'self'; " +
       "object-src 'none'; " +
       "base-uri 'self'; " +
       "form-action 'self'; " +
-      "frame-ancestors 'self'; " +
-      "block-all-mixed-content;"
+      "frame-ancestors 'self';" +
+      (isDevMode ? "" : " block-all-mixed-content;")
   };
 };
 
