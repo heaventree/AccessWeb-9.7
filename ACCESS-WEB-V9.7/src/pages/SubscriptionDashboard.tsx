@@ -156,7 +156,7 @@ export function SubscriptionDashboard() {
                       </dt>
                       <dd>
                         <div className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                          {subscription.usageStats.scansThisMonth}
+                          {loading ? '...' : stats.scansThisMonth}
                         </div>
                       </dd>
                     </dl>
@@ -177,7 +177,7 @@ export function SubscriptionDashboard() {
                       </dt>
                       <dd>
                         <div className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                          {subscription.usageStats.totalScans}
+                          {loading ? '...' : stats.totalScans}
                         </div>
                       </dd>
                     </dl>
@@ -198,7 +198,7 @@ export function SubscriptionDashboard() {
                       </dt>
                       <dd>
                         <div className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                          {subscription.usageStats.pagesScanned}
+                          {loading ? '...' : stats.pagesScanned}
                         </div>
                       </dd>
                     </dl>
@@ -219,7 +219,7 @@ export function SubscriptionDashboard() {
                       </dt>
                       <dd>
                         <div className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                          {subscription.usageStats.teamMembers}
+                          {loading ? '...' : stats.teamMembers}
                         </div>
                       </dd>
                     </dl>
@@ -282,31 +282,63 @@ export function SubscriptionDashboard() {
             <div className="px-4 py-4 sm:px-6">
               <div className="flow-root">
                 <ul className="-my-5 divide-y divide-gray-200 dark:divide-gray-700">
-                  {subscription.recentScans.map((scan) => (
-                    <li key={scan.id} className="py-4">
+                  {loading ? (
+                    <li className="py-4">
                       <div className="flex items-center space-x-4">
-                        <div className="flex-shrink-0 rounded-lg bg-blue-100 dark:bg-blue-900/30 p-2">
-                          <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <div className="animate-pulse">
+                          <div className="h-9 w-9 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {scan.url}
-                          </p>
-                          <p className="truncate text-sm text-gray-500 dark:text-gray-400">
-                            {format(scan.date, 'MMM d, yyyy')} - {scan.issues} issues found
-                          </p>
-                        </div>
-                        <div>
-                          <Link
-                            to="#"
-                            className="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-medium leading-5 text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600"
-                          >
-                            View Report
-                          </Link>
+                        <div className="flex-1 animate-pulse">
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
                         </div>
                       </div>
                     </li>
-                  ))}
+                  ) : recentScans.length === 0 ? (
+                    <li className="py-8 text-center">
+                      <Globe className="mx-auto h-12 w-12 text-gray-400" />
+                      <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No scans yet</h3>
+                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Start monitoring your sites to see scan results here.
+                      </p>
+                      <div className="mt-6">
+                        <Link
+                          to="/my-account/monitoring"
+                          className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
+                        >
+                          <Globe className="mr-1.5 h-4 w-4" />
+                          Add Site Connection
+                        </Link>
+                      </div>
+                    </li>
+                  ) : (
+                    recentScans.map((scan: ScanResult) => (
+                      <li key={scan.id} className="py-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex-shrink-0 rounded-lg bg-blue-100 dark:bg-blue-900/30 p-2">
+                            <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+                              {scan.siteName || scan.url}
+                            </p>
+                            <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+                              {formatDate(scan.createdAt)} - {scan.errorCount + scan.warningCount} issues • Score: <span className={getScoreColor(scan.score)}>{scan.score}%</span>
+                            </p>
+                          </div>
+                          <div>
+                            <button
+                              type="button"
+                              onClick={() => handleViewResult(scan)}
+                              className="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-medium leading-5 text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600"
+                            >
+                              View Report
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    ))
+                  )}
                 </ul>
               </div>
             </div>
