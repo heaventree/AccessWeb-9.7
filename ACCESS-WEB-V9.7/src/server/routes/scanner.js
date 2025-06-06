@@ -342,6 +342,77 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
 });
 
 /**
+ * Get scanner statistics
+ * GET /api/scanner/stats
+ */
+router.get('/stats', logRequest, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    console.log(`📊 [SCANNER] Fetching scanner statistics for user ${userId}`);
+
+    // Get current month start
+    const currentMonth = new Date();
+    currentMonth.setDate(1);
+    currentMonth.setHours(0, 0, 0, 0);
+
+    // Get statistics
+    const [scansThisMonth, totalScans, pagesScanned, teamMembers] = await Promise.all([
+      // Scans this month
+      prisma.scanResult.count({
+        where: {
+          siteConnection: {
+            userId: userId
+          },
+          createdAt: {
+            gte: currentMonth
+          }
+        }
+      }),
+      // Total scans
+      prisma.scanResult.count({
+        where: {
+          siteConnection: {
+            userId: userId
+          }
+        }
+      }),
+      // Pages scanned (total scan results)
+      prisma.scanResult.count({
+        where: {
+          siteConnection: {
+            userId: userId
+          }
+        }
+      }),
+      // Team members (for now, just return 1 for the user)
+      Promise.resolve(1)
+    ]);
+
+    const stats = {
+      scansThisMonth,
+      totalScans,
+      pagesScanned,
+      teamMembers
+    };
+
+    console.log(`✅ [SCANNER] Statistics for user ${userId}:`, stats);
+
+    res.json({
+      success: true,
+      data: stats
+    });
+
+  } catch (error) {
+    console.error('❌ [SCANNER] Error fetching scanner statistics:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch scanner statistics'
+    });
+  }
+});
+
+/**
  * Get recent scan results
  * GET /api/scanner/recent-scans
  */

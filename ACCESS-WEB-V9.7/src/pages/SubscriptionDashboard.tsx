@@ -377,6 +377,13 @@ export function SubscriptionDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Scan Result Modal */}
+      <ScanResultModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        scanResult={selectedScan}
+      />
     </div>
   );
 }
