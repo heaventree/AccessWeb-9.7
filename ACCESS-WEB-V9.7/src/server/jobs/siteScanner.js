@@ -127,38 +127,66 @@ class SiteScannerJobQueue {
   }
 
   async performAccessibilityScan(connectionId, siteUrl, platform) {
-    // Simulate accessibility scanning process with fancy output
-    console.log(`🔍 [SCAN-${connectionId}] Fetching page content from: ${siteUrl}`);
-    await this.delay(2000); // Simulate network request
-    
-    console.log(`📊 [SCAN-${connectionId}] Analyzing WCAG compliance for ${platform} platform`);
-    await this.delay(3000); // Simulate analysis
-    
-    console.log(`📝 [SCAN-${connectionId}] Generating accessibility report`);
-    await this.delay(1000); // Simulate report generation
-    
-    console.log(`💾 [SCAN-${connectionId}] Saving scan results to database`);
-    await this.delay(500); // Simulate database save
-    
-    // Display fancy scan results
-    const mockResults = {
-      totalIssues: Math.floor(Math.random() * 20),
-      criticalIssues: Math.floor(Math.random() * 5),
-      warningIssues: Math.floor(Math.random() * 10),
-      score: Math.floor(Math.random() * 40) + 60 // 60-100 score
-    };
-    
-    console.log(`
+    try {
+      console.log(`🔍 [SCAN-${connectionId}] Starting WCAG accessibility scan for: ${siteUrl}`);
+      
+      // Perform real accessibility scan using pa11y
+      const scanResult = await accessibilityScanner.scanUrl(siteUrl, connectionId);
+      
+      console.log(`
 ╔═══════════════════ SCAN RESULTS ═══════════════════╗
 ║ Connection ID: ${String(connectionId).padEnd(32)} ║
-║ Accessibility Score: ${String(mockResults.score).padEnd(26)} ║
-║ Total Issues: ${String(mockResults.totalIssues).padEnd(32)} ║
-║ Critical Issues: ${String(mockResults.criticalIssues).padEnd(29)} ║
-║ Warning Issues: ${String(mockResults.warningIssues).padEnd(30)} ║
+║ Accessibility Score: ${String(scanResult.score || 'N/A').padEnd(26)} ║
+║ Total Errors: ${String(scanResult.errorCount).padEnd(30)} ║
+║ Total Warnings: ${String(scanResult.warningCount).padEnd(28)} ║
+║ Total Notices: ${String(scanResult.noticeCount).padEnd(29)} ║
+║ Scan Duration: ${String(scanResult.scanDuration + 'ms').padEnd(29)} ║
+║ Scan Status: ${String(scanResult.scanStatus).padEnd(31)} ║
 ╚════════════════════════════════════════════════════╝
-    `);
-    
-    return mockResults;
+      `);
+      
+      return {
+        scanResultId: scanResult.id,
+        connectionId: connectionId,
+        score: scanResult.score,
+        errorCount: scanResult.errorCount,
+        warningCount: scanResult.warningCount,
+        noticeCount: scanResult.noticeCount,
+        scanStatus: scanResult.scanStatus,
+        scanDuration: scanResult.scanDuration
+      };
+      
+    } catch (error) {
+      console.error(`❌ [SCAN-${connectionId}] Accessibility scan failed:`, error.message);
+      
+      // Save failed scan result
+      const errorResult = await accessibilityScanner.saveResults({
+        siteConnectionId: connectionId,
+        scanUrl: siteUrl,
+        scanStatus: 'failed',
+        errorCount: 0,
+        warningCount: 0,
+        noticeCount: 0,
+        score: null,
+        rawResults: {
+          error: error.message,
+          timestamp: new Date().toISOString()
+        },
+        scanDuration: 0,
+        userAgent: 'AccessWeb-Scanner/1.0'
+      });
+      
+      return {
+        scanResultId: errorResult.id,
+        connectionId: connectionId,
+        score: null,
+        errorCount: 0,
+        warningCount: 0,
+        noticeCount: 0,
+        scanStatus: 'failed',
+        error: error.message
+      };
+    }
   }
 
   async syncSchedules() {

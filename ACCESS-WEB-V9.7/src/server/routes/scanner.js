@@ -278,4 +278,76 @@ router.get('/schedule/status', logRequest, async (req, res) => {
   }
 });
 
+/**
+ * Trigger manual accessibility scan
+ * POST /api/scanner/trigger-manual-scan
+ */
+router.post('/trigger-manual-scan', logRequest, async (req, res) => {
+  try {
+    const { connectionId } = req.body;
+    const userId = req.user.userId;
+
+    console.log(`🔍 [SCANNER] Manual WCAG scan trigger requested for connection ${connectionId} by user ${userId}`);
+
+    // Verify the connection belongs to the authenticated user
+    const connection = await prisma.siteConnection.findFirst({
+      where: {
+        id: parseInt(connectionId),
+        userId: userId,
+        isActive: true
+      }
+    });
+
+    if (!connection) {
+      console.log(`❌ [SCANNER] Connection ${connectionId} not found or not accessible by user ${userId}`);
+      return res.status(404).json({
+        success: false,
+        error: 'Site connection not found or not accessible'
+      });
+    }
+
+    // Import the job queue singleton
+    const siteScannerQueue = (await import('../jobs/siteScanner.js')).default;
+    
+    // Ensure job queue is initialized
+    if (!siteScannerQueue.boss) {
+      await siteScannerQueue.initialize();
+    }
+
+    // Trigger immediate accessibility scan job
+    const jobData = {
+      connectionId: connection.id,
+      userId: userId,
+      siteName: connection.siteName,
+      siteUrl: connection.siteUrl,
+      platform: connection.platform,
+      triggerType: 'manual'
+    };
+
+    const job = await siteScannerQueue.boss.send('site-accessibility-scan', jobData, {
+      retryLimit: 2,
+      retryDelay: 30,
+      expireInSeconds: 300
+    });
+
+    console.log(`✅ [SCANNER] Manual WCAG scan job queued with ID: ${job.id} for ${connection.siteName}`);
+
+    res.json({
+      success: true,
+      message: 'Manual accessibility scan triggered successfully',
+      jobId: job.id,
+      connectionId: connection.id,
+      siteName: connection.siteName,
+      siteUrl: connection.siteUrl
+    });
+
+  } catch (error) {
+    console.error('❌ [SCANNER] Error triggering manual scan:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to trigger manual accessibility scan'
+    });
+  }
+});
+
 export default router;
