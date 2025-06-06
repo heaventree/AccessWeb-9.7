@@ -80,19 +80,25 @@ export function SubscriptionDashboard() {
 
   const fetchRecentScans = async () => {
     try {
+      console.log('Fetching recent scans...');
       const response = await apiRequest('GET', '/api/scanner/recent-scans?limit=5');
-      setRecentScans(response.data);
+      console.log('Recent scans response:', response);
+      setRecentScans(response.data || []);
     } catch (error) {
       console.error('Failed to fetch recent scans:', error);
+      setRecentScans([]);
     }
   };
 
   const fetchStats = async () => {
     try {
+      console.log('Fetching scanner stats...');
       const response = await apiRequest('GET', '/api/scanner/stats');
-      setStats(response.data);
+      console.log('Scanner stats response:', response);
+      setStats(response.data || { scansThisMonth: 0, totalScans: 0, pagesScanned: 0, teamMembers: 0 });
     } catch (error) {
       console.error('Failed to fetch scanner stats:', error);
+      setStats({ scansThisMonth: 0, totalScans: 0, pagesScanned: 0, teamMembers: 0 });
     } finally {
       setLoading(false);
     }
