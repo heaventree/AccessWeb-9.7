@@ -80,40 +80,50 @@ export function SubscriptionDashboard() {
     return await response.json();
   };
 
-  useEffect(() => {
-    console.log('Dashboard useEffect triggered - loading scan data...');
-    const loadData = async () => {
-      await fetchRecentScans();
-      await fetchStats();
-    };
-    loadData();
-  }, []);
-
   const fetchRecentScans = async () => {
     try {
-      console.log('Fetching recent scans...');
+      console.log('🔍 Starting to fetch recent scans...');
       const response = await apiRequest('GET', '/api/scanner/recent-scans?limit=5');
-      console.log('Recent scans response:', response);
+      console.log('✅ Recent scans response received:', response);
       setRecentScans(response.data || []);
+      console.log('📊 Recent scans state updated with', response.data?.length || 0, 'items');
     } catch (error) {
-      console.error('Failed to fetch recent scans:', error);
+      console.error('❌ Failed to fetch recent scans:', error);
       setRecentScans([]);
     }
   };
 
   const fetchStats = async () => {
     try {
-      console.log('Fetching scanner stats...');
+      console.log('📈 Starting to fetch scanner stats...');
       const response = await apiRequest('GET', '/api/scanner/stats');
-      console.log('Scanner stats response:', response);
+      console.log('✅ Scanner stats response received:', response);
       setStats(response.data || { scansThisMonth: 0, totalScans: 0, pagesScanned: 0, teamMembers: 0 });
+      console.log('📊 Scanner stats state updated');
     } catch (error) {
-      console.error('Failed to fetch scanner stats:', error);
+      console.error('❌ Failed to fetch scanner stats:', error);
       setStats({ scansThisMonth: 0, totalScans: 0, pagesScanned: 0, teamMembers: 0 });
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log('🚀 Dashboard useEffect triggered - starting data load...');
+    
+    const loadData = async () => {
+      try {
+        console.log('🔄 Executing loadData function...');
+        await fetchRecentScans();
+        await fetchStats();
+        console.log('✅ Data loading completed');
+      } catch (error) {
+        console.error('❌ Error in loadData:', error);
+      }
+    };
+    
+    loadData();
+  }, []);
 
   const handleViewResult = async (scan: ScanResult) => {
     try {
