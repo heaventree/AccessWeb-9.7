@@ -305,36 +305,28 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
       });
     }
 
-    // Import the job queue singleton
-    const siteScannerQueue = (await import('../jobs/siteScanner.js')).default;
+    // Trigger immediate accessibility scan using the scanner directly
+    console.log(`🚀 [SCANNER] Triggering immediate WCAG scan for: ${connection.siteUrl}`);
     
-    // Ensure job queue is initialized
-    if (!siteScannerQueue.boss) {
-      await siteScannerQueue.initialize();
-    }
-
-    // Trigger immediate accessibility scan job
-    const jobData = {
-      connectionId: connection.id,
-      userId: userId,
-      siteName: connection.siteName,
-      siteUrl: connection.siteUrl,
-      platform: connection.platform,
-      triggerType: 'manual'
-    };
-
-    const job = await siteScannerQueue.boss.send('site-accessibility-scan', jobData, {
-      retryLimit: 2,
-      retryDelay: 30,
-      expireInSeconds: 300
-    });
-
-    console.log(`✅ [SCANNER] Manual WCAG scan job queued with ID: ${job.id} for ${connection.siteName}`);
+    // Perform the scan directly instead of queuing
+    const { accessibilityScanner } = await import('../services/accessibilityScanner.js');
+    
+    const scanResult = await accessibilityScanner.scanUrl(connection.siteUrl, connection.id);
+    
+    console.log(`✅ [SCANNER] Manual WCAG scan completed for ${connection.siteName} - Score: ${scanResult.score}%`);
 
     res.json({
       success: true,
-      message: 'Manual accessibility scan triggered successfully',
-      jobId: job.id,
+      message: 'Manual accessibility scan completed successfully',
+      scanResult: {
+        id: scanResult.id,
+        score: scanResult.score,
+        errorCount: scanResult.errorCount,
+        warningCount: scanResult.warningCount,
+        noticeCount: scanResult.noticeCount,
+        scanStatus: scanResult.scanStatus,
+        scanDuration: scanResult.scanDuration
+      },
       connectionId: connection.id,
       siteName: connection.siteName,
       siteUrl: connection.siteUrl
