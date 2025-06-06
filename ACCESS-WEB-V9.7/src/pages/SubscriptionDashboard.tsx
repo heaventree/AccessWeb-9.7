@@ -81,8 +81,12 @@ export function SubscriptionDashboard() {
   };
 
   useEffect(() => {
-    fetchRecentScans();
-    fetchStats();
+    console.log('Dashboard useEffect triggered - loading scan data...');
+    const loadData = async () => {
+      await fetchRecentScans();
+      await fetchStats();
+    };
+    loadData();
   }, []);
 
   const fetchRecentScans = async () => {
