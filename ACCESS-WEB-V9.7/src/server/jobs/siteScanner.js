@@ -67,6 +67,22 @@ class SiteScannerJobQueue {
       );
       
       console.log(`👷 [SITE-SCANNER] Worker started with max concurrency: ${MAX_CONCURRENT_JOBS}`);
+      console.log(`👷 [SITE-SCANNER] Worker listening for jobs on queue: ${JOB_QUEUE_NAME}`);
+      
+      // Add debugging for job queue activity
+      this.boss.on('error', error => {
+        console.error('🚨 [SITE-SCANNER] Pg-boss error:', error);
+      });
+      
+      this.boss.on('monitor-states', (states) => {
+        if (states && states.queues) {
+          const scanQueue = states.queues.find(q => q.name === JOB_QUEUE_NAME);
+          if (scanQueue && scanQueue.count > 0) {
+            console.log(`📊 [SITE-SCANNER] Queue stats - Active: ${scanQueue.active}, Completed: ${scanQueue.completed}, Failed: ${scanQueue.failed}`);
+          }
+        }
+      });
+      
     } catch (error) {
       console.error('❌ [SITE-SCANNER] Failed to start worker:', error);
       throw error;
@@ -319,8 +335,13 @@ class SiteScannerJobQueue {
         };
 
         try {
-          await this.boss.send(JOB_QUEUE_NAME, jobData);
-          console.log(`⚡ [SITE-SCANNER] 15-second auto-scan triggered for ${connection.siteName}`);
+          const jobId = await this.boss.send(JOB_QUEUE_NAME, jobData);
+          console.log(`⚡ [SITE-SCANNER] 15-second auto-scan triggered for ${connection.siteName} (Job ID: ${jobId})`);
+          
+          // Check job queue status immediately after sending
+          const queueStatus = await this.boss.getQueueSize(JOB_QUEUE_NAME);
+          console.log(`📋 [SITE-SCANNER] Queue size after job send: ${queueStatus}`);
+          
         } catch (error) {
           console.error(`❌ [SITE-SCANNER] Failed to trigger testing scan for connection ${connection.id}:`, error);
         }
