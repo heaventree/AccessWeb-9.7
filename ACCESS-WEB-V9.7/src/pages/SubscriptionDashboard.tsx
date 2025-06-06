@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ScanResultModal from '../components/ScanResultModal';
+import apiClient from '../lib/apiClient';
 
 
 interface ScanResult {
@@ -54,54 +55,26 @@ export function SubscriptionDashboard() {
     paymentMethod: '**** **** **** 4242'
   };
 
-  // API client for making authenticated requests
-  const apiRequest = async (method: string, endpoint: string) => {
-    const token = localStorage.getItem('accessToken');
-    const apiUrl = endpoint.startsWith('http') ? endpoint : `http://localhost:3001${endpoint}`;
-    console.log(`Making ${method} request to:`, apiUrl);
-    console.log('Using token:', token ? 'present' : 'missing');
-    
-    const response = await fetch(apiUrl, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      credentials: 'include'
-    });
-
-    console.log(`Response status: ${response.status}`);
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`API Error: ${response.status} - ${response.statusText}`, errorText);
-      throw new Error(`API Error: ${response.status} - ${response.statusText}`);
-    }
-
-    return await response.json();
-  };
-
   const fetchRecentScans = async () => {
     try {
-      console.log('🔍 Starting to fetch recent scans...');
-      const response = await apiRequest('GET', '/api/scanner/recent-scans?limit=5');
-      console.log('✅ Recent scans response received:', response);
-      setRecentScans(response.data || []);
-      console.log('📊 Recent scans state updated with', response.data?.length || 0, 'items');
+      console.log('Fetching recent scans with apiClient...');
+      const response = await apiClient.get('/scanner/recent-scans?limit=5');
+      console.log('Recent scans response:', response.data);
+      setRecentScans(response.data.data || []);
     } catch (error) {
-      console.error('❌ Failed to fetch recent scans:', error);
+      console.error('Error fetching recent scans:', error);
       setRecentScans([]);
     }
   };
 
   const fetchStats = async () => {
     try {
-      console.log('📈 Starting to fetch scanner stats...');
-      const response = await apiRequest('GET', '/api/scanner/stats');
-      console.log('✅ Scanner stats response received:', response);
-      setStats(response.data || { scansThisMonth: 0, totalScans: 0, pagesScanned: 0, teamMembers: 0 });
-      console.log('📊 Scanner stats state updated');
+      console.log('Fetching scanner stats with apiClient...');
+      const response = await apiClient.get('/scanner/stats');
+      console.log('Scanner stats response:', response.data);
+      setStats(response.data.data || { scansThisMonth: 0, totalScans: 0, pagesScanned: 0, teamMembers: 0 });
     } catch (error) {
-      console.error('❌ Failed to fetch scanner stats:', error);
+      console.error('Error fetching scanner stats:', error);
       setStats({ scansThisMonth: 0, totalScans: 0, pagesScanned: 0, teamMembers: 0 });
     } finally {
       setLoading(false);
@@ -109,26 +82,14 @@ export function SubscriptionDashboard() {
   };
 
   useEffect(() => {
-    console.log('🚀 Dashboard useEffect triggered - starting data load...');
-    
-    const loadData = async () => {
-      try {
-        console.log('🔄 Executing loadData function...');
-        await fetchRecentScans();
-        await fetchStats();
-        console.log('✅ Data loading completed');
-      } catch (error) {
-        console.error('❌ Error in loadData:', error);
-      }
-    };
-    
-    loadData();
+    fetchRecentScans();
+    fetchStats();
   }, []);
 
   const handleViewResult = async (scan: ScanResult) => {
     try {
-      const response = await apiRequest('GET', `/api/scanner/scan-details/${scan.id}`);
-      setSelectedScan(response.data);
+      const response = await apiClient.get(`/scanner/scan-details/${scan.id}`);
+      setSelectedScan(response.data.data);
       setIsModalOpen(true);
     } catch (error) {
       console.error('Failed to fetch scan details:', error);
