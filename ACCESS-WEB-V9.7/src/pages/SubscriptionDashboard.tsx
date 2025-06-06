@@ -57,7 +57,11 @@ export function SubscriptionDashboard() {
   // API client for making authenticated requests
   const apiRequest = async (method: string, endpoint: string) => {
     const token = localStorage.getItem('accessToken');
-    const response = await fetch(endpoint, {
+    const apiUrl = endpoint.startsWith('http') ? endpoint : `http://localhost:3001${endpoint}`;
+    console.log(`Making ${method} request to:`, apiUrl);
+    console.log('Using token:', token ? 'present' : 'missing');
+    
+    const response = await fetch(apiUrl, {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -66,7 +70,10 @@ export function SubscriptionDashboard() {
       credentials: 'include'
     });
 
+    console.log(`Response status: ${response.status}`);
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API Error: ${response.status} - ${response.statusText}`, errorText);
       throw new Error(`API Error: ${response.status} - ${response.statusText}`);
     }
 
