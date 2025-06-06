@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,27 +8,25 @@ datasource db {
 }
 
 model User {
-  id                   Int       @id @default(autoincrement())
-  email                String    @unique
+  id                   Int              @id @default(autoincrement())
+  email                String           @unique
   password             String
   name                 String?
-  firstName            String?   @map("first_name")
-  lastName             String?   @map("last_name")
-  createdAt            DateTime  @default(now()) @map("created_at")
-  updatedAt            DateTime? @updatedAt @map("updated_at")
-  profileImageUrl      String?   @map("profile_image_url")
-  isAdmin              Boolean   @default(false) @map("is_admin")
-  subscriptionPlan     String    @default("free") @map("subscription_plan")
-  subscriptionStatus   String    @default("active") @map("subscription_status")
-  stripeCustomerId     String?   @map("stripe_customer_id")
-  stripeSubscriptionId String?   @map("stripe_subscription_id")
-  currentPeriodEnd     DateTime? @map("current_period_end")
-  cancellationReason   String?   @map("cancellation_reason")
-  cancelledAt          DateTime? @map("cancelled_at")
-
-  // Relations
-  paymentHistory PaymentHistory[]
-  siteConnections SiteConnection[]
+  createdAt            DateTime         @default(now()) @map("created_at")
+  currentPeriodEnd     DateTime?        @map("current_period_end")
+  firstName            String?          @map("first_name")
+  isAdmin              Boolean          @default(false) @map("is_admin")
+  lastName             String?          @map("last_name")
+  profileImageUrl      String?          @map("profile_image_url")
+  stripeCustomerId     String?          @map("stripe_customer_id")
+  stripeSubscriptionId String?          @map("stripe_subscription_id")
+  subscriptionPlan     String           @default("free") @map("subscription_plan")
+  subscriptionStatus   String           @default("active") @map("subscription_status")
+  updatedAt            DateTime?        @updatedAt @map("updated_at")
+  cancellationReason   String?          @map("cancellation_reason")
+  cancelledAt          DateTime?        @map("cancelled_at")
+  paymentHistory       PaymentHistory[]
+  siteConnections      SiteConnection[]
 
   @@map("User")
 }
@@ -39,7 +34,7 @@ model User {
 model PricingPlan {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(100)
-  description String   @db.Text
+  description String
   price       Decimal  @db.Decimal(10, 2)
   currency    String   @default("USD") @db.VarChar(3)
   period      String   @default("month") @db.VarChar(20)
@@ -47,7 +42,7 @@ model PricingPlan {
   isPopular   Boolean  @default(false) @map("is_popular")
   cta         String   @default("Get Started") @db.VarChar(50)
   variant     String   @default("outline") @db.VarChar(20)
-  accentColor String   @default("text-primary") @db.VarChar(50) @map("accent_color")
+  accentColor String   @default("text-primary") @map("accent_color") @db.VarChar(50)
   sortOrder   Int      @default(0) @map("sort_order")
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")
@@ -57,71 +52,63 @@ model PricingPlan {
 }
 
 model PaymentHistory {
-  id                Int      @id @default(autoincrement())
-  userId            Int      @map("user_id")
-  amount            Decimal  @db.Decimal(10, 2)
-  currency          String   @default("USD") @db.VarChar(3)
-  status            String   @db.VarChar(20)
-  planName          String   @db.VarChar(100) @map("plan_name")
-  stripePaymentId   String   @unique @db.VarChar(255) @map("stripe_payment_id")
-  stripeCustomerId  String?  @db.VarChar(255) @map("stripe_customer_id")
-  paymentMethod     String?  @db.VarChar(50) @map("payment_method")
-  description       String?  @db.Text
-  receiptUrl        String?  @db.VarChar(500) @map("receipt_url")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-
-  // Relation to User
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               Int      @id @default(autoincrement())
+  userId           Int      @map("user_id")
+  amount           Decimal  @db.Decimal(10, 2)
+  currency         String   @default("USD") @db.VarChar(3)
+  status           String   @db.VarChar(20)
+  planName         String   @map("plan_name") @db.VarChar(100)
+  stripePaymentId  String   @unique @map("stripe_payment_id") @db.VarChar(255)
+  stripeCustomerId String?  @map("stripe_customer_id") @db.VarChar(255)
+  paymentMethod    String?  @map("payment_method") @db.VarChar(50)
+  description      String?
+  receiptUrl       String?  @map("receipt_url") @db.VarChar(500)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("payment_history")
 }
 
 model SiteConnection {
-  id              Int       @id @default(autoincrement())
-  userId          Int       @map("user_id")
-  siteName        String    @db.VarChar(100) @map("site_name")
-  siteUrl         String    @db.VarChar(255) @map("site_url")
-  platform        String    @default("wordpress") @db.VarChar(50)
-  apiToken        String?   @db.VarChar(255) @map("api_token")
-  status          String    @default("inactive") @db.VarChar(20)
-  isActive        Boolean   @default(false) @map("is_active")
-  lastScanAt      DateTime? @map("last_scan_at")
-  scanFrequency   String    @default("weekly") @db.VarChar(20) @map("scan_frequency")
-  autoScanEnabled Boolean   @default(false) @map("auto_scan_enabled")
-  webhookUrl      String?   @db.VarChar(255) @map("webhook_url")
+  id              Int          @id @default(autoincrement())
+  userId          Int          @map("user_id")
+  siteName        String       @map("site_name") @db.VarChar(100)
+  siteUrl         String       @map("site_url") @db.VarChar(255)
+  platform        String       @default("wordpress") @db.VarChar(50)
+  apiToken        String?      @map("api_token") @db.VarChar(255)
+  status          String       @default("inactive") @db.VarChar(20)
+  isActive        Boolean      @default(false) @map("is_active")
+  lastScanAt      DateTime?    @map("last_scan_at")
+  scanFrequency   String       @default("weekly") @map("scan_frequency") @db.VarChar(20)
+  autoScanEnabled Boolean      @default(false) @map("auto_scan_enabled")
+  webhookUrl      String?      @map("webhook_url") @db.VarChar(255)
   config          Json?
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-
-  // Relation to User
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Relations
-  scanResults ScanResult[]
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  scanResults     ScanResult[]
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("site_connections")
 }
 
 model ScanResult {
-  id                Int       @id @default(autoincrement())
-  siteConnectionId  Int       @map("site_connection_id")
-  scanType          String    @default("accessibility") @db.VarChar(50) @map("scan_type")
-  scanUrl           String    @db.VarChar(500) @map("scan_url")
-  scanStatus        String    @default("completed") @db.VarChar(20) @map("scan_status")
-  errorCount        Int       @default(0) @map("error_count")
-  warningCount      Int       @default(0) @map("warning_count")
-  noticeCount       Int       @default(0) @map("notice_count")
-  score             Float?    @db.Real
-  rawResults        Json      @map("raw_results")
-  scanDuration      Int?      @map("scan_duration") // in milliseconds
-  userAgent         String?   @db.VarChar(255) @map("user_agent")
-  screenCapture     String?   @db.VarChar(500) @map("screen_capture")
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-
-  // Relation to SiteConnection
-  siteConnection SiteConnection @relation(fields: [siteConnectionId], references: [id], onDelete: Cascade)
+  id               Int            @id @default(autoincrement())
+  siteConnectionId Int            @map("site_connection_id")
+  scanType         String         @default("accessibility") @map("scan_type") @db.VarChar(50)
+  scanUrl          String         @map("scan_url") @db.VarChar(500)
+  scanStatus       String         @default("completed") @map("scan_status") @db.VarChar(20)
+  errorCount       Int            @default(0) @map("error_count")
+  warningCount     Int            @default(0) @map("warning_count")
+  noticeCount      Int            @default(0) @map("notice_count")
+  score            Float?         @db.Real
+  rawResults       Json           @map("raw_results")
+  scanDuration     Int?           @map("scan_duration")
+  userAgent        String?        @map("user_agent") @db.VarChar(255)
+  screenCapture    String?        @map("screen_capture") @db.VarChar(500)
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+  siteConnection   SiteConnection @relation(fields: [siteConnectionId], references: [id], onDelete: Cascade)
 
   @@map("scan_results")
 }

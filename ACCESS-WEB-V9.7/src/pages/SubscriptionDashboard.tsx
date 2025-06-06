@@ -57,7 +57,7 @@ export function SubscriptionDashboard() {
   // API client for making authenticated requests
   const apiRequest = async (method: string, endpoint: string) => {
     const token = localStorage.getItem('accessToken');
-    const response = await fetch(`http://localhost:3001${endpoint}`, {
+    const response = await fetch(endpoint, {
       method,
       headers: {
         'Content-Type': 'application/json',
