@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { storageService } from '../lib/storage';
+import apiClient from '../lib/apiClient';
 import {
   BarChart,
   Bar,
@@ -13,35 +13,50 @@ import {
   Line
 } from 'recharts';
 import {
-  AlertOctagon,
-  Clock,
   Activity,
-  Settings,
-  Bell,
-  RefreshCw,
+  Clock,
+  Globe,
+  Search,
+  Filter,
+  TrendingUp,
+  AlertTriangle,
   CheckCircle,
   XCircle,
-  AlertTriangle
+  Calendar,
+  RefreshCw
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import type { MonitoringAlert } from '../types';
 
-interface MonitoringConfig {
-  id: string;
-  site_id: string;
-  frequency: 'realtime' | 'hourly' | 'daily' | 'weekly';
-  enabled: boolean;
-  last_check: string | null;
-  notification_email: string | null;
-  notification_webhook: string | null;
-  excluded_paths: string[];
+interface ScanResult {
+  id: number;
+  url: string;
+  timestamp: string;
+  accessibility_score: number;
+  total_issues: number;
+  errors: number;
+  warnings: number;
+  notices: number;
+  status: string;
+  scan_duration: number;
+  site_name?: string;
+}
+
+interface SiteConnection {
+  id: number;
+  site_name: string;
+  site_url: string;
+  status: string;
+  auto_scan_enabled: boolean;
+  scan_frequency: string;
+  last_scan_at: string | null;
 }
 
 export function MonitoringDashboard() {
-  const [configs, setConfigs] = useState<MonitoringConfig[]>([]);
-  const [alerts, setAlerts] = useState<MonitoringAlert[]>([]);
+  const [scans, setScans] = useState<ScanResult[]>([]);
+  const [connections, setConnections] = useState<SiteConnection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedConfig, setSelectedConfig] = useState<string | null>(null);
+  const [filter, setFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('timestamp');
 
   useEffect(() => {
     loadData();
@@ -49,118 +64,148 @@ export function MonitoringDashboard() {
 
   const loadData = async () => {
     try {
-      // Load monitoring configs
-      const configsData = await storageService.getItem<MonitoringConfig[]>('monitoring_configs') || [];
-      setConfigs(configsData);
+      // Load all scan results
+      const scansResponse = await apiClient.get('/scanner/recent-scans?limit=100');
+      setScans(scansResponse.data || []);
 
-      // Load monitoring alerts
-      const alertsData = await storageService.getItem<MonitoringAlert[]>('monitoring_alerts') || [];
-      setAlerts(alertsData);
+      // Load site connections (if the endpoint exists)
+      try {
+        const connectionsResponse = await apiClient.get('/scanner/connections');
+        setConnections(connectionsResponse.data || []);
+      } catch {
+        // Connection endpoint may not exist, that's fine
+        setConnections([]);
+      }
     } catch (error) {
+      console.error('Failed to load monitoring data:', error);
       toast.error('Failed to load monitoring data');
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleMonitoring = async (configId: string, enabled: boolean) => {
-    try {
-      const updatedConfigs = configs.map(config => 
-        config.id === configId ? { ...config, enabled } : config
-      );
-      await storageService.setItem('monitoring_configs', updatedConfigs);
-      setConfigs(updatedConfigs);
-      
-      toast.success(`Monitoring ${enabled ? 'enabled' : 'disabled'}`);
-    } catch (error) {
-      toast.error('Failed to update monitoring status');
-    }
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return 'text-green-600';
+    if (score >= 70) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
-  const getAlertIcon = (type: string) => {
-    switch (type) {
-      case 'info':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'error':
-        return <XCircle className="w-5 h-5 text-red-500" />;
-      case 'warning':
-        return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
-      default:
-        return null;
-    }
+  const getScoreBadgeColor = (score: number) => {
+    if (score >= 90) return 'bg-green-100 text-green-800';
+    if (score >= 70) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-red-100 text-red-800';
   };
+
+  // Filter and sort scans
+  const filteredScans = scans.filter(scan => {
+    if (filter === 'all') return true;
+    if (filter === 'errors' && scan.errors > 0) return true;
+    if (filter === 'warnings' && scan.warnings > 0) return true;
+    if (filter === 'passed' && scan.errors === 0 && scan.warnings === 0) return true;
+    return false;
+  });
+
+  const sortedScans = filteredScans.sort((a, b) => {
+    if (sortBy === 'timestamp') return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    if (sortBy === 'score') return b.accessibility_score - a.accessibility_score;
+    if (sortBy === 'issues') return b.total_issues - a.total_issues;
+    return 0;
+  });
 
   // Process data for charts
-  const alertsTrend = alerts.reduce((acc, alert) => {
-    const date = new Date(alert.created_at).toLocaleDateString();
+  const chartData = scans.reduce((acc, scan) => {
+    const date = new Date(scan.timestamp).toLocaleDateString();
     if (!acc[date]) {
-      acc[date] = { date, errors: 0, warnings: 0, info: 0 };
+      acc[date] = { date, scans: 0, avgScore: 0, totalErrors: 0, totalWarnings: 0 };
     }
-    acc[date][alert.type]++;
+    acc[date].scans++;
+    acc[date].avgScore = ((acc[date].avgScore * (acc[date].scans - 1)) + scan.accessibility_score) / acc[date].scans;
+    acc[date].totalErrors += scan.errors;
+    acc[date].totalWarnings += scan.warnings;
     return acc;
-  }, {} as Record<string, { date: string; errors: number; warnings: number; info: number; }>);
+  }, {} as Record<string, { date: string; scans: number; avgScore: number; totalErrors: number; totalWarnings: number; }>);
 
-  const chartData = Object.values(alertsTrend);
+  const chartDataArray = Object.values(chartData);
+
+  // Calculate summary stats
+  const totalScans = scans.length;
+  const avgScore = scans.length > 0 ? scans.reduce((sum, scan) => sum + scan.accessibility_score, 0) / scans.length : 0;
+  const totalErrors = scans.reduce((sum, scan) => sum + scan.errors, 0);
+  const totalWarnings = scans.reduce((sum, scan) => sum + scan.warnings, 0);
+  const activeConnections = connections.filter(conn => conn.status === 'active' && conn.auto_scan_enabled).length;
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-lg shadow-sm p-6">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Activity className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <Activity className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Active Monitors</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {configs.filter(c => c.enabled).length}
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Scans</p>
+              <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                {totalScans}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <TrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Success Rate</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {alerts.length ? 
-                  `${((alerts.filter(a => a.type === 'info').length / alerts.length) * 100).toFixed(1)}%` 
-                  : '0%'}
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Score</p>
+              <p className={`text-2xl font-semibold ${getScoreColor(avgScore)} dark:text-gray-100`}>
+                {avgScore.toFixed(1)}%
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-red-100 rounded-lg">
-              <AlertOctagon className="w-6 h-6 text-red-600" />
+            <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
+              <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Issues Found</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {alerts.filter(a => a.type === 'error').length}
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Issues</p>
+              <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                {totalErrors + totalWarnings}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <Clock className="w-6 h-6 text-purple-600" />
+            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <Globe className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Avg Response Time</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {alerts.length ? 
-                  `${(alerts.reduce((sum, alert) => sum + (alert.data.duration || 0), 0) / alerts.length / 1000).toFixed(1)}s` 
-                  : '0s'}
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Sites</p>
+              <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                {activeConnections}
               </p>
             </div>
           </div>
@@ -168,135 +213,192 @@ export function MonitoringDashboard() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-6">Alerts Trend</h3>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="errors" stroke="#ef4444" name="Errors" />
-                <Line type="monotone" dataKey="warnings" stroke="#f59e0b" name="Warnings" />
-                <Line type="monotone" dataKey="info" stroke="#10b981" name="Info" />
-              </LineChart>
-            </ResponsiveContainer>
+      {chartDataArray.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Accessibility Score Trend</h3>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartDataArray}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="avgScore" stroke="#10b981" name="Avg Score" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Issues Distribution</h3>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartDataArray}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="totalErrors" fill="#ef4444" name="Errors" />
+                  <Bar dataKey="totalWarnings" fill="#f59e0b" name="Warnings" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
+      )}
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-6">Alert Distribution</h3>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="errors" fill="#ef4444" name="Errors" />
-                <Bar dataKey="warnings" fill="#f59e0b" name="Warnings" />
-                <Bar dataKey="info" fill="#10b981" name="Info" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* Monitoring Configs */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">Monitoring Configurations</h3>
-            <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-              <Settings className="w-4 h-4 mr-2" />
-              Add Monitor
+      {/* Filters and Controls */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">All Scan Results</h3>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Filter className="w-4 h-4 text-gray-400" />
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="all">All Results</option>
+                <option value="errors">With Errors</option>
+                <option value="warnings">With Warnings</option>
+                <option value="passed">Passed</option>
+              </select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <label className="text-sm text-gray-600 dark:text-gray-400">Sort by:</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="timestamp">Date</option>
+                <option value="score">Score</option>
+                <option value="issues">Issues</option>
+              </select>
+            </div>
+            <button
+              onClick={loadData}
+              className="inline-flex items-center px-3 py-1 border border-transparent rounded-md text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+            >
+              <RefreshCw className="w-4 h-4 mr-1" />
+              Refresh
             </button>
           </div>
         </div>
 
-        <div className="divide-y divide-gray-200">
-          {configs.map(config => (
-            <div key={config.id} className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900">Site ID: {config.site_id}</h4>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Frequency: {config.frequency}
-                  </p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() => toggleMonitoring(config.id, !config.enabled)}
-                    className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                      config.enabled ? 'bg-blue-600' : 'bg-gray-200'
-                    }`}
-                  >
-                    <span className="sr-only">
-                      {config.enabled ? 'Disable monitoring' : 'Enable monitoring'}
-                    </span>
-                    <span
-                      className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${
-                        config.enabled ? 'translate-x-5' : 'translate-x-0'
-                      }`}
-                    />
-                  </button>
-                  <button className="text-gray-400 hover:text-gray-500">
-                    <Settings className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Recent Logs */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">Recent Alerts</h3>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-              <Bell className="w-4 h-4 mr-1" />
-              {alerts.filter(a => !a.acknowledged_at).length} unacknowledged
-            </span>
-          </div>
-        </div>
-
-        <div className="divide-y divide-gray-200">
-          {alerts.slice(0, 10).map(alert => (
-            <div key={alert.id} className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  {getAlertIcon(alert.type)}
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-900">{alert.message}</p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(alert.created_at).toLocaleString()}
+        {/* Scan Results Table */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Site
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Score
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Issues
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Duration
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {sortedScans.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <Globe className="mx-auto h-12 w-12 text-gray-400" />
+                    <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No scans found</h3>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      No scan results match the current filter criteria.
                     </p>
-                  </div>
-                </div>
-                {!alert.acknowledged_at && (
-                  <button
-                    onClick={() => acknowledgeAlert(alert.id)}
-                    className="text-sm text-blue-600 hover:text-blue-700"
-                  >
-                    Acknowledge
-                  </button>
-                )}
-              </div>
-              {alert.data && Object.keys(alert.data).length > 0 && (
-                <div className="mt-2">
-                  <pre className="text-xs bg-gray-50 p-2 rounded-md overflow-x-auto">
-                    {JSON.stringify(alert.data, null, 2)}
-                  </pre>
-                </div>
+                  </td>
+                </tr>
+              ) : (
+                sortedScans.map((scan) => (
+                  <tr key={scan.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-8 w-8">
+                          <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                            <Globe className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            {scan.site_name || new URL(scan.url).hostname}
+                          </div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                            {scan.url}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getScoreBadgeColor(scan.accessibility_score)}`}>
+                        {scan.accessibility_score}%
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      <div className="flex items-center space-x-2">
+                        {scan.errors > 0 && (
+                          <span className="inline-flex items-center text-red-600 dark:text-red-400">
+                            <XCircle className="w-4 h-4 mr-1" />
+                            {scan.errors}
+                          </span>
+                        )}
+                        {scan.warnings > 0 && (
+                          <span className="inline-flex items-center text-yellow-600 dark:text-yellow-400">
+                            <AlertTriangle className="w-4 h-4 mr-1" />
+                            {scan.warnings}
+                          </span>
+                        )}
+                        {scan.errors === 0 && scan.warnings === 0 && (
+                          <span className="inline-flex items-center text-green-600 dark:text-green-400">
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            None
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {new Date(scan.timestamp).toLocaleDateString()}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center">
+                        <Clock className="w-4 h-4 mr-1" />
+                        {scan.scan_duration ? `${(scan.scan_duration / 1000).toFixed(1)}s` : 'N/A'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        scan.status === 'completed' 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                      }`}>
+                        {scan.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
               )}
-            </div>
-          ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
