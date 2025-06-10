@@ -12,11 +12,11 @@ export class AccessibilityScanner {
     };
   }
 
-  async scanUrl(url, siteConnectionId) {
+  async scanUrl(url, siteConnectionId, scanReason = 'schedule') {
     const startTime = Date.now();
     
     try {
-      console.log(`🔍 [ACCESSIBILITY] Starting WCAG scan for: ${url}`);
+      console.log(`🔍 [ACCESSIBILITY] Starting WCAG scan for: ${url} (${scanReason})`);
       
       // Fetch and analyze HTML content
       const htmlContent = await this.fetchPageContent(url);
@@ -37,7 +37,8 @@ export class AccessibilityScanner {
         score: analysisResults.score,
         rawResults: analysisResults.rawData,
         scanDuration,
-        userAgent: this.scanConfig.userAgent
+        userAgent: this.scanConfig.userAgent,
+        scanReason: scanReason
       });
       
       // Update site connection last scan time
@@ -65,7 +66,8 @@ export class AccessibilityScanner {
           timestamp: new Date().toISOString()
         },
         scanDuration,
-        userAgent: this.scanConfig.userAgent
+        userAgent: this.scanConfig.userAgent,
+        scanReason: scanReason
       });
       
       throw error;

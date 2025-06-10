@@ -142,12 +142,12 @@ class SiteScannerJobQueue {
     }
   }
 
-  async performAccessibilityScan(connectionId, siteUrl, platform) {
+  async performAccessibilityScan(connectionId, siteUrl, platform, scanReason = 'schedule') {
     try {
-      console.log(`🔍 [SCAN-${connectionId}] Starting WCAG accessibility scan for: ${siteUrl}`);
+      console.log(`🔍 [SCAN-${connectionId}] Starting WCAG accessibility scan for: ${siteUrl} (Reason: ${scanReason})`);
       
       // Perform real accessibility scan using pa11y
-      const scanResult = await accessibilityScanner.scanUrl(siteUrl, connectionId);
+      const scanResult = await accessibilityScanner.scanUrl(siteUrl, connectionId, scanReason);
       
       console.log(`
 ╔═══════════════════ SCAN RESULTS ═══════════════════╗
@@ -189,7 +189,8 @@ class SiteScannerJobQueue {
           timestamp: new Date().toISOString()
         },
         scanDuration: 0,
-        userAgent: 'AccessWeb-Scanner/1.0'
+        userAgent: 'AccessWeb-Scanner/1.0',
+        scanReason: scanReason
       });
       
       return {
