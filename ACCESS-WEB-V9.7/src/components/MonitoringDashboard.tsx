@@ -26,6 +26,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import ScanResultModal from './ScanResultModal';
 
 interface ScanResult {
   id: number;
@@ -59,6 +60,8 @@ export function MonitoringDashboard() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('timestamp');
+  const [selectedScan, setSelectedScan] = useState<ScanResult | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -83,6 +86,17 @@ export function MonitoringDashboard() {
       toast.error('Failed to load monitoring data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleViewReport = async (scan: ScanResult) => {
+    try {
+      const response = await apiClient.get(`/scanner/scan-details/${scan.id}`);
+      setSelectedScan(response.data.data);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('Failed to fetch scan details:', error);
+      toast.error('Failed to load scan details');
     }
   };
 
@@ -315,12 +329,15 @@ export function MonitoringDashboard() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {sortedScans.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+                  <td colSpan={7} className="px-6 py-12 text-center">
                     <Globe className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No scans found</h3>
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -396,6 +413,14 @@ export function MonitoringDashboard() {
                         {scan.scanStatus}
                       </span>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() => handleViewReport(scan)}
+                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                      >
+                        View Report
+                      </button>
+                    </td>
                   </tr>
                 ))
               )}
@@ -403,6 +428,15 @@ export function MonitoringDashboard() {
           </table>
         </div>
       </div>
+
+      {/* Scan Result Modal */}
+      {selectedScan && (
+        <ScanResultModal
+          scan={selectedScan}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
