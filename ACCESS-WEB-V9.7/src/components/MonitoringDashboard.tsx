@@ -355,19 +355,19 @@ export function MonitoringDashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                       <div className="flex items-center space-x-2">
-                        {scan.errors > 0 && (
+                        {scan.errorCount > 0 && (
                           <span className="inline-flex items-center text-red-600 dark:text-red-400">
                             <XCircle className="w-4 h-4 mr-1" />
-                            {scan.errors}
+                            {scan.errorCount}
                           </span>
                         )}
-                        {scan.warnings > 0 && (
+                        {scan.warningCount > 0 && (
                           <span className="inline-flex items-center text-yellow-600 dark:text-yellow-400">
                             <AlertTriangle className="w-4 h-4 mr-1" />
-                            {scan.warnings}
+                            {scan.warningCount}
                           </span>
                         )}
-                        {scan.errors === 0 && scan.warnings === 0 && (
+                        {scan.errorCount === 0 && scan.warningCount === 0 && (
                           <span className="inline-flex items-center text-green-600 dark:text-green-400">
                             <CheckCircle className="w-4 h-4 mr-1" />
                             None
@@ -378,22 +378,22 @@ export function MonitoringDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
-                        {new Date(scan.timestamp).toLocaleDateString()}
+                        {new Date(scan.createdAt).toLocaleDateString()}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       <div className="flex items-center">
                         <Clock className="w-4 h-4 mr-1" />
-                        {scan.scan_duration ? `${(scan.scan_duration / 1000).toFixed(1)}s` : 'N/A'}
+                        {scan.scanDuration ? `${(scan.scanDuration / 1000).toFixed(1)}s` : 'N/A'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        scan.status === 'completed' 
+                        scan.scanStatus === 'completed' 
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                           : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                       }`}>
-                        {scan.status}
+                        {scan.scanStatus}
                       </span>
                     </td>
                   </tr>
