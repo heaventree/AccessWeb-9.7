@@ -432,7 +432,7 @@ export function MonitoringDashboard() {
       {/* Scan Result Modal */}
       {selectedScan && (
         <ScanResultModal
-          scan={selectedScan}
+          scanResult={selectedScan}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
         />
