@@ -136,7 +136,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
  * Generate WordPress Plugin Token
  * Creates a new token for WordPress plugin integration
  */
-router.post('/wp-plugin/generate-token', async (req, res) => {
+router.post('/wp-plugin/generate-token', requireAuth, async (req, res) => {
   try {
     const { site_connection_id, domain } = req.body;
     const userId = req.user?.id;
@@ -200,7 +200,7 @@ router.post('/wp-plugin/generate-token', async (req, res) => {
  * List WordPress Plugin Tokens
  * Get all tokens for the authenticated user
  */
-router.get('/wp-plugin/tokens', async (req, res) => {
+router.get('/wp-plugin/tokens', requireAuth, async (req, res) => {
   try {
     const userId = req.user?.id;
 
@@ -253,7 +253,7 @@ router.get('/wp-plugin/tokens', async (req, res) => {
  * Revoke WordPress Plugin Token
  * Deactivate a token
  */
-router.delete('/wp-plugin/tokens/:tokenId', async (req, res) => {
+router.delete('/wp-plugin/tokens/:tokenId', requireAuth, async (req, res) => {
   try {
     const userId = req.user?.id;
     const tokenId = parseInt(req.params.tokenId);
