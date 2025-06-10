@@ -2,6 +2,7 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import siteScannerQueue from '../jobs/siteScanner.js';
+import { requireAuth } from '../../middleware/userAuth.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -49,7 +50,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
       }
     });
 
-    if (!tokenRecord || !tokenRecord.is_active) {
+    if (!tokenRecord || !tokenRecord.isActive) {
       console.log(`❌ [WP-PLUGIN] Invalid or inactive token: ${token}`);
       return res.status(401).json({
         error: 'Invalid or inactive token'
@@ -65,12 +66,12 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
     }
 
     // Update last used timestamp
-    await prisma.wp_plugin_tokens.update({
+    await prisma.wpPluginToken.update({
       where: { id: tokenRecord.id },
-      data: { last_used_at: new Date() }
+      data: { lastUsedAt: new Date() }
     });
 
-    const siteConnection = tokenRecord.site_connection;
+    const siteConnection = tokenRecord.siteConnection;
 
     // Handle different status types
     if (status === 'no-update') {
@@ -90,7 +91,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
       try {
         const scanResult = await siteScannerQueue.performAccessibilityScan(
           siteConnection.id,
-          siteConnection.site_url,
+          siteConnection.siteUrl,
           siteConnection.platform || 'wordpress',
           scanReason
         );
@@ -151,10 +152,10 @@ router.post('/wp-plugin/generate-token', async (req, res) => {
     }
 
     // Verify user owns the site connection
-    const siteConnection = await prisma.site_connections.findFirst({
+    const siteConnection = await prisma.siteConnection.findFirst({
       where: {
         id: parseInt(site_connection_id),
-        user_id: userId
+        userId: userId
       }
     });
 
@@ -168,10 +169,10 @@ router.post('/wp-plugin/generate-token', async (req, res) => {
     const token = crypto.randomBytes(32).toString('hex');
 
     // Create token record
-    const tokenRecord = await prisma.wp_plugin_tokens.create({
+    const tokenRecord = await prisma.wpPluginToken.create({
       data: {
         token,
-        site_connection_id: parseInt(site_connection_id),
+        siteConnectionId: parseInt(site_connection_id),
         domain
       }
     });
@@ -207,23 +208,23 @@ router.get('/wp-plugin/tokens', async (req, res) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const tokens = await prisma.wp_plugin_tokens.findMany({
+    const tokens = await prisma.wpPluginToken.findMany({
       where: {
-        site_connection: {
-          user_id: userId
+        siteConnection: {
+          userId: userId
         }
       },
       include: {
-        site_connection: {
+        siteConnection: {
           select: {
             id: true,
-            site_name: true,
-            site_url: true,
+            siteName: true,
+            siteUrl: true,
             status: true
           }
         }
       },
-      orderBy: { created_at: 'desc' }
+      orderBy: { createdAt: 'desc' }
     });
 
     res.json({
@@ -232,10 +233,10 @@ router.get('/wp-plugin/tokens', async (req, res) => {
         id: token.id,
         token: token.token.substring(0, 8) + '...' + token.token.substring(token.token.length - 8), // Masked token
         domain: token.domain,
-        site_connection: token.site_connection,
-        created_at: token.created_at,
-        last_used_at: token.last_used_at,
-        is_active: token.is_active
+        site_connection: token.siteConnection,
+        created_at: token.createdAt,
+        last_used_at: token.lastUsedAt,
+        is_active: token.isActive
       }))
     });
 
@@ -262,11 +263,11 @@ router.delete('/wp-plugin/tokens/:tokenId', async (req, res) => {
     }
 
     // Verify user owns the token
-    const tokenRecord = await prisma.wp_plugin_tokens.findFirst({
+    const tokenRecord = await prisma.wpPluginToken.findFirst({
       where: {
         id: tokenId,
-        site_connection: {
-          user_id: userId
+        siteConnection: {
+          userId: userId
         }
       }
     });
@@ -278,9 +279,9 @@ router.delete('/wp-plugin/tokens/:tokenId', async (req, res) => {
     }
 
     // Deactivate token
-    await prisma.wp_plugin_tokens.update({
+    await prisma.wpPluginToken.update({
       where: { id: tokenId },
-      data: { is_active: false }
+      data: { isActive: false }
     });
 
     console.log(`🔐 [WP-PLUGIN] Token revoked for domain: ${tokenRecord.domain}`);
