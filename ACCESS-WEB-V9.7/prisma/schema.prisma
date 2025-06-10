@@ -87,6 +87,7 @@ model SiteConnection {
   createdAt       DateTime     @default(now()) @map("created_at")
   updatedAt       DateTime     @updatedAt @map("updated_at")
   scanResults     ScanResult[]
+  wpPluginTokens  WpPluginToken[]
   user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("site_connections")
@@ -106,9 +107,23 @@ model ScanResult {
   scanDuration     Int?           @map("scan_duration")
   userAgent        String?        @map("user_agent") @db.VarChar(255)
   screenCapture    String?        @map("screen_capture") @db.VarChar(500)
+  scanReason       String?        @default("schedule") @map("scan_reason") @db.VarChar(50)
   createdAt        DateTime       @default(now()) @map("created_at")
   updatedAt        DateTime       @updatedAt @map("updated_at")
   siteConnection   SiteConnection @relation(fields: [siteConnectionId], references: [id], onDelete: Cascade)
 
   @@map("scan_results")
+}
+
+model WpPluginToken {
+  id               Int            @id @default(autoincrement())
+  token            String         @unique @db.VarChar(255)
+  siteConnectionId Int            @map("site_connection_id")
+  domain           String         @db.VarChar(255)
+  createdAt        DateTime       @default(now()) @map("created_at")
+  lastUsedAt       DateTime?      @map("last_used_at")
+  isActive         Boolean        @default(true) @map("is_active")
+  siteConnection   SiteConnection @relation(fields: [siteConnectionId], references: [id], onDelete: Cascade)
+
+  @@map("wp_plugin_tokens")
 }

@@ -38,10 +38,10 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
     }
 
     // Find the site connection using the token
-    const tokenRecord = await prisma.wp_plugin_tokens.findUnique({
+    const tokenRecord = await prisma.wpPluginToken.findUnique({
       where: { token },
       include: {
-        site_connection: {
+        siteConnection: {
           include: {
             user: true
           }

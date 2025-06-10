@@ -39,6 +39,7 @@ interface ScanResult {
   status: string;
   scan_duration: number;
   site_name?: string;
+  scan_reason?: string;
 }
 
 interface SiteConnection {
