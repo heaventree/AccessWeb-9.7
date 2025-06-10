@@ -46,12 +46,14 @@ interface ScanResult {
 
 interface SiteConnection {
   id: number;
-  site_name: string;
-  site_url: string;
-  status: string;
-  auto_scan_enabled: boolean;
-  scan_frequency: string;
-  last_scan_at: string | null;
+  siteName: string;
+  siteUrl: string;
+  isActive: boolean;
+  autoScanEnabled: boolean;
+  scanFrequency: string;
+  lastScanAt: string | null;
+  apiToken?: string;
+  platform: string;
 }
 
 export function MonitoringDashboard() {
@@ -75,10 +77,12 @@ export function MonitoringDashboard() {
 
       // Load site connections (if the endpoint exists)
       try {
-        const connectionsResponse = await apiClient.get('/scanner/connections');
-        setConnections(connectionsResponse.data?.data || []);
-      } catch {
-        // Connection endpoint may not exist, that's fine
+        const connectionsResponse = await apiClient.get('/site-connections');
+        const connectionsData = connectionsResponse.data?.data || [];
+        console.log('Loaded site connections:', connectionsData);
+        setConnections(connectionsData);
+      } catch (error) {
+        console.error('Failed to load connections:', error);
         setConnections([]);
       }
     } catch (error) {
@@ -148,7 +152,7 @@ export function MonitoringDashboard() {
   const avgScore = scans.length > 0 ? scans.reduce((sum, scan) => sum + scan.score, 0) / scans.length : 0;
   const totalErrors = scans.reduce((sum, scan) => sum + scan.errorCount, 0);
   const totalWarnings = scans.reduce((sum, scan) => sum + scan.warningCount, 0);
-  const activeConnections = connections.filter(conn => conn.status === 'active' && conn.auto_scan_enabled).length;
+  const activeConnections = connections.filter(conn => conn.isActive && conn.autoScanEnabled).length;
 
   if (loading) {
     return (
