@@ -413,20 +413,58 @@ router.get('/stats', logRequest, async (req, res) => {
 });
 
 /**
- * Get recent scan results
+ * Get recent scan results with pagination
  * GET /api/scanner/recent-scans
  */
 router.get('/recent-scans', logRequest, async (req, res) => {
   try {
     const userId = req.user.userId;
+    const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
+    const filter = req.query.filter || 'all';
+    const sort = req.query.sort || 'timestamp';
+    
+    const skip = (page - 1) * limit;
+    
+    // Build where clause based on filter
+    let whereClause = {
+      siteConnection: {
+        userId: userId
+      }
+    };
+    
+    if (filter === 'failed') {
+      whereClause.scanStatus = 'failed';
+    } else if (filter === 'issues') {
+      whereClause.OR = [
+        { errorCount: { gt: 0 } },
+        { warningCount: { gt: 0 } }
+      ];
+    } else if (filter === 'passed') {
+      whereClause.AND = [
+        { errorCount: 0 },
+        { warningCount: 0 },
+        { scanStatus: 'completed' }
+      ];
+    }
+    
+    // Build orderBy clause based on sort
+    let orderBy = { createdAt: 'desc' };
+    if (sort === 'score') {
+      orderBy = { score: 'desc' };
+    } else if (sort === 'issues') {
+      orderBy = [{ errorCount: 'desc' }, { warningCount: 'desc' }];
+    }
+
+    // Get total count for pagination
+    const totalCount = await prisma.scanResult.count({
+      where: whereClause
+    });
+    
+    const totalPages = Math.ceil(totalCount / limit);
 
     const recentScans = await prisma.scanResult.findMany({
-      where: {
-        siteConnection: {
-          userId: userId
-        }
-      },
+      where: whereClause,
       include: {
         siteConnection: {
           select: {
@@ -436,9 +474,8 @@ router.get('/recent-scans', logRequest, async (req, res) => {
           }
         }
       },
-      orderBy: {
-        createdAt: 'desc'
-      },
+      orderBy: orderBy,
+      skip: skip,
       take: limit
     });
 
@@ -460,7 +497,15 @@ router.get('/recent-scans', logRequest, async (req, res) => {
 
     res.json({
       success: true,
-      data: formattedScans
+      data: formattedScans,
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        total: totalCount,
+        limit: limit,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
     });
 
   } catch (error) {

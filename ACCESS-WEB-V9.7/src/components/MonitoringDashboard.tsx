@@ -64,16 +64,22 @@ export function MonitoringDashboard() {
   const [sortBy, setSortBy] = useState('timestamp');
   const [selectedScan, setSelectedScan] = useState<ScanResult | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalScans, setTotalScans] = useState(0);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [currentPage, filter, sortBy]);
 
   const loadData = async () => {
     try {
-      // Load all scan results
-      const scansResponse = await apiClient.get('/scanner/recent-scans?limit=100');
+      // Load paginated scan results
+      const scansResponse = await apiClient.get(`/scanner/recent-scans?page=${currentPage}&limit=${itemsPerPage}&filter=${filter}&sort=${sortBy}`);
       setScans(scansResponse.data?.data || []);
+      setTotalPages(scansResponse.data?.pagination?.totalPages || 1);
+      setTotalScans(scansResponse.data?.pagination?.total || 0);
 
       // Load site connections (if the endpoint exists)
       try {
@@ -148,7 +154,7 @@ export function MonitoringDashboard() {
   const chartDataArray = Object.values(chartData);
 
   // Calculate summary stats
-  const totalScans = scans.length;
+  const displayTotalScans = totalScans || scans.length;
   const avgScore = scans.length > 0 ? scans.reduce((sum, scan) => sum + scan.score, 0) / scans.length : 0;
   const totalErrors = scans.reduce((sum, scan) => sum + scan.errorCount, 0);
   const totalWarnings = scans.reduce((sum, scan) => sum + scan.warningCount, 0);
@@ -183,7 +189,7 @@ export function MonitoringDashboard() {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Scans</p>
               <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                {totalScans}
+                {displayTotalScans}
               </p>
             </div>
           </div>
