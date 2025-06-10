@@ -454,7 +454,8 @@ router.get('/recent-scans', logRequest, async (req, res) => {
       scanDuration: scan.scanDuration,
       createdAt: scan.createdAt,
       platform: scan.siteConnection.platform,
-      issues: scan.errorCount + scan.warningCount
+      issues: scan.errorCount + scan.warningCount,
+      scanReason: scan.scanReason
     }));
 
     res.json({

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
 import {
   CreditCard,
   Settings,
@@ -33,6 +33,7 @@ interface ScanResult {
   createdAt: string;
   platform: string;
   issues: number;
+  scanReason?: string;
   rawResults?: any;
 }
 
@@ -97,7 +98,44 @@ export function SubscriptionDashboard() {
   };
 
   const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'MMM d, yyyy');
+    const date = new Date(dateString);
+    const now = new Date();
+    
+    if (isToday(date)) {
+      return formatDistanceToNow(date, { addSuffix: true });
+    } else if (isYesterday(date)) {
+      return 'yesterday';
+    } else {
+      return format(date, 'MMM d, yyyy');
+    }
+  };
+
+  const getScanReasonDisplay = (scanReason?: string) => {
+    if (!scanReason) return 'scheduled';
+    
+    switch (scanReason) {
+      case 'file_update':
+        return 'file change';
+      case 'file_init':
+        return 'plugin init';
+      case 'manual':
+        return 'manual';
+      default:
+        return 'scheduled';
+    }
+  };
+
+  const getScanReasonIcon = (scanReason?: string) => {
+    switch (scanReason) {
+      case 'file_update':
+        return '🔄';
+      case 'file_init':
+        return '🚀';
+      case 'manual':
+        return '👤';
+      default:
+        return '⏰';
+    }
   };
 
   const getScoreColor = (score: number) => {
@@ -310,9 +348,15 @@ export function SubscriptionDashboard() {
                             <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
                               {scan.siteName || scan.url}
                             </p>
-                            <p className="truncate text-sm text-gray-500 dark:text-gray-400">
-                              {formatDate(scan.createdAt)} - {scan.errorCount + scan.warningCount} issues • Score: <span className={getScoreColor(scan.score)}>{scan.score}%</span>
-                            </p>
+                            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                              <span className="truncate">
+                                {formatDate(scan.createdAt)} • {scan.errorCount + scan.warningCount} issues • Score: <span className={getScoreColor(scan.score)}>{scan.score}%</span>
+                              </span>
+                              <span className="flex items-center gap-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-full text-xs whitespace-nowrap">
+                                <span>{getScanReasonIcon(scan.scanReason)}</span>
+                                <span>{getScanReasonDisplay(scan.scanReason)}</span>
+                              </span>
+                            </div>
                           </div>
                           <div>
                             <button
