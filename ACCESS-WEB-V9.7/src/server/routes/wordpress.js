@@ -1,10 +1,10 @@
-const express = require('express');
-const { PrismaClient } = require('@prisma/client');
-const SiteScanner = require('../jobs/siteScanner');
+import express from 'express';
+import { PrismaClient } from '@prisma/client';
+import crypto from 'crypto';
+import siteScannerQueue from '../jobs/siteScanner.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
-const siteScanner = new SiteScanner();
 
 /**
  * WordPress Plugin Webhook API
@@ -88,7 +88,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
 
       // Trigger the accessibility scan using existing scanner logic
       try {
-        const scanResult = await siteScanner.performAccessibilityScan(
+        const scanResult = await siteScannerQueue.performAccessibilityScan(
           siteConnection.id,
           siteConnection.site_url,
           siteConnection.platform || 'wordpress',
@@ -165,7 +165,7 @@ router.post('/wp-plugin/generate-token', async (req, res) => {
     }
 
     // Generate unique token
-    const token = require('crypto').randomBytes(32).toString('hex');
+    const token = crypto.randomBytes(32).toString('hex');
 
     // Create token record
     const tokenRecord = await prisma.wp_plugin_tokens.create({
@@ -299,4 +299,4 @@ router.delete('/wp-plugin/tokens/:tokenId', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
