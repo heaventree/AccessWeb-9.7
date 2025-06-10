@@ -30,16 +30,17 @@ import { toast } from 'react-hot-toast';
 interface ScanResult {
   id: number;
   url: string;
-  timestamp: string;
-  accessibility_score: number;
-  total_issues: number;
-  errors: number;
-  warnings: number;
-  notices: number;
-  status: string;
-  scan_duration: number;
-  site_name?: string;
-  scan_reason?: string;
+  siteName: string;
+  score: number;
+  errorCount: number;
+  warningCount: number;
+  noticeCount: number;
+  scanStatus: string;
+  scanDuration: number;
+  createdAt: string;
+  platform: string;
+  issues: number;
+  scanReason?: string;
 }
 
 interface SiteConnection {
@@ -67,12 +68,12 @@ export function MonitoringDashboard() {
     try {
       // Load all scan results
       const scansResponse = await apiClient.get('/scanner/recent-scans?limit=100');
-      setScans(scansResponse.data || []);
+      setScans(scansResponse.data?.data || []);
 
       // Load site connections (if the endpoint exists)
       try {
         const connectionsResponse = await apiClient.get('/scanner/connections');
-        setConnections(connectionsResponse.data || []);
+        setConnections(connectionsResponse.data?.data || []);
       } catch {
         // Connection endpoint may not exist, that's fine
         setConnections([]);
@@ -100,29 +101,29 @@ export function MonitoringDashboard() {
   // Filter and sort scans
   const filteredScans = scans.filter(scan => {
     if (filter === 'all') return true;
-    if (filter === 'errors' && scan.errors > 0) return true;
-    if (filter === 'warnings' && scan.warnings > 0) return true;
-    if (filter === 'passed' && scan.errors === 0 && scan.warnings === 0) return true;
+    if (filter === 'errors' && scan.errorCount > 0) return true;
+    if (filter === 'warnings' && scan.warningCount > 0) return true;
+    if (filter === 'passed' && scan.errorCount === 0 && scan.warningCount === 0) return true;
     return false;
   });
 
   const sortedScans = filteredScans.sort((a, b) => {
-    if (sortBy === 'timestamp') return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-    if (sortBy === 'score') return b.accessibility_score - a.accessibility_score;
-    if (sortBy === 'issues') return b.total_issues - a.total_issues;
+    if (sortBy === 'timestamp') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    if (sortBy === 'score') return b.score - a.score;
+    if (sortBy === 'issues') return b.issues - a.issues;
     return 0;
   });
 
   // Process data for charts
   const chartData = scans.reduce((acc, scan) => {
-    const date = new Date(scan.timestamp).toLocaleDateString();
+    const date = new Date(scan.createdAt).toLocaleDateString();
     if (!acc[date]) {
       acc[date] = { date, scans: 0, avgScore: 0, totalErrors: 0, totalWarnings: 0 };
     }
     acc[date].scans++;
-    acc[date].avgScore = ((acc[date].avgScore * (acc[date].scans - 1)) + scan.accessibility_score) / acc[date].scans;
-    acc[date].totalErrors += scan.errors;
-    acc[date].totalWarnings += scan.warnings;
+    acc[date].avgScore = ((acc[date].avgScore * (acc[date].scans - 1)) + scan.score) / acc[date].scans;
+    acc[date].totalErrors += scan.errorCount;
+    acc[date].totalWarnings += scan.warningCount;
     return acc;
   }, {} as Record<string, { date: string; scans: number; avgScore: number; totalErrors: number; totalWarnings: number; }>);
 
@@ -130,9 +131,9 @@ export function MonitoringDashboard() {
 
   // Calculate summary stats
   const totalScans = scans.length;
-  const avgScore = scans.length > 0 ? scans.reduce((sum, scan) => sum + scan.accessibility_score, 0) / scans.length : 0;
-  const totalErrors = scans.reduce((sum, scan) => sum + scan.errors, 0);
-  const totalWarnings = scans.reduce((sum, scan) => sum + scan.warnings, 0);
+  const avgScore = scans.length > 0 ? scans.reduce((sum, scan) => sum + scan.score, 0) / scans.length : 0;
+  const totalErrors = scans.reduce((sum, scan) => sum + scan.errorCount, 0);
+  const totalWarnings = scans.reduce((sum, scan) => sum + scan.warningCount, 0);
   const activeConnections = connections.filter(conn => conn.status === 'active' && conn.auto_scan_enabled).length;
 
   if (loading) {
@@ -339,7 +340,7 @@ export function MonitoringDashboard() {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {scan.site_name || new URL(scan.url).hostname}
+                            {scan.siteName || new URL(scan.url).hostname}
                           </div>
                           <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
                             {scan.url}
@@ -348,8 +349,8 @@ export function MonitoringDashboard() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getScoreBadgeColor(scan.accessibility_score)}`}>
-                        {scan.accessibility_score}%
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getScoreBadgeColor(scan.score)}`}>
+                        {scan.score}%
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
