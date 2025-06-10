@@ -19,7 +19,6 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
   try {
     const {
       token,
-      domain,
       run_time,
       success,
       message,
@@ -29,12 +28,12 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
       modified_at
     } = req.body;
 
-    console.log(`🔌 [WP-PLUGIN] Received webhook from domain: ${domain}, status: ${status}`);
+    console.log(`🔌 [WP-PLUGIN] Received webhook with token: ${token?.substring(0, 8)}..., status: ${status}`);
 
     // Validate required fields
-    if (!token || !domain || !status) {
+    if (!token || !status) {
       return res.status(400).json({
-        error: 'Missing required fields: token, domain, status'
+        error: 'Missing required fields: token, status'
       });
     }
 
@@ -50,24 +49,18 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
     });
 
     if (!siteConnection) {
-      console.log(`❌ [WP-PLUGIN] Invalid token or inactive site connection: ${token}`);
+      console.log(`❌ [WP-PLUGIN] Invalid token or inactive site connection: ${token?.substring(0, 8)}...`);
       return res.status(401).json({
         error: 'Invalid token or inactive site connection'
       });
     }
 
-    // Verify domain matches site URL
-    const siteUrl = new URL(siteConnection.siteUrl);
-    if (siteUrl.hostname !== domain) {
-      console.log(`❌ [WP-PLUGIN] Domain mismatch. Expected: ${siteUrl.hostname}, Got: ${domain}`);
-      return res.status(403).json({
-        error: 'Domain mismatch'
-      });
-    }
+    console.log(`✅ [WP-PLUGIN] Authenticated for site: ${siteConnection.siteName} (${siteConnection.siteUrl})`);
+    const siteDomain = new URL(siteConnection.siteUrl).hostname;
 
     // Handle different status types
     if (status === 'no-update') {
-      console.log(`ℹ️ [WP-PLUGIN] No changes detected for ${domain}, ignoring`);
+      console.log(`ℹ️ [WP-PLUGIN] No changes detected for ${siteDomain}, ignoring`);
       return res.json({
         success: true,
         message: 'No changes detected, scan not triggered'
@@ -77,7 +70,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
     if (status === 'init' || status === 'update') {
       const scanReason = status === 'init' ? 'file_init' : 'file_update';
       
-      console.log(`🚀 [WP-PLUGIN] Triggering ${scanReason} scan for ${domain}`);
+      console.log(`🚀 [WP-PLUGIN] Triggering ${scanReason} scan for ${siteDomain}`);
 
       // Trigger the accessibility scan using existing scanner logic
       try {
@@ -88,7 +81,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
           scanReason
         );
 
-        console.log(`✅ [WP-PLUGIN] Scan completed for ${domain}, result ID: ${scanResult?.id}`);
+        console.log(`✅ [WP-PLUGIN] Scan completed for ${siteDomain}, result ID: ${scanResult?.id}`);
 
         return res.json({
           success: true,
@@ -98,7 +91,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
         });
 
       } catch (scanError) {
-        console.error(`❌ [WP-PLUGIN] Scan failed for ${domain}:`, scanError);
+        console.error(`❌ [WP-PLUGIN] Scan failed for ${siteDomain}:`, scanError);
         
         return res.status(500).json({
           success: false,
@@ -109,7 +102,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
     }
 
     // Unknown status
-    console.log(`⚠️ [WP-PLUGIN] Unknown status: ${status} for ${domain}`);
+    console.log(`⚠️ [WP-PLUGIN] Unknown status: ${status} for ${siteDomain}`);
     return res.status(400).json({
       error: `Unknown status: ${status}`
     });

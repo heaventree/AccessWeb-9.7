@@ -27,7 +27,6 @@ POST /api/wp-json/wp/v2/accessibility-auth/debug
 ```json
 {
   "token": "site-connection-api-token",
-  "domain": "example.com",
   "status": "update|init|no-update",
   "run_time": 1234567890,
   "success": true,
@@ -40,7 +39,6 @@ POST /api/wp-json/wp/v2/accessibility-auth/debug
 
 ### Required Fields
 - `token`: API token from site connection
-- `domain`: Website domain (must match site connection URL)
 - `status`: Change status (`update`, `init`, or `no-update`)
 
 ### Response Formats
