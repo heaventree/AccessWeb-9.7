@@ -114,7 +114,7 @@ The WCAG Accessibility Audit Tool is a comprehensive platform for testing, monit
 
 ## Changelog
 
-- June 17, 2025: WordPress webhook endpoint (`/wcag-compliance/schedule-response`) completed with full payload processing and scan triggering logic
+- June 17, 2025: WordPress webhook endpoint (`/wcag-compliance/schedule-response`) optimized with async scan processing for fast responses
 - June 17, 2025: WordPress Code Change Detection system completed with full API integration
 - June 17, 2025: Extended timeout support for WordPress "Run Once" scans (10 minutes)
 - June 17, 2025: Initial setup

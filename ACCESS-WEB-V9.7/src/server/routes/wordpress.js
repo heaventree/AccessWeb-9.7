@@ -389,45 +389,47 @@ router.post('/wcag-compliance/schedule-response', async (req, res) => {
       console.log(`🆕 [WP-SCHEDULE-WEBHOOK] Status is "init" - First time scan detected`);
       console.log(`🚀 [WP-SCHEDULE-WEBHOOK] Triggering accessibility scan for first-time setup`);
       
-      try {
-        // Trigger accessibility scan using existing scanner infrastructure
-        scanResult = await siteScannerQueue.performAccessibilityScan(
-          siteConnection.id,
-          siteConnection.siteUrl,
-          siteConnection.platform || 'wordpress',
-          'wordpress_init_scan'
-        );
-        
-        scanTriggered = true;
-        console.log(`✅ [WP-SCHEDULE-WEBHOOK] Init scan completed for connection ${siteConnection.id}`);
-        console.log(`📊 [WP-SCHEDULE-WEBHOOK] Scan result: Score ${scanResult.score}%, Errors: ${scanResult.errorCount}, Warnings: ${scanResult.warningCount}`);
-        
-      } catch (error) {
-        console.error(`❌ [WP-SCHEDULE-WEBHOOK] Init scan failed for connection ${siteConnection.id}:`, error);
-        scanResult = { error: error.message, scanStatus: 'failed' };
-      }
+      // Trigger accessibility scan asynchronously (don't wait for completion)
+      setImmediate(async () => {
+        try {
+          console.log(`🔍 [WP-SCAN-ASYNC] Starting async init scan for connection ${siteConnection.id}`);
+          const result = await siteScannerQueue.performAccessibilityScan(
+            siteConnection.id,
+            siteConnection.siteUrl,
+            siteConnection.platform || 'wordpress',
+            'wordpress_init_scan'
+          );
+          console.log(`✅ [WP-SCAN-ASYNC] Init scan completed - Score: ${result.score}%, Errors: ${result.errorCount}`);
+        } catch (error) {
+          console.error(`❌ [WP-SCAN-ASYNC] Init scan failed for connection ${siteConnection.id}:`, error);
+        }
+      });
+      
+      scanTriggered = true;
+      console.log(`✅ [WP-SCHEDULE-WEBHOOK] Init scan queued for connection ${siteConnection.id}`);
       
     } else if (status === 'update') {
       console.log(`🔄 [WP-SCHEDULE-WEBHOOK] Status is "update" - File changes detected`);
       console.log(`🚀 [WP-SCHEDULE-WEBHOOK] Triggering accessibility scan for updated files`);
       
-      try {
-        // Trigger accessibility scan using existing scanner infrastructure
-        scanResult = await siteScannerQueue.performAccessibilityScan(
-          siteConnection.id,
-          siteConnection.siteUrl,
-          siteConnection.platform || 'wordpress',
-          'wordpress_file_update'
-        );
-        
-        scanTriggered = true;
-        console.log(`✅ [WP-SCHEDULE-WEBHOOK] Update scan completed for connection ${siteConnection.id}`);
-        console.log(`📊 [WP-SCHEDULE-WEBHOOK] Scan result: Score ${scanResult.score}%, Errors: ${scanResult.errorCount}, Warnings: ${scanResult.warningCount}`);
-        
-      } catch (error) {
-        console.error(`❌ [WP-SCHEDULE-WEBHOOK] Update scan failed for connection ${siteConnection.id}:`, error);
-        scanResult = { error: error.message, scanStatus: 'failed' };
-      }
+      // Trigger accessibility scan asynchronously (don't wait for completion)
+      setImmediate(async () => {
+        try {
+          console.log(`🔍 [WP-SCAN-ASYNC] Starting async update scan for connection ${siteConnection.id}`);
+          const result = await siteScannerQueue.performAccessibilityScan(
+            siteConnection.id,
+            siteConnection.siteUrl,
+            siteConnection.platform || 'wordpress',
+            'wordpress_file_update'
+          );
+          console.log(`✅ [WP-SCAN-ASYNC] Update scan completed - Score: ${result.score}%, Errors: ${result.errorCount}`);
+        } catch (error) {
+          console.error(`❌ [WP-SCAN-ASYNC] Update scan failed for connection ${siteConnection.id}:`, error);
+        }
+      });
+      
+      scanTriggered = true;
+      console.log(`✅ [WP-SCHEDULE-WEBHOOK] Update scan queued for connection ${siteConnection.id}`)
       
     } else if (status === 'no-update') {
       console.log(`ℹ️ [WP-SCHEDULE-WEBHOOK] Status is "no-update" - No changes detected`);
@@ -450,52 +452,26 @@ router.post('/wcag-compliance/schedule-response', async (req, res) => {
     console.log(`💾 [WP-SCHEDULE-WEBHOOK] Webhook processed successfully`);
     console.log(`📊 [WP-SCHEDULE-WEBHOOK] Summary:`);
     console.log(`   - Connection: ${siteConnection.siteName} (${siteConnection.id})`);
-    console.log(`   - Action taken: ${scanTriggered ? 'Accessibility scan executed' : 'No scan needed'}`);
+    console.log(`   - Action taken: ${scanTriggered ? 'Accessibility scan queued' : 'No scan needed'}`);
     console.log(`   - Files scanned by WP: ${count || 'Unknown'}`);
     console.log(`   - Plugin success: ${success}`);
-    
-    if (scanResult) {
-      if (scanResult.error) {
-        console.log(`   - Scan status: Failed - ${scanResult.error}`);
-      } else {
-        console.log(`   - Scan status: ${scanResult.scanStatus}`);
-        console.log(`   - Accessibility score: ${scanResult.score}%`);
-        console.log(`   - Issues found: ${scanResult.errorCount} errors, ${scanResult.warningCount} warnings`);
-      }
-    }
 
-    // Return success response with scan results
-    const responseData = {
-      connectionId: siteConnection.id,
-      siteName: siteConnection.siteName,
-      status: status,
-      scanTriggered: scanTriggered,
-      timestamp: new Date().toISOString(),
-      webhookData: {
-        filesChanged: count,
-        pluginSuccess: success,
-        message: message
-      }
-    };
-
-    // Include scan results if available
-    if (scanResult) {
-      responseData.scanResult = {
-        scanResultId: scanResult.scanResultId,
-        score: scanResult.score,
-        errorCount: scanResult.errorCount,
-        warningCount: scanResult.warningCount,
-        noticeCount: scanResult.noticeCount,
-        scanStatus: scanResult.scanStatus,
-        scanDuration: scanResult.scanDuration,
-        error: scanResult.error
-      };
-    }
-
+    // Return immediate response without waiting for scan completion
     return res.json({
       success: true,
-      message: 'WordPress webhook processed and accessibility scan completed',
-      data: responseData
+      message: scanTriggered ? 'WordPress webhook processed and accessibility scan queued' : 'WordPress webhook processed - no scan required',
+      data: {
+        connectionId: siteConnection.id,
+        siteName: siteConnection.siteName,
+        status: status,
+        scanTriggered: scanTriggered,
+        timestamp: new Date().toISOString(),
+        webhookData: {
+          filesChanged: count,
+          pluginSuccess: success,
+          message: message
+        }
+      }
     });
 
   } catch (error) {
