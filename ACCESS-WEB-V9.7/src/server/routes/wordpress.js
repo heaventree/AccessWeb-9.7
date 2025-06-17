@@ -397,7 +397,7 @@ router.post('/wcag-compliance/schedule-response', async (req, res) => {
             siteConnection.id,
             siteConnection.siteUrl,
             siteConnection.platform || 'wordpress',
-            'wordpress_init_scan'
+            'file_init'
           );
           console.log(`✅ [WP-SCAN-ASYNC] Init scan completed - Score: ${result.score}%, Errors: ${result.errorCount}`);
         } catch (error) {
@@ -420,7 +420,7 @@ router.post('/wcag-compliance/schedule-response', async (req, res) => {
             siteConnection.id,
             siteConnection.siteUrl,
             siteConnection.platform || 'wordpress',
-            'wordpress_file_update'
+            'file_update'
           );
           console.log(`✅ [WP-SCAN-ASYNC] Update scan completed - Score: ${result.score}%, Errors: ${result.errorCount}`);
         } catch (error) {
