@@ -7,6 +7,19 @@ import { requireAuth } from '../../middleware/userAuth.js';
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// Test route to verify router is working
+router.get('/test', (req, res) => {
+  console.log('🧪 [WP-TEST] WordPress test route hit');
+  res.json({ success: true, message: 'WordPress router working' });
+});
+
+// Simple test webhook route
+router.post('/test-webhook', (req, res) => {
+  console.log('🧪 [WP-TEST-WEBHOOK] Test webhook route hit');
+  console.log('🧪 [WP-TEST-WEBHOOK] Body:', req.body);
+  res.json({ success: true, message: 'Test webhook working', received: req.body });
+});
+
 /**
  * WordPress Plugin Webhook API
  * Endpoint: /wp-json/wp/v2/accessibility-auth/debug
@@ -304,6 +317,11 @@ router.post('/:connectionId/schedule', requireAuth, async (req, res) => {
  * and triggers accessibility scans when status is "init" or "update"
  */
 router.post('/wcag-compliance/schedule-response', async (req, res) => {
+  console.log(`🔥 [WP-SCHEDULE-WEBHOOK] Route handler called - START`);
+  console.log(`🔥 [WP-SCHEDULE-WEBHOOK] Request method: ${req.method}`);
+  console.log(`🔥 [WP-SCHEDULE-WEBHOOK] Request URL: ${req.url}`);
+  console.log(`🔥 [WP-SCHEDULE-WEBHOOK] Request body exists: ${!!req.body}`);
+  
   try {
     console.log(`📥 [WP-SCHEDULE-WEBHOOK] Received hourly schedule response`);
     console.log(`📥 [WP-SCHEDULE-WEBHOOK] Full payload:`, JSON.stringify(req.body, null, 2));
