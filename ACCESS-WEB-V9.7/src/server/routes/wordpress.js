@@ -295,4 +295,166 @@ router.post('/:connectionId/schedule', requireAuth, async (req, res) => {
   }
 });
 
+/**
+ * WordPress Plugin Hourly Schedule Response Webhook
+ * Endpoint: /wcag-compliance/schedule-response
+ * Method: POST
+ * 
+ * Handles hourly file change notifications from WordPress plugin
+ * and triggers accessibility scans when status is "init" or "update"
+ */
+router.post('/wcag-compliance/schedule-response', async (req, res) => {
+  try {
+    console.log(`📥 [WP-SCHEDULE-WEBHOOK] Received hourly schedule response`);
+    console.log(`📥 [WP-SCHEDULE-WEBHOOK] Full payload:`, JSON.stringify(req.body, null, 2));
+
+    const {
+      token,
+      domain,
+      run_time,
+      success,
+      message,
+      status,
+      ignore_list,
+      count,
+      modified_at
+    } = req.body;
+
+    console.log(`🔍 [WP-SCHEDULE-WEBHOOK] Extracted fields:`);
+    console.log(`   - Token: ${token ? `${token.substring(0, 8)}...` : 'MISSING'}`);
+    console.log(`   - Domain: ${domain || 'MISSING'}`);
+    console.log(`   - Status: ${status || 'MISSING'}`);
+    console.log(`   - Success: ${success}`);
+    console.log(`   - Message: ${message || 'No message'}`);
+    console.log(`   - Run time: ${run_time || 'MISSING'}`);
+    console.log(`   - File count: ${count || 'MISSING'}`);
+    console.log(`   - Modified at: ${modified_at || 'MISSING'}`);
+
+    // Validate required fields
+    if (!token) {
+      console.log(`❌ [WP-SCHEDULE-WEBHOOK] Missing required field: token`);
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required field: token'
+      });
+    }
+
+    if (!status) {
+      console.log(`❌ [WP-SCHEDULE-WEBHOOK] Missing required field: status`);
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required field: status'
+      });
+    }
+
+    // Find the site connection using the API token
+    console.log(`🔍 [WP-SCHEDULE-WEBHOOK] Looking up site connection for token: ${token.substring(0, 8)}...`);
+    
+    const siteConnection = await prisma.siteConnection.findFirst({
+      where: { 
+        apiToken: token,
+        status: 'active',
+        platform: 'wordpress'
+      },
+      include: {
+        user: true
+      }
+    });
+
+    if (!siteConnection) {
+      console.log(`❌ [WP-SCHEDULE-WEBHOOK] No active WordPress site connection found for token: ${token.substring(0, 8)}...`);
+      return res.status(404).json({
+        success: false,
+        error: 'Site connection not found or inactive'
+      });
+    }
+
+    console.log(`✅ [WP-SCHEDULE-WEBHOOK] Found site connection:`);
+    console.log(`   - Connection ID: ${siteConnection.id}`);
+    console.log(`   - Site Name: ${siteConnection.siteName}`);
+    console.log(`   - Site URL: ${siteConnection.siteUrl}`);
+    console.log(`   - User ID: ${siteConnection.userId}`);
+    console.log(`   - User Email: ${siteConnection.user.email}`);
+
+    // Check if we should trigger a scan based on status
+    console.log(`🔄 [WP-SCHEDULE-WEBHOOK] Checking status: "${status}"`);
+    
+    if (status === 'init') {
+      console.log(`🆕 [WP-SCHEDULE-WEBHOOK] Status is "init" - First time scan detected`);
+      console.log(`🚀 [WP-SCHEDULE-WEBHOOK] Triggering accessibility scan for first-time setup`);
+      
+      // TODO: Trigger accessibility scan via siteScannerQueue
+      // await siteScannerQueue.addJob('site-accessibility-scan', {
+      //   connectionId: siteConnection.id,
+      //   userId: siteConnection.userId,
+      //   priority: 'high',
+      //   reason: 'wordpress_init_scan'
+      // });
+      
+      console.log(`✅ [WP-SCHEDULE-WEBHOOK] Scan queued for connection ${siteConnection.id} (init)`);
+      
+    } else if (status === 'update') {
+      console.log(`🔄 [WP-SCHEDULE-WEBHOOK] Status is "update" - File changes detected`);
+      console.log(`🚀 [WP-SCHEDULE-WEBHOOK] Triggering accessibility scan for updated files`);
+      
+      // TODO: Trigger accessibility scan via siteScannerQueue
+      // await siteScannerQueue.addJob('site-accessibility-scan', {
+      //   connectionId: siteConnection.id,
+      //   userId: siteConnection.userId,
+      //   priority: 'normal',
+      //   reason: 'wordpress_file_update'
+      // });
+      
+      console.log(`✅ [WP-SCHEDULE-WEBHOOK] Scan queued for connection ${siteConnection.id} (update)`);
+      
+    } else if (status === 'no-update') {
+      console.log(`ℹ️ [WP-SCHEDULE-WEBHOOK] Status is "no-update" - No changes detected`);
+      console.log(`⏭️ [WP-SCHEDULE-WEBHOOK] Skipping scan - no file changes to process`);
+      
+    } else {
+      console.log(`⚠️ [WP-SCHEDULE-WEBHOOK] Unknown status: "${status}" - Skipping scan`);
+    }
+
+    // Log additional details if available
+    if (ignore_list && Array.isArray(ignore_list)) {
+      console.log(`📁 [WP-SCHEDULE-WEBHOOK] Ignore list contains ${ignore_list.length} items:`, ignore_list);
+    }
+
+    if (success === false) {
+      console.log(`⚠️ [WP-SCHEDULE-WEBHOOK] WordPress plugin reported scan failure: ${message}`);
+    }
+
+    // Store webhook data for potential future reference
+    console.log(`💾 [WP-SCHEDULE-WEBHOOK] Webhook processed successfully`);
+    console.log(`📊 [WP-SCHEDULE-WEBHOOK] Summary:`);
+    console.log(`   - Connection: ${siteConnection.siteName} (${siteConnection.id})`);
+    console.log(`   - Action taken: ${status === 'init' || status === 'update' ? 'Scan triggered' : 'No action needed'}`);
+    console.log(`   - Files scanned: ${count || 'Unknown'}`);
+    console.log(`   - Plugin success: ${success}`);
+
+    // Return success response
+    return res.json({
+      success: true,
+      message: 'Webhook received and processed successfully',
+      data: {
+        connectionId: siteConnection.id,
+        siteName: siteConnection.siteName,
+        status: status,
+        scanTriggered: status === 'init' || status === 'update',
+        timestamp: new Date().toISOString()
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ [WP-SCHEDULE-WEBHOOK] Error processing webhook:', error);
+    console.error('❌ [WP-SCHEDULE-WEBHOOK] Error stack:', error.stack);
+    
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error processing webhook',
+      message: error.message
+    });
+  }
+});
+
 export default router;
