@@ -114,7 +114,9 @@ The WCAG Accessibility Audit Tool is a comprehensive platform for testing, monit
 
 ## Changelog
 
-- June 17, 2025. Initial setup
+- June 17, 2025: WordPress Code Change Detection system completed with full API integration
+- June 17, 2025: Extended timeout support for WordPress "Run Once" scans (10 minutes)
+- June 17, 2025: Initial setup
 
 ## User Preferences
 

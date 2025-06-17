@@ -187,8 +187,13 @@ export function WordPressAPIPage() {
     try {
       console.log('Making WordPress API call via backend for action:', action);
 
+      // Set longer timeout for "run" action as it waits for complete scan (10 minutes)
+      const timeoutMs = action === 'run' ? 600000 : 30000;
+
       const response = await apiClient.post(`/wordpress/${connection.id}/schedule`, {
         action: action
+      }, {
+        timeout: timeoutMs
       });
 
       console.log('WordPress API response:', response.data);

@@ -241,14 +241,24 @@ router.post('/:connectionId/schedule', requireAuth, async (req, res) => {
     const apiUrl = `${baseUrl}/wp-json/wcag/v2/schedule`;
     console.log(`🌐 [WP-SCHEDULE] Making API call to: ${apiUrl} with action: ${action}`);
 
+    // Set longer timeout for "run" action as it waits for complete scan
+    const timeoutMs = action === 'run' ? 600000 : 30000; // 10 minutes for run, 30 seconds for others
+    
+    // Create AbortController for timeout handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
     // Make the request to WordPress plugin API
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ action })
+      body: JSON.stringify({ action }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     console.log(`📡 [WP-SCHEDULE] WordPress API response status: ${response.status}`);
 
