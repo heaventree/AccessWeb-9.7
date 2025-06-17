@@ -165,22 +165,7 @@ router.post('/accessibility-auth/verify', async (req, res) => {
       });
     }
 
-    // Optional: Validate site URL matches (if needed for extra security)
-    try {
-      const tokenSiteUrl = new URL(siteConnection.siteUrl).hostname;
-      const requestSiteUrl = new URL(site_url).hostname;
-      
-      if (tokenSiteUrl !== requestSiteUrl) {
-        console.log(`⚠️ [WP-AUTH] Site URL mismatch: ${tokenSiteUrl} vs ${requestSiteUrl}`);
-        return res.json({
-          success: false,
-          message: 'Token is valid but site URL does not match'
-        });
-      }
-    } catch (urlError) {
-      console.log(`⚠️ [WP-AUTH] URL parsing error: ${urlError.message}`);
-      // Continue anyway - URL validation is optional
-    }
+    // Site URL validation removed - focus only on token validation
 
     console.log(`✅ [WP-AUTH] Token verified for site: ${siteConnection.siteName} (${siteConnection.siteUrl})`);
 
