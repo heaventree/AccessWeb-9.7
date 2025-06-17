@@ -896,6 +896,55 @@ export function WordPressAPIPage() {
           </div>
         </div>
       </div>
+
+      {/* Plugin Error Modal */}
+      {showPluginErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center mb-4">
+              <AlertCircle className="w-6 h-6 text-red-600 mr-3" />
+              <h3 className="text-lg font-semibold text-gray-900">Plugin Connection Error</h3>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-600 mb-4">
+                Unable to connect to the WordPress plugin. This could be due to:
+              </p>
+              
+              <ul className="list-disc list-inside text-gray-600 space-y-2 mb-4">
+                <li>WordPress plugin is not installed</li>
+                <li>Plugin is not activated</li>
+                <li>API token is not configured in the plugin</li>
+                <li>WordPress site is temporarily unavailable</li>
+              </ul>
+              
+              <div className="bg-blue-50 rounded-lg p-4">
+                <p className="text-blue-800 text-sm">
+                  <strong>Next Steps:</strong> Please verify that the WordPress plugin is properly installed and configured with your API token.
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link
+                to="/docs/wordpress"
+                className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                onClick={() => setShowPluginErrorModal(false)}
+              >
+                <Book className="w-4 h-4 mr-2" />
+                View Setup Guide
+              </Link>
+              
+              <button
+                onClick={() => setShowPluginErrorModal(false)}
+                className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
