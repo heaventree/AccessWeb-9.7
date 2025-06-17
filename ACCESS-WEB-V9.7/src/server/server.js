@@ -152,7 +152,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/accessibility', accessibilityRouter);
 app.use('/api/site-connections', siteConnectionsRouter);
 app.use('/api/scanner', scannerRouter);
-app.use('/api', wordpressRouter);
+app.use('/api/wordpress', wordpressRouter);
 
 // Pricing Plans Routes
 app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed

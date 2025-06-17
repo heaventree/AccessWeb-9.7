@@ -190,4 +190,99 @@ router.post('/accessibility-auth/verify', async (req, res) => {
   }
 });
 
+/**
+ * WordPress Schedule API Proxy
+ * Endpoint: /api/wordpress/:connectionId/schedule
+ * Method: POST
+ * 
+ * Proxies schedule control requests to WordPress plugin API
+ */
+router.post('/:connectionId/schedule', requireAuth, async (req, res) => {
+  try {
+    const { connectionId } = req.params;
+    const { action } = req.body;
+    const userId = req.user.id;
+
+    console.log(`🔄 [WP-SCHEDULE] User ${userId} requesting action "${action}" for connection ${connectionId}`);
+
+    // Validate required fields
+    if (!action) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required field: action'
+      });
+    }
+
+    // Find the site connection and verify ownership
+    const siteConnection = await prisma.siteConnection.findFirst({
+      where: { 
+        id: parseInt(connectionId),
+        userId: userId,
+        status: 'active',
+        platform: 'wordpress'
+      }
+    });
+
+    if (!siteConnection) {
+      console.log(`❌ [WP-SCHEDULE] Connection ${connectionId} not found for user ${userId}`);
+      return res.status(404).json({
+        success: false,
+        message: 'WordPress connection not found or access denied'
+      });
+    }
+
+    // Ensure URL is properly formatted
+    let baseUrl = siteConnection.siteUrl.trim();
+    if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+      baseUrl = `https://${baseUrl}`;
+    }
+    baseUrl = baseUrl.replace(/\/$/, '');
+
+    const apiUrl = `${baseUrl}/wp-json/wcag/v2/schedule`;
+    console.log(`🌐 [WP-SCHEDULE] Making API call to: ${apiUrl} with action: ${action}`);
+
+    // Make the request to WordPress plugin API
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ action })
+    });
+
+    console.log(`📡 [WP-SCHEDULE] WordPress API response status: ${response.status}`);
+
+    if (!response.ok) {
+      throw new Error(`WordPress API responded with status ${response.status}: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    console.log(`✅ [WP-SCHEDULE] WordPress API response:`, result);
+
+    // Return the response from WordPress plugin
+    return res.json({
+      success: true,
+      ...result
+    });
+
+  } catch (error) {
+    console.error('❌ [WP-SCHEDULE] Error proxying WordPress schedule request:', error);
+    
+    // Handle specific error cases
+    if (error.message.includes('fetch')) {
+      return res.status(503).json({
+        success: false,
+        message: 'Unable to connect to WordPress site. Please verify the plugin is installed and the site is accessible.',
+        error_type: 'connection_failed'
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to communicate with WordPress plugin',
+      error_type: 'api_error'
+    });
+  }
+});
+
 export default router;

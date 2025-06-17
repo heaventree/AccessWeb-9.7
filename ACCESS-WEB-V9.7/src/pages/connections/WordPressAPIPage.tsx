@@ -177,25 +177,23 @@ export function WordPressAPIPage() {
     }
   };
 
-  // WordPress periodic scan API functions
+  // WordPress periodic scan API functions via backend proxy
   const callWordPressScheduleAPI = async (action: string) => {
-    if (!connection?.siteUrl) return null;
+    if (!connection?.id) {
+      console.error('No connection ID available');
+      return null;
+    }
     
     try {
-      const response = await fetch(`${connection.siteUrl}/wp-json/wcag/v2/schedule`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action })
+      console.log('Making WordPress API call via backend for action:', action);
+
+      const response = await apiClient.post(`/wordpress/${connection.id}/schedule`, {
+        action: action
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
+      console.log('WordPress API response:', response.data);
+      return response.data;
+    } catch (error: any) {
       console.error('WordPress API error:', error);
       throw error;
     }
