@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Globe, Key, Download, FileText, Settings, Activity, RefreshCw, CheckCircle, AlertCircle, Info, HelpCircle, Book, Search } from 'lucide-react';
+import { ArrowLeft, Globe, Key, Download, FileText, Settings, Activity, RefreshCw, CheckCircle, AlertCircle, Info, HelpCircle, Book, Search, Play, Square, Clock, Eye } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import apiClient from '../../lib/apiClient';
 import { motion } from 'framer-motion';
@@ -35,6 +35,12 @@ export function WordPressAPIPage() {
     notifyAdmin: true,
     autoFix: false
   });
+
+  // WordPress periodic scan states
+  const [scheduleStatus, setScheduleStatus] = useState<string>('');
+  const [runStatus, setRunStatus] = useState<string>('');
+  const [periodicScanLoading, setPeriodicScanLoading] = useState(false);
+  const [showPluginErrorModal, setShowPluginErrorModal] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -170,6 +176,125 @@ export function WordPressAPIPage() {
       setScanningInProgress(false);
     }
   };
+
+  // WordPress periodic scan API functions
+  const callWordPressScheduleAPI = async (action: string) => {
+    if (!connection?.siteUrl) return null;
+    
+    try {
+      const response = await fetch(`${connection.siteUrl}/wp-json/wcag/v2/schedule`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('WordPress API error:', error);
+      throw error;
+    }
+  };
+
+  const fetchScheduleStatus = async () => {
+    if (!connection?.apiToken) return;
+    
+    setPeriodicScanLoading(true);
+    try {
+      const result = await callWordPressScheduleAPI('schedule-status');
+      if (result?.response) {
+        setScheduleStatus(result.response);
+      }
+    } catch (error) {
+      setShowPluginErrorModal(true);
+    } finally {
+      setPeriodicScanLoading(false);
+    }
+  };
+
+  const fetchRunStatus = async () => {
+    if (!connection?.apiToken) return;
+    
+    try {
+      const result = await callWordPressScheduleAPI('run-status');
+      if (result?.response) {
+        setRunStatus(result.response);
+      }
+    } catch (error) {
+      console.error('Failed to fetch run status:', error);
+    }
+  };
+
+  const handleStartSchedule = async () => {
+    if (!connection?.apiToken) return;
+    
+    setPeriodicScanLoading(true);
+    try {
+      const result = await callWordPressScheduleAPI('start');
+      if (result?.response === 'start-schedule') {
+        toast.success('Periodic scan schedule started successfully');
+        setScheduleStatus('schedule-running');
+      } else if (result?.response === 'start-found') {
+        toast('Schedule is already running', { icon: 'ℹ️' });
+        setScheduleStatus('schedule-running');
+      }
+    } catch (error) {
+      setShowPluginErrorModal(true);
+      toast.error('Failed to start schedule. Please check if the plugin is installed.');
+    } finally {
+      setPeriodicScanLoading(false);
+    }
+  };
+
+  const handleStopSchedule = async () => {
+    if (!connection?.apiToken) return;
+    
+    setPeriodicScanLoading(true);
+    try {
+      const result = await callWordPressScheduleAPI('stop');
+      if (result?.response === 'stop-schedule') {
+        toast.success('Periodic scan schedule stopped successfully');
+        setScheduleStatus('schedule-stoped');
+      }
+    } catch (error) {
+      setShowPluginErrorModal(true);
+      toast.error('Failed to stop schedule. Please check if the plugin is installed.');
+    } finally {
+      setPeriodicScanLoading(false);
+    }
+  };
+
+  const handleRunOnce = async () => {
+    if (!connection?.apiToken) return;
+    
+    setPeriodicScanLoading(true);
+    try {
+      const result = await callWordPressScheduleAPI('run');
+      if (result?.response === 'run-action') {
+        toast.success('One-time scan initiated successfully');
+        // Refresh run status after a short delay
+        setTimeout(fetchRunStatus, 2000);
+      }
+    } catch (error) {
+      setShowPluginErrorModal(true);
+      toast.error('Failed to run one-time scan. Please check if the plugin is installed.');
+    } finally {
+      setPeriodicScanLoading(false);
+    }
+  };
+
+  // Initialize schedule status when component loads and API key exists
+  useEffect(() => {
+    if (connection?.apiToken) {
+      fetchScheduleStatus();
+      fetchRunStatus();
+    }
+  }, [connection?.apiToken]);
 
   if (loading) {
     return (
@@ -541,6 +666,155 @@ export function WordPressAPIPage() {
               </div>
             </div>
           </motion.div>
+
+          {/* WordPress Periodic Scan Control */}
+          {connection.apiToken && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-white rounded-xl shadow-sm border border-gray-200"
+            >
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                    <Clock className="w-6 h-6 text-blue-600 mr-3" />
+                    WordPress Code Change Detection
+                  </h2>
+                  <span className="text-sm text-gray-500">Step 4</span>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <p className="text-gray-600 mb-6">
+                  Monitor your WordPress site for code changes that might affect accessibility compliance. This feature requires the WordPress plugin to be properly installed and configured.
+                </p>
+
+                {/* Schedule Status Display */}
+                <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-gray-700">Schedule Status</span>
+                    <button
+                      onClick={fetchScheduleStatus}
+                      disabled={periodicScanLoading}
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium disabled:opacity-50"
+                    >
+                      {periodicScanLoading ? (
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full mr-2 ${
+                      scheduleStatus === 'schedule-running' ? 'bg-green-500' : 
+                      scheduleStatus === 'schedule-stoped' ? 'bg-red-500' : 'bg-gray-400'
+                    }`} />
+                    <span className={`text-sm font-medium ${
+                      scheduleStatus === 'schedule-running' ? 'text-green-700' : 
+                      scheduleStatus === 'schedule-stoped' ? 'text-red-700' : 'text-gray-700'
+                    }`}>
+                      {scheduleStatus === 'schedule-running' ? 'Running' : 
+                       scheduleStatus === 'schedule-stoped' ? 'Stopped' : 'Unknown'}
+                    </span>
+                  </div>
+
+                  {runStatus && (
+                    <div className="mt-2 pt-2 border-t border-gray-200">
+                      <div className="flex items-center">
+                        <span className="text-xs text-gray-500 mr-2">Scan Status:</span>
+                        <span className={`text-xs font-medium ${
+                          runStatus === 'action-running' ? 'text-blue-700' : 'text-gray-700'
+                        }`}>
+                          {runStatus === 'action-running' ? 'Scanning in progress' : 'Ready'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Control Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  {scheduleStatus === 'schedule-stoped' || !scheduleStatus ? (
+                    <button
+                      onClick={handleStartSchedule}
+                      disabled={periodicScanLoading}
+                      className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                    >
+                      {periodicScanLoading ? (
+                        <>
+                          <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                          Starting...
+                        </>
+                      ) : (
+                        <>
+                          <Play className="-ml-1 mr-2 h-5 w-5" />
+                          Start Monitoring
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleStopSchedule}
+                      disabled={periodicScanLoading}
+                      className="inline-flex items-center justify-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                    >
+                      {periodicScanLoading ? (
+                        <>
+                          <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                          Stopping...
+                        </>
+                      ) : (
+                        <>
+                          <Square className="-ml-1 mr-2 h-5 w-5" />
+                          Stop Monitoring
+                        </>
+                      )}
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleRunOnce}
+                    disabled={periodicScanLoading || runStatus === 'action-running'}
+                    className="inline-flex items-center justify-center px-6 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 disabled:opacity-50"
+                  >
+                    {periodicScanLoading ? (
+                      <>
+                        <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                        Running...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="-ml-1 mr-2 h-5 w-5" />
+                        Run Once
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={fetchScheduleStatus}
+                    disabled={periodicScanLoading}
+                    className="inline-flex items-center justify-center px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <RefreshCw className={`-ml-1 mr-2 h-5 w-5 ${periodicScanLoading ? 'animate-spin' : ''}`} />
+                    Refresh Status
+                  </button>
+                </div>
+
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                  <div className="flex items-start">
+                    <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
+                    <div className="text-sm text-blue-800">
+                      <p className="font-medium mb-1">About Code Change Detection</p>
+                      <p>This feature monitors your WordPress site for theme and plugin file changes that could impact accessibility. When changes are detected, an automated scan is triggered to check for compliance issues.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Sidebar */}
