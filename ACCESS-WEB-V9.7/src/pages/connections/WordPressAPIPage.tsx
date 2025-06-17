@@ -205,8 +205,8 @@ export function WordPressAPIPage() {
     setPeriodicScanLoading(true);
     try {
       const result = await callWordPressScheduleAPI('schedule-status');
-      if (result?.response) {
-        setScheduleStatus(result.response);
+      if (result?.status) {
+        setScheduleStatus(result.status);
       }
     } catch (error) {
       setShowPluginErrorModal(true);
@@ -220,8 +220,8 @@ export function WordPressAPIPage() {
     
     try {
       const result = await callWordPressScheduleAPI('run-status');
-      if (result?.response) {
-        setRunStatus(result.response);
+      if (result?.status) {
+        setRunStatus(result.status);
       }
     } catch (error) {
       console.error('Failed to fetch run status:', error);
@@ -234,10 +234,10 @@ export function WordPressAPIPage() {
     setPeriodicScanLoading(true);
     try {
       const result = await callWordPressScheduleAPI('start');
-      if (result?.response === 'start-schedule') {
+      if (result?.status === 'start-schedule') {
         toast.success('Periodic scan schedule started successfully');
         setScheduleStatus('schedule-running');
-      } else if (result?.response === 'start-found') {
+      } else if (result?.status === 'schedule-found') {
         toast('Schedule is already running', { icon: 'ℹ️' });
         setScheduleStatus('schedule-running');
       }
@@ -255,7 +255,7 @@ export function WordPressAPIPage() {
     setPeriodicScanLoading(true);
     try {
       const result = await callWordPressScheduleAPI('stop');
-      if (result?.response === 'stop-schedule') {
+      if (result?.status === 'stop-schedule') {
         toast.success('Periodic scan schedule stopped successfully');
         setScheduleStatus('schedule-stoped');
       }
@@ -273,7 +273,7 @@ export function WordPressAPIPage() {
     setPeriodicScanLoading(true);
     try {
       const result = await callWordPressScheduleAPI('run');
-      if (result?.response === 'run-action') {
+      if (result?.status === 'run-action') {
         toast.success('One-time scan initiated successfully');
         // Refresh run status after a short delay
         setTimeout(fetchRunStatus, 2000);
