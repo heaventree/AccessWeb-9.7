@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { HeadingSection } from '../../components/ui/HeadingSection';
+import { RoadmapFeatureEditor } from '../../components/admin/RoadmapFeatureEditor';
 import { roadmapFeatures, FeatureStatus, RoadmapFeature, RoadmapFeatureSource, getFeaturesByStatus, getFeaturesByCategory, getNextFeatures } from '../../data/roadmapData';
+import { apiClient } from '../../lib/apiClient';
 
 export function AdminRoadmap() {
   const [statusFilter, setStatusFilter] = useState<FeatureStatus | 'all'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [sourceFilter, setSourceFilter] = useState<RoadmapFeatureSource | 'all'>('all');
   const [features, setFeatures] = useState<RoadmapFeature[]>(roadmapFeatures);
+  const [editingFeature, setEditingFeature] = useState<RoadmapFeature | null>(null);
+  const [showEditor, setShowEditor] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Listen for changes in roadmapFeatures (from feedback system)
   useEffect(() => {

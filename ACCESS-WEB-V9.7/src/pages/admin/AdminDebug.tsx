@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { HeadingSection } from '../../components/ui/HeadingSection';
+import { DebugItemEditor } from '../../components/admin/DebugItemEditor';
 import { debugItems, DebugItem, DebugItemCategory, DebugItemPriority, DebugItemStatus, DebugItemSource } from '../../data/debugData';
+import { apiClient } from '../../lib/apiClient';
 
 export function AdminDebug() {
   const [statusFilter, setStatusFilter] = useState<DebugItemStatus | 'all'>('all');
@@ -10,6 +12,9 @@ export function AdminDebug() {
   const [sourceFilter, setSourceFilter] = useState<DebugItemSource | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<DebugItem[]>(debugItems);
+  const [editingItem, setEditingItem] = useState<DebugItem | null>(null);
+  const [showEditor, setShowEditor] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Listen for changes in debugItems (from feedback system)
   useEffect(() => {
