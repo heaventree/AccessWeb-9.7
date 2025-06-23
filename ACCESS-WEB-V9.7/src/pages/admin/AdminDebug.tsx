@@ -36,6 +36,54 @@ export function AdminDebug() {
     };
   }, []);
 
+  // Handle saving debug item (create or update)
+  const handleSaveDebugItem = async (itemData: Partial<DebugItem>) => {
+    setIsLoading(true);
+    try {
+      if (editingItem) {
+        // Update existing item
+        await apiClient.put(`/admin/debug/${editingItem.id}`, itemData);
+      } else {
+        // Create new item
+        await apiClient.post('/admin/debug', itemData);
+      }
+      
+      // Refresh items list
+      setItems(prevItems => {
+        if (editingItem) {
+          return prevItems.map(item => 
+            item.id === editingItem.id ? { ...item, ...itemData } : item
+          );
+        } else {
+          const newItem = { ...itemData, id: `debug-${Date.now()}` } as DebugItem;
+          return [...prevItems, newItem];
+        }
+      });
+      
+      setShowEditor(false);
+      setEditingItem(null);
+    } catch (error) {
+      console.error('Error saving debug item:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEditItem = (item: DebugItem) => {
+    setEditingItem(item);
+    setShowEditor(true);
+  };
+
+  const handleAddItem = () => {
+    setEditingItem(null);
+    setShowEditor(true);
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditor(false);
+    setEditingItem(null);
+  };
+
   // Filter items based on selected filters and search query
   const filteredItems = items
     .filter(item => statusFilter === 'all' || item.status === statusFilter)
@@ -263,6 +311,16 @@ export function AdminDebug() {
               {item.notes}
             </div>
           )}
+          
+          <div className="flex justify-end mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+            <button
+              onClick={() => handleEditItem(item)}
+              className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
+              disabled={isLoading}
+            >
+              Edit
+            </button>
+          </div>
         </CardContent>
       </Card>
     );
@@ -270,11 +328,20 @@ export function AdminDebug() {
 
   return (
     <div className="container mx-auto py-6 px-4">
-      <HeadingSection 
-        title="Debug List" 
-        description="Track and manage current development issues, bugs, and improvements in progress." 
-        className="mb-8"
-      />
+      <div className="flex justify-between items-center mb-8">
+        <HeadingSection 
+          title="Debug List" 
+          description="Track and manage current development issues, bugs, and improvements in progress." 
+          className="mb-0"
+        />
+        <button
+          onClick={handleAddItem}
+          className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors flex items-center gap-2"
+          disabled={isLoading}
+        >
+          <span>+</span> Add Debug Item
+        </button>
+      </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">

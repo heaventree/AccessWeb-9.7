@@ -33,6 +33,54 @@ export function AdminRoadmap() {
       window.removeEventListener('roadmapFeaturesUpdated', handleRoadmapUpdated as EventListener);
     };
   }, []);
+
+  // Handle saving roadmap feature (create or update)
+  const handleSaveFeature = async (featureData: Partial<RoadmapFeature>) => {
+    setIsLoading(true);
+    try {
+      if (editingFeature) {
+        // Update existing feature
+        await apiClient.put(`/admin/roadmap/${editingFeature.id}`, featureData);
+      } else {
+        // Create new feature
+        await apiClient.post('/admin/roadmap', featureData);
+      }
+      
+      // Refresh features list
+      setFeatures(prevFeatures => {
+        if (editingFeature) {
+          return prevFeatures.map(feature => 
+            feature.id === editingFeature.id ? { ...feature, ...featureData } : feature
+          );
+        } else {
+          const newFeature = { ...featureData, id: `feature-${Date.now()}` } as RoadmapFeature;
+          return [...prevFeatures, newFeature];
+        }
+      });
+      
+      setShowEditor(false);
+      setEditingFeature(null);
+    } catch (error) {
+      console.error('Error saving roadmap feature:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEditFeature = (feature: RoadmapFeature) => {
+    setEditingFeature(feature);
+    setShowEditor(true);
+  };
+
+  const handleAddFeature = () => {
+    setEditingFeature(null);
+    setShowEditor(true);
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditor(false);
+    setEditingFeature(null);
+  };
   
   // Filter items based on selected filters
   const filteredItems = features
@@ -132,11 +180,20 @@ export function AdminRoadmap() {
 
   return (
     <div className="container mx-auto py-6 px-4">
-      <HeadingSection 
-        title="Roadmap Items" 
-        description="Track the development progress of features and improvements for AccessWeb." 
-        className="mb-8"
-      />
+      <div className="flex justify-between items-center mb-8">
+        <HeadingSection 
+          title="Roadmap Items" 
+          description="Track the development progress of features and improvements for AccessWeb." 
+          className="mb-0"
+        />
+        <button
+          onClick={handleAddFeature}
+          className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors flex items-center gap-2"
+          disabled={isLoading}
+        >
+          <span>+</span> Add Feature
+        </button>
+      </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
