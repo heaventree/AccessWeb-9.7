@@ -3,7 +3,24 @@ import { Card, CardContent } from '../../components/ui/Card';
 import { HeadingSection } from '../../components/ui/HeadingSection';
 import { RoadmapFeatureEditor } from '../../components/admin/RoadmapFeatureEditor';
 import { roadmapFeatures, FeatureStatus, RoadmapFeature, RoadmapFeatureSource, getFeaturesByStatus, getFeaturesByCategory, getNextFeatures } from '../../data/roadmapData';
-import { apiClient } from '../../lib/apiClient';
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: '/api',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add request interceptor to include access token
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export function AdminRoadmap() {
   const [statusFilter, setStatusFilter] = useState<FeatureStatus | 'all'>('all');
@@ -354,12 +371,21 @@ export function AdminRoadmap() {
                     {getSourceLabel(item.source)}
                   </span>
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {item.status === 'completed' && item.completedDate 
-                    ? `Completed: ${item.completedDate}` 
-                    : item.estimatedCompletionDate 
+                <div className="flex justify-between items-center">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {item.status === 'completed' && item.completedDate 
+                      ? `Completed: ${item.completedDate}` 
+                      : item.estimatedCompletionDate 
                     ? `Target: ${item.estimatedCompletionDate}` 
                     : `Category: ${getCategoryLabel(item.category)}`}
+                  </div>
+                  <button
+                    onClick={() => handleEditFeature(item)}
+                    className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
+                    disabled={isLoading}
+                  >
+                    Edit
+                  </button>
                 </div>
               </CardContent>
             </Card>
@@ -371,6 +397,16 @@ export function AdminRoadmap() {
         <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <p className="text-lg text-gray-500 dark:text-gray-400">No features found matching the selected filters.</p>
         </div>
+      )}
+
+      {/* Editor Modal */}
+      {showEditor && (
+        <RoadmapFeatureEditor
+          feature={editingFeature || undefined}
+          onSave={handleSaveFeature}
+          onCancel={handleCancelEdit}
+          isEditing={!!editingFeature}
+        />
       )}
     </div>
   );

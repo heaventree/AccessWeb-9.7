@@ -3,7 +3,24 @@ import { Card, CardContent } from '../../components/ui/Card';
 import { HeadingSection } from '../../components/ui/HeadingSection';
 import { DebugItemEditor } from '../../components/admin/DebugItemEditor';
 import { debugItems, DebugItem, DebugItemCategory, DebugItemPriority, DebugItemStatus, DebugItemSource } from '../../data/debugData';
-import { apiClient } from '../../lib/apiClient';
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: '/api',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add request interceptor to include access token
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export function AdminDebug() {
   const [statusFilter, setStatusFilter] = useState<DebugItemStatus | 'all'>('all');
@@ -471,6 +488,16 @@ export function AdminDebug() {
         <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <p className="text-lg text-gray-500 dark:text-gray-400">No debug items found matching the selected filters.</p>
         </div>
+      )}
+
+      {/* Editor Modal */}
+      {showEditor && (
+        <DebugItemEditor
+          item={editingItem || undefined}
+          onSave={handleSaveDebugItem}
+          onCancel={handleCancelEdit}
+          isEditing={!!editingItem}
+        />
       )}
     </div>
   );
