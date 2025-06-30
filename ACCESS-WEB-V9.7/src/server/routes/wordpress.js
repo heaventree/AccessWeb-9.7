@@ -265,7 +265,7 @@ router.post('/:connectionId/schedule', requireAuth, async (req, res) => {
     // Production logging: `📡 [WP-SCHEDULE] WordPress API response status: ${response.status};
 
     if (!response.ok) {
-      throw new Error(`WordPress API responded with status ${response.status}: ${response.statusText};
+      throw new Error(`WordPress API responded with status ${response.status}: ${response.statusText}`);
     }
 
     const result = await response.json();

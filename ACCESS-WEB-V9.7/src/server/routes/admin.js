@@ -36,7 +36,7 @@ async function readDataFile(filename) {
     return content;
   } catch (error) {
     // console.error(`Error reading ${filename}:`, error);
-    throw new Error(`Failed to read ${filename};
+    throw new Error(`Failed to read ${filename}`);
   }
 }
 

@@ -105,24 +105,20 @@ class SiteScannerJobQueue {
     // Scan job logging disabled for production
     // Scan job logging disabled for production
     // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-    // Scan job logging disabled for production
-      ;
+    try {
+      // Update last_scan_at timestamp
+      await prisma.siteConnection.update({
+        where: { id: connectionId },
+        data: { lastScanAt: new Date() }
+      });
+
+      // Perform accessibility scanning process
+      await this.performAccessibilityScan(connectionId, siteUrl, platform);
+      
+      // Scan completed successfully
 
     } catch (error) {
-      // console.error(`
-      ;
+      // Scan error logged in production monitoring
       throw error;
     }
   }

@@ -182,7 +182,7 @@ router.post('/test-url', parseRawBody, async (req, res) => {
     const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], textarea, select');
     inputs.forEach((input, index) => {
       const id = input.getAttribute('id');
-      const hasLabel = id && document.querySelector(`label[for="${id}"];
+      const hasLabel = id && document.querySelector(`label[for="${id}"]`);
       const hasAriaLabel = input.hasAttribute('aria-label') || input.hasAttribute('aria-labelledby');
       
       if (!hasLabel && !hasAriaLabel) {
