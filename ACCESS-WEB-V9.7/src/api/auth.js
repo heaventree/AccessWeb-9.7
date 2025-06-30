@@ -85,7 +85,7 @@ router.post('/login', async (req, res) => {
 
     // Validate input
     if (!email || !password) {
-      console.log("Missing email or password");
+      // console.log("Missing email or password");
       return res.status(400).json({ 
         success: false,
         error: { 
@@ -98,16 +98,16 @@ router.post('/login', async (req, res) => {
     // Test database connection first
     try {
       await prisma.$queryRaw`SELECT 1`;
-      console.log('Database connection successful');
+      // console.log('Database connection successful');
     } catch (dbError) {
-      console.error('Database connection failed:', dbError);
+      // console.error('Database connection failed:', dbError);
       throw new Error('Database connection failed');
     }
 
     // Check if user exists
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      console.log("User not found:", email);
+      // console.log("User not found:", email);
       return res.status(401).json({ 
         success: false,
         error: { 
@@ -118,11 +118,11 @@ router.post('/login', async (req, res) => {
     }
     
 
-    console.log("User found:", user.email, "isAdmin:", user.isAdmin);
+    // console.log("User found:", user.email, "isAdmin:", user.isAdmin);
 
     // If trying to login as admin but user is not admin, reject the login
     if (isAdminLoginAttempt && !user.isAdmin) {
-      console.log("Non-admin user trying to access admin login:", email);
+      // console.log("Non-admin user trying to access admin login:", email);
       return res.status(401).json({ 
         success: false,
         error: { 
@@ -134,7 +134,7 @@ router.post('/login', async (req, res) => {
 
     // If trying to login as regular user but user is admin, redirect to admin login
     if (!isAdminLoginAttempt && user.isAdmin) {
-      console.log("Admin user trying to access regular login:", email);
+      // console.log("Admin user trying to access regular login:", email);
       return res.status(200).json({ 
         success: true,
         isAdminRedirect: true,
@@ -146,7 +146,7 @@ router.post('/login', async (req, res) => {
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      console.log("Invalid password for user:", email);
+      // console.log("Invalid password for user:", email);
       return res.status(401).json({ 
         success: false,
         error: { 
@@ -255,7 +255,7 @@ router.get('/me', async (req, res) => {
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-    console.log('Decoded JWT:', decoded);
+    // console.log('Decoded JWT:', decoded);
 
     // Get user
     const user = await prisma.user.findUnique({ 
@@ -276,7 +276,7 @@ router.get('/me', async (req, res) => {
 
     return res.json({ user: userResponse });
   } catch (error) {
-    console.error('Get user error:', error);
+    // console.error('Get user error:', error);
     return res.status(401).json({ error: 'Not authenticated' });
   }
 });

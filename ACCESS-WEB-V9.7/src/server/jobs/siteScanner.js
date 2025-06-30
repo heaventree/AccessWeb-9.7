@@ -30,7 +30,7 @@ class SiteScannerJobQueue {
 
       await this.boss.start();
       
-      console.log('🚀 [SITE-SCANNER] Job queue initialized successfully');
+      // console.log('🚀 [SITE-SCANNER] Job queue initialized successfully');
       
       // Start worker to process scan jobs
       await this.startWorker();
@@ -48,11 +48,11 @@ class SiteScannerJobQueue {
         await this.triggerTestingScans();
       }, 15000);
 
-      console.log(`⏰ [SITE-SCANNER] Schedule sync interval set to ${SYNC_INTERVAL_MS / 1000} seconds`);
-      console.log('⚡ [SITE-SCANNER] Testing interval set to 15 seconds');
+      // console.log(`⏰ [SITE-SCANNER] Schedule sync interval set to ${SYNC_INTERVAL_MS / 1000} seconds`);
+      // console.log('⚡ [SITE-SCANNER] Testing interval set to 15 seconds');
       
     } catch (error) {
-      console.error('❌ [SITE-SCANNER] Failed to initialize job queue:', error);
+      // console.error('❌ [SITE-SCANNER] Failed to initialize job queue:', error);
       throw error;
     }
   }
@@ -66,25 +66,25 @@ class SiteScannerJobQueue {
         this.processScanJob.bind(this)
       );
       
-      console.log(`👷 [SITE-SCANNER] Worker started with max concurrency: ${MAX_CONCURRENT_JOBS}`);
-      console.log(`👷 [SITE-SCANNER] Worker listening for jobs on queue: ${JOB_QUEUE_NAME}`);
+      // console.log(`👷 [SITE-SCANNER] Worker started with max concurrency: ${MAX_CONCURRENT_JOBS}`);
+      // console.log(`👷 [SITE-SCANNER] Worker listening for jobs on queue: ${JOB_QUEUE_NAME}`);
       
       // Add debugging for job queue activity
       this.boss.on('error', error => {
-        console.error('🚨 [SITE-SCANNER] Pg-boss error:', error);
+        // console.error('🚨 [SITE-SCANNER] Pg-boss error:', error);
       });
       
       this.boss.on('monitor-states', (states) => {
         if (states && states.queues) {
           const scanQueue = states.queues.find(q => q.name === JOB_QUEUE_NAME);
           if (scanQueue && scanQueue.count > 0) {
-            console.log(`📊 [SITE-SCANNER] Queue stats - Active: ${scanQueue.active}, Completed: ${scanQueue.completed}, Failed: ${scanQueue.failed}`);
+            // console.log(`📊 [SITE-SCANNER] Queue stats - Active: ${scanQueue.active}, Completed: ${scanQueue.completed}, Failed: ${scanQueue.failed}`);
           }
         }
       });
       
     } catch (error) {
-      console.error('❌ [SITE-SCANNER] Failed to start worker:', error);
+      // console.error('❌ [SITE-SCANNER] Failed to start worker:', error);
       throw error;
     }
   }
@@ -92,7 +92,7 @@ class SiteScannerJobQueue {
   async processScanJob(job) {
     const { connectionId, userId, siteName, siteUrl, platform } = job.data;
     
-    console.log(`
+    // console.log(`
 ╔════════════════════════════════════════════════════════════════╗
 ║                    🔍 ACCESSIBILITY SCAN STARTED               ║
 ╠════════════════════════════════════════════════════════════════╣
@@ -116,7 +116,7 @@ class SiteScannerJobQueue {
       // Perform accessibility scanning process
       await this.performAccessibilityScan(connectionId, siteUrl, platform);
       
-      console.log(`
+      // console.log(`
 ╔════════════════════════════════════════════════════════════════╗
 ║                    ✅ ACCESSIBILITY SCAN COMPLETED             ║
 ╠════════════════════════════════════════════════════════════════╣
@@ -128,7 +128,7 @@ class SiteScannerJobQueue {
       `);
 
     } catch (error) {
-      console.error(`
+      // console.error(`
 ╔════════════════════════════════════════════════════════════════╗
 ║                    ❌ ACCESSIBILITY SCAN FAILED                ║
 ╠════════════════════════════════════════════════════════════════╣
@@ -144,12 +144,12 @@ class SiteScannerJobQueue {
 
   async performAccessibilityScan(connectionId, siteUrl, platform, scanReason = 'schedule') {
     try {
-      console.log(`🔍 [SCAN-${connectionId}] Starting WCAG accessibility scan for: ${siteUrl} (Reason: ${scanReason})`);
+      // console.log(`🔍 [SCAN-${connectionId}] Starting WCAG accessibility scan for: ${siteUrl} (Reason: ${scanReason})`);
       
       // Perform real accessibility scan using pa11y
       const scanResult = await accessibilityScanner.scanUrl(siteUrl, connectionId, scanReason);
       
-      console.log(`
+      // console.log(`
 ╔═══════════════════ SCAN RESULTS ═══════════════════╗
 ║ Connection ID: ${String(connectionId).padEnd(32)} ║
 ║ Accessibility Score: ${String(scanResult.score || 'N/A').padEnd(26)} ║
@@ -173,7 +173,7 @@ class SiteScannerJobQueue {
       };
       
     } catch (error) {
-      console.error(`❌ [SCAN-${connectionId}] Accessibility scan failed:`, error.message);
+      // console.error(`❌ [SCAN-${connectionId}] Accessibility scan failed:`, error.message);
       
       // Save failed scan result
       const errorResult = await accessibilityScanner.saveResults({
@@ -208,7 +208,7 @@ class SiteScannerJobQueue {
 
   async syncSchedules() {
     try {
-      console.log('🔄 [SITE-SCANNER] Syncing schedules with database...');
+      // console.log('🔄 [SITE-SCANNER] Syncing schedules with database...');
       
       // Fetch all active site connections with auto_scan enabled
       const activeConnections = await prisma.siteConnection.findMany({
@@ -227,7 +227,7 @@ class SiteScannerJobQueue {
         }
       });
 
-      console.log(`📋 [SITE-SCANNER] Found ${activeConnections.length} active connections with auto-scan enabled`);
+      // console.log(`📋 [SITE-SCANNER] Found ${activeConnections.length} active connections with auto-scan enabled`);
 
       // Convert scan frequency to cron expression
       const frequencyToCron = {
@@ -247,7 +247,7 @@ class SiteScannerJobQueue {
         
         // Special handling for testing frequency - use 15-second intervals only
         if (connection.scanFrequency === 'testing') {
-          console.log(`⚡ [SITE-SCANNER] Testing frequency detected for ${connection.siteName} - using 15-second interval trigger`);
+          // console.log(`⚡ [SITE-SCANNER] Testing frequency detected for ${connection.siteName} - using 15-second interval trigger`);
           // Testing frequency uses interval-based scanning, not cron scheduling
           continue;
         }
@@ -276,10 +276,10 @@ class SiteScannerJobQueue {
             lastUpdated: new Date()
           });
 
-          console.log(`✅ [SITE-SCANNER] Scheduled job for ${connection.siteName} (${connection.scanFrequency}) - User: ${connection.user.email}`);
+          // console.log(`✅ [SITE-SCANNER] Scheduled job for ${connection.siteName} (${connection.scanFrequency}) - User: ${connection.user.email}`);
           
         } catch (error) {
-          console.error(`❌ [SITE-SCANNER] Failed to schedule job for connection ${connection.id}:`, error);
+          // console.error(`❌ [SITE-SCANNER] Failed to schedule job for connection ${connection.id}:`, error);
         }
       }
 
@@ -295,16 +295,16 @@ class SiteScannerJobQueue {
         try {
           await this.boss.cancel(jobInfo.jobKey);
           this.activeJobs.delete(connectionId);
-          console.log(`🗑️  [SITE-SCANNER] Removed job for deleted connection: ${connectionId}`);
+          // console.log(`🗑️  [SITE-SCANNER] Removed job for deleted connection: ${connectionId}`);
         } catch (error) {
-          console.error(`❌ [SITE-SCANNER] Failed to remove job for connection ${connectionId}:`, error);
+          // console.error(`❌ [SITE-SCANNER] Failed to remove job for connection ${connectionId}:`, error);
         }
       }
 
-      console.log(`✅ [SITE-SCANNER] Schedule sync completed - Active jobs: ${this.activeJobs.size}`);
+      // console.log(`✅ [SITE-SCANNER] Schedule sync completed - Active jobs: ${this.activeJobs.size}`);
       
     } catch (error) {
-      console.error('❌ [SITE-SCANNER] Failed to sync schedules:', error);
+      // console.error('❌ [SITE-SCANNER] Failed to sync schedules:', error);
     }
   }
 
@@ -337,19 +337,19 @@ class SiteScannerJobQueue {
 
         try {
           // Direct scan execution instead of queuing for testing frequency
-          console.log(`🔍 [SITE-SCANNER] Executing direct scan for ${connection.siteName}`);
+          // console.log(`🔍 [SITE-SCANNER] Executing direct scan for ${connection.siteName}`);
           
           // Execute scan immediately instead of queuing
           await this.performAccessibilityScan(connection.id, connection.siteUrl, connection.platform);
           
-          console.log(`✅ [SITE-SCANNER] Direct scan completed for ${connection.siteName}`);
+          // console.log(`✅ [SITE-SCANNER] Direct scan completed for ${connection.siteName}`);
           
         } catch (error) {
-          console.error(`❌ [SITE-SCANNER] Failed to execute direct scan for connection ${connection.id}:`, error);
+          // console.error(`❌ [SITE-SCANNER] Failed to execute direct scan for connection ${connection.id}:`, error);
         }
       }
     } catch (error) {
-      console.error('❌ [SITE-SCANNER] Testing scan trigger failed:', error);
+      // console.error('❌ [SITE-SCANNER] Testing scan trigger failed:', error);
     }
   }
 
@@ -357,7 +357,7 @@ class SiteScannerJobQueue {
     if (this.testingIntervalId) {
       clearInterval(this.testingIntervalId);
       this.testingIntervalId = null;
-      console.log('🛑 [SITE-SCANNER] 15-second testing schedule stopped');
+      // console.log('🛑 [SITE-SCANNER] 15-second testing schedule stopped');
     }
   }
 
@@ -366,7 +366,7 @@ class SiteScannerJobQueue {
       this.testingIntervalId = setInterval(() => {
         this.triggerTestingScans();
       }, 15000); // 15 seconds in milliseconds
-      console.log('▶️ [SITE-SCANNER] 15-second testing schedule started');
+      // console.log('▶️ [SITE-SCANNER] 15-second testing schedule started');
     }
   }
 
@@ -387,14 +387,14 @@ class SiteScannerJobQueue {
         syncInterval: SYNC_INTERVAL_MS / 1000
       };
     } catch (error) {
-      console.error('❌ [SITE-SCANNER] Failed to get job stats:', error);
+      // console.error('❌ [SITE-SCANNER] Failed to get job stats:', error);
       return null;
     }
   }
 
   async shutdown() {
     try {
-      console.log('🛑 [SITE-SCANNER] Shutting down job queue...');
+      // console.log('🛑 [SITE-SCANNER] Shutting down job queue...');
       
       if (this.syncInterval) {
         clearInterval(this.syncInterval);
@@ -410,9 +410,9 @@ class SiteScannerJobQueue {
       
       await prisma.$disconnect();
       
-      console.log('✅ [SITE-SCANNER] Job queue shutdown completed');
+      // console.log('✅ [SITE-SCANNER] Job queue shutdown completed');
     } catch (error) {
-      console.error('❌ [SITE-SCANNER] Error during shutdown:', error);
+      // console.error('❌ [SITE-SCANNER] Error during shutdown:', error);
     }
   }
 
@@ -431,11 +431,11 @@ class SiteScannerJobQueue {
         expireInMinutes: 5
       });
 
-      console.log(`🚀 [SITE-SCANNER] Manual scan job ${jobId} queued for ${jobData.siteName}`);
+      // console.log(`🚀 [SITE-SCANNER] Manual scan job ${jobId} queued for ${jobData.siteName}`);
       return jobId;
 
     } catch (error) {
-      console.error('❌ [SITE-SCANNER] Failed to trigger manual scan:', error);
+      // console.error('❌ [SITE-SCANNER] Failed to trigger manual scan:', error);
       throw error;
     }
   }
@@ -451,13 +451,13 @@ const siteScannerQueue = new SiteScannerJobQueue();
 
 // Graceful shutdown handling
 process.on('SIGINT', async () => {
-  console.log('\n🛑 [SITE-SCANNER] Received SIGINT, shutting down gracefully...');
+  // console.log('\n🛑 [SITE-SCANNER] Received SIGINT, shutting down gracefully...');
   await siteScannerQueue.shutdown();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  console.log('\n🛑 [SITE-SCANNER] Received SIGTERM, shutting down gracefully...');
+  // console.log('\n🛑 [SITE-SCANNER] Received SIGTERM, shutting down gracefully...');
   await siteScannerQueue.shutdown();
   process.exit(0);
 });

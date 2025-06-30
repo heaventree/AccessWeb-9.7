@@ -18,7 +18,7 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
     const { connectionId } = req.params;
     const userId = req.user.userId;
 
-    console.log(`🔍 [SCANNER] Manual scan trigger requested for connection ${connectionId} by user ${userId}`);
+    // console.log(`🔍 [SCANNER] Manual scan trigger requested for connection ${connectionId} by user ${userId}`);
 
     // Verify the connection belongs to the authenticated user
     const connection = await prisma.siteConnection.findFirst({
@@ -31,7 +31,7 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
     });
 
     if (!connection) {
-      console.log(`❌ [SCANNER] Connection ${connectionId} not found or not accessible by user ${userId}`);
+      // console.log(`❌ [SCANNER] Connection ${connectionId} not found or not accessible by user ${userId}`);
       return res.status(404).json({
         success: false,
         error: 'Site connection not found or not accessible'
@@ -59,7 +59,7 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
 
     const jobId = await siteScannerQueue.triggerManualScan(jobData);
 
-    console.log(`✅ [SCANNER] Manual scan job ${jobId} queued for ${connection.siteName}`);
+    // console.log(`✅ [SCANNER] Manual scan job ${jobId} queued for ${connection.siteName}`);
 
     res.json({
       success: true,
@@ -74,7 +74,7 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [SCANNER] Error triggering manual scan:', error);
+    // console.error('❌ [SCANNER] Error triggering manual scan:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to trigger accessibility scan',
@@ -132,7 +132,7 @@ router.get('/history/:connectionId', logRequest, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [SCANNER] Error fetching scan history:', error);
+    // console.error('❌ [SCANNER] Error fetching scan history:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch scan history'
@@ -181,7 +181,7 @@ router.get('/status/:connectionId', logRequest, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [SCANNER] Error fetching scan status:', error);
+    // console.error('❌ [SCANNER] Error fetching scan status:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch scan status'
@@ -203,7 +203,7 @@ router.post('/schedule/stop', logRequest, async (req, res) => {
 
     siteScannerQueue.stopTestingSchedule();
     
-    console.log('🛑 [SCANNER] 15-second testing schedule stopped by user');
+    // console.log('🛑 [SCANNER] 15-second testing schedule stopped by user');
     
     res.json({
       success: true,
@@ -211,7 +211,7 @@ router.post('/schedule/stop', logRequest, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [SCANNER] Error stopping schedule:', error);
+    // console.error('❌ [SCANNER] Error stopping schedule:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to stop testing schedule'
@@ -233,7 +233,7 @@ router.post('/schedule/start', logRequest, async (req, res) => {
 
     siteScannerQueue.startTestingSchedule();
     
-    console.log('▶️ [SCANNER] 15-second testing schedule started by user');
+    // console.log('▶️ [SCANNER] 15-second testing schedule started by user');
     
     res.json({
       success: true,
@@ -241,7 +241,7 @@ router.post('/schedule/start', logRequest, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [SCANNER] Error starting schedule:', error);
+    // console.error('❌ [SCANNER] Error starting schedule:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to start testing schedule'
@@ -270,7 +270,7 @@ router.get('/schedule/status', logRequest, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [SCANNER] Error checking schedule status:', error);
+    // console.error('❌ [SCANNER] Error checking schedule status:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to check schedule status'
@@ -287,7 +287,7 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
     const { connectionId } = req.body;
     const userId = req.user.userId;
 
-    console.log(`🔍 [SCANNER] Manual WCAG scan trigger requested for connection ${connectionId} by user ${userId}`);
+    // console.log(`🔍 [SCANNER] Manual WCAG scan trigger requested for connection ${connectionId} by user ${userId}`);
 
     // Verify the connection belongs to the authenticated user
     const connection = await prisma.siteConnection.findFirst({
@@ -298,7 +298,7 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
     });
 
     if (!connection) {
-      console.log(`❌ [SCANNER] Connection ${connectionId} not found or not accessible by user ${userId}`);
+      // console.log(`❌ [SCANNER] Connection ${connectionId} not found or not accessible by user ${userId}`);
       return res.status(404).json({
         success: false,
         error: 'Site connection not found or not accessible'
@@ -306,14 +306,14 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
     }
 
     // Trigger immediate accessibility scan using the scanner directly
-    console.log(`🚀 [SCANNER] Triggering immediate WCAG scan for: ${connection.siteUrl}`);
+    // console.log(`🚀 [SCANNER] Triggering immediate WCAG scan for: ${connection.siteUrl}`);
     
     // Perform the scan directly instead of queuing
     const { accessibilityScanner } = await import('../services/accessibilityScanner.js');
     
     const scanResult = await accessibilityScanner.scanUrl(connection.siteUrl, connection.id);
     
-    console.log(`✅ [SCANNER] Manual WCAG scan completed for ${connection.siteName} - Score: ${scanResult.score}%`);
+    // console.log(`✅ [SCANNER] Manual WCAG scan completed for ${connection.siteName} - Score: ${scanResult.score}%`);
 
     res.json({
       success: true,
@@ -333,7 +333,7 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [SCANNER] Error triggering manual scan:', error);
+    // console.error('❌ [SCANNER] Error triggering manual scan:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to trigger manual accessibility scan'
@@ -349,7 +349,7 @@ router.get('/stats', logRequest, async (req, res) => {
   try {
     const userId = req.user.userId;
 
-    console.log(`📊 [SCANNER] Fetching scanner statistics for user ${userId}`);
+    // console.log(`📊 [SCANNER] Fetching scanner statistics for user ${userId}`);
 
     // Get current month start
     const currentMonth = new Date();
@@ -396,7 +396,7 @@ router.get('/stats', logRequest, async (req, res) => {
       teamMembers
     };
 
-    console.log(`✅ [SCANNER] Statistics for user ${userId}:`, stats);
+    // console.log(`✅ [SCANNER] Statistics for user ${userId}:`, stats);
 
     res.json({
       success: true,
@@ -404,7 +404,7 @@ router.get('/stats', logRequest, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [SCANNER] Error fetching scanner statistics:', error);
+    // console.error('❌ [SCANNER] Error fetching scanner statistics:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch scanner statistics'
@@ -509,7 +509,7 @@ router.get('/recent-scans', logRequest, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [SCANNER] Error fetching recent scans:', error);
+    // console.error('❌ [SCANNER] Error fetching recent scans:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch recent scans'
@@ -557,7 +557,7 @@ router.get('/scan-details/:scanId', logRequest, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [SCANNER] Error fetching scan details:', error);
+    // console.error('❌ [SCANNER] Error fetching scan details:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch scan details'

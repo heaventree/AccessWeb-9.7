@@ -16,7 +16,7 @@ export class AccessibilityScanner {
     const startTime = Date.now();
     
     try {
-      console.log(`🔍 [ACCESSIBILITY] Starting WCAG scan for: ${url} (${scanReason})`);
+      // console.log(`🔍 [ACCESSIBILITY] Starting WCAG scan for: ${url} (${scanReason})`);
       
       // Fetch and analyze HTML content
       const htmlContent = await this.fetchPageContent(url);
@@ -24,7 +24,7 @@ export class AccessibilityScanner {
       
       const scanDuration = Date.now() - startTime;
       
-      console.log(`✅ [ACCESSIBILITY] Scan completed in ${scanDuration}ms - Errors: ${analysisResults.errorCount}, Warnings: ${analysisResults.warningCount}, Notices: ${analysisResults.noticeCount}`);
+      // console.log(`✅ [ACCESSIBILITY] Scan completed in ${scanDuration}ms - Errors: ${analysisResults.errorCount}, Warnings: ${analysisResults.warningCount}, Notices: ${analysisResults.noticeCount}`);
       
       // Save results to database
       const savedResult = await this.saveResults({
@@ -49,7 +49,7 @@ export class AccessibilityScanner {
     } catch (error) {
       const scanDuration = Date.now() - startTime;
       
-      console.error(`❌ [ACCESSIBILITY] Scan failed for ${url}:`, error.message);
+      // console.error(`❌ [ACCESSIBILITY] Scan failed for ${url}:`, error.message);
       
       // Save error result to database
       const errorResult = await this.saveResults({
@@ -369,11 +369,11 @@ export class AccessibilityScanner {
         data: resultData
       });
       
-      console.log(`💾 [ACCESSIBILITY] Scan results saved with ID: ${savedResult.id}`);
+      // console.log(`💾 [ACCESSIBILITY] Scan results saved with ID: ${savedResult.id}`);
       return savedResult;
       
     } catch (error) {
-      console.error('❌ [ACCESSIBILITY] Failed to save scan results:', error);
+      // console.error('❌ [ACCESSIBILITY] Failed to save scan results:', error);
       throw error;
     }
   }
@@ -385,10 +385,10 @@ export class AccessibilityScanner {
         data: { lastScanAt: new Date() }
       });
       
-      console.log(`⏰ [ACCESSIBILITY] Updated last scan time for connection ${siteConnectionId}`);
+      // console.log(`⏰ [ACCESSIBILITY] Updated last scan time for connection ${siteConnectionId}`);
       
     } catch (error) {
-      console.error('❌ [ACCESSIBILITY] Failed to update scan time:', error);
+      // console.error('❌ [ACCESSIBILITY] Failed to update scan time:', error);
     }
   }
 
@@ -403,7 +403,7 @@ export class AccessibilityScanner {
       return results;
       
     } catch (error) {
-      console.error('❌ [ACCESSIBILITY] Failed to fetch scan results:', error);
+      // console.error('❌ [ACCESSIBILITY] Failed to fetch scan results:', error);
       throw error;
     }
   }
@@ -426,7 +426,7 @@ export class AccessibilityScanner {
       return results;
       
     } catch (error) {
-      console.error('❌ [ACCESSIBILITY] Failed to fetch scan history:', error);
+      // console.error('❌ [ACCESSIBILITY] Failed to fetch scan history:', error);
       throw error;
     }
   }

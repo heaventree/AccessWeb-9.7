@@ -9,26 +9,26 @@ const prisma = new PrismaClient();
 const logger = {
   info: (message, data = null) => {
     const timestamp = new Date().toISOString();
-    console.log(
+    // console.log(
       `[${timestamp}] [SITE-CONNECTIONS] [INFO] ${message}`,
       data ? JSON.stringify(data, null, 2) : "",
     );
   },
   error: (message, error = null, context = null) => {
     const timestamp = new Date().toISOString();
-    console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] ${message}`);
+    // console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] ${message}`);
     if (error) {
-      console.error(
+      // console.error(
         `[${timestamp}] [SITE-CONNECTIONS] [ERROR] Stack:`,
         error.stack || error,
       );
-      console.error(
+      // console.error(
         `[${timestamp}] [SITE-CONNECTIONS] [ERROR] Details:`,
         JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
       );
     }
     if (context) {
-      console.error(
+      // console.error(
         `[${timestamp}] [SITE-CONNECTIONS] [ERROR] Context:`,
         JSON.stringify(context, null, 2),
       );
@@ -36,7 +36,7 @@ const logger = {
   },
   warn: (message, data = null) => {
     const timestamp = new Date().toISOString();
-    console.warn(
+    // console.warn(
       `[${timestamp}] [SITE-CONNECTIONS] [WARN] ${message}`,
       data ? JSON.stringify(data, null, 2) : "",
     );
@@ -44,7 +44,7 @@ const logger = {
   debug: (message, data = null) => {
     if (process.env.NODE_ENV === "development") {
       const timestamp = new Date().toISOString();
-      console.log(
+      // console.log(
         `[${timestamp}] [SITE-CONNECTIONS] [DEBUG] ${message}`,
         data ? JSON.stringify(data, null, 2) : "",
       );
@@ -63,7 +63,7 @@ function generateApiToken() {
 router.get("/", requireAuth, async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log("user->>>>>>>>>>>>>>>>>>", req.user);
+    // console.log("user->>>>>>>>>>>>>>>>>>", req.user);
     logger.info("Fetching site connections", { userId });
 
     const connections = await prisma.siteConnection.findMany({
@@ -593,22 +593,22 @@ router.post("/webhook/scan", async (req, res) => {
     // Use provided URL or default to connection URL
     const scanUrl = url || connection.siteUrl;
 
-    console.log(`\n🚀 WORDPRESS SCAN INITIATED`);
-    console.log(`════════════════════════════════`);
-    console.log(`📝 Site: ${connection.siteName}`);
-    console.log(`🔗 Scanning URL: ${scanUrl}`);
-    console.log(`⚙️  Platform: ${connection.platform}`);
-    console.log(`🔧 Trigger: ${trigger_type}`);
-    console.log(`🆔 Connection ID: ${connection.id}`);
-    console.log(`👤 User ID: ${connection.userId}`);
-    console.log(`🔐 Token: ${api_token.substring(0, 20)}...`);
-    console.log(`📊 Starting WCAG compliance scan...`);
-    console.log(`════════════════════════════════`);
-    console.log(`⏳ Fetching page content...`);
-    console.log(`🔍 Analyzing accessibility issues...`);
-    console.log(`📈 Calculating compliance score...`);
-    console.log(`✅ SCAN COMPLETED SUCCESSFULLY!`);
-    console.log(`════════════════════════════════\n`);
+    // console.log(`\n🚀 WORDPRESS SCAN INITIATED`);
+    // console.log(`════════════════════════════════`);
+    // console.log(`📝 Site: ${connection.siteName}`);
+    // console.log(`🔗 Scanning URL: ${scanUrl}`);
+    // console.log(`⚙️  Platform: ${connection.platform}`);
+    // console.log(`🔧 Trigger: ${trigger_type}`);
+    // console.log(`🆔 Connection ID: ${connection.id}`);
+    // console.log(`👤 User ID: ${connection.userId}`);
+    // console.log(`🔐 Token: ${api_token.substring(0, 20)}...`);
+    // console.log(`📊 Starting WCAG compliance scan...`);
+    // console.log(`════════════════════════════════`);
+    // console.log(`⏳ Fetching page content...`);
+    // console.log(`🔍 Analyzing accessibility issues...`);
+    // console.log(`📈 Calculating compliance score...`);
+    // console.log(`✅ SCAN COMPLETED SUCCESSFULLY!`);
+    // console.log(`════════════════════════════════\n`);
 
     // Update last scan time
     await prisma.siteConnection.update({
@@ -646,7 +646,7 @@ router.post("/webhook/scan", async (req, res) => {
       data: mockResults,
     });
   } catch (error) {
-    console.error("Error processing WordPress webhook:", error);
+    // console.error("Error processing WordPress webhook:", error);
     res.status(500).json({
       success: false,
       error: "Failed to process scan request",

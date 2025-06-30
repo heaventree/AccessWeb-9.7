@@ -11,7 +11,7 @@ async function createAdminUser() {
     });
 
     if (existingAdmin) {
-      console.log('Admin user already exists');
+      // console.log('Admin user already exists');
       return;
     }
 
@@ -27,9 +27,9 @@ async function createAdminUser() {
       }
     });
 
-    console.log('Admin user created successfully:', admin.email);
+    // console.log('Admin user created successfully:', admin.email);
   } catch (error) {
-    console.error('Error creating admin user:', error);
+    // console.error('Error creating admin user:', error);
   } finally {
     await prisma.$disconnect();
   }

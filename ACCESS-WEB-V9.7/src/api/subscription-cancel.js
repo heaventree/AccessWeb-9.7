@@ -42,7 +42,7 @@ async function cancelSubscription(req, res) {
           cancel_at_period_end: true
         });
       } catch (stripeError) {
-        console.error('Error canceling Stripe subscription:', stripeError);
+        // console.error('Error canceling Stripe subscription:', stripeError);
         // Continue with local cancellation even if Stripe fails
       }
     }
@@ -76,7 +76,7 @@ async function cancelSubscription(req, res) {
     });
 
   } catch (error) {
-    console.error('Error canceling subscription:', error);
+    // console.error('Error canceling subscription:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to cancel subscription',
