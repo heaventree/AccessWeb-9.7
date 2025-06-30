@@ -193,7 +193,7 @@ export class AccessibilityScanner {
       const title = control.getAttribute('title');
       
       if (id) {
-        const label = root.querySelector(`label[for="${id}"];
+        const label = root.querySelector(`label[for="${id}"]`);
         if (!label && !ariaLabel && !ariaLabelledby && !title) {
           issues.push({
             type: 'error',

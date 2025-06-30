@@ -231,7 +231,7 @@ function updateRoadmapFeatureInContent(content, featureId, updates) {
     Object.entries(updates).forEach(([key, value]) => {
       const fieldRegex = new RegExp(`(${key}:\\s*)([^,}]+)`, 'g');
       const newValue = typeof value === 'string' ? `'${value}'` : value;
-      updatedFeature = updatedFeature.replace(fieldRegex, `$1${newValue};
+      updatedFeature = updatedFeature.replace(fieldRegex, '$1' + newValue + '$2');
     });
     
     return updatedFeature;
