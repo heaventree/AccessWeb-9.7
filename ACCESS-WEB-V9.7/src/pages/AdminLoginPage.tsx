@@ -28,8 +28,12 @@ export function AdminLoginPage() {
       // Use the provided email/username as is
       const emailToUse = username.includes('@') ? username : `${username}@example.com`;
       
+      console.log('Admin login attempt:', { emailToUse, hasPassword: !!password });
+      
       // Attempt login with the provided credentials and specify this is an admin login
       const result = await login(emailToUse, password, { isAdminLogin: true });
+      
+      console.log('Login result:', { success: result?.success, hasUser: !!result?.user, isAdmin: result?.user?.isAdmin });
       
       if (result.success) {
         // Check if the user has admin privileges based on the isAdmin flag from the database
@@ -63,8 +67,19 @@ export function AdminLoginPage() {
         // Clear password field on error
         setPassword('');
       }
-    } catch (error) {
-      setError('An unexpected error occurred. Please try again.');
+    } catch (error: any) {
+      console.error('Admin login error:', error);
+      
+      // Handle different types of errors
+      if (error.response) {
+        // API returned an error response
+        const errorMessage = error.response.data?.error || error.response.data?.message || 'Invalid credentials';
+        setError(errorMessage);
+      } else if (error.message) {
+        setError(error.message);
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
       setPassword('');
     } finally {
       setIsLoading(false);
