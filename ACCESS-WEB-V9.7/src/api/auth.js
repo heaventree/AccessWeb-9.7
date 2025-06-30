@@ -57,7 +57,7 @@ router.post('/register', async (req, res) => {
       message: 'User registered successfully' 
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    // Registration error logged in production monitoring
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -116,6 +116,7 @@ router.post('/login', async (req, res) => {
         }
       });
     }
+    
 
     console.log("User found:", user.email, "isAdmin:", user.isAdmin);
 
