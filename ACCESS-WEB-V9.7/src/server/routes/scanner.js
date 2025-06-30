@@ -18,7 +18,7 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
     const { connectionId } = req.params;
     const userId = req.user.userId;
 
-    // console.log(`🔍 [SCANNER] Manual scan trigger requested for connection ${connectionId} by user ${userId}`);
+    // Production logging: `🔍 [SCANNER] Manual scan trigger requested for connection ${connectionId} by user ${userId}`);
 
     // Verify the connection belongs to the authenticated user
     const connection = await prisma.siteConnection.findFirst({
@@ -31,7 +31,7 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
     });
 
     if (!connection) {
-      // console.log(`❌ [SCANNER] Connection ${connectionId} not found or not accessible by user ${userId}`);
+      // Production logging: `❌ [SCANNER] Connection ${connectionId} not found or not accessible by user ${userId}`);
       return res.status(404).json({
         success: false,
         error: 'Site connection not found or not accessible'
@@ -59,7 +59,7 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
 
     const jobId = await siteScannerQueue.triggerManualScan(jobData);
 
-    // console.log(`✅ [SCANNER] Manual scan job ${jobId} queued for ${connection.siteName}`);
+    // Production logging: `✅ [SCANNER] Manual scan job ${jobId} queued for ${connection.siteName}`);
 
     res.json({
       success: true,
@@ -203,7 +203,7 @@ router.post('/schedule/stop', logRequest, async (req, res) => {
 
     siteScannerQueue.stopTestingSchedule();
     
-    // console.log('🛑 [SCANNER] 15-second testing schedule stopped by user');
+    // Production logging: '🛑 [SCANNER] 15-second testing schedule stopped by user');
     
     res.json({
       success: true,
@@ -233,7 +233,7 @@ router.post('/schedule/start', logRequest, async (req, res) => {
 
     siteScannerQueue.startTestingSchedule();
     
-    // console.log('▶️ [SCANNER] 15-second testing schedule started by user');
+    // Production logging: '▶️ [SCANNER] 15-second testing schedule started by user');
     
     res.json({
       success: true,
@@ -287,7 +287,7 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
     const { connectionId } = req.body;
     const userId = req.user.userId;
 
-    // console.log(`🔍 [SCANNER] Manual WCAG scan trigger requested for connection ${connectionId} by user ${userId}`);
+    // Production logging: `🔍 [SCANNER] Manual WCAG scan trigger requested for connection ${connectionId} by user ${userId}`);
 
     // Verify the connection belongs to the authenticated user
     const connection = await prisma.siteConnection.findFirst({
@@ -298,7 +298,7 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
     });
 
     if (!connection) {
-      // console.log(`❌ [SCANNER] Connection ${connectionId} not found or not accessible by user ${userId}`);
+      // Production logging: `❌ [SCANNER] Connection ${connectionId} not found or not accessible by user ${userId}`);
       return res.status(404).json({
         success: false,
         error: 'Site connection not found or not accessible'
@@ -306,14 +306,14 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
     }
 
     // Trigger immediate accessibility scan using the scanner directly
-    // console.log(`🚀 [SCANNER] Triggering immediate WCAG scan for: ${connection.siteUrl}`);
+    // Production logging: `🚀 [SCANNER] Triggering immediate WCAG scan for: ${connection.siteUrl}`);
     
     // Perform the scan directly instead of queuing
     const { accessibilityScanner } = await import('../services/accessibilityScanner.js');
     
     const scanResult = await accessibilityScanner.scanUrl(connection.siteUrl, connection.id);
     
-    // console.log(`✅ [SCANNER] Manual WCAG scan completed for ${connection.siteName} - Score: ${scanResult.score}%`);
+    // Production logging: `✅ [SCANNER] Manual WCAG scan completed for ${connection.siteName} - Score: ${scanResult.score}%`);
 
     res.json({
       success: true,
@@ -349,7 +349,7 @@ router.get('/stats', logRequest, async (req, res) => {
   try {
     const userId = req.user.userId;
 
-    // console.log(`📊 [SCANNER] Fetching scanner statistics for user ${userId}`);
+    // Production logging: `📊 [SCANNER] Fetching scanner statistics for user ${userId}`);
 
     // Get current month start
     const currentMonth = new Date();
@@ -396,7 +396,7 @@ router.get('/stats', logRequest, async (req, res) => {
       teamMembers
     };
 
-    // console.log(`✅ [SCANNER] Statistics for user ${userId}:`, stats);
+    // Production logging: `✅ [SCANNER] Statistics for user ${userId}:`, stats);
 
     res.json({
       success: true,

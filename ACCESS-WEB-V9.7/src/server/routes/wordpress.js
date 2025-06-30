@@ -30,7 +30,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
       modified_at
     } = req.body;
 
-    // console.log(`🔌 [WP-PLUGIN] Received webhook with token: ${token?.substring(0, 8)}..., status: ${status}`);
+    // Production logging: `🔌 [WP-PLUGIN] Received webhook with token: ${token?.substring(0, 8)}..., status: ${status}`);
 
     // Validate required fields
     if (!token || !status) {
@@ -51,18 +51,18 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
     });
 
     if (!siteConnection) {
-      // console.log(`❌ [WP-PLUGIN] Invalid token or inactive site connection: ${token?.substring(0, 8)}...`);
+      // Production logging: `❌ [WP-PLUGIN] Invalid token or inactive site connection: ${token?.substring(0, 8)}...`);
       return res.status(401).json({
         error: 'Invalid token or inactive site connection'
       });
     }
 
-    // console.log(`✅ [WP-PLUGIN] Authenticated for site: ${siteConnection.siteName} (${siteConnection.siteUrl})`);
+    // Production logging: `✅ [WP-PLUGIN] Authenticated for site: ${siteConnection.siteName} (${siteConnection.siteUrl})`);
     const siteDomain = new URL(siteConnection.siteUrl).hostname;
 
     // Handle different status types
     if (status === 'no-update') {
-      // console.log(`ℹ️ [WP-PLUGIN] No changes detected for ${siteDomain}, ignoring`);
+      // Production logging: `ℹ️ [WP-PLUGIN] No changes detected for ${siteDomain}, ignoring`);
       return res.json({
         success: true,
         message: 'No changes detected, scan not triggered'
@@ -72,7 +72,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
     if (status === 'init' || status === 'update') {
       const scanReason = status === 'init' ? 'file_init' : 'file_update';
       
-      // console.log(`🚀 [WP-PLUGIN] Triggering ${scanReason} scan for ${siteDomain}`);
+      // Production logging: `🚀 [WP-PLUGIN] Triggering ${scanReason} scan for ${siteDomain}`);
 
       // Trigger the accessibility scan using existing scanner logic
       try {
@@ -83,7 +83,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
           scanReason
         );
 
-        // console.log(`✅ [WP-PLUGIN] Scan completed for ${siteDomain}, result ID: ${scanResult?.id}`);
+        // Production logging: `✅ [WP-PLUGIN] Scan completed for ${siteDomain}, result ID: ${scanResult?.id}`);
 
         return res.json({
           success: true,
@@ -104,7 +104,7 @@ router.post('/wp-json/wp/v2/accessibility-auth/debug', async (req, res) => {
     }
 
     // Unknown status
-    // console.log(`⚠️ [WP-PLUGIN] Unknown status: ${status} for ${siteDomain}`);
+    // Production logging: `⚠️ [WP-PLUGIN] Unknown status: ${status} for ${siteDomain}`);
     return res.status(400).json({
       error: `Unknown status: ${status}`
     });
@@ -131,11 +131,11 @@ router.post('/accessibility-auth/verify', async (req, res) => {
   try {
     const { token, site_url } = req.body;
 
-    // console.log(`🔐 [WP-AUTH] Token verification request for site: ${site_url}`);
+    // Production logging: `🔐 [WP-AUTH] Token verification request for site: ${site_url}`);
 
     // Validate required fields
     if (!token || !site_url) {
-      // console.log(`❌ [WP-AUTH] Missing required fields: token or site_url`);
+      // Production logging: `❌ [WP-AUTH] Missing required fields: token or site_url`);
       return res.status(400).json({
         success: false,
         message: 'Missing required fields: token and site_url are required'
@@ -160,7 +160,7 @@ router.post('/accessibility-auth/verify', async (req, res) => {
     });
 
     if (!siteConnection) {
-      // console.log(`❌ [WP-AUTH] Invalid token: ${token?.substring(0, 8)}...`);
+      // Production logging: `❌ [WP-AUTH] Invalid token: ${token?.substring(0, 8)}...`);
       return res.json({
         success: false,
         message: 'Token is invalid or site connection is not active'
@@ -169,7 +169,7 @@ router.post('/accessibility-auth/verify', async (req, res) => {
 
     // Site URL validation removed - focus only on token validation
 
-    // console.log(`✅ [WP-AUTH] Token verified for site: ${siteConnection.siteName} (${siteConnection.siteUrl})`);
+    // Production logging: `✅ [WP-AUTH] Token verified for site: ${siteConnection.siteName} (${siteConnection.siteUrl})`);
 
     // Return success with basic site information
     return res.json({
@@ -205,7 +205,7 @@ router.post('/:connectionId/schedule', requireAuth, async (req, res) => {
     const { action } = req.body;
     const userId = req.user.id;
 
-    // console.log(`🔄 [WP-SCHEDULE] User ${userId} requesting action "${action}" for connection ${connectionId}`);
+    // Production logging: `🔄 [WP-SCHEDULE] User ${userId} requesting action "${action}" for connection ${connectionId}`);
 
     // Validate required fields
     if (!action) {
@@ -226,7 +226,7 @@ router.post('/:connectionId/schedule', requireAuth, async (req, res) => {
     });
 
     if (!siteConnection) {
-      // console.log(`❌ [WP-SCHEDULE] Connection ${connectionId} not found for user ${userId}`);
+      // Production logging: `❌ [WP-SCHEDULE] Connection ${connectionId} not found for user ${userId}`);
       return res.status(404).json({
         success: false,
         message: 'WordPress connection not found or access denied'
@@ -241,7 +241,7 @@ router.post('/:connectionId/schedule', requireAuth, async (req, res) => {
     baseUrl = baseUrl.replace(/\/$/, '');
 
     const apiUrl = `${baseUrl}/wp-json/wcag/v2/schedule`;
-    // console.log(`🌐 [WP-SCHEDULE] Making API call to: ${apiUrl} with action: ${action}`);
+    // Production logging: `🌐 [WP-SCHEDULE] Making API call to: ${apiUrl} with action: ${action}`);
 
     // Set longer timeout for "run" action as it waits for complete scan
     const timeoutMs = action === 'run' ? 600000 : 30000; // 10 minutes for run, 30 seconds for others
@@ -262,14 +262,14 @@ router.post('/:connectionId/schedule', requireAuth, async (req, res) => {
 
     clearTimeout(timeoutId);
 
-    // console.log(`📡 [WP-SCHEDULE] WordPress API response status: ${response.status}`);
+    // Production logging: `📡 [WP-SCHEDULE] WordPress API response status: ${response.status}`);
 
     if (!response.ok) {
       throw new Error(`WordPress API responded with status ${response.status}: ${response.statusText}`);
     }
 
     const result = await response.json();
-    // console.log(`✅ [WP-SCHEDULE] WordPress API response:`, result);
+    // Production logging: `✅ [WP-SCHEDULE] WordPress API response:`, result);
 
     // Return the response from WordPress plugin
     return res.json({
@@ -307,8 +307,8 @@ router.post('/:connectionId/schedule', requireAuth, async (req, res) => {
  */
 router.post('/wcag-compliance/schedule-response', async (req, res) => {
   try {
-    // console.log(`📥 [WP-SCHEDULE-WEBHOOK] Received hourly schedule response`);
-    // console.log(`📥 [WP-SCHEDULE-WEBHOOK] Full payload:`, JSON.stringify(req.body, null, 2));
+    // Production logging: `📥 [WP-SCHEDULE-WEBHOOK] Received hourly schedule response`);
+    // Production logging: `📥 [WP-SCHEDULE-WEBHOOK] Full payload:`, JSON.stringify(req.body, null, 2));
 
     const {
       token,
@@ -322,19 +322,19 @@ router.post('/wcag-compliance/schedule-response', async (req, res) => {
       modified_at
     } = req.body;
 
-    // console.log(`🔍 [WP-SCHEDULE-WEBHOOK] Extracted fields:`);
-    // console.log(`   - Token: ${token ? `${token.substring(0, 8)}...` : 'MISSING'}`);
-    // console.log(`   - Domain: ${domain || 'MISSING'}`);
-    // console.log(`   - Status: ${status || 'MISSING'}`);
-    // console.log(`   - Success: ${success}`);
-    // console.log(`   - Message: ${message || 'No message'}`);
-    // console.log(`   - Run time: ${run_time || 'MISSING'}`);
-    // console.log(`   - File count: ${count || 'MISSING'}`);
-    // console.log(`   - Modified at: ${modified_at || 'MISSING'}`);
+    // Production logging: `🔍 [WP-SCHEDULE-WEBHOOK] Extracted fields:`);
+    // Production logging: `   - Token: ${token ? `${token.substring(0, 8)}...` : 'MISSING'}`);
+    // Production logging: `   - Domain: ${domain || 'MISSING'}`);
+    // Production logging: `   - Status: ${status || 'MISSING'}`);
+    // Production logging: `   - Success: ${success}`);
+    // Production logging: `   - Message: ${message || 'No message'}`);
+    // Production logging: `   - Run time: ${run_time || 'MISSING'}`);
+    // Production logging: `   - File count: ${count || 'MISSING'}`);
+    // Production logging: `   - Modified at: ${modified_at || 'MISSING'}`);
 
     // Validate required fields
     if (!token) {
-      // console.log(`❌ [WP-SCHEDULE-WEBHOOK] Missing required field: token`);
+      // Production logging: `❌ [WP-SCHEDULE-WEBHOOK] Missing required field: token`);
       return res.status(400).json({
         success: false,
         error: 'Missing required field: token'
@@ -342,7 +342,7 @@ router.post('/wcag-compliance/schedule-response', async (req, res) => {
     }
 
     if (!status) {
-      // console.log(`❌ [WP-SCHEDULE-WEBHOOK] Missing required field: status`);
+      // Production logging: `❌ [WP-SCHEDULE-WEBHOOK] Missing required field: status`);
       return res.status(400).json({
         success: false,
         error: 'Missing required field: status'
@@ -350,7 +350,7 @@ router.post('/wcag-compliance/schedule-response', async (req, res) => {
     }
 
     // Find the site connection using the API token
-    // console.log(`🔍 [WP-SCHEDULE-WEBHOOK] Looking up site connection for token: ${token.substring(0, 8)}...`);
+    // Production logging: `🔍 [WP-SCHEDULE-WEBHOOK] Looking up site connection for token: ${token.substring(0, 8)}...`);
     
     const siteConnection = await prisma.siteConnection.findFirst({
       where: { 
@@ -364,97 +364,97 @@ router.post('/wcag-compliance/schedule-response', async (req, res) => {
     });
 
     if (!siteConnection) {
-      // console.log(`❌ [WP-SCHEDULE-WEBHOOK] No active WordPress site connection found for token: ${token.substring(0, 8)}...`);
+      // Production logging: `❌ [WP-SCHEDULE-WEBHOOK] No active WordPress site connection found for token: ${token.substring(0, 8)}...`);
       return res.status(404).json({
         success: false,
         error: 'Site connection not found or inactive'
       });
     }
 
-    // console.log(`✅ [WP-SCHEDULE-WEBHOOK] Found site connection:`);
-    // console.log(`   - Connection ID: ${siteConnection.id}`);
-    // console.log(`   - Site Name: ${siteConnection.siteName}`);
-    // console.log(`   - Site URL: ${siteConnection.siteUrl}`);
-    // console.log(`   - User ID: ${siteConnection.userId}`);
-    // console.log(`   - User Email: ${siteConnection.user.email}`);
+    // Production logging: `✅ [WP-SCHEDULE-WEBHOOK] Found site connection:`);
+    // Production logging: `   - Connection ID: ${siteConnection.id}`);
+    // Production logging: `   - Site Name: ${siteConnection.siteName}`);
+    // Production logging: `   - Site URL: ${siteConnection.siteUrl}`);
+    // Production logging: `   - User ID: ${siteConnection.userId}`);
+    // Production logging: `   - User Email: ${siteConnection.user.email}`);
 
     // Check if we should trigger a scan based on status
-    // console.log(`🔄 [WP-SCHEDULE-WEBHOOK] Checking status: "${status}"`);
+    // Production logging: `🔄 [WP-SCHEDULE-WEBHOOK] Checking status: "${status}"`);
     
     // Initialize scan data for tracking
     let scanResult = null;
     let scanTriggered = false;
 
     if (status === 'init') {
-      // console.log(`🆕 [WP-SCHEDULE-WEBHOOK] Status is "init" - First time scan detected`);
-      // console.log(`🚀 [WP-SCHEDULE-WEBHOOK] Triggering accessibility scan for first-time setup`);
+      // Production logging: `🆕 [WP-SCHEDULE-WEBHOOK] Status is "init" - First time scan detected`);
+      // Production logging: `🚀 [WP-SCHEDULE-WEBHOOK] Triggering accessibility scan for first-time setup`);
       
       // Trigger accessibility scan asynchronously (don't wait for completion)
       setImmediate(async () => {
         try {
-          // console.log(`🔍 [WP-SCAN-ASYNC] Starting async init scan for connection ${siteConnection.id}`);
+          // Production logging: `🔍 [WP-SCAN-ASYNC] Starting async init scan for connection ${siteConnection.id}`);
           const result = await siteScannerQueue.performAccessibilityScan(
             siteConnection.id,
             siteConnection.siteUrl,
             siteConnection.platform || 'wordpress',
             'file_init'
           );
-          // console.log(`✅ [WP-SCAN-ASYNC] Init scan completed - Score: ${result.score}%, Errors: ${result.errorCount}`);
+          // Production logging: `✅ [WP-SCAN-ASYNC] Init scan completed - Score: ${result.score}%, Errors: ${result.errorCount}`);
         } catch (error) {
           // console.error(`❌ [WP-SCAN-ASYNC] Init scan failed for connection ${siteConnection.id}:`, error);
         }
       });
       
       scanTriggered = true;
-      // console.log(`✅ [WP-SCHEDULE-WEBHOOK] Init scan queued for connection ${siteConnection.id}`);
+      // Production logging: `✅ [WP-SCHEDULE-WEBHOOK] Init scan queued for connection ${siteConnection.id}`);
       
     } else if (status === 'update') {
-      // console.log(`🔄 [WP-SCHEDULE-WEBHOOK] Status is "update" - File changes detected`);
-      // console.log(`🚀 [WP-SCHEDULE-WEBHOOK] Triggering accessibility scan for updated files`);
+      // Production logging: `🔄 [WP-SCHEDULE-WEBHOOK] Status is "update" - File changes detected`);
+      // Production logging: `🚀 [WP-SCHEDULE-WEBHOOK] Triggering accessibility scan for updated files`);
       
       // Trigger accessibility scan asynchronously (don't wait for completion)
       setImmediate(async () => {
         try {
-          // console.log(`🔍 [WP-SCAN-ASYNC] Starting async update scan for connection ${siteConnection.id}`);
+          // Production logging: `🔍 [WP-SCAN-ASYNC] Starting async update scan for connection ${siteConnection.id}`);
           const result = await siteScannerQueue.performAccessibilityScan(
             siteConnection.id,
             siteConnection.siteUrl,
             siteConnection.platform || 'wordpress',
             'file_update'
           );
-          // console.log(`✅ [WP-SCAN-ASYNC] Update scan completed - Score: ${result.score}%, Errors: ${result.errorCount}`);
+          // Production logging: `✅ [WP-SCAN-ASYNC] Update scan completed - Score: ${result.score}%, Errors: ${result.errorCount}`);
         } catch (error) {
           // console.error(`❌ [WP-SCAN-ASYNC] Update scan failed for connection ${siteConnection.id}:`, error);
         }
       });
       
       scanTriggered = true;
-      // console.log(`✅ [WP-SCHEDULE-WEBHOOK] Update scan queued for connection ${siteConnection.id}`)
+      // Production logging: `✅ [WP-SCHEDULE-WEBHOOK] Update scan queued for connection ${siteConnection.id}`)
       
     } else if (status === 'no-update') {
-      // console.log(`ℹ️ [WP-SCHEDULE-WEBHOOK] Status is "no-update" - No changes detected`);
-      // console.log(`⏭️ [WP-SCHEDULE-WEBHOOK] Skipping scan - no file changes to process`);
+      // Production logging: `ℹ️ [WP-SCHEDULE-WEBHOOK] Status is "no-update" - No changes detected`);
+      // Production logging: `⏭️ [WP-SCHEDULE-WEBHOOK] Skipping scan - no file changes to process`);
       
     } else {
-      // console.log(`⚠️ [WP-SCHEDULE-WEBHOOK] Unknown status: "${status}" - Skipping scan`);
+      // Production logging: `⚠️ [WP-SCHEDULE-WEBHOOK] Unknown status: "${status}" - Skipping scan`);
     }
 
     // Log additional details if available
     if (ignore_list && Array.isArray(ignore_list)) {
-      // console.log(`📁 [WP-SCHEDULE-WEBHOOK] Ignore list contains ${ignore_list.length} items:`, ignore_list);
+      // Production logging: `📁 [WP-SCHEDULE-WEBHOOK] Ignore list contains ${ignore_list.length} items:`, ignore_list);
     }
 
     if (success === false) {
-      // console.log(`⚠️ [WP-SCHEDULE-WEBHOOK] WordPress plugin reported scan failure: ${message}`);
+      // Production logging: `⚠️ [WP-SCHEDULE-WEBHOOK] WordPress plugin reported scan failure: ${message}`);
     }
 
     // Store webhook data for potential future reference
-    // console.log(`💾 [WP-SCHEDULE-WEBHOOK] Webhook processed successfully`);
-    // console.log(`📊 [WP-SCHEDULE-WEBHOOK] Summary:`);
-    // console.log(`   - Connection: ${siteConnection.siteName} (${siteConnection.id})`);
-    // console.log(`   - Action taken: ${scanTriggered ? 'Accessibility scan queued' : 'No scan needed'}`);
-    // console.log(`   - Files scanned by WP: ${count || 'Unknown'}`);
-    // console.log(`   - Plugin success: ${success}`);
+    // Production logging: `💾 [WP-SCHEDULE-WEBHOOK] Webhook processed successfully`);
+    // Production logging: `📊 [WP-SCHEDULE-WEBHOOK] Summary:`);
+    // Production logging: `   - Connection: ${siteConnection.siteName} (${siteConnection.id})`);
+    // Production logging: `   - Action taken: ${scanTriggered ? 'Accessibility scan queued' : 'No scan needed'}`);
+    // Production logging: `   - Files scanned by WP: ${count || 'Unknown'}`);
+    // Production logging: `   - Plugin success: ${success}`);
 
     // Return immediate response without waiting for scan completion
     return res.json({

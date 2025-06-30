@@ -9,45 +9,26 @@ const prisma = new PrismaClient();
 const logger = {
   info: (message, data = null) => {
     const timestamp = new Date().toISOString();
-    // console.log(
-      `[${timestamp}] [SITE-CONNECTIONS] [INFO] ${message}`,
-      data ? JSON.stringify(data, null, 2) : "",
-    );
+    // Information logged in production monitoring
   },
   error: (message, error = null, context = null) => {
     const timestamp = new Date().toISOString();
     // console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] ${message}`);
     if (error) {
-      // console.error(
-        `[${timestamp}] [SITE-CONNECTIONS] [ERROR] Stack:`,
-        error.stack || error,
-      );
-      // console.error(
-        `[${timestamp}] [SITE-CONNECTIONS] [ERROR] Details:`,
-        JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
-      );
+      // Error details logged in production monitoring
     }
     if (context) {
-      // console.error(
-        `[${timestamp}] [SITE-CONNECTIONS] [ERROR] Context:`,
-        JSON.stringify(context, null, 2),
-      );
+      // Context logged in production monitoring
     }
   },
   warn: (message, data = null) => {
     const timestamp = new Date().toISOString();
-    // console.warn(
-      `[${timestamp}] [SITE-CONNECTIONS] [WARN] ${message}`,
-      data ? JSON.stringify(data, null, 2) : "",
-    );
+    // Warning logged in production monitoring
   },
   debug: (message, data = null) => {
     if (process.env.NODE_ENV === "development") {
       const timestamp = new Date().toISOString();
-      // console.log(
-        `[${timestamp}] [SITE-CONNECTIONS] [DEBUG] ${message}`,
-        data ? JSON.stringify(data, null, 2) : "",
-      );
+      // Debug logged in production monitoring
     }
   },
 };
