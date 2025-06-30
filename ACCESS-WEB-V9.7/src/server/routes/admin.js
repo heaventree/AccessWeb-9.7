@@ -46,7 +46,7 @@ async function writeDataFile(filename, content) {
     await fs.writeFile(filePath, content, 'utf-8');
   } catch (error) {
     // console.error(`Error writing ${filename}:`, error);
-    throw new Error(`Failed to write ${filename};
+    throw new Error(`Failed to write ${filename}`);
   }
 }
 
@@ -219,7 +219,7 @@ function addDebugItemToContent(content, newItem) {
   const itemsEndRegex = /(\];)/;
   const newItemString = formatDebugItemForFile(newItem);
   
-  return content.replace(itemsEndRegex, `,\n  ${newItemString}\n$1;
+  return content.replace(itemsEndRegex, `,\n  ${newItemString}\n$1`);
 }
 
 function updateRoadmapFeatureInContent(content, featureId, updates) {
