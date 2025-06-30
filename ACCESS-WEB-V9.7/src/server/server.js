@@ -9,11 +9,11 @@ import accessibilityRouter from '../api/accessibility.js';
 const logger = {
   info: (message, data = null) => {
     const timestamp = new Date().toISOString();
-    // console.log(`[${timestamp}] [INFO] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+    // Logging disabled: [${timestamp}] [INFO] ${message}`, data ? JSON.stringify(data, null, 2) : '');
   },
   error: (message, error = null) => {
     const timestamp = new Date().toISOString();
-    // console.error(`[${timestamp}] [ERROR] ${message}`);
+    // console.error(`[${timestamp}] [ERROR] ${message};
     if (error) {
       // console.error(`[${timestamp}] [ERROR] Stack:`, error.stack || error);
       // console.error(`[${timestamp}] [ERROR] Details:`, JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
@@ -26,7 +26,7 @@ const logger = {
   debug: (message, data = null) => {
     if (process.env.NODE_ENV === 'development') {
       const timestamp = new Date().toISOString();
-      // console.log(`[${timestamp}] [DEBUG] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+      // Logging disabled: [${timestamp}] [DEBUG] ${message}`, data ? JSON.stringify(data, null, 2) : '');
     }
   }
 };

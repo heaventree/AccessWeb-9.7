@@ -57,7 +57,7 @@ export async function handleStripeWebhook(req, res) {
         break;
 
       default:
-        // console.log(`Unhandled event type: ${event.type}`);
+        // Logging disabled: Unhandled event type: ${event.type};
     }
 
     res.json({ received: true });
@@ -163,7 +163,7 @@ async function handlePaymentFailure(paymentIntent) {
         updatedAt: new Date(),
       });
 
-      // console.log(`❌ Recorded failed payment for user ${userIdFromMetadata}`);
+      // Logging disabled: ❌ Recorded failed payment for user ${userIdFromMetadata};
     }
   } catch (error) {
     // // console.error("Error processing payment failure:", error);

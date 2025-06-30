@@ -36,7 +36,7 @@ async function readDataFile(filename) {
     return content;
   } catch (error) {
     // console.error(`Error reading ${filename}:`, error);
-    throw new Error(`Failed to read ${filename}`);
+    throw new Error(`Failed to read ${filename};
   }
 }
 
@@ -46,7 +46,7 @@ async function writeDataFile(filename, content) {
     await fs.writeFile(filePath, content, 'utf-8');
   } catch (error) {
     // console.error(`Error writing ${filename}:`, error);
-    throw new Error(`Failed to write ${filename}`);
+    throw new Error(`Failed to write ${filename};
   }
 }
 
@@ -208,7 +208,7 @@ function updateDebugItemInContent(content, itemId, updates) {
     Object.entries(updates).forEach(([key, value]) => {
       const fieldRegex = new RegExp(`(${key}:\\s*)([^,}]+)`, 'g');
       const newValue = typeof value === 'string' ? `'${value}'` : value;
-      updatedItem = updatedItem.replace(fieldRegex, `$1${newValue}`);
+      updatedItem = updatedItem.replace(fieldRegex, `$1${newValue};
     });
     
     return updatedItem;
@@ -219,7 +219,7 @@ function addDebugItemToContent(content, newItem) {
   const itemsEndRegex = /(\];)/;
   const newItemString = formatDebugItemForFile(newItem);
   
-  return content.replace(itemsEndRegex, `,\n  ${newItemString}\n$1`);
+  return content.replace(itemsEndRegex, `,\n  ${newItemString}\n$1;
 }
 
 function updateRoadmapFeatureInContent(content, featureId, updates) {
@@ -231,7 +231,7 @@ function updateRoadmapFeatureInContent(content, featureId, updates) {
     Object.entries(updates).forEach(([key, value]) => {
       const fieldRegex = new RegExp(`(${key}:\\s*)([^,}]+)`, 'g');
       const newValue = typeof value === 'string' ? `'${value}'` : value;
-      updatedFeature = updatedFeature.replace(fieldRegex, `$1${newValue}`);
+      updatedFeature = updatedFeature.replace(fieldRegex, `$1${newValue};
     });
     
     return updatedFeature;
@@ -242,7 +242,7 @@ function addRoadmapFeatureToContent(content, newFeature) {
   const featuresEndRegex = /(\];)/;
   const newFeatureString = formatRoadmapFeatureForFile(newFeature);
   
-  return content.replace(featuresEndRegex, `,\n  ${newFeatureString}\n$1`);
+  return content.replace(featuresEndRegex, `,\n  ${newFeatureString}\n$1;
 }
 
 function formatDebugItemForFile(item) {

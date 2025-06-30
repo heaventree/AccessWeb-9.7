@@ -13,7 +13,7 @@ const logger = {
   },
   error: (message, error = null, context = null) => {
     const timestamp = new Date().toISOString();
-    // console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] ${message}`);
+    // console.error(`[${timestamp}] [SITE-CONNECTIONS] [ERROR] ${message};
     if (error) {
       // Error details logged in production monitoring
     }
@@ -574,22 +574,22 @@ router.post("/webhook/scan", async (req, res) => {
     // Use provided URL or default to connection URL
     const scanUrl = url || connection.siteUrl;
 
-    // console.log(`\n🚀 WORDPRESS SCAN INITIATED`);
-    // console.log(`════════════════════════════════`);
-    // console.log(`📝 Site: ${connection.siteName}`);
-    // console.log(`🔗 Scanning URL: ${scanUrl}`);
-    // console.log(`⚙️  Platform: ${connection.platform}`);
-    // console.log(`🔧 Trigger: ${trigger_type}`);
-    // console.log(`🆔 Connection ID: ${connection.id}`);
-    // console.log(`👤 User ID: ${connection.userId}`);
-    // console.log(`🔐 Token: ${api_token.substring(0, 20)}...`);
-    // console.log(`📊 Starting WCAG compliance scan...`);
-    // console.log(`════════════════════════════════`);
-    // console.log(`⏳ Fetching page content...`);
-    // console.log(`🔍 Analyzing accessibility issues...`);
-    // console.log(`📈 Calculating compliance score...`);
-    // console.log(`✅ SCAN COMPLETED SUCCESSFULLY!`);
-    // console.log(`════════════════════════════════\n`);
+    // Logging disabled: \n🚀 WORDPRESS SCAN INITIATED;
+    // Logging disabled: ════════════════════════════════;
+    // Logging disabled: 📝 Site: ${connection.siteName};
+    // Logging disabled: 🔗 Scanning URL: ${scanUrl};
+    // Logging disabled: ⚙️  Platform: ${connection.platform};
+    // Logging disabled: 🔧 Trigger: ${trigger_type};
+    // Logging disabled: 🆔 Connection ID: ${connection.id};
+    // Logging disabled: 👤 User ID: ${connection.userId};
+    // Logging disabled: 🔐 Token: ${api_token.substring(0, 20)}...;
+    // Logging disabled: 📊 Starting WCAG compliance scan...;
+    // Logging disabled: ════════════════════════════════;
+    // Logging disabled: ⏳ Fetching page content...;
+    // Logging disabled: 🔍 Analyzing accessibility issues...;
+    // Logging disabled: 📈 Calculating compliance score...;
+    // Logging disabled: ✅ SCAN COMPLETED SUCCESSFULLY!;
+    // Logging disabled: ════════════════════════════════\n;
 
     // Update last scan time
     await prisma.siteConnection.update({

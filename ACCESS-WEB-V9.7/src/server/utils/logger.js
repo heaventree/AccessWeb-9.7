@@ -6,7 +6,7 @@ export const logger = {
   },
   error: (message, error = null) => {
     const timestamp = new Date().toISOString();
-    // console.error(`[${timestamp}] [ERROR] ${message}`);
+    // console.error(`[${timestamp}] [ERROR] ${message};
     if (error) {
       // console.error(`[${timestamp}] [ERROR] Stack:`, error.stack || error);
       // console.error(`[${timestamp}] [ERROR] Details:`, JSON.stringify(error, Object.getOwnPropertyNames(error), 2));

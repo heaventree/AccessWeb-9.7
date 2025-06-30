@@ -16,7 +16,7 @@ export class AccessibilityScanner {
     const startTime = Date.now();
     
     try {
-      // console.log(`🔍 [ACCESSIBILITY] Starting WCAG scan for: ${url} (${scanReason})`);
+      // Logging disabled: 🔍 [ACCESSIBILITY] Starting WCAG scan for: ${url} (${scanReason});
       
       // Fetch and analyze HTML content
       const htmlContent = await this.fetchPageContent(url);
@@ -24,7 +24,7 @@ export class AccessibilityScanner {
       
       const scanDuration = Date.now() - startTime;
       
-      // console.log(`✅ [ACCESSIBILITY] Scan completed in ${scanDuration}ms - Errors: ${analysisResults.errorCount}, Warnings: ${analysisResults.warningCount}, Notices: ${analysisResults.noticeCount}`);
+      // Logging disabled: ✅ [ACCESSIBILITY] Scan completed in ${scanDuration}ms - Errors: ${analysisResults.errorCount}, Warnings: ${analysisResults.warningCount}, Notices: ${analysisResults.noticeCount};
       
       // Save results to database
       const savedResult = await this.saveResults({
@@ -85,7 +85,7 @@ export class AccessibilityScanner {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText};
     }
 
     return await response.text();
@@ -193,7 +193,7 @@ export class AccessibilityScanner {
       const title = control.getAttribute('title');
       
       if (id) {
-        const label = root.querySelector(`label[for="${id}"]`);
+        const label = root.querySelector(`label[for="${id}"];
         if (!label && !ariaLabel && !ariaLabelledby && !title) {
           issues.push({
             type: 'error',
@@ -369,7 +369,7 @@ export class AccessibilityScanner {
         data: resultData
       });
       
-      // console.log(`💾 [ACCESSIBILITY] Scan results saved with ID: ${savedResult.id}`);
+      // Logging disabled: 💾 [ACCESSIBILITY] Scan results saved with ID: ${savedResult.id};
       return savedResult;
       
     } catch (error) {
@@ -385,7 +385,7 @@ export class AccessibilityScanner {
         data: { lastScanAt: new Date() }
       });
       
-      // console.log(`⏰ [ACCESSIBILITY] Updated last scan time for connection ${siteConnectionId}`);
+      // Logging disabled: ⏰ [ACCESSIBILITY] Updated last scan time for connection ${siteConnectionId};
       
     } catch (error) {
       // console.error('❌ [ACCESSIBILITY] Failed to update scan time:', error);

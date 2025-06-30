@@ -45,11 +45,11 @@ export async function checkAndExpireSubscriptions() {
       }
     });
 
-    // console.log(`Automatically expired ${result.count} subscriptions`);
+    // Logging disabled: Automatically expired ${result.count} subscriptions;
     
     // Log expired subscriptions for monitoring
     expiredSubscriptions.forEach(sub => {
-      // console.log(`Expired subscription for user ${sub.email} (${sub.subscriptionPlan} plan)`);
+      // Logging disabled: Expired subscription for user ${sub.email} (${sub.subscriptionPlan} plan);
     });
 
     return { 
