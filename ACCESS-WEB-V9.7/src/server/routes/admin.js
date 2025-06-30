@@ -208,7 +208,7 @@ function updateDebugItemInContent(content, itemId, updates) {
     Object.entries(updates).forEach(([key, value]) => {
       const fieldRegex = new RegExp(`(${key}:\\s*)([^,}]+)`, 'g');
       const newValue = typeof value === 'string' ? `'${value}'` : value;
-      updatedItem = updatedItem.replace(fieldRegex, `$1${newValue};
+      updatedItem = updatedItem.replace(fieldRegex, '$1' + newValue + '$2');
     });
     
     return updatedItem;
@@ -219,11 +219,11 @@ function addDebugItemToContent(content, newItem) {
   const itemsEndRegex = /(\];)/;
   const newItemString = formatDebugItemForFile(newItem);
   
-  return content.replace(itemsEndRegex, `,\n  ${newItemString}\n$1`);
+  return content.replace(itemsEndRegex, ',' + '\n  ' + newItemString + '\n$1');
 }
 
 function updateRoadmapFeatureInContent(content, featureId, updates) {
-  const featureRegex = new RegExp(`(\\{[^}]*id:\\s*['"\`]${featureId}['"\`][^}]*\\})`, 'gs');
+  const featureRegex = new RegExp('(\\\\{[^}]*id:\\\\s*[\'"`]' + featureId + '[\'"`][^}]*\\\\})', 'gs');
   
   return content.replace(featureRegex, (match) => {
     let updatedFeature = match;
@@ -242,7 +242,7 @@ function addRoadmapFeatureToContent(content, newFeature) {
   const featuresEndRegex = /(\];)/;
   const newFeatureString = formatRoadmapFeatureForFile(newFeature);
   
-  return content.replace(featuresEndRegex, `,\n  ${newFeatureString}\n$1;
+  return content.replace(featuresEndRegex, ',\n  ' + newFeatureString + '\n$1');
 }
 
 function formatDebugItemForFile(item) {
