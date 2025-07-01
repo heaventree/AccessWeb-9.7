@@ -141,8 +141,8 @@ function App() {
               <Route path="/tools/image-alt-scanner" element={<><Navigation /><main id="main-content"><ImageAltScannerPage /></main><Footer /><BackToTop /></>} />
               <Route path="/ui-demo" element={<><Navigation /><main id="main-content"><UiDemo /></main><Footer /><BackToTop /></>} />
               <Route path="/integrations" element={<><Navigation /><main id="main-content"><Integrations /></main><Footer /><BackToTop /></>} />
-              <Route path="/connections" element={<ProtectedRoute><><Navigation /><main id="main-content"><ConnectionsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/site-connections" element={<ProtectedRoute><><Navigation /><main id="main-content"><SiteConnectionsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/connections" element={<UserOnlyRoute><><Navigation /><main id="main-content"><ConnectionsPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
+              <Route path="/site-connections" element={<UserOnlyRoute><><Navigation /><main id="main-content"><SiteConnectionsPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
               
               {/* Auth Routes */}
               <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
@@ -197,8 +197,8 @@ function App() {
               <Route path="/my-account/billing" element={<UserOnlyRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
               <Route path="/settings" element={<UserOnlyRoute><><Navigation /><main id="main-content"><SettingsPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
               <Route path="/team" element={<UserOnlyRoute><><Navigation /><main id="main-content"><TeamPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
-              <Route path="/integrations/shopify" element={<ProtectedRoute><><Navigation /><main id="main-content"><ShopifyIntegrationPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/payment/:planId" element={<ProtectedRoute><><Navigation /><main id="main-content"><PaymentPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/integrations/shopify" element={<UserOnlyRoute><><Navigation /><main id="main-content"><ShopifyIntegrationPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
+              <Route path="/payment/:planId" element={<UserOnlyRoute><><Navigation /><main id="main-content"><PaymentPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
               
               {/* Stripe Payment Routes */}
               <Route path="/checkout" element={<><Navigation /><main id="main-content" className="pt-32">
