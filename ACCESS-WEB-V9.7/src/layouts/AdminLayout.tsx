@@ -76,7 +76,7 @@ export function AdminLayout() {
     <DashboardLayout
       menuItems={menuItems}
       title="Admin"
-      showBackToHome={true}
+      showBackToHome={false}
       notifications={5}
       userName="Admin User"
     />

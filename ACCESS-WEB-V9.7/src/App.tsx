@@ -36,7 +36,7 @@ import { APIGuide } from './pages/docs/APIGuide';
 import { WordPressGuide } from './pages/docs/WordPressGuide';
 import { ShopifyGuide } from './pages/docs/ShopifyGuide';
 import { Documentation as DocumentationPage } from './pages/docs/Documentation';
-import { ProtectedRoute, PublicOnlyRoute, SubscriberRoute, AdminRoute } from './layouts/AuthLayout';
+import { ProtectedRoute, PublicOnlyRoute, SubscriberRoute, AdminRoute, UserOnlyRoute } from './layouts/AuthLayout';
 
 // Import auth pages
 import LoginPage from './pages/auth/LoginPage';
@@ -149,8 +149,8 @@ function App() {
               <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
               <Route path="/admin/login" element={<AdminLoginPage />} />
               
-              {/* Account Routes with shared layout - Subscriber Only */}
-              <Route path="/my-account" element={<SubscriberRoute><AccountLayout /></SubscriberRoute>}>
+              {/* Account Routes with shared layout - User Only (No Admin Access) */}
+              <Route path="/my-account" element={<UserOnlyRoute><AccountLayout /></UserOnlyRoute>}>
                 <Route index element={<SubscriptionDashboard />} />
                 <Route path="monitoring" element={<MonitoringPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
@@ -189,14 +189,14 @@ function App() {
               {/* For backward compatibility */}
               <Route path="/signup" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
 
-              {/* Protected Routes */}
-              <Route path="/dashboard" element={<ProtectedRoute><><Navigation /><main id="main-content"><SubscriptionDashboard /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/dashboard/billing" element={<ProtectedRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              {/* User-Only Routes (No Admin Access) */}
+              <Route path="/dashboard" element={<UserOnlyRoute><><Navigation /><main id="main-content"><SubscriptionDashboard /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
+              <Route path="/dashboard/billing" element={<UserOnlyRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
               {/* Keep old routes for backwards compatibility */}
-              <Route path="/billing" element={<ProtectedRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/my-account/billing" element={<ProtectedRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><><Navigation /><main id="main-content"><SettingsPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
-              <Route path="/team" element={<ProtectedRoute><><Navigation /><main id="main-content"><TeamPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
+              <Route path="/billing" element={<UserOnlyRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
+              <Route path="/my-account/billing" element={<UserOnlyRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
+              <Route path="/settings" element={<UserOnlyRoute><><Navigation /><main id="main-content"><SettingsPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
+              <Route path="/team" element={<UserOnlyRoute><><Navigation /><main id="main-content"><TeamPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
               <Route path="/integrations/shopify" element={<ProtectedRoute><><Navigation /><main id="main-content"><ShopifyIntegrationPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               <Route path="/payment/:planId" element={<ProtectedRoute><><Navigation /><main id="main-content"><PaymentPage /></main><Footer /><BackToTop /></></ProtectedRoute>} />
               
