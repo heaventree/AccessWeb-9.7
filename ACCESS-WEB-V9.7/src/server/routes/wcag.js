@@ -574,4 +574,4 @@ process.on('SIGINT', async () => {
   await wcagChecker.cleanup();
 });
 
-module.exports = router;
+export default router;

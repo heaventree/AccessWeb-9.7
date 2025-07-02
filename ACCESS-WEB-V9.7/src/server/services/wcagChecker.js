@@ -1,10 +1,10 @@
-const puppeteer = require('puppeteer');
-const axeCore = require('axe-core');
-const pa11y = require('pa11y');
-const validator = require('validator');
-const urlParse = require('url-parse');
-const fs = require('fs').promises;
-const path = require('path');
+import puppeteer from 'puppeteer';
+import axeCore from 'axe-core';
+import pa11y from 'pa11y';
+import validator from 'validator';
+import urlParse from 'url-parse';
+import fs from 'fs/promises';
+import path from 'path';
 
 class WCAGChecker {
   constructor() {
@@ -128,7 +128,7 @@ class WCAGChecker {
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
       
       // Inject axe-core
-      await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
+      await page.addScriptTag({ path: path.join(process.cwd(), 'node_modules', 'axe-core', 'axe.min.js') });
       
       // Run axe checks
       const axeResults = await page.evaluate(() => {
@@ -437,4 +437,4 @@ class WCAGChecker {
   }
 }
 
-module.exports = WCAGChecker;
+export default WCAGChecker;
