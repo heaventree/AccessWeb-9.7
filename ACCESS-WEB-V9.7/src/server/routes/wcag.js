@@ -5,7 +5,7 @@ import { db } from '../db.js';
 import { wcagScans, wcagScanIssues } from '../../shared/schema.js';
 import WCAGChecker from '../services/wcagChecker.js';
 import { eq, desc, and } from 'drizzle-orm';
-import PDFDocument from 'pdfkit';
+// import PDFDocument from 'pdfkit'; // Temporarily disabled
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -401,87 +401,10 @@ router.post('/scan/:id/rescan', scanLimiter, async (req, res) => {
 // GET /api/wcag/scan/:id/download/pdf - Download scan results as PDF
 router.get('/scan/:id/download/pdf', async (req, res) => {
   try {
-    const scanId = parseInt(req.params.id);
-    
-    if (isNaN(scanId)) {
-      return res.status(400).json({
-        error: 'Invalid scan ID',
-        message: 'Scan ID must be a valid number'
-      });
-    }
-
-    // Get scan with issues
-    const scan = await db.query.wcagScans.findFirst({
-      where: eq(wcagScans.id, scanId),
-      with: {
-        issues: true
-      }
+    return res.status(501).json({
+      error: 'PDF generation temporarily disabled',
+      message: 'PDF downloads are currently under maintenance. Please use JSON export instead.'
     });
-
-    if (!scan) {
-      return res.status(404).json({
-        error: 'Scan not found',
-        message: 'No scan found with the provided ID'
-      });
-    }
-
-    // Check if user has access to this scan
-    const userId = req.user?.id;
-    if (scan.userId && scan.userId !== userId) {
-      return res.status(403).json({
-        error: 'Access denied',
-        message: 'You do not have permission to download this scan'
-      });
-    }
-
-    // Generate PDF
-    const doc = new PDFDocument();
-    const filename = `wcag-scan-${scan.id}-${new Date().toISOString().split('T')[0]}.pdf`;
-    
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    
-    doc.pipe(res);
-
-    // PDF Content
-    doc.fontSize(20).text('WCAG Accessibility Scan Report', { align: 'center' });
-    doc.moveDown();
-    
-    doc.fontSize(14).text(`URL: ${scan.url}`);
-    doc.text(`Scan Date: ${new Date(scan.createdAt).toLocaleDateString()}`);
-    doc.text(`Overall Score: ${scan.overallScore}/100`);
-    doc.moveDown();
-    
-    doc.fontSize(16).text('Summary:');
-    doc.fontSize(12);
-    doc.text(`Total Issues: ${scan.totalIssues}`);
-    doc.text(`Critical Issues: ${scan.criticalIssues}`, { fillColor: 'red' });
-    doc.text(`Serious Issues: ${scan.seriousIssues}`, { fillColor: 'orange' });
-    doc.text(`Moderate Issues: ${scan.moderateIssues}`, { fillColor: 'yellow' });
-    doc.text(`Minor Issues: ${scan.minorIssues}`, { fillColor: 'blue' });
-    doc.moveDown();
-    
-    if (scan.issues.length > 0) {
-      doc.fontSize(16).text('Issues Found:');
-      doc.moveDown();
-      
-      scan.issues.forEach((issue, index) => {
-        doc.fontSize(12);
-        doc.text(`${index + 1}. ${issue.message}`, { fillColor: 'black' });
-        doc.fontSize(10);
-        doc.text(`Severity: ${issue.severity}`, { fillColor: 'gray' });
-        if (issue.wcagGuideline) {
-          doc.text(`WCAG Guideline: ${issue.wcagGuideline}`, { fillColor: 'gray' });
-        }
-        if (issue.recommendation) {
-          doc.text(`Recommendation: ${issue.recommendation}`, { fillColor: 'gray' });
-        }
-        doc.moveDown(0.5);
-      });
-    }
-    
-    doc.end();
-
   } catch (error) {
     console.error('Error generating PDF report:', error);
     res.status(500).json({

@@ -24,6 +24,10 @@ args = "API Server"
 task = "workflow.run"
 args = "ACCESS-WEB-V9.7 Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "API Server Direct"
+
 [[workflows.workflow]]
 name = "Strapi CMS"
 author = 40264017
@@ -58,6 +62,15 @@ author = "agent"
 task = "shell.exec"
 args = "cd ACCESS-WEB-V9.7 && npm run dev"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "API Server Direct"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd ACCESS-WEB-V9.7 && npm run api"
+waitForPort = 3001
 
 [deployment]
 run = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run dev"]
