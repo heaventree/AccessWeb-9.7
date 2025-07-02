@@ -36,6 +36,7 @@ import { APIGuide } from './pages/docs/APIGuide';
 import { WordPressGuide } from './pages/docs/WordPressGuide';
 import { ShopifyGuide } from './pages/docs/ShopifyGuide';
 import { Documentation as DocumentationPage } from './pages/docs/Documentation';
+import WCAGChecker from './pages/WCAGChecker';
 import { ProtectedRoute, PublicOnlyRoute, SubscriberRoute, AdminRoute, UserOnlyRoute } from './layouts/AuthLayout';
 
 // Import auth pages
@@ -168,6 +169,8 @@ function App() {
               <Route path="/integrations/wordpress" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/analytics" element={<><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/compliance" element={<><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></>} />
+              <Route path="/tools/wcag-checker" element={<WCAGChecker />} />
+              <Route path="/checker" element={<WCAGChecker />} />
               <Route path="/integrations/api" element={<><Navigation /><main id="main-content"><APIIntegrationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/integrations/compliance" element={<><Navigation /><main id="main-content"><ComplianceIntegrationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/integrations/enterprise" element={<><Navigation /><main id="main-content"><EnterpriseIntegrationPage /></main><Footer /><BackToTop /></>} />

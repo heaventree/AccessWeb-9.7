@@ -8,7 +8,7 @@ import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { AlertCircle, CheckCircle, Download, ExternalLink, RefreshCw, Clock, Globe } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';

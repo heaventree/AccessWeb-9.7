@@ -1,7 +1,7 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import validator from 'validator';
-import { db } from '../lib/database.js';
+import { db } from '../db.js';
 import { wcagScans, wcagScanIssues } from '../../shared/schema.js';
 import WCAGChecker from '../services/wcagChecker.js';
 import { eq, desc, and } from 'drizzle-orm';
