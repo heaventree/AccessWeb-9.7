@@ -151,7 +151,7 @@ import siteScannerQueue from './jobs/siteScanner.js';
 import adminRouter from './routes/admin.js';
 
 // Import WCAG checker routes
-// import wcagRouter from './routes/wcag.js'; // Temporarily disabled
+import wcagRouter from './routes/wcag.js';
 
 // API Routes
 app.use('/api/auth', authRouter);
@@ -160,7 +160,7 @@ app.use('/api/site-connections', siteConnectionsRouter);
 app.use('/api/scanner', scannerRouter);
 app.use('/api/wordpress', wordpressRouter);
 app.use('/api/admin', requireAuth, adminRouter);
-// app.use('/api/wcag', wcagRouter); // Temporarily disabled
+app.use('/api/wcag', wcagRouter);
 
 // Pricing Plans Routes
 app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed

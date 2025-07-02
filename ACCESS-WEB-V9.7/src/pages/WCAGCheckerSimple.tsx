@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
@@ -46,6 +46,40 @@ const WCAGCheckerSimple: React.FC = () => {
   const [activeTab, setActiveTab] = useState('scanner');
   const [expandedIssue, setExpandedIssue] = useState<number | null>(null);
   const [scanHistory, setScanHistory] = useState<ScanResult[]>([]);
+
+  // Load scan history when user is available
+  useEffect(() => {
+    const loadScanHistory = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await fetch('/api/wcag/scans');
+        if (response.ok) {
+          const data = await response.json();
+          const history = data.scans?.map((scan: any) => ({
+            id: scan.id,
+            url: scan.url,
+            overallScore: scan.overallScore,
+            totalIssues: scan.totalIssues,
+            criticalIssues: scan.criticalIssues,
+            seriousIssues: scan.seriousIssues,
+            moderateIssues: scan.moderateIssues,
+            minorIssues: scan.minorIssues,
+            status: scan.status as 'pending' | 'completed' | 'failed',
+            scanDuration: scan.scanDuration,
+            createdAt: scan.createdAt,
+            issues: scan.topIssues || []
+          })) || [];
+          
+          setScanHistory(history);
+        }
+      } catch (error) {
+        console.error('Error loading scan history:', error);
+      }
+    };
+
+    loadScanHistory();
+  }, [user]);
 
   const validateUrl = (inputUrl: string): { isValid: boolean; error?: string } => {
     if (!inputUrl || !inputUrl.trim()) {
@@ -239,47 +273,113 @@ const WCAGCheckerSimple: React.FC = () => {
 
     showToast("Scan Started", "Analyzing accessibility compliance...");
 
-    // Simulate real WCAG scanning process
-    setTimeout(() => {
-      const issues = generateMockIssues(url);
-      const criticalCount = issues.filter(i => i.severity === 'critical').length;
-      const seriousCount = issues.filter(i => i.severity === 'serious').length;
-      const moderateCount = issues.filter(i => i.severity === 'moderate').length;
-      const minorCount = issues.filter(i => i.severity === 'minor').length;
-      
-      // Calculate realistic accessibility score
-      const totalIssues = issues.length;
-      const weightedScore = Math.max(
-        10, 
-        100 - (criticalCount * 15 + seriousCount * 10 + moderateCount * 5 + minorCount * 2)
-      );
+    try {
+      // Start the scan on the backend
+      const response = await fetch('/api/wcag/scan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
 
-      const result: ScanResult = {
-        id: Date.now(),
-        url: url,
-        overallScore: Math.round(weightedScore),
-        totalIssues: totalIssues,
-        criticalIssues: criticalCount,
-        seriousIssues: seriousCount,
-        moderateIssues: moderateCount,
-        minorIssues: minorCount,
-        status: 'completed',
-        scanDuration: Math.floor(Math.random() * 15000) + 5000, // 5-20 seconds
-        createdAt: new Date().toISOString(),
-        issues: issues
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      // Poll for results since the scan runs asynchronously
+      const pollForResults = async () => {
+        let attempts = 0;
+        const maxAttempts = 60; // 2 minutes max wait time
+        
+        while (attempts < maxAttempts) {
+          try {
+            // Get the latest scan for this URL
+            const historyResponse = await fetch('/api/wcag/scans');
+            
+            if (historyResponse.ok) {
+              const historyData = await historyResponse.json();
+              const recentScan = historyData.scans?.find((scan: any) => 
+                scan.url === url && 
+                scan.status !== 'pending' &&
+                new Date(scan.createdAt).getTime() > Date.now() - 300000 // Within last 5 minutes
+              );
+              
+              if (recentScan) {
+                // Get full scan details
+                const scanResponse = await fetch(`/api/wcag/scan/${recentScan.id}`);
+                if (scanResponse.ok) {
+                  const scanData = await scanResponse.json();
+                  
+                  const result: ScanResult = {
+                    id: scanData.id,
+                    url: scanData.url,
+                    overallScore: scanData.overallScore,
+                    totalIssues: scanData.totalIssues,
+                    criticalIssues: scanData.criticalIssues,
+                    seriousIssues: scanData.seriousIssues,
+                    moderateIssues: scanData.moderateIssues,
+                    minorIssues: scanData.minorIssues,
+                    status: scanData.status as 'pending' | 'completed' | 'failed',
+                    errorMessage: scanData.errorMessage,
+                    scanDuration: scanData.scanDuration,
+                    createdAt: scanData.createdAt,
+                    issues: scanData.issues?.map((issue: any) => ({
+                      id: issue.id,
+                      issueType: issue.issueType,
+                      severity: issue.severity as 'critical' | 'serious' | 'moderate' | 'minor',
+                      wcagGuideline: issue.wcagGuideline,
+                      element: issue.element,
+                      message: issue.message,
+                      recommendation: issue.recommendation
+                    })) || []
+                  };
+
+                  setCurrentScan(result);
+                  setIsScanning(false);
+                  
+                  if (result.status === 'completed') {
+                    showToast("Scan Complete", `Found ${result.totalIssues} accessibility issues. Score: ${result.overallScore}/100`);
+                    
+                    // Add to local history
+                    if (user) {
+                      setScanHistory(prev => [result, ...prev.slice(0, 9)]);
+                    }
+                  } else if (result.status === 'failed') {
+                    showToast("Scan Failed", result.errorMessage || "The accessibility scan failed to complete", "destructive");
+                  }
+                  
+                  return;
+                }
+              }
+            }
+            
+            // Wait 2 seconds before trying again
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            attempts++;
+            
+          } catch (pollError) {
+            console.error('Error polling for scan results:', pollError);
+            attempts++;
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+        }
+        
+        // Timeout - scan took too long
+        setIsScanning(false);
+        showToast("Scan Timeout", "The scan is taking longer than expected. Please try again.", "destructive");
       };
 
-      setCurrentScan(result);
+      // Start polling for results
+      pollForResults();
+      
+    } catch (error) {
+      console.error('Error starting scan:', error);
       setIsScanning(false);
-      
-      // Add to history if user is logged in
-      if (user) {
-        setScanHistory(prev => [result, ...prev.slice(0, 9)]); // Keep last 10 scans
-      }
-      
-      showToast("Scan Complete", `Found ${totalIssues} accessibility issues. Score: ${result.overallScore}/100`);
-    }, 4000); // 4 second realistic scan time
-  }, [url, generateMockIssues, user]);
+      showToast("Scan Failed", error instanceof Error ? error.message : "Failed to start accessibility scan", "destructive");
+    }
+  }, [url, user]);
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
