@@ -40,18 +40,64 @@ const WCAGCheckerSimple: React.FC = () => {
   const { user } = useAuth();
   
   const [url, setUrl] = useState('');
+  const [urlError, setUrlError] = useState<string>('');
   const [isScanning, setIsScanning] = useState(false);
   const [currentScan, setCurrentScan] = useState<ScanResult | null>(null);
   const [activeTab, setActiveTab] = useState('scanner');
   const [expandedIssue, setExpandedIssue] = useState<number | null>(null);
   const [scanHistory, setScanHistory] = useState<ScanResult[]>([]);
 
-  const validateUrl = (inputUrl: string): boolean => {
+  const validateUrl = (inputUrl: string): { isValid: boolean; error?: string } => {
+    if (!inputUrl || !inputUrl.trim()) {
+      return { isValid: false, error: "Please enter a URL to scan" };
+    }
+
+    const trimmedUrl = inputUrl.trim();
+
+    // Check if URL starts with protocol
+    if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
+      return { isValid: false, error: "URL must start with http:// or https://" };
+    }
+
     try {
-      const urlObj = new URL(inputUrl);
-      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
-    } catch {
-      return false;
+      const urlObj = new URL(trimmedUrl);
+      
+      // Check protocol
+      if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+        return { isValid: false, error: "Only HTTP and HTTPS protocols are supported" };
+      }
+
+      // Check hostname exists and is valid
+      if (!urlObj.hostname || urlObj.hostname.length < 1) {
+        return { isValid: false, error: "Please enter a valid domain name" };
+      }
+
+      // Check for valid domain format
+      const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+      if (!domainRegex.test(urlObj.hostname)) {
+        return { isValid: false, error: "Please enter a valid domain name (e.g., example.com)" };
+      }
+
+      // Check minimum domain length
+      if (urlObj.hostname.length < 4) {
+        return { isValid: false, error: "Domain name too short. Please enter a complete domain (e.g., example.com)" };
+      }
+
+      // Check for localhost or invalid domains in production
+      const invalidDomains = ['localhost', '127.0.0.1', '0.0.0.0'];
+      if (invalidDomains.includes(urlObj.hostname.toLowerCase())) {
+        return { isValid: false, error: "Local URLs cannot be scanned. Please enter a public website URL" };
+      }
+
+      // Check for private IP ranges
+      const privateIPRegex = /^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|169\.254\.)/;
+      if (privateIPRegex.test(urlObj.hostname)) {
+        return { isValid: false, error: "Private network URLs cannot be scanned. Please enter a public website URL" };
+      }
+
+      return { isValid: true };
+    } catch (error) {
+      return { isValid: false, error: "Invalid URL format. Please enter a complete URL (e.g., https://example.com)" };
     }
   };
 
@@ -159,17 +205,35 @@ const WCAGCheckerSimple: React.FC = () => {
     return selectedIssues;
   }, []);
 
+  // Handle URL input change with real-time validation
+  const handleUrlChange = (value: string) => {
+    setUrl(value);
+    
+    // Clear error when user starts typing
+    if (urlError) {
+      setUrlError('');
+    }
+    
+    // Only validate if user has entered something meaningful
+    if (value.trim().length > 3) {
+      const validation = validateUrl(value);
+      if (!validation.isValid) {
+        setUrlError(validation.error || '');
+      }
+    }
+  };
+
   const startScan = useCallback(async () => {
-    if (!url.trim()) {
-      showToast("URL Required", "Please enter a valid URL to scan", "destructive");
+    const validation = validateUrl(url);
+    
+    if (!validation.isValid) {
+      setUrlError(validation.error || "Please enter a valid URL");
+      showToast("Invalid URL", validation.error || "Please enter a valid URL", "destructive");
       return;
     }
 
-    if (!validateUrl(url)) {
-      showToast("Invalid URL", "Please enter a valid HTTP or HTTPS URL", "destructive");
-      return;
-    }
-
+    // Clear any previous errors
+    setUrlError('');
     setIsScanning(true);
     setCurrentScan(null);
 
@@ -340,29 +404,69 @@ ${index + 1}. ${issue.message}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex gap-4">
-                      <Input
-                        type="url"
-                        placeholder="https://example.com"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        disabled={isScanning}
-                        className="flex-1"
-                      />
-                      <Button 
-                        onClick={startScan} 
-                        disabled={isScanning || !url.trim()}
-                        className="min-w-[120px]"
-                      >
-                        {isScanning ? (
-                          <>
-                            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                            Scanning...
-                          </>
-                        ) : (
-                          'Start Scan'
-                        )}
-                      </Button>
+                    <div className="space-y-4">
+                      <div className="flex gap-4">
+                        <div className="flex-1">
+                          <Input
+                            type="url"
+                            placeholder="https://example.com"
+                            value={url}
+                            onChange={(e) => handleUrlChange(e.target.value)}
+                            disabled={isScanning}
+                            className={`w-full ${urlError ? 'border-red-500 focus:border-red-500' : ''}`}
+                            aria-describedby={urlError ? "url-error" : undefined}
+                          />
+                          {urlError && (
+                            <div 
+                              id="url-error" 
+                              className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-start gap-2"
+                              role="alert"
+                            >
+                              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                              <span>{urlError}</span>
+                            </div>
+                          )}
+                        </div>
+                        <Button 
+                          onClick={startScan} 
+                          disabled={isScanning || !url.trim() || !!urlError}
+                          className="min-w-[120px]"
+                        >
+                          {isScanning ? (
+                            <>
+                              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                              Scanning...
+                            </>
+                          ) : (
+                            'Start Scan'
+                          )}
+                        </Button>
+                      </div>
+                      
+                      {/* URL Examples for user guidance */}
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="mb-1">Valid URL examples:</p>
+                        <div className="flex flex-wrap gap-2">
+                          <code 
+                            className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                            onClick={() => handleUrlChange('https://example.com')}
+                          >
+                            https://example.com
+                          </code>
+                          <code 
+                            className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                            onClick={() => handleUrlChange('https://www.google.com')}
+                          >
+                            https://www.google.com
+                          </code>
+                          <code 
+                            className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                            onClick={() => handleUrlChange('https://github.com')}
+                          >
+                            https://github.com
+                          </code>
+                        </div>
+                      </div>
                     </div>
                     
                     {isScanning && (
