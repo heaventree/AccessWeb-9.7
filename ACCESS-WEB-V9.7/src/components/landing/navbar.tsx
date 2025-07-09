@@ -265,16 +265,19 @@ export default function Navbar() {
 
   return (
     <header className={`fixed w-full bg-background/95 dark:bg-background/95 backdrop-blur-sm z-50 ${scrolled ? 'shadow-sm' : ''} transition-shadow duration-300`}>
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4 flex items-center justify-between">
         <div className="flex items-center space-x-1">
-          <div className="w-10 h-10 rounded-xl bg-[#e0f5f1] dark:bg-[#0fae96]/20 flex items-center justify-center mr-1">
-            <CheckCircle className="w-5 h-5 text-[#0fae96] dark:text-[#5eead4]" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#e0f5f1] dark:bg-[#0fae96]/20 flex items-center justify-center mr-1">
+            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-[#0fae96] dark:text-[#5eead4]" />
           </div>
-          <span className="text-xl font-bold text-foreground dark:text-foreground">AccessWeb<span className="text-[#0fae96] dark:text-[#5eead4]">Pro</span></span>
+          <span className="text-lg sm:text-xl font-bold text-foreground dark:text-foreground">
+            <span className="hidden sm:inline">AccessWeb<span className="text-[#0fae96] dark:text-[#5eead4]">Pro</span></span>
+            <span className="sm:hidden">AWP</span>
+          </span>
         </div>
         
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
           {/* Tools Dropdown */}
           <NavDropdown label="Tools" items={toolsDropdownItems} />
           
@@ -303,13 +306,13 @@ export default function Navbar() {
           ))}
         </nav>
         
-        <div className="flex items-center space-x-5">
+        <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-5">
           {loading ? (
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0fae96] border-t-transparent"></div>
           ) : user ? (
             <>
-              <div className="hidden md:flex items-center space-x-2">
-                <span className="text-muted-foreground dark:text-gray-300">
+              <div className="hidden lg:flex items-center space-x-2">
+                <span className="text-sm text-muted-foreground dark:text-gray-300 max-w-[200px] truncate">
                   {user.email}
                 </span>
                 <Button
@@ -332,14 +335,16 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/login" className="hidden md:inline-block text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium transition-colors">
+              <Link to="/login" className="hidden lg:inline-block text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white text-base font-medium transition-colors">
                 Login
               </Link>
               <Link to="/register">
                 <Button 
-                  className="bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-6 text-white"
+                  className="bg-[#0fae96] hover:bg-[#0fae96]/90 dark:bg-[#0fae96] dark:hover:bg-[#0fae96]/80 transition-all duration-300 rounded-full px-4 sm:px-6 text-sm sm:text-base text-white"
                 >
-                  Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
+                  <span className="hidden sm:inline">Start Free Trial</span>
+                  <span className="sm:hidden">Trial</span>
+                  <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </Link>
             </>
@@ -357,7 +362,7 @@ export default function Navbar() {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="lg:hidden"
             onClick={() => {
               console.log("Mobile menu toggle clicked, current state:", isMenuOpen);
               setIsMenuOpen(!isMenuOpen);
@@ -381,72 +386,80 @@ export default function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-background border-t border-border px-4 py-4 overflow-hidden absolute w-full left-0 dark:bg-slate-900"
+            className="lg:hidden bg-background border-t border-border px-3 sm:px-4 py-4 overflow-y-auto max-h-[calc(100vh-80px)] absolute w-full left-0 dark:bg-slate-900"
             role="navigation"
             aria-label="Mobile navigation"
           >
             {/* Tools Section */}
-            <div className="py-2 mb-2">
-              <h3 className="font-medium text-base mb-2 dark:text-[#86e4d4]">Tools</h3>
-              {toolsDropdownItems.map((item, index) => (
-                <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
-                  <div className="flex items-center mb-1">
-                    <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
-                    <span className="dark:text-white">{item.label}</span>
-                  </div>
-                  <div className="pl-7 text-base text-muted-foreground dark:text-[#86e4d4] whitespace-nowrap text-ellipsis overflow-hidden">
-                    {item.description}
-                  </div>
-                </Link>
-              ))}
+            <div className="py-2 mb-3">
+              <h3 className="font-medium text-base mb-3 dark:text-[#86e4d4] text-foreground">Tools</h3>
+              <div className="grid gap-1">
+                {toolsDropdownItems.map((item, index) => (
+                  <Link key={index} to={item.href} className="block py-3 px-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-lg transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
+                    <div className="flex items-center mb-1">
+                      <item.icon className="h-4 w-4 mr-3 text-[#0fae96] dark:text-[#5eead4] flex-shrink-0" />
+                      <span className="dark:text-white font-medium">{item.label}</span>
+                    </div>
+                    <div className="pl-7 text-sm text-muted-foreground dark:text-[#86e4d4]">
+                      {item.description}
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
             
             {/* Integrations Section */}
-            <div className="py-2 mb-2">
-              <h3 className="font-medium text-base mb-2 dark:text-[#86e4d4]">Integrations</h3>
-              {integrationsDropdownItems.map((item, index) => (
-                <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
-                  <div className="flex items-center mb-1">
-                    <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
-                    <span className="dark:text-white">{item.label}</span>
-                  </div>
-                  <div className="pl-7 text-base text-muted-foreground dark:text-[#86e4d4] whitespace-nowrap text-ellipsis overflow-hidden">
-                    {item.description}
-                  </div>
-                </Link>
-              ))}
+            <div className="py-2 mb-3 border-t border-border/50 pt-4">
+              <h3 className="font-medium text-base mb-3 dark:text-[#86e4d4] text-foreground">Integrations</h3>
+              <div className="grid gap-1">
+                {integrationsDropdownItems.map((item, index) => (
+                  <Link key={index} to={item.href} className="block py-3 px-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-lg transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
+                    <div className="flex items-center mb-1">
+                      <item.icon className="h-4 w-4 mr-3 text-[#0fae96] dark:text-[#5eead4] flex-shrink-0" />
+                      <span className="dark:text-white font-medium">{item.label}</span>
+                    </div>
+                    <div className="pl-7 text-sm text-muted-foreground dark:text-[#86e4d4]">
+                      {item.description}
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
             
             {/* Resources Section */}
-            <div className="py-2 mb-2">
-              <h3 className="font-medium text-base mb-2 dark:text-[#86e4d4]">Resources</h3>
-              {resourcesDropdownItems.map((item, index) => (
-                <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
-                  <div className="flex items-center mb-1">
-                    <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
-                    <span className="dark:text-white">{item.label}</span>
-                  </div>
-                  <div className="pl-7 text-base text-muted-foreground dark:text-[#86e4d4] whitespace-nowrap text-ellipsis overflow-hidden">
-                    {item.description}
-                  </div>
-                </Link>
-              ))}
+            <div className="py-2 mb-3 border-t border-border/50 pt-4">
+              <h3 className="font-medium text-base mb-3 dark:text-[#86e4d4] text-foreground">Resources</h3>
+              <div className="grid gap-1">
+                {resourcesDropdownItems.map((item, index) => (
+                  <Link key={index} to={item.href} className="block py-3 px-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-lg transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
+                    <div className="flex items-center mb-1">
+                      <item.icon className="h-4 w-4 mr-3 text-[#0fae96] dark:text-[#5eead4] flex-shrink-0" />
+                      <span className="dark:text-white font-medium">{item.label}</span>
+                    </div>
+                    <div className="pl-7 text-sm text-muted-foreground dark:text-[#86e4d4]">
+                      {item.description}
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
             
             {/* My Account Section */}
-            <div className="py-2 mb-2">
-              <h3 className="font-medium text-base mb-2 dark:text-[#86e4d4]">My Account</h3>
-              {accountDropdownItems.map((item, index) => (
-                <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
-                  <div className="flex items-center mb-1">
-                    <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
-                    <span className="dark:text-white">{item.label}</span>
-                  </div>
-                  <div className="pl-7 text-base text-muted-foreground dark:text-[#86e4d4] whitespace-nowrap text-ellipsis overflow-hidden">
-                    {item.description}
-                  </div>
-                </Link>
-              ))}
+            <div className="py-2 mb-3 border-t border-border/50 pt-4">
+              <h3 className="font-medium text-base mb-3 dark:text-[#86e4d4] text-foreground">My Account</h3>
+              <div className="grid gap-1">
+                {accountDropdownItems.map((item, index) => (
+                  <Link key={index} to={item.href} className="block py-3 px-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-lg transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
+                    <div className="flex items-center mb-1">
+                      <item.icon className="h-4 w-4 mr-3 text-[#0fae96] dark:text-[#5eead4] flex-shrink-0" />
+                      <span className="dark:text-white font-medium">{item.label}</span>
+                    </div>
+                    <div className="pl-7 text-sm text-muted-foreground dark:text-[#86e4d4]">
+                      {item.description}
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
             
             {/* Regular Nav Items */}
