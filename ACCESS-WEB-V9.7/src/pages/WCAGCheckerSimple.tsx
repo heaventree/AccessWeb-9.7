@@ -7,7 +7,8 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { AlertCircle, CheckCircle, Download, ExternalLink, RefreshCw, Clock, Globe, ChevronDown, ChevronRight } from 'lucide-react';
+import { Progress } from '../components/ui/progress';
+import { AlertCircle, CheckCircle, Download, ExternalLink, RefreshCw, Clock, Globe, ChevronDown, ChevronRight, Shield, TrendingUp, Search, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ScanResult {
@@ -46,6 +47,13 @@ const WCAGCheckerSimple: React.FC = () => {
   const [activeTab, setActiveTab] = useState('scanner');
   const [expandedIssue, setExpandedIssue] = useState<number | null>(null);
   const [scanHistory, setScanHistory] = useState<ScanResult[]>([]);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') === 'dark' || 
+             (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+    return false;
+  });
 
   // Load scan history from localStorage when user is available
   useEffect(() => {
@@ -387,137 +395,164 @@ ${index + 1}. ${issue.message}
   };
 
   return (
-    <>
+    <div className={isDarkMode ? 'dark' : ''}>
       <Navigation />
-      <main id="main-content" className="pt-32 min-h-screen bg-gray-50 dark:bg-slate-900">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                WCAG Accessibility Checker
-              </h1>
-              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Comprehensive WCAG 2.1 AA compliance testing for your website. 
-                Get detailed reports with actionable recommendations to improve accessibility.
-              </p>
+      <main id="main-content" className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 transition-colors duration-300">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+          <div className="max-w-7xl mx-auto">
+            {/* Hero Section */}
+            <div className="text-center mb-8 lg:mb-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="flex items-center justify-center mb-4">
+                  <Shield className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-blue-600 dark:text-blue-400 mr-3" />
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                    WCAG Checker
+                  </h1>
+                </div>
+                <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed">
+                  Professional accessibility testing with real WCAG 2.1 AA compliance analysis. 
+                  Get detailed insights and actionable recommendations to make your website accessible to everyone.
+                </p>
+              </motion.div>
             </div>
 
-            {/* Tab Navigation */}
-            <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
-              <button
-                onClick={() => setActiveTab('scanner')}
-                className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
-                  activeTab === 'scanner'
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                }`}
-              >
-                <Globe className="w-4 h-4 inline mr-2" />
-                URL Scanner
-              </button>
-              {user && (
+            {/* Tab Navigation - Mobile Responsive */}
+            <div className="flex flex-col sm:flex-row border-b border-gray-200 dark:border-gray-700 mb-6 lg:mb-8">
+              <div className="flex overflow-x-auto sm:overflow-visible">
                 <button
-                  onClick={() => setActiveTab('history')}
-                  className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
-                    activeTab === 'history'
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                  onClick={() => setActiveTab('scanner')}
+                  className={`flex items-center px-4 sm:px-6 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-all duration-200 ${
+                    activeTab === 'scanner'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800'
                   }`}
                 >
-                  <Clock className="w-4 h-4 inline mr-2" />
-                  Scan History
+                  <Search className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">URL </span>Scanner
                 </button>
-              )}
+                {user && (
+                  <button
+                    onClick={() => setActiveTab('history')}
+                    className={`flex items-center px-4 sm:px-6 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-all duration-200 ${
+                      activeTab === 'history'
+                        ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <History className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">Scan </span>History
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Scanner Tab */}
             {activeTab === 'scanner' && (
-              <div className="space-y-6">
-                {/* URL Input Section */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Website URL</CardTitle>
-                    <CardDescription>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="space-y-6 lg:space-y-8"
+              >
+                {/* URL Input Section - Enhanced Responsive Design */}
+                <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-xl lg:text-2xl flex items-center gap-3">
+                      <Globe className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                      Website URL
+                    </CardTitle>
+                    <CardDescription className="text-base">
                       Enter the URL of the website you want to test for WCAG 2.1 AA compliance
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex gap-4">
-                        <div className="flex-1">
-                          <Input
-                            type="url"
-                            placeholder="https://example.com"
-                            value={url}
-                            onChange={(e) => handleUrlChange(e.target.value)}
-                            disabled={isScanning}
-                            className={`w-full ${urlError ? 'border-red-500 focus:border-red-500' : ''}`}
-                            aria-describedby={urlError ? "url-error" : undefined}
-                          />
-                          {urlError && (
-                            <div 
-                              id="url-error" 
-                              className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-start gap-2"
-                              role="alert"
-                            >
-                              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                              <span>{urlError}</span>
-                            </div>
-                          )}
-                        </div>
-                        <Button 
-                          onClick={startScan} 
-                          disabled={isScanning || !url.trim() || !!urlError}
-                          className="min-w-[120px]"
-                        >
-                          {isScanning ? (
-                            <>
-                              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                              Scanning...
-                            </>
-                          ) : (
-                            'Start Scan'
-                          )}
-                        </Button>
+                  <CardContent className="space-y-6">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="flex-1">
+                        <Input
+                          type="url"
+                          placeholder="https://example.com"
+                          value={url}
+                          onChange={(e) => handleUrlChange(e.target.value)}
+                          disabled={isScanning}
+                          className={`h-12 text-base ${urlError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-slate-700`}
+                          aria-describedby={urlError ? "url-error" : undefined}
+                        />
+                        {urlError && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            id="url-error" 
+                            className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-start gap-2"
+                            role="alert"
+                          >
+                            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                            <span>{urlError}</span>
+                          </motion.div>
+                        )}
                       </div>
-                      
-                      {/* URL Examples for user guidance */}
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        <p className="mb-1">Valid URL examples:</p>
-                        <div className="flex flex-wrap gap-2">
-                          <code 
-                            className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
-                            onClick={() => handleUrlChange('https://example.com')}
+                      <Button 
+                        onClick={startScan} 
+                        disabled={isScanning || !url.trim() || !!urlError}
+                        className="h-12 px-6 min-w-[140px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                        size="lg"
+                      >
+                        {isScanning ? (
+                          <>
+                            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                            Scanning...
+                          </>
+                        ) : (
+                          <>
+                            <TrendingUp className="w-4 h-4 mr-2" />
+                            Start Scan
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    
+                    {/* URL Examples - Mobile Responsive */}
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Try these examples:</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        {[
+                          'https://example.com',
+                          'https://www.google.com', 
+                          'https://github.com'
+                        ].map((exampleUrl) => (
+                          <button
+                            key={exampleUrl}
+                            className="text-left px-3 py-2 text-sm bg-gray-100 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition-all duration-200 font-mono"
+                            onClick={() => handleUrlChange(exampleUrl)}
                           >
-                            https://example.com
-                          </code>
-                          <code 
-                            className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
-                            onClick={() => handleUrlChange('https://www.google.com')}
-                          >
-                            https://www.google.com
-                          </code>
-                          <code 
-                            className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
-                            onClick={() => handleUrlChange('https://github.com')}
-                          >
-                            https://github.com
-                          </code>
-                        </div>
+                            {exampleUrl}
+                          </button>
+                        ))}
                       </div>
                     </div>
                     
+                    {/* Progress Section - Enhanced */}
                     {isScanning && (
-                      <div className="mt-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="space-y-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
                             Analyzing website for accessibility issues...
                           </span>
+                          <div className="flex items-center space-x-2">
+                            <RefreshCw className="w-4 h-4 animate-spin text-blue-600 dark:text-blue-400" />
+                          </div>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '70%' }}></div>
+                        <Progress value={70} className="h-2" />
+                        <div className="text-xs text-blue-600 dark:text-blue-400">
+                          Fetching HTML content and running WCAG compliance checks...
                         </div>
-                      </div>
+                      </motion.div>
                     )}
                   </CardContent>
                 </Card>
@@ -531,61 +566,64 @@ ${index + 1}. ${issue.message}
                       exit={{ opacity: 0, y: -20 }}
                       className="space-y-6"
                     >
-                      {/* Summary Card */}
-                      <Card>
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <CardTitle className="flex items-center gap-2">
-                                <CheckCircle className="w-5 h-5 text-green-500" />
-                                Scan Results
+                      {/* Summary Card - Enhanced Responsive Design */}
+                      <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                        <CardHeader className="pb-4">
+                          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div className="flex-1">
+                              <CardTitle className="text-xl lg:text-2xl flex items-center gap-3 mb-2">
+                                <CheckCircle className="w-6 h-6 text-green-500" />
+                                Scan Complete
                               </CardTitle>
-                              <CardDescription className="flex items-center gap-2 mt-1">
+                              <CardDescription className="flex items-center gap-2 text-base">
                                 <ExternalLink className="w-4 h-4" />
-                                {currentScan.url}
+                                <span className="break-all">{currentScan.url}</span>
                               </CardDescription>
                             </div>
-                            <div className="text-right">
-                              <div className={`text-3xl font-bold ${getScoreColor(currentScan.overallScore)}`}>
-                                {currentScan.overallScore}/100
+                            <div className="text-center lg:text-right">
+                              <div className={`text-4xl lg:text-5xl font-bold ${getScoreColor(currentScan.overallScore)} mb-1`}>
+                                {currentScan.overallScore}<span className="text-2xl lg:text-3xl">/100</span>
                               </div>
-                              <div className="text-sm text-gray-500">Accessibility Score</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">Accessibility Score</div>
                             </div>
                           </div>
                         </CardHeader>
-                        <CardContent>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-red-600">{currentScan.criticalIssues}</div>
-                              <div className="text-sm text-gray-500">Critical</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-orange-600">{currentScan.seriousIssues}</div>
-                              <div className="text-sm text-gray-500">Serious</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-yellow-600">{currentScan.moderateIssues}</div>
-                              <div className="text-sm text-gray-500">Moderate</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-blue-600">{currentScan.minorIssues}</div>
-                              <div className="text-sm text-gray-500">Minor</div>
-                            </div>
+                        <CardContent className="space-y-6">
+                          {/* Issues Grid - Enhanced Responsive */}
+                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                            {[
+                              { label: 'Critical', count: currentScan.criticalIssues, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' },
+                              { label: 'Serious', count: currentScan.seriousIssues, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' },
+                              { label: 'Moderate', count: currentScan.moderateIssues, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
+                              { label: 'Minor', count: currentScan.minorIssues, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' }
+                            ].map((item) => (
+                              <div key={item.label} className={`text-center p-4 rounded-lg ${item.bg} transition-colors`}>
+                                <div className={`text-2xl lg:text-3xl font-bold ${item.color}`}>
+                                  {item.count}
+                                </div>
+                                <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">
+                                  {item.label}
+                                </div>
+                              </div>
+                            ))}
                           </div>
                           
-                          <div className="flex flex-wrap gap-2 justify-center">
+                          {/* Action Buttons - Enhanced */}
+                          <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Button
                               variant="outline"
-                              size="sm"
+                              size="lg"
                               onClick={() => downloadReport(currentScan, 'txt')}
+                              className="bg-white dark:bg-slate-700 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-slate-600"
                             >
                               <Download className="w-4 h-4 mr-2" />
                               Download Report
                             </Button>
                             <Button
                               variant="outline"
-                              size="sm"
+                              size="lg"
                               onClick={() => downloadReport(currentScan, 'json')}
+                              className="bg-white dark:bg-slate-700 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-slate-600"
                             >
                               <Download className="w-4 h-4 mr-2" />
                               Download JSON
@@ -594,44 +632,55 @@ ${index + 1}. ${issue.message}
                         </CardContent>
                       </Card>
 
-                      {/* Issues List */}
+                      {/* Issues List - Enhanced Responsive Design */}
                       {currentScan.issues && currentScan.issues.length > 0 && (
-                        <Card>
+                        <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
                           <CardHeader>
-                            <CardTitle>Issues Found</CardTitle>
-                            <CardDescription>
+                            <CardTitle className="text-xl lg:text-2xl flex items-center gap-3">
+                              <AlertCircle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                              Issues Found
+                            </CardTitle>
+                            <CardDescription className="text-base">
                               Detailed list of accessibility issues with recommendations for fixes
                             </CardDescription>
                           </CardHeader>
                           <CardContent>
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                               {currentScan.issues.map((issue) => (
-                                <div
+                                <motion.div
                                   key={issue.id}
-                                  className="border rounded-lg transition-colors"
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md"
                                 >
                                   <div 
-                                    className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800"
+                                    className="p-4 sm:p-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                                     onClick={() => setExpandedIssue(expandedIssue === issue.id ? null : issue.id)}
                                   >
-                                    <div className="flex items-start justify-between">
-                                      <div className="flex items-center gap-3 flex-1">
-                                        <Badge className={getSeverityColor(issue.severity)}>
-                                          {issue.severity}
-                                        </Badge>
-                                        {issue.wcagGuideline && (
-                                          <Badge variant="outline">
-                                            WCAG {issue.wcagGuideline}
+                                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                                      <div className="flex-1 space-y-3 sm:space-y-0">
+                                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                                          <Badge 
+                                            className={`${getSeverityColor(issue.severity)} text-white font-medium`}
+                                          >
+                                            {issue.severity.toUpperCase()}
                                           </Badge>
-                                        )}
-                                        <h4 className="font-medium text-gray-900 dark:text-white">
+                                          {issue.wcagGuideline && (
+                                            <Badge variant="outline" className="border-gray-300 dark:border-gray-600">
+                                              WCAG {issue.wcagGuideline}
+                                            </Badge>
+                                          )}
+                                        </div>
+                                        <h4 className="font-medium text-gray-900 dark:text-white text-base sm:text-lg leading-relaxed">
                                           {issue.message}
                                         </h4>
                                       </div>
-                                      {expandedIssue === issue.id ? 
-                                        <ChevronDown className="w-5 h-5 text-gray-400" /> : 
-                                        <ChevronRight className="w-5 h-5 text-gray-400" />
-                                      }
+                                      <div className="flex items-center justify-end">
+                                        {expandedIssue === issue.id ? 
+                                          <ChevronDown className="w-5 h-5 text-gray-400 transition-transform" /> : 
+                                          <ChevronRight className="w-5 h-5 text-gray-400 transition-transform" />
+                                        }
+                                      </div>
                                     </div>
                                   </div>
                                   
@@ -641,27 +690,29 @@ ${index + 1}. ${issue.message}
                                         initial={{ opacity: 0, height: 0 }}
                                         animate={{ opacity: 1, height: 'auto' }}
                                         exit={{ opacity: 0, height: 0 }}
-                                        className="border-t bg-gray-50 dark:bg-slate-800"
+                                        className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-700"
                                       >
-                                        <div className="p-4 space-y-3">
+                                        <div className="p-4 sm:p-6 space-y-4">
                                           {issue.recommendation && (
-                                            <div>
-                                              <h5 className="font-medium text-green-700 dark:text-green-400 mb-1">
-                                                Recommendation:
+                                            <div className="space-y-2">
+                                              <h5 className="font-semibold text-green-700 dark:text-green-400 flex items-center gap-2">
+                                                <CheckCircle className="w-4 h-4" />
+                                                Recommended Fix:
                                               </h5>
-                                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                                              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed pl-6">
                                                 {issue.recommendation}
                                               </p>
                                             </div>
                                           )}
                                           
                                           {issue.element && (
-                                            <div>
-                                              <h5 className="font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                Element:
+                                            <div className="space-y-2">
+                                              <h5 className="font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                <ExternalLink className="w-4 h-4" />
+                                                HTML Element:
                                               </h5>
-                                              <div className="bg-gray-100 dark:bg-slate-700 rounded p-2">
-                                                <code className="text-sm text-gray-800 dark:text-gray-200">
+                                              <div className="bg-gray-800 dark:bg-slate-800 rounded-lg p-3 overflow-x-auto">
+                                                <code className="text-sm text-green-400 font-mono whitespace-pre">
                                                   {issue.element}
                                                 </code>
                                               </div>
@@ -671,7 +722,7 @@ ${index + 1}. ${issue.message}
                                       </motion.div>
                                     )}
                                   </AnimatePresence>
-                                </div>
+                                </motion.div>
                               ))}
                             </div>
                           </CardContent>
@@ -680,62 +731,91 @@ ${index + 1}. ${issue.message}
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </motion.div>
             )}
 
-            {/* History Tab */}
+            {/* History Tab - Enhanced Responsive Design */}
             {activeTab === 'history' && user && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Scan History</CardTitle>
-                  <CardDescription>
-                    Previous accessibility scans and their results
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {scanHistory.length === 0 ? (
-                    <p className="text-center text-gray-600 dark:text-gray-400 py-8">
-                      No scans found. Start your first scan using the URL Scanner tab.
-                    </p>
-                  ) : (
-                    <div className="space-y-4">
-                      {scanHistory.map((scan) => (
-                        <div
-                          key={scan.id}
-                          className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                          onClick={() => setCurrentScan(scan)}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="space-y-6"
+              >
+                <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl lg:text-2xl flex items-center gap-3">
+                      <History className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                      Your Scan History
+                    </CardTitle>
+                    <CardDescription className="text-base">
+                      Previous accessibility scans and their results
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {scanHistory.length === 0 ? (
+                      <div className="text-center py-12">
+                        <History className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                        <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">
+                          No scans found yet
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+                          Start your first scan using the URL Scanner tab to see results here.
+                        </p>
+                        <Button
+                          onClick={() => setActiveTab('scanner')}
+                          className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                         >
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                              <ExternalLink className="w-4 h-4" />
-                              <span className="font-medium">{scan.url}</span>
+                          <Search className="w-4 h-4 mr-2" />
+                          Start Your First Scan
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="grid gap-4 sm:gap-6">
+                        {scanHistory.map((scan) => (
+                          <motion.div
+                            key={scan.id}
+                            whileHover={{ scale: 1.02 }}
+                            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+                            onClick={() => setCurrentScan(scan)}
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div className="flex items-start sm:items-center gap-3 flex-1">
+                                <ExternalLink className="w-5 h-5 text-gray-400 mt-0.5 sm:mt-0 flex-shrink-0" />
+                                <div className="min-w-0 flex-1">
+                                  <h3 className="font-medium text-gray-900 dark:text-white truncate">
+                                    {scan.url}
+                                  </h3>
+                                  <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                    <span>{scan.totalIssues} issues found</span>
+                                    <span>•</span>
+                                    <span>{new Date(scan.createdAt).toLocaleDateString()}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <div className="text-right">
+                                  <div className={`text-2xl sm:text-3xl font-bold ${getScoreColor(scan.overallScore)}`}>
+                                    {scan.overallScore}/100
+                                  </div>
+                                  <div className="text-xs text-gray-500">Score</div>
+                                </div>
+                                <ChevronRight className="w-5 h-5 text-gray-400" />
+                              </div>
                             </div>
-                            <div className={`text-lg font-bold ${getScoreColor(scan.overallScore)}`}>
-                              {scan.overallScore}/100
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                            <span>
-                              {scan.totalIssues} issues found
-                            </span>
-                            <span>
-                              {new Date(scan.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
             )}
           </div>
         </div>
       </main>
       <Footer />
       <BackToTop />
-    </>
+    </div>
   );
 };
 
