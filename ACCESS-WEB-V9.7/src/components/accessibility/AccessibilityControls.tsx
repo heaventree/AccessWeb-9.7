@@ -41,191 +41,297 @@ export function AccessibilityControls() {
     const root = document.documentElement;
     const body = document.body;
     
-    // Apply text scaling that actually works
-    root.style.fontSize = `${textSize}%`;
-    root.style.setProperty('--accessibility-text-zoom', `${textSize}%`);
-    
-    // Apply line height
-    root.style.setProperty('--accessibility-line-height', `${lineHeight}%`);
-    
-    // Apply letter spacing
-    root.style.setProperty('--accessibility-letter-spacing', `${letterSpacing * 0.01}em`);
-    
-    // Apply word spacing
-    root.style.setProperty('--accessibility-word-spacing', `${wordSpacing * 0.01}em`);
-    
-    // Apply text scaling to all text elements
-    const style = document.createElement('style');
-    style.id = 'accessibility-text-scaling';
+    // Remove existing style first to avoid conflicts
     const existingStyle = document.getElementById('accessibility-text-scaling');
     if (existingStyle) {
       existingStyle.remove();
     }
     
+    // Create comprehensive text scaling that actually works
+    const style = document.createElement('style');
+    style.id = 'accessibility-text-scaling';
+    
+    // Calculate scaling factors
+    const textScale = textSize / 100;
+    const lineScale = lineHeight / 100;
+    const letterScale = (letterSpacing - 100) * 0.01;
+    const wordScale = (wordSpacing - 100) * 0.01;
+    
     style.textContent = `
-      body, p, div, span, h1, h2, h3, h4, h5, h6, li, td, th, label, input, textarea, button, a {
-        font-size: calc(1em * ${textSize / 100}) !important;
-        line-height: calc(1.5 * ${lineHeight / 100}) !important;
-        letter-spacing: ${letterSpacing * 0.01}em !important;
-        word-spacing: ${wordSpacing * 0.01}em !important;
+      /* Base font size scaling */
+      html {
+        font-size: ${textSize}% !important;
+      }
+      
+      /* Apply to all text elements with proper specificity */
+      body, body *, 
+      p, div, span, h1, h2, h3, h4, h5, h6, 
+      li, td, th, label, input, textarea, button, a,
+      .text-xs, .text-sm, .text-base, .text-lg, .text-xl, .text-2xl, .text-3xl, .text-4xl, .text-5xl, .text-6xl {
+        font-size: ${textScale}em !important;
+        line-height: ${lineScale * 1.5} !important;
+        letter-spacing: ${letterScale}em !important;
+        word-spacing: ${wordScale}em !important;
+      }
+      
+      /* Specific overrides for different text sizes */
+      h1, .text-4xl, .text-5xl, .text-6xl {
+        font-size: ${textScale * 2}em !important;
+      }
+      
+      h2, .text-3xl {
+        font-size: ${textScale * 1.75}em !important;
+      }
+      
+      h3, .text-2xl {
+        font-size: ${textScale * 1.5}em !important;
+      }
+      
+      h4, .text-xl {
+        font-size: ${textScale * 1.25}em !important;
+      }
+      
+      h5, .text-lg {
+        font-size: ${textScale * 1.125}em !important;
+      }
+      
+      h6, .text-base {
+        font-size: ${textScale}em !important;
+      }
+      
+      .text-sm {
+        font-size: ${textScale * 0.875}em !important;
+      }
+      
+      .text-xs {
+        font-size: ${textScale * 0.75}em !important;
+      }
+      
+      /* Ensure buttons and inputs scale properly */
+      button, input, textarea, select {
+        font-size: ${textScale}em !important;
+        line-height: ${lineScale * 1.5} !important;
+        padding: ${textScale * 0.5}em ${textScale * 0.75}em !important;
+      }
+      
+      /* Scale icons and other elements */
+      svg {
+        width: ${textScale}em !important;
+        height: ${textScale}em !important;
       }
     `;
+    
     document.head.appendChild(style);
     
-  }, [textSize, lineHeight, letterSpacing, wordSpacing]);
+    // Store settings in localStorage for persistence
+    localStorage.setItem('accessibility-settings', JSON.stringify({
+      textSize,
+      lineHeight,
+      letterSpacing,
+      wordSpacing,
+      features
+    }));
+    
+  }, [textSize, lineHeight, letterSpacing, wordSpacing, features]);
+
+  // Load settings from localStorage on component mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('accessibility-settings');
+    if (savedSettings) {
+      try {
+        const parsed = JSON.parse(savedSettings);
+        setTextSize(parsed.textSize || 100);
+        setLineHeight(parsed.lineHeight || 100);
+        setLetterSpacing(parsed.letterSpacing || 100);
+        setWordSpacing(parsed.wordSpacing || 100);
+        setFeatures(parsed.features || features);
+      } catch (e) {
+        console.log('Failed to load accessibility settings');
+      }
+    }
+  }, []);
 
   const toggleFeature = (feature: keyof typeof features) => {
-    // Special handling for mutually exclusive features
-    if (feature === 'textAlignLeft' || feature === 'textAlignCenter' || feature === 'textAlignRight') {
-      const isCurrentlyActive = features[feature];
+    const currentValue = features[feature];
+    const newValue = !currentValue;
+
+    // Update feature state
+    setFeatures(prev => {
+      const newFeatures = { ...prev };
       
-      if (!isCurrentlyActive) {
-        setFeatures(prev => ({
-          ...prev,
-          textAlignLeft: feature === 'textAlignLeft',
-          textAlignCenter: feature === 'textAlignCenter',
-          textAlignRight: feature === 'textAlignRight'
-        }));
-        
+      // Handle mutually exclusive features
+      if (feature === 'textAlignLeft' || feature === 'textAlignCenter' || feature === 'textAlignRight') {
+        newFeatures.textAlignLeft = false;
+        newFeatures.textAlignCenter = false;
+        newFeatures.textAlignRight = false;
+        if (newValue) {
+          newFeatures[feature] = true;
+        }
+      } else if (feature === 'bigBlackCursor' || feature === 'bigWhiteCursor' || feature === 'largeCursor') {
+        newFeatures.bigBlackCursor = false;
+        newFeatures.bigWhiteCursor = false;
+        newFeatures.largeCursor = false;
+        if (newValue) {
+          newFeatures[feature] = true;
+        }
+      } else if (feature === 'darkMode' || feature === 'lightMode' || feature === 'invertColors' || 
+                 feature === 'monochrome' || feature === 'yellowFilter' || feature === 'blueFilter' || feature === 'greenFilter') {
+        newFeatures.darkMode = false;
+        newFeatures.lightMode = false;
+        newFeatures.invertColors = false;
+        newFeatures.monochrome = false;
+        newFeatures.yellowFilter = false;
+        newFeatures.blueFilter = false;
+        newFeatures.greenFilter = false;
+        if (newValue) {
+          newFeatures[feature] = true;
+        }
+      } else {
+        newFeatures[feature] = newValue;
+      }
+      
+      return newFeatures;
+    });
+
+    // Apply DOM changes immediately
+    setTimeout(() => {
+      applyAccessibilityFeatures(feature, newValue);
+    }, 0);
+  };
+
+  const applyAccessibilityFeatures = (feature: keyof typeof features, isEnabled: boolean) => {
+    const body = document.body;
+    
+    // Remove all conflicting classes first
+    if (feature === 'textAlignLeft' || feature === 'textAlignCenter' || feature === 'textAlignRight') {
+      body.style.textAlign = '';
+      if (isEnabled) {
         const alignment = feature === 'textAlignLeft' ? 'left' : 
                          feature === 'textAlignCenter' ? 'center' : 'right';
-        document.body.style.textAlign = alignment;
+        body.style.textAlign = alignment;
+        
+        // Also apply to all elements
+        const style = document.createElement('style');
+        style.id = 'accessibility-text-align';
+        const existingStyle = document.getElementById('accessibility-text-align');
+        if (existingStyle) {
+          existingStyle.remove();
+        }
+        
+        style.textContent = `
+          body *, p, div, span, h1, h2, h3, h4, h5, h6, li, td, th, label {
+            text-align: ${alignment} !important;
+          }
+        `;
+        document.head.appendChild(style);
       } else {
-        setFeatures(prev => ({
-          ...prev,
-          [feature]: false
-        }));
-        document.body.style.textAlign = '';
+        const existingStyle = document.getElementById('accessibility-text-align');
+        if (existingStyle) {
+          existingStyle.remove();
+        }
       }
-      return;
     }
 
-    // Special handling for cursor types (mutually exclusive)
+    // Handle cursor changes
     if (feature === 'bigBlackCursor' || feature === 'bigWhiteCursor' || feature === 'largeCursor') {
-      const isCurrentlyActive = features[feature];
-      
-      if (!isCurrentlyActive) {
-        setFeatures(prev => ({
-          ...prev,
-          bigBlackCursor: feature === 'bigBlackCursor',
-          bigWhiteCursor: feature === 'bigWhiteCursor',
-          largeCursor: feature === 'largeCursor'
-        }));
-        
-        // Remove existing cursor classes
-        document.body.classList.remove('big-black-cursor', 'big-white-cursor', 'large-cursor');
-        
-        // Add new cursor class
+      body.classList.remove('big-black-cursor', 'big-white-cursor', 'large-cursor');
+      if (isEnabled) {
         const cursorClass = feature === 'bigBlackCursor' ? 'big-black-cursor' :
                            feature === 'bigWhiteCursor' ? 'big-white-cursor' : 'large-cursor';
-        document.body.classList.add(cursorClass);
-      } else {
-        setFeatures(prev => ({
-          ...prev,
-          [feature]: false
-        }));
-        document.body.classList.remove('big-black-cursor', 'big-white-cursor', 'large-cursor');
+        body.classList.add(cursorClass);
       }
-      return;
     }
 
-    // Special handling for color filters (mutually exclusive)
+    // Handle color filters
     if (feature === 'darkMode' || feature === 'lightMode' || feature === 'invertColors' || 
         feature === 'monochrome' || feature === 'yellowFilter' || feature === 'blueFilter' || feature === 'greenFilter') {
-      const isCurrentlyActive = features[feature];
-      
-      if (!isCurrentlyActive) {
-        setFeatures(prev => ({
-          ...prev,
-          darkMode: feature === 'darkMode',
-          lightMode: feature === 'lightMode',
-          invertColors: feature === 'invertColors',
-          monochrome: feature === 'monochrome',
-          yellowFilter: feature === 'yellowFilter',
-          blueFilter: feature === 'blueFilter',
-          greenFilter: feature === 'greenFilter'
-        }));
-        
-        // Remove existing filter classes
-        document.body.classList.remove('dark-mode', 'light-mode', 'invert-colors', 'monochrome', 'yellow-filter', 'blue-filter', 'green-filter');
-        
-        // Add new filter class
+      body.classList.remove('dark-mode', 'light-mode', 'invert-colors', 'monochrome', 'yellow-filter', 'blue-filter', 'green-filter');
+      if (isEnabled) {
         const filterClass = feature === 'darkMode' ? 'dark-mode' :
                            feature === 'lightMode' ? 'light-mode' :
                            feature === 'invertColors' ? 'invert-colors' :
                            feature === 'monochrome' ? 'monochrome' :
                            feature === 'yellowFilter' ? 'yellow-filter' :
                            feature === 'blueFilter' ? 'blue-filter' : 'green-filter';
-        document.body.classList.add(filterClass);
-      } else {
-        setFeatures(prev => ({
-          ...prev,
-          [feature]: false
-        }));
-        document.body.classList.remove('dark-mode', 'light-mode', 'invert-colors', 'monochrome', 'yellow-filter', 'blue-filter', 'green-filter');
+        body.classList.add(filterClass);
       }
-      return;
     }
-    
-    // Regular toggle for other features
-    setFeatures(prev => ({
-      ...prev,
-      [feature]: !prev[feature]
-    }));
-    
-    // Apply feature effects
-    const newValue = !features[feature];
-    switch (feature) {
-      case 'highlightLinks':
-        document.body.classList.toggle('highlight-links', newValue);
-        break;
-      case 'highlightFocus':
-        document.body.classList.toggle('highlight-focus', newValue);
-        break;
-      case 'highContrast':
-        document.body.classList.toggle('high-contrast', newValue);
-        break;
-      case 'readingMask':
-        document.body.classList.toggle('reading-mask', newValue);
-        break;
-      case 'keyboardNavigation':
-        document.body.classList.toggle('keyboard-navigation', newValue);
-        break;
-      case 'underlineLinks':
-        document.body.classList.toggle('underline-links', newValue);
-        break;
-      case 'blockAnimations':
-        document.body.classList.toggle('block-animations', newValue);
-        break;
-      case 'hideImages':
-        document.body.classList.toggle('hide-images', newValue);
-        break;
-      case 'readableFont':
-        document.body.classList.toggle('readable-font', newValue);
-        break;
-      case 'textToSpeech':
-        if (newValue) {
-          startTextToSpeech();
-        } else {
-          stopTextToSpeech();
-        }
-        break;
+
+    // Handle other features
+    const featureMap = {
+      highlightLinks: 'highlight-links',
+      highlightFocus: 'highlight-focus',
+      highContrast: 'high-contrast',
+      readingMask: 'reading-mask',
+      keyboardNavigation: 'keyboard-navigation',
+      underlineLinks: 'underline-links',
+      blockAnimations: 'block-animations',
+      hideImages: 'hide-images',
+      readableFont: 'readable-font'
+    };
+
+    if (featureMap[feature]) {
+      body.classList.toggle(featureMap[feature], isEnabled);
+    }
+
+    // Special handling for text-to-speech
+    if (feature === 'textToSpeech') {
+      if (isEnabled) {
+        startTextToSpeech();
+      } else {
+        stopTextToSpeech();
+      }
+    }
+
+    // Virtual keyboard simulation
+    if (feature === 'virtualKeyboard') {
+      body.classList.toggle('virtual-keyboard-active', isEnabled);
     }
   };
 
   const startTextToSpeech = () => {
     setIsReading(true);
-    // Simple text-to-speech implementation
-    const textContent = document.body.innerText;
+    // Get visible text content only
+    const textContent = document.body.innerText.substring(0, 1000); // Limit to prevent long reading
     const utterance = new SpeechSynthesisUtterance(textContent);
-    utterance.onend = () => setIsReading(false);
+    
+    // Configure speech settings
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    
+    // Add reading indicator
+    document.body.classList.add('text-to-speech-active');
+    
+    utterance.onend = () => {
+      setIsReading(false);
+      document.body.classList.remove('text-to-speech-active');
+      setFeatures(prev => ({ ...prev, textToSpeech: false }));
+    };
+    
+    utterance.onerror = () => {
+      setIsReading(false);
+      document.body.classList.remove('text-to-speech-active');
+      setFeatures(prev => ({ ...prev, textToSpeech: false }));
+    };
+    
     speechSynthesis.speak(utterance);
   };
 
   const stopTextToSpeech = () => {
     speechSynthesis.cancel();
+    document.body.classList.remove('text-to-speech-active');
     setIsReading(false);
   };
+
+  // Apply all loaded settings when features change
+  useEffect(() => {
+    Object.entries(features).forEach(([feature, isEnabled]) => {
+      if (isEnabled) {
+        applyAccessibilityFeatures(feature as keyof typeof features, true);
+      }
+    });
+  }, [features]);
 
   const increaseTextSize = () => {
     if (textSize < 200) {
@@ -276,13 +382,14 @@ export function AccessibilityControls() {
   };
 
   const resetAllSettings = () => {
+    // Reset all state
     setTextSize(100);
     setLineHeight(100);
     setLetterSpacing(100);
     setWordSpacing(100);
     setIsReading(false);
     
-    setFeatures({
+    const defaultFeatures = {
       largeCursor: false,
       highlightLinks: false,
       highlightFocus: false,
@@ -307,36 +414,62 @@ export function AccessibilityControls() {
       yellowFilter: false,
       blueFilter: false,
       greenFilter: false
-    });
+    };
     
-    // Reset all applied classes and styles
-    document.documentElement.style.fontSize = '100%';
-    document.documentElement.style.setProperty('--accessibility-text-zoom', '100%');
-    document.documentElement.style.setProperty('--accessibility-line-height', '100%');
-    document.documentElement.style.setProperty('--accessibility-letter-spacing', '0em');
-    document.documentElement.style.setProperty('--accessibility-word-spacing', '0em');
+    setFeatures(defaultFeatures);
+    
+    // Reset DOM immediately
+    const body = document.body;
+    const html = document.documentElement;
     
     // Remove all accessibility classes
-    document.body.classList.remove(
+    body.classList.remove(
       'large-cursor', 'big-black-cursor', 'big-white-cursor',
       'highlight-links', 'highlight-focus', 'high-contrast',
       'dark-mode', 'light-mode', 'invert-colors', 'monochrome',
       'yellow-filter', 'blue-filter', 'green-filter',
       'reading-mask', 'keyboard-navigation', 'underline-links',
-      'block-animations', 'hide-images', 'readable-font'
+      'block-animations', 'hide-images', 'readable-font',
+      'virtual-keyboard-active'
     );
     
     // Reset text alignment
-    document.body.style.textAlign = '';
+    body.style.textAlign = '';
     
-    // Remove accessibility CSS
-    const existingStyle = document.getElementById('accessibility-text-scaling');
-    if (existingStyle) {
-      existingStyle.remove();
-    }
+    // Reset HTML font size
+    html.style.fontSize = '';
+    
+    // Remove all accessibility styles
+    const stylesToRemove = [
+      'accessibility-text-scaling',
+      'accessibility-text-align'
+    ];
+    
+    stylesToRemove.forEach(id => {
+      const existingStyle = document.getElementById(id);
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    });
     
     // Stop any text-to-speech
     speechSynthesis.cancel();
+    
+    // Clear localStorage
+    localStorage.removeItem('accessibility-settings');
+    
+    // Force a small delay to ensure DOM is updated
+    setTimeout(() => {
+      // Apply default styling
+      const style = document.createElement('style');
+      style.id = 'accessibility-text-scaling';
+      style.textContent = `
+        html {
+          font-size: 100% !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }, 100);
   };
 
   const toggleMenu = () => {

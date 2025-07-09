@@ -268,6 +268,136 @@ body[style*="text-align: right"] * {
   background: #a8a8a8;
 }
 
+/* Color Filters */
+.yellow-filter {
+  filter: sepia(100%) saturate(200%) hue-rotate(40deg) brightness(1.2) !important;
+}
+
+.yellow-filter * {
+  filter: none !important;
+}
+
+.blue-filter {
+  filter: sepia(100%) saturate(200%) hue-rotate(180deg) brightness(1.1) !important;
+}
+
+.blue-filter * {
+  filter: none !important;
+}
+
+.green-filter {
+  filter: sepia(100%) saturate(200%) hue-rotate(90deg) brightness(1.1) !important;
+}
+
+.green-filter * {
+  filter: none !important;
+}
+
+.invert-colors {
+  filter: invert(1) !important;
+}
+
+.invert-colors * {
+  filter: none !important;
+}
+
+.monochrome {
+  filter: grayscale(100%) !important;
+}
+
+.monochrome * {
+  filter: none !important;
+}
+
+/* Text-to-Speech Reading Indicator */
+.text-to-speech-active {
+  position: relative;
+}
+
+.text-to-speech-active::before {
+  content: "🔊 Reading...";
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #007ACC;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  z-index: 10001;
+  font-size: 14px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Improved focus indicators */
+.highlight-focus *:focus {
+  outline: 3px solid #FFD700 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 5px rgba(255, 215, 0, 0.3) !important;
+}
+
+/* Enhanced keyboard navigation */
+.keyboard-navigation {
+  /* Hide mouse cursor to encourage keyboard use */
+  cursor: none !important;
+}
+
+.keyboard-navigation * {
+  cursor: none !important;
+}
+
+/* Better link underlines */
+.underline-links a {
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 2px !important;
+}
+
+/* Animation blocking */
+.block-animations * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Enhanced Reading Mask */
+.reading-mask {
+  position: relative;
+  overflow: hidden;
+}
+
+.reading-mask::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9998;
+  pointer-events: none;
+}
+
+.reading-mask::after {
+  content: "";
+  position: fixed;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: transparent;
+  z-index: 9999;
+  pointer-events: none;
+  transform: translateY(-50%);
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
 /* Text-to-Speech Indicator */
 .text-to-speech-active {
   animation: pulse 2s infinite;
