@@ -8,6 +8,9 @@
 /* Import main styling file with all component styles and theme variables */
 @import './styles/main.css';
 
+/* Import comprehensive accessibility styles */
+@import './styles/accessibility.css';
+
 /* Any additional accessibility improvements that are not in main.css */
 /* Skip links - visible only on focus for accessibility */
 .skip-to-main,
