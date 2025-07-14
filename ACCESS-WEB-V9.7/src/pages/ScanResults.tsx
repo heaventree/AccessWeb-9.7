@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { API_ENDPOINTS } from '../config/api';
-import { Navigation } from '../components/Navigation';
-import { Footer } from '../components/Footer';
-import { BackToTop } from '../components/BackToTop';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -222,7 +219,6 @@ Recommendation: ${issue.recommendation}
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <Navigation />
         <div className="pt-20 flex items-center justify-center h-screen">
           <div className="text-center space-y-4">
             <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto" />
@@ -230,8 +226,6 @@ Recommendation: ${issue.recommendation}
             <p className="text-gray-600 dark:text-gray-400">Fetching accessibility analysis data</p>
           </div>
         </div>
-        <Footer />
-        <BackToTop />
       </div>
     );
   }
@@ -239,7 +233,6 @@ Recommendation: ${issue.recommendation}
   if (!scanResult) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <Navigation />
         <div className="pt-20 container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">No Scan Results Found</h1>
@@ -249,15 +242,12 @@ Recommendation: ${issue.recommendation}
             </Button>
           </div>
         </div>
-        <Footer />
-        <BackToTop />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <Navigation />
       <main className="pt-20 pb-8">
         <div className="container mx-auto px-4">
           {/* Header */}
@@ -576,9 +566,6 @@ Recommendation: ${issue.recommendation}
           </div>
         </div>
       </main>
-
-      <Footer />
-      <BackToTop />
     </div>
   );
 }

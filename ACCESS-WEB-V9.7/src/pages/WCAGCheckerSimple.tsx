@@ -201,56 +201,25 @@ const WCAGCheckerSimple: React.FC = () => {
     showToast("Scan Started", "Analyzing accessibility compliance...");
 
     try {
-      // Start the WCAG scan using centralized API configuration
-      const response = await fetch(API_ENDPOINTS.WCAG_SCAN, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url }),
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      // Get the comprehensive WCAG results
-      const scanData = await response.json();
+      // Just navigate to results page - API call will happen there
+      setIsScanning(false);
       
-      console.log('WCAG Scan Response:', scanData);
+      showToast("Scan Started", "Redirecting to results page...");
       
-      if (scanData.success) {
-        setIsScanning(false);
-        
-        showToast("Scan Complete", 
-          `Found ${scanData.summary.totalIssues} accessibility issues. Score: ${scanData.summary.overallScore}/100`);
-        
-        // Add to local history and save to localStorage  
-        if (user) {
-          const newHistory = [scanData, ...scanHistory.slice(0, 9)];
-          setScanHistory(newHistory);
-          localStorage.setItem(`wcag-scan-history-${user.id}`, JSON.stringify(newHistory));
-        }
-        
-        // Navigate to results page with just the URL - fetch data on the results page
-        console.log('Navigating to scan results for URL:', url);
-        const resultsUrl = `/checker/result?url=${encodeURIComponent(url)}`;
-        console.log('Navigating to:', resultsUrl);
-        
-        try {
-          // Try React Router navigation first
-          navigate(resultsUrl);
-        } catch (navError) {
-          console.error('React Router navigation failed, using window.location:', navError);
-          // Fallback to direct navigation
-          setTimeout(() => {
-            window.location.href = resultsUrl;
-          }, 500);
-        }
-      } else {
-        throw new Error(scanData.message || 'Scan failed');
+      // Navigate to results page with just the URL - fetch data on the results page
+      console.log('Navigating to scan results for URL:', url);
+      const resultsUrl = `/checker/result?url=${encodeURIComponent(url)}`;
+      console.log('Navigating to:', resultsUrl);
+      
+      try {
+        // Try React Router navigation first
+        navigate(resultsUrl);
+      } catch (navError) {
+        console.error('React Router navigation failed, using window.location:', navError);
+        // Fallback to direct navigation
+        setTimeout(() => {
+          window.location.href = resultsUrl;
+        }, 500);
       }
       
     } catch (error) {
