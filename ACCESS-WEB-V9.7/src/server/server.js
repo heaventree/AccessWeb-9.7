@@ -152,6 +152,7 @@ import adminRouter from './routes/admin.js';
 
 // Import WCAG checker routes
 import wcagRouter from './routes/wcag.js';
+import wcagTestRouter from './routes/wcag-test.js';
 
 // API Routes
 app.use('/api/auth', authRouter);
@@ -161,6 +162,7 @@ app.use('/api/scanner', scannerRouter);
 app.use('/api/wordpress', wordpressRouter);
 app.use('/api/admin', requireAuth, adminRouter);
 app.use('/api/wcag-simple', wcagRouter);
+app.use('/api/wcag-test', wcagTestRouter);
 
 // Pricing Plans Routes
 app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed
