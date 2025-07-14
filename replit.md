@@ -114,6 +114,8 @@ The WCAG Accessibility Audit Tool is a comprehensive platform for testing, monit
 
 ## Changelog
 
+- July 14, 2025: Fixed Express trust proxy configuration to resolve rate limiting errors
+- July 14, 2025: Resolved frontend/backend response format mismatch for WCAG scan results by updating backend to include success field
 - July 14, 2025: Added missing WCAG test route (/api/wcag-test) to main server configuration
 - July 14, 2025: Fixed WCAG API URL to use Replit domain instead of hardcoded localhost:3001
 - July 14, 2025: Fixed CSP violations blocking API calls by adding localhost:* to connect-src directive for development

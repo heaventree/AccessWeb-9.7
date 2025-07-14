@@ -106,6 +106,7 @@ router.post('/scan', scanLimiter, async (req, res) => {
     
     if (!url) {
       return res.status(400).json({
+        success: false,
         error: 'URL is required',
         message: 'Please provide a valid URL to scan'
       });
@@ -121,6 +122,7 @@ router.post('/scan', scanLimiter, async (req, res) => {
     console.log(`Test WCAG scan completed for ${sanitizedUrl} in ${endTime - startTime}ms`);
     
     const responseData = {
+      success: true,
       ...scanResult,
       scanId: Date.now(),
       message: 'Test WCAG scan completed successfully'
@@ -131,6 +133,7 @@ router.post('/scan', scanLimiter, async (req, res) => {
   } catch (error) {
     console.error('Error in test WCAG scan:', error);
     res.status(500).json({
+      success: false,
       error: 'Scan failed to start',
       message: error.message
     });

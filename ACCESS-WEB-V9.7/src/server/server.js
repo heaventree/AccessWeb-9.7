@@ -63,6 +63,9 @@ const prisma = new PrismaClient();
 const app = express();
 const PORT = process.env.SERVER_PORT || 3001;
 
+// Configure trust proxy for rate limiting to work properly
+app.set('trust proxy', 1);
+
 // Validate critical environment variables
 const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
