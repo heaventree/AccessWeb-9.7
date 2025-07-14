@@ -148,19 +148,35 @@ async function performWCAGScan(url) {
       timeout: 30000
     });
     
-    // Wait for page to fully load
-    await page.waitForTimeout(2000);
+    // Wait for page to fully load (fixed method for Puppeteer)
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    
+    // Take screenshot of the page
+    const screenshot = await page.screenshot({
+      fullPage: true,
+      type: 'png',
+      encoding: 'base64'
+    });
+    
+    // Inject axe-core script
+    await page.addScriptTag({
+      url: 'https://unpkg.com/axe-core@4.8.2/axe.min.js'
+    });
+    
+    // Wait for axe to load
+    await page.waitForFunction(() => typeof window.axe !== 'undefined', { timeout: 10000 });
     
     // Run axe-core accessibility analysis
-    const results = await new AxePuppeteer(page)
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice'])
-      .options({
+    const results = await page.evaluate(async () => {
+      return await window.axe.run({
+        tags: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice'],
         runOnly: {
           type: 'tag',
           values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice']
         }
-      })
-      .analyze();
+      });
+    });
     
     // Process violations (issues)
     const issues = results.violations.map(violation => {
@@ -266,7 +282,8 @@ async function performWCAGScan(url) {
         accessibilityScore: Math.round(overallScore),
         testEngine: 'axe-core',
         totalRules: results.passes.length + results.violations.length + results.incomplete.length + results.inapplicable.length,
-        applicableRules: results.passes.length + results.violations.length
+        applicableRules: results.passes.length + results.violations.length,
+        screenshot: `data:image/png;base64,${screenshot}`
       },
       wcagGuidelines: {
         version: '2.1',
@@ -438,7 +455,8 @@ async function performBasicWCAGScan(url) {
         toolVersion: 'Basic HTML Parser (Fallback)',
         conformanceLevel,
         accessibilityScore: Math.round(overallScore),
-        testEngine: 'html-parser-fallback'
+        testEngine: 'html-parser-fallback',
+        screenshot: null // No screenshot available for HTML-only fallback
       },
       wcagGuidelines: {
         version: '2.1',

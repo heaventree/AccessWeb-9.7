@@ -9,7 +9,7 @@ import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
-import { AlertCircle, CheckCircle, Download, ExternalLink, RefreshCw, Clock, Globe, ChevronDown, ChevronRight, Shield, TrendingUp, Search, History } from 'lucide-react';
+import { AlertCircle, CheckCircle, Download, ExternalLink, RefreshCw, Clock, Globe, ChevronDown, ChevronRight, Shield, TrendingUp, Search, History, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ScanResult {
@@ -43,6 +43,7 @@ interface ScanResult {
     toolVersion: string;
     conformanceLevel: string;
     accessibilityScore: number;
+    screenshot?: string;
   };
   wcagGuidelines: {
     version: string;
@@ -549,6 +550,27 @@ ${index + 1}. ${check.description}
                           </div>
                         </CardHeader>
                         <CardContent className="space-y-6">
+                          {/* Screenshot Section */}
+                          {currentScan.scanMetadata?.screenshot && (
+                            <div className="mb-6">
+                              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+                                <Camera className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                Page Screenshot
+                              </h3>
+                              <div className="bg-white dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-gray-600 p-4">
+                                <img 
+                                  src={currentScan.scanMetadata.screenshot} 
+                                  alt={`Screenshot of ${currentScan.scanMetadata.url}`}
+                                  className="w-full max-h-96 object-contain rounded-lg shadow-sm border border-gray-100 dark:border-gray-600"
+                                  loading="lazy"
+                                />
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 text-center">
+                                  Captured during accessibility scan on {new Date(currentScan.scanMetadata.timestamp).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                          
                           {/* Issues Grid - Enhanced Responsive */}
                           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                             {[
