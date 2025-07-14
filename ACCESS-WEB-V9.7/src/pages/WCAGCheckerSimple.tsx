@@ -234,13 +234,9 @@ const WCAGCheckerSimple: React.FC = () => {
           localStorage.setItem(`wcag-scan-history-${user.id}`, JSON.stringify(newHistory));
         }
         
-        // Navigate to results page with scan data
-        console.log('Navigating to scan results with data:', scanData);
-        const encodedData = encodeURIComponent(JSON.stringify(scanData));
-        console.log('Encoded data length:', encodedData.length);
-        
-        // Navigate to checker/result page as requested
-        const resultsUrl = `/checker/result?data=${encodedData}`;
+        // Navigate to results page with just the URL - fetch data on the results page
+        console.log('Navigating to scan results for URL:', url);
+        const resultsUrl = `/checker/result?url=${encodeURIComponent(url)}`;
         console.log('Navigating to:', resultsUrl);
         
         try {

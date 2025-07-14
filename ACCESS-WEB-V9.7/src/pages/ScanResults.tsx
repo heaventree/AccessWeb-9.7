@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../config/api';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 import { BackToTop } from '../components/BackToTop';
@@ -98,28 +99,52 @@ export function ScanResults() {
     console.log('ScanResults: useEffect triggered');
     console.log('ScanResults: Current URL search params:', window.location.search);
     
-    const resultData = searchParams.get('data');
-    console.log('ScanResults: Retrieved data param:', resultData ? 'Data found' : 'No data');
+    const urlParam = searchParams.get('url');
+    console.log('ScanResults: Retrieved URL param:', urlParam);
     
-    if (resultData) {
-      try {
-        const decodedData = decodeURIComponent(resultData);
-        console.log('ScanResults: Decoded data length:', decodedData.length);
-        
-        const parsedData = JSON.parse(decodedData);
-        console.log('ScanResults: Parsed scan data successfully:', parsedData);
-        
-        setScanResult(parsedData);
-      } catch (error) {
-        console.error('ScanResults: Error parsing scan result data:', error);
-        console.error('ScanResults: Raw data:', resultData);
-        navigate('/checker');
-      }
+    if (urlParam) {
+      // Fetch scan results from API
+      const fetchScanResults = async () => {
+        try {
+          setIsLoading(true);
+          console.log('ScanResults: Fetching scan data for URL:', urlParam);
+          
+          const response = await fetch(API_ENDPOINTS.WCAG_SCAN, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ url: urlParam }),
+            credentials: 'include'
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const scanData = await response.json();
+          console.log('ScanResults: Fetched scan data successfully:', scanData);
+          
+          if (scanData.success) {
+            setScanResult(scanData);
+          } else {
+            throw new Error(scanData.message || 'Scan failed');
+          }
+        } catch (error) {
+          console.error('ScanResults: Error fetching scan results:', error);
+          navigate('/checker');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchScanResults();
     } else {
-      console.log('ScanResults: No scan data found, redirecting to checker');
+      console.log('ScanResults: No URL parameter found, redirecting to checker');
       navigate('/checker');
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, [searchParams, navigate]);
 
   const toggleSection = (section: string) => {
@@ -197,9 +222,16 @@ Recommendation: ${issue.recommendation}
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <Navigation />
         <div className="pt-20 flex items-center justify-center h-screen">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+          <div className="text-center space-y-4">
+            <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto" />
+            <h2 className="text-xl font-medium text-gray-900 dark:text-white">Loading Scan Results...</h2>
+            <p className="text-gray-600 dark:text-gray-400">Fetching accessibility analysis data</p>
+          </div>
         </div>
+        <Footer />
+        <BackToTop />
       </div>
     );
   }
@@ -207,6 +239,7 @@ Recommendation: ${issue.recommendation}
   if (!scanResult) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <Navigation />
         <div className="pt-20 container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">No Scan Results Found</h1>
@@ -216,13 +249,15 @@ Recommendation: ${issue.recommendation}
             </Button>
           </div>
         </div>
+        <Footer />
+        <BackToTop />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      
+      <Navigation />
       <main className="pt-20 pb-8">
         <div className="container mx-auto px-4">
           {/* Header */}
