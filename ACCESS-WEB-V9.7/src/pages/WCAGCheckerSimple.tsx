@@ -239,8 +239,8 @@ const WCAGCheckerSimple: React.FC = () => {
         const encodedData = encodeURIComponent(JSON.stringify(scanData));
         console.log('Encoded data length:', encodedData.length);
         
-        // Use window.location.href for more reliable navigation
-        const resultsUrl = `/scan-results?data=${encodedData}`;
+        // Navigate to checker/result page as requested
+        const resultsUrl = `/checker/result?data=${encodedData}`;
         console.log('Navigating to:', resultsUrl);
         
         try {

@@ -136,6 +136,7 @@ function App() {
               <Route path="/pricing" element={<><Navigation /><main id="main-content"><PricingPage /></main><Footer /><BackToTop /></>} />
               <Route path="/wordpressint" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
               <Route path="/checker" element={<><Navigation /><main id="main-content"><WCAGCheckerSimple /></main><Footer /><BackToTop /></>} />
+              <Route path="/checker/result" element={<><Navigation /><main id="main-content"><ScanResults /></main><Footer /><BackToTop /></>} />
               <Route path="/scan-results" element={<><Navigation /><main id="main-content"><ScanResults /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/wcag-standards" element={<><Navigation /><main id="main-content"><WCAGStandardsTable /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
