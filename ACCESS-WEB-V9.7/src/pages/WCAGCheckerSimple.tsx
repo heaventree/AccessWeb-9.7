@@ -234,8 +234,8 @@ const WCAGCheckerSimple: React.FC = () => {
     showToast("Scan Started", "Analyzing accessibility compliance...");
 
     try {
-      // Start the comprehensive WCAG scan
-      const response = await fetch('/api/wcag-simple/scan', {
+      // Start the WCAG scan using test API temporarily
+      const response = await fetch('http://localhost:3002/api/wcag-test/scan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

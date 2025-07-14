@@ -1,9 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import wcagRouter from './routes/wcag.js';
+import wcagTestRouter from './routes/wcag-test.js';
 
 const app = express();
 const PORT = 3001;
+
+// Trust proxy for rate limiting
+app.set('trust proxy', 1);
 
 // CORS configuration
 app.use(cors({
@@ -19,8 +22,8 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// WCAG routes
-app.use('/api/wcag-simple', wcagRouter);
+// WCAG test routes
+app.use('/api/wcag-test', wcagTestRouter);
 
 // Error handling
 app.use((error, req, res, next) => {

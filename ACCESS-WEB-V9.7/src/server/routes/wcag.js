@@ -1,14 +1,6 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
-import validator from 'validator';
-import { db } from '../db.js';
-import { wcagScans, wcagScanIssues } from '../../shared/schema.js';
-import WCAGChecker from '../services/wcagChecker.js';
 import ComprehensiveWCAGChecker from '../services/comprehensiveWCAGChecker.js';
-import { eq, desc, and } from 'drizzle-orm';
-// import PDFDocument from 'pdfkit'; // Temporarily disabled
-import fs from 'fs/promises';
-import path from 'path';
 
 const router = express.Router();
 
@@ -24,25 +16,33 @@ const scanLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Create WCAG checker instances
-const wcagChecker = new WCAGChecker();
+// Create WCAG checker instance
 const comprehensiveChecker = new ComprehensiveWCAGChecker();
 
 // Helper function to sanitize URL input
 function sanitizeUrl(url) {
-  // Remove any potentially dangerous characters
-  const sanitized = validator.escape(url.trim());
-  
-  // Validate URL format
-  if (!validator.isURL(sanitized, { 
-    protocols: ['http', 'https'],
-    require_protocol: true,
-    require_valid_protocol: true
-  })) {
-    throw new Error('Invalid URL format');
+  try {
+    // Clean the URL
+    let cleanUrl = url.trim();
+    
+    // Add protocol if missing
+    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+      cleanUrl = 'https://' + cleanUrl;
+    }
+    
+    // Basic URL validation
+    const urlObj = new URL(cleanUrl);
+    
+    // Ensure it's http or https
+    if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+      throw new Error('Only HTTP and HTTPS protocols are supported');
+    }
+    
+    return cleanUrl;
+  } catch (e) {
+    console.error('URL validation failed for:', url, 'Error:', e.message);
+    throw new Error(`Invalid URL format: ${e.message}`);
   }
-  
-  return sanitized;
 }
 
 // Helper function to save scan results to database
