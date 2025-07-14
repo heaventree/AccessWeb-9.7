@@ -4,6 +4,7 @@ import { Save, RefreshCw, Activity, Code, Key, Info, Book, ArrowRight, ArrowLeft
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAPI } from '../../hooks/useAPI';
+import { API_CONFIG } from '../../config/api';
 
 export function CustomAPISetup() {
   const { apiKeys, isLoading, mutate } = useAPI();
@@ -63,7 +64,7 @@ export function CustomAPISetup() {
     setGenerating(true);
 
     try {
-      const response = await fetch('/api/generate-api-key', {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/generate-api-key`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
