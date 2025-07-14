@@ -33,316 +33,248 @@ function sanitizeUrl(url) {
   }
 }
 
-// Install required packages for web scraping and accessibility testing
-import axios from 'axios';
-import { parse } from 'node-html-parser';
+// Industry-standard accessibility testing using axe-core
+import puppeteer from 'puppeteer';
+import { AxePuppeteer } from '@axe-core/puppeteer';
 
-// Real WCAG scan function
+// Severity mapping from axe-core to our system
+const SEVERITY_MAP = {
+  'critical': 'critical',
+  'serious': 'serious', 
+  'moderate': 'moderate',
+  'minor': 'minor'
+};
+
+// WCAG principle mapping
+const PRINCIPLE_MAP = {
+  'color-contrast': 'perceivable',
+  'image-alt': 'perceivable',
+  'heading-order': 'perceivable',
+  'label': 'perceivable',
+  'language': 'understandable',
+  'keyboard': 'operable',
+  'focus': 'operable',
+  'navigation': 'operable',
+  'structure': 'robust',
+  'parsing': 'robust'
+};
+
+function mapWcagPrinciple(tags) {
+  if (!tags) return 'robust';
+  
+  for (const tag of tags) {
+    if (tag.includes('color-contrast')) return 'perceivable';
+    if (tag.includes('image') || tag.includes('alt')) return 'perceivable';
+    if (tag.includes('heading')) return 'perceivable';
+    if (tag.includes('keyboard') || tag.includes('focus')) return 'operable';
+    if (tag.includes('navigation') || tag.includes('skip')) return 'operable';
+    if (tag.includes('language') || tag.includes('title')) return 'understandable';
+    if (tag.includes('parsing') || tag.includes('valid')) return 'robust';
+  }
+  
+  return 'robust';
+}
+
+function generateRecommendation(ruleId, description) {
+  const recommendations = {
+    'color-contrast': 'Ensure text has sufficient color contrast ratio (4.5:1 for normal text, 3:1 for large text)',
+    'image-alt': 'Add descriptive alt text that conveys the purpose and content of the image',
+    'heading-order': 'Use heading levels in sequential order (h1 → h2 → h3) to create proper document structure',
+    'label': 'Associate form controls with descriptive labels using <label> elements or aria-labelledby',
+    'keyboard': 'Ensure all interactive elements are keyboard accessible and have proper focus indicators',
+    'skip-link': 'Add skip navigation links to allow keyboard users to bypass repetitive content',
+    'html-has-lang': 'Add lang attribute to html element (e.g., <html lang="en">)',
+    'document-title': 'Provide a descriptive and unique page title',
+    'landmark': 'Use semantic HTML landmarks (nav, main, header, footer) to structure page content',
+    'list': 'Use proper list markup (ul, ol, li) for groups of related items',
+    'button-name': 'Provide accessible names for buttons using text content or aria-label',
+    'link-name': 'Ensure links have accessible names that describe their purpose or destination'
+  };
+
+  for (const [key, rec] of Object.entries(recommendations)) {
+    if (ruleId.includes(key)) {
+      return rec;
+    }
+  }
+  
+  return 'Review the element and ensure it follows WCAG accessibility guidelines';
+}
+
+// Real WCAG scan function using axe-core
 async function performWCAGScan(url) {
   const startTime = Date.now();
-  let html = '';
-  let issues = [];
-  let passedChecks = [];
+  let browser;
   
   try {
-    // Fetch the webpage
-    const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'AccessWeb WCAG Scanner/1.0'
-      },
-      timeout: 10000,
-      maxRedirects: 5
+    // Launch browser with accessibility-friendly options
+    browser = await puppeteer.launch({
+      headless: 'new',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding'
+      ]
     });
     
-    html = response.data;
-  } catch (error) {
-    throw new Error(`Failed to fetch URL: ${error.message}`);
-  }
-
-  // Parse HTML
-  const root = parse(html);
-  
-  // WCAG 1.1.1 - Non-text Content (Alt text)
-  const images = root.querySelectorAll('img');
-  images.forEach((img, index) => {
-    const alt = img.getAttribute('alt');
-    const src = img.getAttribute('src');
+    const page = await browser.newPage();
     
-    if (!alt || alt.trim() === '') {
-      issues.push({
-        wcagRule: '1.1.1',
-        ruleName: 'Non-text Content',
-        severity: alt === null ? 'critical' : 'serious',
-        principle: 'perceivable',
-        element: img.outerHTML.substring(0, 100) + '...',
-        selector: `img:nth-child(${index + 1})`,
-        description: alt === null ? 'Image missing alt attribute' : 'Image has empty alt text',
-        recommendation: 'Add descriptive alt text that conveys the purpose and content of the image'
-      });
-    } else {
-      passedChecks.push({
-        wcagRule: '1.1.1',
-        ruleName: 'Non-text Content',
-        description: `Image has alt text: "${alt.substring(0, 50)}..."`
-      });
-    }
-  });
-
-  // WCAG 1.3.1 - Info and Relationships (Heading structure)
-  const headings = root.querySelectorAll('h1, h2, h3, h4, h5, h6');
-  let lastHeadingLevel = 0;
-  
-  headings.forEach((heading, index) => {
-    const level = parseInt(heading.tagName[1]);
+    // Set realistic viewport and user agent
+    await page.setViewport({ width: 1280, height: 720 });
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 AccessWeb-Scanner/1.0');
     
-    if (index === 0 && level !== 1) {
-      issues.push({
-        wcagRule: '1.3.1',
-        ruleName: 'Info and Relationships',
-        severity: 'moderate',
-        principle: 'perceivable',
-        element: heading.outerHTML.substring(0, 100) + '...',
-        selector: heading.tagName.toLowerCase(),
-        description: 'Page should start with h1 heading',
-        recommendation: 'Use h1 for the main page heading'
-      });
-    }
-    
-    if (level > lastHeadingLevel + 1) {
-      issues.push({
-        wcagRule: '1.3.1',
-        ruleName: 'Info and Relationships',
-        severity: 'moderate',
-        principle: 'perceivable',
-        element: heading.outerHTML.substring(0, 100) + '...',
-        selector: `${heading.tagName.toLowerCase()}:nth-child(${index + 1})`,
-        description: `Heading level jumps from h${lastHeadingLevel} to h${level}, skipping levels`,
-        recommendation: 'Use heading levels in order (h1 -> h2 -> h3, etc.)'
-      });
-    }
-    
-    lastHeadingLevel = level;
-  });
-
-  // WCAG 1.4.3 - Contrast (Minimum) - Basic check for common patterns
-  const buttons = root.querySelectorAll('button, .btn, .button');
-  buttons.forEach((button, index) => {
-    const style = button.getAttribute('style') || '';
-    const className = button.getAttribute('class') || '';
-    
-    // Check for common low-contrast patterns
-    if (style.includes('color: #ccc') || style.includes('color: #ddd') || 
-        className.includes('disabled') || className.includes('muted')) {
-      issues.push({
-        wcagRule: '1.4.3',
-        ruleName: 'Contrast (Minimum)',
-        severity: 'serious',
-        principle: 'perceivable',
-        element: button.outerHTML.substring(0, 100) + '...',
-        selector: `button:nth-child(${index + 1})`,
-        description: 'Button may have insufficient color contrast',
-        recommendation: 'Ensure text has contrast ratio of at least 4.5:1 against background'
-      });
-    }
-  });
-
-  // WCAG 2.1.1 - Keyboard (Basic check for interactive elements)
-  const interactiveElements = root.querySelectorAll('button, a, input, select, textarea');
-  let keyboardAccessibleCount = 0;
-  
-  interactiveElements.forEach((element, index) => {
-    const tabindex = element.getAttribute('tabindex');
-    const href = element.getAttribute('href');
-    
-    if (element.tagName.toLowerCase() === 'a' && (!href || href === '#')) {
-      issues.push({
-        wcagRule: '2.1.1',
-        ruleName: 'Keyboard',
-        severity: 'moderate',
-        principle: 'operable',
-        element: element.outerHTML.substring(0, 100) + '...',
-        selector: `a:nth-child(${index + 1})`,
-        description: 'Link has no href or empty href',
-        recommendation: 'Provide meaningful href attributes for all links'
-      });
-    } else if (tabindex !== '-1') {
-      keyboardAccessibleCount++;
-    }
-  });
-
-  // WCAG 2.4.1 - Bypass Blocks (Skip links)
-  const skipLinks = root.querySelectorAll('a[href^="#"]');
-  let hasSkipLink = false;
-  
-  skipLinks.forEach(link => {
-    const text = link.text.toLowerCase();
-    if (text.includes('skip') && (text.includes('content') || text.includes('main') || text.includes('navigation'))) {
-      hasSkipLink = true;
-      passedChecks.push({
-        wcagRule: '2.4.1',
-        ruleName: 'Bypass Blocks',
-        description: 'Skip navigation link found'
-      });
-    }
-  });
-  
-  if (!hasSkipLink && root.querySelectorAll('nav, header').length > 0) {
-    issues.push({
-      wcagRule: '2.4.1',
-      ruleName: 'Bypass Blocks',
-      severity: 'moderate',
-      principle: 'operable',
-      element: 'Page structure',
-      selector: 'body',
-      description: 'No skip navigation link found',
-      recommendation: 'Add a skip link to allow keyboard users to bypass navigation'
+    // Navigate to the page with timeout
+    await page.goto(url, {
+      waitUntil: 'networkidle0',
+      timeout: 30000
     });
-  }
-
-  // WCAG 1.4.4 - Resize text (Check for viewport meta tag)
-  const viewportMeta = root.querySelector('meta[name="viewport"]');
-  if (viewportMeta) {
-    const content = viewportMeta.getAttribute('content') || '';
-    if (content.includes('user-scalable=no') || content.includes('maximum-scale=1')) {
-      issues.push({
-        wcagRule: '1.4.4',
-        ruleName: 'Resize text',
-        severity: 'serious',
-        principle: 'perceivable',
-        element: viewportMeta.outerHTML,
-        selector: 'meta[name="viewport"]',
-        description: 'Viewport prevents text scaling',
-        recommendation: 'Allow users to scale text up to 200% by removing user-scalable=no'
-      });
-    } else {
-      passedChecks.push({
-        wcagRule: '1.4.4',
-        ruleName: 'Resize text',
-        description: 'Viewport allows text scaling'
-      });
-    }
-  }
-
-  // WCAG 3.1.1 - Language of Page
-  const htmlElement = root.querySelector('html');
-  const lang = htmlElement?.getAttribute('lang');
-  
-  if (!lang || lang.trim() === '') {
-    issues.push({
-      wcagRule: '3.1.1',
-      ruleName: 'Language of Page',
-      severity: 'moderate',
-      principle: 'understandable',
-      element: htmlElement?.outerHTML.substring(0, 100) + '...' || '<html>',
-      selector: 'html',
-      description: 'Page language not specified',
-      recommendation: 'Add lang attribute to html element (e.g., <html lang="en">)'
+    
+    // Wait for page to fully load
+    await page.waitForTimeout(2000);
+    
+    // Run axe-core accessibility analysis
+    const results = await new AxePuppeteer(page)
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice'])
+      .options({
+        runOnly: {
+          type: 'tag',
+          values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice']
+        }
+      })
+      .analyze();
+    
+    // Process violations (issues)
+    const issues = results.violations.map(violation => {
+      const firstNode = violation.nodes[0];
+      const element = firstNode?.html || '';
+      const selector = firstNode?.target?.[0] || violation.id;
+      
+      return {
+        wcagRule: violation.tags.find(tag => tag.match(/wcag\d+/))?.replace('wcag', '').replace(/(\d)(\d)/, '$1.$2') || violation.id,
+        ruleName: violation.help,
+        severity: SEVERITY_MAP[violation.impact] || 'moderate',
+        principle: mapWcagPrinciple(violation.tags),
+        element: element.substring(0, 200) + (element.length > 200 ? '...' : ''),
+        selector: selector,
+        description: violation.description,
+        recommendation: generateRecommendation(violation.id, violation.description),
+        helpUrl: violation.helpUrl,
+        axeRuleId: violation.id,
+        nodesCount: violation.nodes.length
+      };
     });
-  } else {
-    passedChecks.push({
-      wcagRule: '3.1.1',
-      ruleName: 'Language of Page',
-      description: `Page language specified: ${lang}`
-    });
-  }
-
-  // WCAG 2.4.2 - Page Titled
-  const title = root.querySelector('title');
-  if (!title || !title.text.trim()) {
-    issues.push({
-      wcagRule: '2.4.2',
-      ruleName: 'Page Titled',
-      severity: 'serious',
-      principle: 'operable',
-      element: title?.outerHTML || '<title>',
-      selector: 'title',
-      description: 'Page has no title or empty title',
-      recommendation: 'Provide a descriptive page title'
-    });
-  } else {
-    passedChecks.push({
-      wcagRule: '2.4.2',
-      ruleName: 'Page Titled',
-      description: `Page has title: "${title.text.substring(0, 50)}..."`
-    });
-  }
-
-  // Calculate severity breakdown
-  const severityBreakdown = {
-    critical: issues.filter(i => i.severity === 'critical').length,
-    serious: issues.filter(i => i.severity === 'serious').length,
-    moderate: issues.filter(i => i.severity === 'moderate').length,
-    minor: issues.filter(i => i.severity === 'minor').length
-  };
-
-  // Calculate score (100 - weighted penalty for issues)
-  const penalties = {
-    critical: 15,
-    serious: 10,
-    moderate: 5,
-    minor: 2
-  };
-  
-  const totalPenalty = Object.entries(severityBreakdown)
-    .reduce((sum, [severity, count]) => sum + (count * penalties[severity]), 0);
-  
-  const overallScore = Math.max(0, 100 - totalPenalty);
-  
-  // Determine conformance level
-  let conformanceLevel = 'Non-conformant';
-  if (severityBreakdown.critical === 0 && severityBreakdown.serious === 0) {
-    conformanceLevel = 'AA';
-  } else if (severityBreakdown.critical === 0) {
-    conformanceLevel = 'A';
-  }
-
-  // Group issues by principle
-  const issuesByPrinciple = {
-    perceivable: { count: 0, issues: [] },
-    operable: { count: 0, issues: [] },
-    understandable: { count: 0, issues: [] },
-    robust: { count: 0, issues: [] }
-  };
-
-  issues.forEach(issue => {
-    if (issuesByPrinciple[issue.principle]) {
-      issuesByPrinciple[issue.principle].count++;
-      issuesByPrinciple[issue.principle].issues.push(issue);
-    }
-  });
-
-  const scanDuration = Date.now() - startTime;
-
-  return {
-    summary: {
-      totalIssues: issues.length,
-      severityBreakdown,
-      passedChecks: passedChecks.length,
-      overallScore,
-      conformanceLevel
-    },
-    issues,
-    issuesByPrinciple,
-    passedChecks,
-    scanMetadata: {
-      url,
-      timestamp: new Date().toISOString(),
-      scanDuration,
-      wcagVersion: '2.1',
-      toolVersion: '1.0.0',
-      conformanceLevel,
-      accessibilityScore: overallScore
-    },
-    wcagGuidelines: {
-      version: '2.1',
-      principles: {
-        perceivable: 'Information and user interface components must be presentable to users in ways they can perceive.',
-        operable: 'User interface components and navigation must be operable.',
-        understandable: 'Information and the operation of user interface must be understandable.',
-        robust: 'Content must be robust enough that it can be interpreted by a wide variety of user agents, including assistive technologies.'
+    
+    // Process passed checks
+    const passedChecks = results.passes.map(pass => ({
+      wcagRule: pass.tags.find(tag => tag.match(/wcag\d+/))?.replace('wcag', '').replace(/(\d)(\d)/, '$1.$2') || pass.id,
+      ruleName: pass.help,
+      description: `✓ ${pass.description}`,
+      nodesCount: pass.nodes.length
+    }));
+    
+    // Calculate severity breakdown
+    const severityBreakdown = {
+      critical: issues.filter(i => i.severity === 'critical').length,
+      serious: issues.filter(i => i.severity === 'serious').length,
+      moderate: issues.filter(i => i.severity === 'moderate').length,
+      minor: issues.filter(i => i.severity === 'minor').length
+    };
+    
+    // Calculate weighted accessibility score
+    const penalties = {
+      critical: 20,
+      serious: 12,
+      moderate: 6,
+      minor: 2
+    };
+    
+    const totalPenalty = Object.entries(severityBreakdown)
+      .reduce((sum, [severity, count]) => sum + (count * penalties[severity]), 0);
+    
+    const overallScore = Math.max(0, Math.min(100, 100 - totalPenalty));
+    
+    // Determine WCAG conformance level
+    let conformanceLevel = 'Non-conformant';
+    if (severityBreakdown.critical === 0 && severityBreakdown.serious === 0) {
+      if (severityBreakdown.moderate === 0) {
+        conformanceLevel = 'AAA';
+      } else {
+        conformanceLevel = 'AA';
       }
+    } else if (severityBreakdown.critical === 0) {
+      conformanceLevel = 'A';
     }
-  };
+    
+    // Group issues by WCAG principle
+    const issuesByPrinciple = {
+      perceivable: { count: 0, issues: [] },
+      operable: { count: 0, issues: [] },
+      understandable: { count: 0, issues: [] },
+      robust: { count: 0, issues: [] }
+    };
+    
+    issues.forEach(issue => {
+      if (issuesByPrinciple[issue.principle]) {
+        issuesByPrinciple[issue.principle].count++;
+        issuesByPrinciple[issue.principle].issues.push(issue);
+      }
+    });
+    
+    const scanDuration = Date.now() - startTime;
+    
+    await browser.close();
+    
+    return {
+      summary: {
+        totalIssues: issues.length,
+        severityBreakdown,
+        passedChecks: passedChecks.length,
+        overallScore: Math.round(overallScore),
+        conformanceLevel,
+        testedElements: results.passes.reduce((sum, pass) => sum + pass.nodes.length, 0) + 
+                       results.violations.reduce((sum, violation) => sum + violation.nodes.length, 0)
+      },
+      issues,
+      issuesByPrinciple,
+      passedChecks,
+      scanMetadata: {
+        url,
+        timestamp: new Date().toISOString(),
+        scanDuration,
+        wcagVersion: '2.1',
+        toolVersion: 'axe-core 4.x',
+        conformanceLevel,
+        accessibilityScore: Math.round(overallScore),
+        testEngine: 'axe-core',
+        totalRules: results.passes.length + results.violations.length + results.incomplete.length + results.inapplicable.length,
+        applicableRules: results.passes.length + results.violations.length
+      },
+      wcagGuidelines: {
+        version: '2.1',
+        principles: {
+          perceivable: 'Information and user interface components must be presentable to users in ways they can perceive.',
+          operable: 'User interface components and navigation must be operable.',
+          understandable: 'Information and the operation of user interface must be understandable.',
+          robust: 'Content must be robust enough that it can be interpreted by a wide variety of user agents, including assistive technologies.'
+        }
+      },
+      axeResults: {
+        violations: results.violations.length,
+        passes: results.passes.length,
+        incomplete: results.incomplete.length,
+        inapplicable: results.inapplicable.length
+      }
+    };
+    
+  } catch (error) {
+    if (browser) {
+      await browser.close();
+    }
+    throw new Error(`Failed to scan URL with axe-core: ${error.message}`);
+  }
 }
 
 // POST /api/wcag-test/scan - Start a new WCAG scan
