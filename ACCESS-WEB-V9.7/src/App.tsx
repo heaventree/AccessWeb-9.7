@@ -37,6 +37,7 @@ import { WordPressGuide } from './pages/docs/WordPressGuide';
 import { ShopifyGuide } from './pages/docs/ShopifyGuide';
 import { Documentation as DocumentationPage } from './pages/docs/Documentation';
 import WCAGCheckerSimple from './pages/WCAGCheckerSimple';
+import { ScanResults } from './pages/ScanResults';
 import { ProtectedRoute, PublicOnlyRoute, SubscriberRoute, AdminRoute, UserOnlyRoute } from './layouts/AuthLayout';
 
 // Import auth pages
@@ -135,6 +136,7 @@ function App() {
               <Route path="/pricing" element={<><Navigation /><main id="main-content"><PricingPage /></main><Footer /><BackToTop /></>} />
               <Route path="/wordpressint" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
               <Route path="/checker" element={<><Navigation /><main id="main-content"><WCAGCheckerSimple /></main><Footer /><BackToTop /></>} />
+              <Route path="/scan-results" element={<><Navigation /><main id="main-content"><ScanResults /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/wcag-standards" element={<><Navigation /><main id="main-content"><WCAGStandardsTable /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/monitoring" element={<><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></>} />
