@@ -5,7 +5,7 @@ import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 import { BackToTop } from '../components/BackToTop';
 import { useHelpCategories } from '../hooks/useHelpCategories';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { EmptyState } from '../components/EmptyState';
 
 export function HelpCenter() {

@@ -17,7 +17,7 @@ import {
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { LoadingSpinner } from './LoadingSpinner';
+import { LoadingSpinner } from './ui/LoadingSpinner';
 import { useTheme } from '../providers/ThemeProvider';
 
 interface ColorCombination {

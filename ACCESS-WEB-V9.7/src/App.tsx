@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { AppProvider } from './providers/AppProvider';
-import ErrorBoundary from './components/ErrorBoundary';
+// Removed duplicate ErrorBoundary import - using CustomErrorBoundary instead
 import { LandingPage } from './pages/LandingPage';
 import PricingPage from './pages/PricingPage';
 import { SubscriptionDashboard } from './pages/SubscriptionDashboard';
@@ -44,7 +44,7 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import { AuthProvider } from './contexts/AuthContext';
 
-import { WCAGCheckerPage } from './pages/WCAGCheckerPage';
+// Removed duplicate WCAG import - using WCAGCheckerSimple only
 import { WCAGStandardsTable } from './pages/WCAGStandardsTable';
 import WCAGColorPalette from './pages/tools/WCAGColorPalette';
 import ImageAltScannerPage from './pages/tools/ImageAltScannerPage';
@@ -89,7 +89,7 @@ import { ErrorPage } from './components/ErrorPage';
 import AccessibilityTipsPage from './pages/help/AccessibilityTipsPage';
 import { AccessibilityTipsDemo } from './components/demo/AccessibilityTipsDemo';
 import React, { useEffect, useState } from 'react';
-import { ErrorBoundary as CustomErrorBoundary } from './components/ErrorBoundary'; //Renamed to avoid conflict
+import { ErrorBoundary as CustomErrorBoundary } from './components/errorBoundaries/ErrorBoundary';
 import { registerErrorHandler, unregisterErrorHandler, StructuredError } from './utils/errorHandler';
 import { initSecureStorage } from './utils/secureStorage';
 
@@ -169,7 +169,7 @@ function App() {
               <Route path="/integrations/wordpress" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/analytics" element={<><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/compliance" element={<><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></>} />
-              <Route path="/tools/wcag-checker" element={<><Navigation /><main id="main-content"><WCAGCheckerSimple /></main><Footer /><BackToTop /></>} />
+              {/* Consolidated WCAG routes to use single checker component */}
 
               <Route path="/integrations/api" element={<><Navigation /><main id="main-content"><APIIntegrationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/integrations/compliance" element={<><Navigation /><main id="main-content"><ComplianceIntegrationPage /></main><Footer /><BackToTop /></>} />
