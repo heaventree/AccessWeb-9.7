@@ -39,62 +39,108 @@ async function mockWCAGScan(url) {
   await new Promise(resolve => setTimeout(resolve, 1000));
   
   return {
-    url,
     summary: {
-      overallScore: 85,
       totalIssues: 12,
-      criticalIssues: 1,
-      seriousIssues: 3,
-      moderateIssues: 5,
-      minorIssues: 3,
-      passedChecks: 45
+      severityBreakdown: {
+        critical: 1,
+        serious: 3,
+        moderate: 5,
+        minor: 3
+      },
+      passedChecks: 45,
+      overallScore: 85,
+      conformanceLevel: 'AA'
     },
-    checks: {
-      colorContrast: {
-        passed: 42,
-        failed: 3,
+    issues: [
+      {
+        wcagRule: '1.4.3',
+        ruleName: 'Contrast (Minimum)',
+        severity: 'serious',
+        principle: 'perceivable',
+        element: 'button.primary',
+        selector: 'button.primary',
+        description: 'Button text contrast ratio is 3.1:1, needs to be at least 4.5:1',
+        recommendation: 'Use darker text or lighter background'
+      },
+      {
+        wcagRule: '1.3.1',
+        ruleName: 'Info and Relationships',
+        severity: 'moderate',
+        principle: 'perceivable',
+        element: 'h3',
+        selector: 'h3:nth-child(3)',
+        description: 'Heading level jumps from h1 to h3, skipping h2',
+        recommendation: 'Use proper heading hierarchy (h1 -> h2 -> h3)'
+      },
+      {
+        wcagRule: '1.1.1',
+        ruleName: 'Non-text Content',
+        severity: 'critical',
+        principle: 'perceivable',
+        element: 'img.hero',
+        selector: 'img.hero',
+        description: 'Image missing alt text',
+        recommendation: 'Add descriptive alt text to all images'
+      }
+    ],
+    issuesByPrinciple: {
+      perceivable: { 
+        count: 8, 
         issues: [
           {
-            type: 'contrast',
+            wcagRule: '1.4.3',
+            ruleName: 'Contrast (Minimum)',
             severity: 'serious',
+            principle: 'perceivable',
             element: 'button.primary',
+            selector: 'button.primary',
             description: 'Button text contrast ratio is 3.1:1, needs to be at least 4.5:1',
             recommendation: 'Use darker text or lighter background'
           }
-        ]
+        ] 
       },
-      headingStructure: {
-        passed: 8,
-        failed: 1,
-        issues: [
-          {
-            type: 'heading-order',
-            severity: 'moderate',
-            element: 'h3',
-            description: 'Heading level jumps from h1 to h3, skipping h2',
-            recommendation: 'Use proper heading hierarchy (h1 -> h2 -> h3)'
-          }
-        ]
+      operable: { 
+        count: 2, 
+        issues: [] 
       },
-      altText: {
-        passed: 15,
-        failed: 2,
-        issues: [
-          {
-            type: 'missing-alt',
-            severity: 'critical',
-            element: 'img.hero',
-            description: 'Image missing alt text',
-            recommendation: 'Add descriptive alt text to all images'
-          }
-        ]
+      understandable: { 
+        count: 1, 
+        issues: [] 
+      },
+      robust: { 
+        count: 1, 
+        issues: [] 
       }
     },
-    metadata: {
-      scanDuration: 1000,
+    passedChecks: [
+      {
+        wcagRule: '2.1.1',
+        ruleName: 'Keyboard',
+        description: 'All interactive elements are keyboard accessible'
+      },
+      {
+        wcagRule: '2.4.1',
+        ruleName: 'Bypass Blocks',
+        description: 'Skip navigation link is present'
+      }
+    ],
+    scanMetadata: {
+      url,
       timestamp: new Date().toISOString(),
+      scanDuration: 1000,
       wcagVersion: '2.2',
-      level: 'AA'
+      toolVersion: '1.0.0',
+      conformanceLevel: 'AA',
+      accessibilityScore: 85
+    },
+    wcagGuidelines: {
+      version: '2.2',
+      principles: {
+        perceivable: 'Information and user interface components must be presentable to users in ways they can perceive.',
+        operable: 'User interface components and navigation must be operable.',
+        understandable: 'Information and the operation of user interface must be understandable.',
+        robust: 'Content must be robust enough that it can be interpreted by a wide variety of user agents, including assistive technologies.'
+      }
     }
   };
 }
