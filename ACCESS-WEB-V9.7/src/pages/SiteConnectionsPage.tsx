@@ -373,7 +373,7 @@ const SiteConnectionsPage: React.FC = () => {
                   <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
                     <li>Install the AccessWeb WCAG Checker plugin on your WordPress site</li>
                     <li>Go to WCAG Checker → Settings in your WordPress admin</li>
-                    <li>Set API Endpoint to: <code className="bg-white px-1 rounded">http://localhost:3001/api</code></li>
+                    <li>Set API Endpoint to: <code className="bg-white px-1 rounded">{import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/api</code></li>
                     <li>Paste your API token in the API Key field</li>
                     <li>Save settings and start testing your site</li>
                   </ol>

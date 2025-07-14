@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { API_ENDPOINTS } from '../config/api';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 import { BackToTop } from '../components/BackToTop';
@@ -234,8 +235,8 @@ const WCAGCheckerSimple: React.FC = () => {
     showToast("Scan Started", "Analyzing accessibility compliance...");
 
     try {
-      // Start the WCAG scan using test API temporarily
-      const response = await fetch('http://localhost:3002/api/wcag-test/scan', {
+      // Start the WCAG scan using centralized API configuration
+      const response = await fetch(API_ENDPOINTS.WCAG_SCAN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
