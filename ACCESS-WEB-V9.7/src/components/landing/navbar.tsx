@@ -287,12 +287,14 @@ export default function Navbar() {
           {/* Resources Dropdown */}
           <NavDropdown label="Resources" items={resourcesDropdownItems} />
           
-          {/* My Account Dropdown */}
-          <NavDropdown 
-            label="My Account" 
-            items={accountDropdownItems} 
-            icon={<User className="h-4 w-4 mr-1" />} 
-          />
+          {/* My Account Dropdown - Only show for authenticated users */}
+          {user && (
+            <NavDropdown 
+              label="My Account" 
+              items={accountDropdownItems} 
+              icon={<User className="h-4 w-4 mr-1" />} 
+            />
+          )}
           
           {/* Regular nav items */}
           {navItems.map((item, index) => (
@@ -444,23 +446,25 @@ export default function Navbar() {
               </div>
             </div>
             
-            {/* My Account Section */}
-            <div className="py-2 mb-3 border-t border-border/50 pt-4">
-              <h3 className="font-medium text-base mb-3 dark:text-[#86e4d4] text-foreground">My Account</h3>
-              <div className="grid gap-1">
-                {accountDropdownItems.map((item, index) => (
-                  <Link key={index} to={item.href} className="block py-3 px-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-lg transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
-                    <div className="flex items-center mb-1">
-                      <item.icon className="h-4 w-4 mr-3 text-[#0fae96] dark:text-[#5eead4] flex-shrink-0" />
-                      <span className="dark:text-white font-medium">{item.label}</span>
-                    </div>
-                    <div className="pl-7 text-sm text-muted-foreground dark:text-[#86e4d4]">
-                      {item.description}
-                    </div>
-                  </Link>
-                ))}
+            {/* My Account Section - Only show for authenticated users */}
+            {user && (
+              <div className="py-2 mb-3 border-t border-border/50 pt-4">
+                <h3 className="font-medium text-base mb-3 dark:text-[#86e4d4] text-foreground">My Account</h3>
+                <div className="grid gap-1">
+                  {accountDropdownItems.map((item, index) => (
+                    <Link key={index} to={item.href} className="block py-3 px-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-lg transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
+                      <div className="flex items-center mb-1">
+                        <item.icon className="h-4 w-4 mr-3 text-[#0fae96] dark:text-[#5eead4] flex-shrink-0" />
+                        <span className="dark:text-white font-medium">{item.label}</span>
+                      </div>
+                      <div className="pl-7 text-sm text-muted-foreground dark:text-[#86e4d4]">
+                        {item.description}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
             
             {/* Regular Nav Items */}
             {navItems.map((item, index) => (
