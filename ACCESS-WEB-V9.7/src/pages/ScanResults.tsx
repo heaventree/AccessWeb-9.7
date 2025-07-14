@@ -95,17 +95,28 @@ export function ScanResults() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log('ScanResults: useEffect triggered');
+    console.log('ScanResults: Current URL search params:', window.location.search);
+    
     const resultData = searchParams.get('data');
+    console.log('ScanResults: Retrieved data param:', resultData ? 'Data found' : 'No data');
+    
     if (resultData) {
       try {
         const decodedData = decodeURIComponent(resultData);
+        console.log('ScanResults: Decoded data length:', decodedData.length);
+        
         const parsedData = JSON.parse(decodedData);
+        console.log('ScanResults: Parsed scan data successfully:', parsedData);
+        
         setScanResult(parsedData);
       } catch (error) {
-        console.error('Error parsing scan result data:', error);
+        console.error('ScanResults: Error parsing scan result data:', error);
+        console.error('ScanResults: Raw data:', resultData);
         navigate('/checker');
       }
     } else {
+      console.log('ScanResults: No scan data found, redirecting to checker');
       navigate('/checker');
     }
     setIsLoading(false);
@@ -186,7 +197,6 @@ Recommendation: ${issue.recommendation}
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <Navigation />
         <div className="pt-20 flex items-center justify-center h-screen">
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
         </div>
@@ -197,7 +207,6 @@ Recommendation: ${issue.recommendation}
   if (!scanResult) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <Navigation />
         <div className="pt-20 container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">No Scan Results Found</h1>
@@ -213,7 +222,6 @@ Recommendation: ${issue.recommendation}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <Navigation />
       
       <main className="pt-20 pb-8">
         <div className="container mx-auto px-4">

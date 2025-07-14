@@ -238,7 +238,21 @@ const WCAGCheckerSimple: React.FC = () => {
         console.log('Navigating to scan results with data:', scanData);
         const encodedData = encodeURIComponent(JSON.stringify(scanData));
         console.log('Encoded data length:', encodedData.length);
-        navigate(`/scan-results?data=${encodedData}`);
+        
+        // Use window.location.href for more reliable navigation
+        const resultsUrl = `/scan-results?data=${encodedData}`;
+        console.log('Navigating to:', resultsUrl);
+        
+        try {
+          // Try React Router navigation first
+          navigate(resultsUrl);
+        } catch (navError) {
+          console.error('React Router navigation failed, using window.location:', navError);
+          // Fallback to direct navigation
+          setTimeout(() => {
+            window.location.href = resultsUrl;
+          }, 500);
+        }
       } else {
         throw new Error(scanData.message || 'Scan failed');
       }
