@@ -219,6 +219,8 @@ const WCAGCheckerSimple: React.FC = () => {
       // Get the comprehensive WCAG results
       const scanData = await response.json();
       
+      console.log('WCAG Scan Response:', scanData);
+      
       if (scanData.success) {
         setIsScanning(false);
         
@@ -233,7 +235,9 @@ const WCAGCheckerSimple: React.FC = () => {
         }
         
         // Navigate to results page with scan data
+        console.log('Navigating to scan results with data:', scanData);
         const encodedData = encodeURIComponent(JSON.stringify(scanData));
+        console.log('Encoded data length:', encodedData.length);
         navigate(`/scan-results?data=${encodedData}`);
       } else {
         throw new Error(scanData.message || 'Scan failed');
@@ -245,7 +249,7 @@ const WCAGCheckerSimple: React.FC = () => {
       setUrlError((error as Error).message || 'An error occurred while scanning');
       showToast("Scan Failed", (error as Error).message || 'An error occurred while scanning', "destructive");
     }
-  }, [url, showToast, navigate, user, scanHistory]);
+  }, [url, navigate, user, scanHistory]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !isScanning && url.trim()) {
@@ -256,7 +260,7 @@ const WCAGCheckerSimple: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
       {/* Main Content */}
-      <main id="main-content" className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+      <main id="main-content" className="max-w-4xl mx-auto px-4 pt-20 pb-8 space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
