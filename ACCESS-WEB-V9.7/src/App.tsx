@@ -49,6 +49,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { WCAGStandardsTable } from './pages/WCAGStandardsTable';
 import WCAGColorPalette from './pages/tools/WCAGColorPalette';
 import ImageAltScannerPage from './pages/tools/ImageAltScannerPage';
+import { ColorAccessibilitySimulatorPage } from './pages/tools/ColorAccessibilitySimulator';
 import { WordPressDashboard } from './components/integrations/WordPressDashboard';
 import SiteConnectionsPage from './pages/SiteConnectionsPage';
 import { CustomAPISetup } from './components/integrations/CustomAPISetup';
@@ -140,6 +141,7 @@ function App() {
               <Route path="/scan-results" element={<><Navigation /><main id="main-content"><ScanResults /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/wcag-standards" element={<><Navigation /><main id="main-content"><WCAGStandardsTable /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/colors" element={<><Navigation /><main id="main-content"><WCAGColorPalette /></main><Footer /><BackToTop /></>} />
+              <Route path="/tools/color-accessibility-simulator" element={<><Navigation /><main id="main-content"><ColorAccessibilitySimulatorPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/monitoring" element={<><Navigation /><main id="main-content"><MonitoringPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/realtime" element={<><Navigation /><main id="main-content"><RealTimeMonitorPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/image-alt-scanner" element={<><Navigation /><main id="main-content"><ImageAltScannerPage /></main><Footer /><BackToTop /></>} />

@@ -129,7 +129,7 @@ export default function Navbar() {
       icon: NavigationIcons.tools.colorSimulator, 
       label: 'Color Accessibility Simulator',
       description: 'Test colors for accessibility',
-      href: '/tools/color-simulator'
+      href: '/tools/color-accessibility-simulator'
     },
     { 
       icon: NavigationIcons.tools.wcagStandards, 
