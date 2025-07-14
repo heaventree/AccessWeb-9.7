@@ -4,6 +4,7 @@ import validator from 'validator';
 import { db } from '../db.js';
 import { wcagScans, wcagScanIssues } from '../../shared/schema.js';
 import WCAGChecker from '../services/wcagChecker.js';
+import ComprehensiveWCAGChecker from '../services/comprehensiveWCAGChecker.js';
 import { eq, desc, and } from 'drizzle-orm';
 // import PDFDocument from 'pdfkit'; // Temporarily disabled
 import fs from 'fs/promises';
@@ -23,8 +24,9 @@ const scanLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Create WCAG checker instance
+// Create WCAG checker instances
 const wcagChecker = new WCAGChecker();
+const comprehensiveChecker = new ComprehensiveWCAGChecker();
 
 // Helper function to sanitize URL input
 function sanitizeUrl(url) {
@@ -149,10 +151,19 @@ router.post('/scan', scanLimiter, async (req, res) => {
     // Start the scan
     const startTime = Date.now();
     
-    res.status(202).json({
-      message: 'Scan started successfully',
-      url: sanitizedUrl,
-      status: 'pending'
+    // Use comprehensive checker for detailed WCAG analysis
+    const scanResult = await comprehensiveChecker.performScan(sanitizedUrl);
+    
+    // Save results to database
+    const scanId = await saveScanResults(scanResult, userId);
+    
+    const endTime = Date.now();
+    console.log(`WCAG scan completed for ${sanitizedUrl} in ${endTime - startTime}ms`);
+    
+    res.json({
+      ...scanResult,
+      scanId,
+      message: 'Scan completed successfully'
     });
 
     // Run the scan asynchronously
@@ -482,6 +493,178 @@ router.get('/scan/:id/download/json', async (req, res) => {
     res.status(500).json({
       error: 'Failed to generate JSON export',
       message: 'An internal error occurred while generating the JSON export'
+    });
+  }
+});
+
+// POST /api/wcag-simple/scan - Comprehensive WCAG scan with detailed worldwide guidelines
+router.post('/wcag-simple/scan', scanLimiter, async (req, res) => {
+  try {
+    const { url } = req.body;
+    
+    if (!url) {
+      return res.status(400).json({
+        error: 'URL is required',
+        message: 'Please provide a valid URL to scan'
+      });
+    }
+
+    // Sanitize and validate URL
+    const sanitizedUrl = sanitizeUrl(url);
+    
+    // Get user ID if authenticated
+    const userId = req.user?.id || null;
+    
+    console.log(`Starting comprehensive WCAG scan for URL: ${sanitizedUrl}${userId ? ` (User: ${userId})` : ' (Anonymous)'}`);
+    
+    try {
+      // Perform comprehensive scan using worldwide WCAG guidelines
+      const comprehensiveResult = await comprehensiveChecker.performScan(sanitizedUrl);
+      
+      // Transform data for database storage
+      const dbScanData = {
+        url: sanitizedUrl,
+        overallScore: comprehensiveResult.summary.accessibilityScore,
+        totalIssues: comprehensiveResult.summary.totalIssues,
+        criticalIssues: comprehensiveResult.summary.criticalIssues,
+        seriousIssues: comprehensiveResult.summary.seriousIssues,
+        moderateIssues: comprehensiveResult.summary.moderateIssues,
+        minorIssues: comprehensiveResult.summary.minorIssues,
+        scanDuration: comprehensiveResult.scanDuration,
+        checks: {
+          comprehensive: comprehensiveResult
+        }
+      };
+      
+      // Save to database
+      const scanId = await saveScanResults(dbScanData, userId);
+      
+      console.log(`Comprehensive WCAG scan completed for ${sanitizedUrl} in ${comprehensiveResult.scanDuration}ms`);
+      
+      // Return structured accessibility report
+      res.json({
+        success: true,
+        scanId,
+        
+        // Summary Overview
+        summary: {
+          totalIssues: comprehensiveResult.summary.totalIssues,
+          severityBreakdown: {
+            critical: comprehensiveResult.summary.criticalIssues,
+            serious: comprehensiveResult.summary.seriousIssues,
+            moderate: comprehensiveResult.summary.moderateIssues,
+            minor: comprehensiveResult.summary.minorIssues
+          },
+          passedChecks: comprehensiveResult.summary.passedChecks,
+          overallScore: comprehensiveResult.summary.accessibilityScore,
+          conformanceLevel: comprehensiveResult.summary.conformanceLevel
+        },
+        
+        // Detailed Issue List
+        issues: comprehensiveResult.detailedIssues.map(issue => ({
+          wcagRule: issue.wcagRule,
+          ruleName: issue.ruleName,
+          severity: issue.severity,
+          principle: issue.principle,
+          element: issue.element,
+          selector: issue.selector,
+          description: issue.description,
+          recommendation: issue.recommendation,
+          location: issue.location,
+          htmlSnippet: issue.html
+        })),
+        
+        // Issues Grouped by WCAG Principle
+        issuesByPrinciple: {
+          perceivable: {
+            count: comprehensiveResult.issuesByPrinciple.perceivable.length,
+            issues: comprehensiveResult.issuesByPrinciple.perceivable
+          },
+          operable: {
+            count: comprehensiveResult.issuesByPrinciple.operable.length,
+            issues: comprehensiveResult.issuesByPrinciple.operable
+          },
+          understandable: {
+            count: comprehensiveResult.issuesByPrinciple.understandable.length,
+            issues: comprehensiveResult.issuesByPrinciple.understandable
+          },
+          robust: {
+            count: comprehensiveResult.issuesByPrinciple.robust.length,
+            issues: comprehensiveResult.issuesByPrinciple.robust
+          }
+        },
+        
+        // List of Passed Checks
+        passedChecks: comprehensiveResult.passedChecks.map(check => ({
+          wcagRule: check.wcagRule,
+          description: check.description,
+          help: check.help
+        })),
+        
+        // Metadata
+        scanMetadata: {
+          url: sanitizedUrl,
+          timestamp: comprehensiveResult.timestamp,
+          scanDuration: comprehensiveResult.scanDuration,
+          wcagVersion: comprehensiveResult.scanMetadata.wcagVersion,
+          toolVersion: comprehensiveResult.scanMetadata.toolVersion,
+          conformanceLevel: comprehensiveResult.summary.conformanceLevel,
+          accessibilityScore: comprehensiveResult.summary.accessibilityScore
+        },
+        
+        // WCAG Guidelines Reference
+        wcagGuidelines: {
+          version: '2.2',
+          principles: {
+            perceivable: 'Information and user interface components must be presentable to users in ways they can perceive.',
+            operable: 'User interface components and navigation must be operable.',
+            understandable: 'Information and the operation of user interface must be understandable.',
+            robust: 'Content must be robust enough that it can be interpreted by a wide variety of user agents, including assistive technologies.'
+          }
+        }
+      });
+      
+    } catch (scanError) {
+      console.error('Comprehensive scan error:', scanError);
+      
+      // Fallback to simple scan if comprehensive scan fails
+      console.log('Falling back to simple scan...');
+      const fallbackResult = await wcagChecker.scanUrl(sanitizedUrl);
+      const scanId = await saveScanResults(fallbackResult, userId);
+      
+      res.json({
+        success: true,
+        scanId,
+        fallback: true,
+        message: 'Comprehensive scan failed, using basic scan results',
+        summary: {
+          totalIssues: fallbackResult.totalIssues || 0,
+          severityBreakdown: {
+            critical: fallbackResult.criticalIssues || 0,
+            serious: fallbackResult.seriousIssues || 0,
+            moderate: fallbackResult.moderateIssues || 0,
+            minor: fallbackResult.minorIssues || 0
+          },
+          passedChecks: 0,
+          overallScore: fallbackResult.overallScore || 0,
+          conformanceLevel: 'Unknown'
+        },
+        issues: [],
+        scanMetadata: {
+          url: sanitizedUrl,
+          timestamp: new Date().toISOString(),
+          fallback: true
+        }
+      });
+    }
+    
+  } catch (error) {
+    console.error('WCAG scan endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Scan failed',
+      message: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });

@@ -12,29 +12,65 @@ import { AlertCircle, CheckCircle, Download, ExternalLink, RefreshCw, Clock, Glo
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ScanResult {
-  id: number;
-  url: string;
-  overallScore: number;
-  totalIssues: number;
-  criticalIssues: number;
-  seriousIssues: number;
-  moderateIssues: number;
-  minorIssues: number;
-  status: 'pending' | 'completed' | 'failed';
-  errorMessage?: string;
-  scanDuration?: number;
-  createdAt: string;
-  issues?: Issue[];
+  success: boolean;
+  scanId: number;
+  summary: {
+    totalIssues: number;
+    severityBreakdown: {
+      critical: number;
+      serious: number;
+      moderate: number;
+      minor: number;
+    };
+    passedChecks: number;
+    overallScore: number;
+    conformanceLevel: string;
+  };
+  issues: Issue[];
+  issuesByPrinciple: {
+    perceivable: { count: number; issues: Issue[] };
+    operable: { count: number; issues: Issue[] };
+    understandable: { count: number; issues: Issue[] };
+    robust: { count: number; issues: Issue[] };
+  };
+  passedChecks: PassedCheck[];
+  scanMetadata: {
+    url: string;
+    timestamp: string;
+    scanDuration: number;
+    wcagVersion: string;
+    toolVersion: string;
+    conformanceLevel: string;
+    accessibilityScore: number;
+  };
+  wcagGuidelines: {
+    version: string;
+    principles: {
+      perceivable: string;
+      operable: string;
+      understandable: string;
+      robust: string;
+    };
+  };
 }
 
 interface Issue {
-  id: number;
-  issueType: string;
+  wcagRule: string;
+  ruleName: string;
   severity: 'critical' | 'serious' | 'moderate' | 'minor';
-  wcagGuideline?: string;
-  element?: string;
-  message: string;
-  recommendation?: string;
+  principle: string;
+  element: string;
+  selector: string;
+  description: string;
+  recommendation: string;
+  location: string;
+  htmlSnippet?: string;
+}
+
+interface PassedCheck {
+  wcagRule: string;
+  description: string;
+  help: string;
 }
 
 const WCAGCheckerSimple: React.FC = () => {
@@ -47,6 +83,7 @@ const WCAGCheckerSimple: React.FC = () => {
   const [activeTab, setActiveTab] = useState('scanner');
   const [expandedIssue, setExpandedIssue] = useState<number | null>(null);
   const [scanHistory, setScanHistory] = useState<ScanResult[]>([]);
+  const [activeSection, setActiveSection] = useState<string>('summary');
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') === 'dark' || 
@@ -141,92 +178,26 @@ const WCAGCheckerSimple: React.FC = () => {
     }, 3000);
   };
 
-  const generateMockIssues = useCallback((url: string): Issue[] => {
-    // Generate realistic WCAG issues based on common accessibility problems
-    const possibleIssues: Omit<Issue, 'id'>[] = [
-      {
-        issueType: 'missing-alt',
-        severity: 'serious',
-        wcagGuideline: '1.1.1',
-        element: '<img src="hero-image.jpg" class="banner-img">',
-        message: 'Image missing alt attribute - Screen readers cannot describe this image to users',
-        recommendation: 'Add descriptive alt text: <img src="hero-image.jpg" alt="Company team working together in modern office">'
-      },
-      {
-        issueType: 'color-contrast',
-        severity: 'serious',
-        wcagGuideline: '1.4.3',
-        element: '<button class="btn-secondary" style="color: #999; background: #ccc;">',
-        message: 'Insufficient color contrast ratio (2.1:1) - Text is difficult to read',
-        recommendation: 'Increase contrast to at least 4.5:1 for normal text or 3:1 for large text'
-      },
-      {
-        issueType: 'missing-form-label',
-        severity: 'critical',
-        wcagGuideline: '3.3.2',
-        element: '<input type="email" placeholder="Enter email" class="form-input">',
-        message: 'Form control missing proper label - Users cannot understand the input purpose',
-        recommendation: 'Add a label: <label for="email">Email Address</label><input type="email" id="email">'
-      },
-      {
-        issueType: 'missing-doc-language',
-        severity: 'serious',
-        wcagGuideline: '3.1.1',
-        element: '<html>',
-        message: 'Document missing language attribute - Screen readers cannot determine language',
-        recommendation: 'Add language declaration: <html lang="en"> for English content'
-      },
-      {
-        issueType: 'heading-hierarchy',
-        severity: 'moderate',
-        wcagGuideline: '1.3.1',
-        element: '<h4>Section Title</h4>',
-        message: 'Heading structure skips levels (h2 to h4) - Confuses navigation flow',
-        recommendation: 'Use proper heading hierarchy: h1 → h2 → h3 → h4 in order'
-      },
-      {
-        issueType: 'empty-link-text',
-        severity: 'serious',
-        wcagGuideline: '2.4.4',
-        element: '<a href="/read-more"><img src="arrow.png"></a>',
-        message: 'Link has no accessible text - Screen readers announce "link" with no context',
-        recommendation: 'Add descriptive text or aria-label: <a href="/read-more" aria-label="Read more about our services">'
-      },
-      {
-        issueType: 'duplicate-id',
-        severity: 'serious',
-        wcagGuideline: '4.1.1',
-        element: '[id="content"]',
-        message: 'Duplicate ID "content" found on multiple elements - Breaks assistive technology',
-        recommendation: 'Ensure all IDs are unique across the page'
-      },
-      {
-        issueType: 'keyboard-focus',
-        severity: 'moderate',
-        wcagGuideline: '2.4.7',
-        element: '<button class="custom-btn" style="outline: none;">',
-        message: 'Interactive element has no visible focus indicator - Keyboard users cannot see focus',
-        recommendation: 'Add visible focus styling: .custom-btn:focus { outline: 2px solid #0066cc; }'
-      },
-      {
-        issueType: 'aria-invalid',
-        severity: 'minor',
-        wcagGuideline: '4.1.2',
-        element: '<div role="button" onclick="submit()">',
-        message: 'Element with button role missing keyboard support - Not accessible via keyboard',
-        recommendation: 'Add tabindex="0" and keydown handler for Enter/Space keys'
-      }
-    ];
+  // Get severity badge color
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'bg-red-100 text-red-800 border-red-200';
+      case 'serious': return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'moderate': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'minor': return 'bg-blue-100 text-blue-800 border-blue-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
 
-    // Select random issues based on URL characteristics
-    const numIssues = Math.floor(Math.random() * 6) + 3; // 3-8 issues
-    const selectedIssues = possibleIssues
-      .sort(() => Math.random() - 0.5)
-      .slice(0, numIssues)
-      .map((issue, index) => ({ ...issue, id: index + 1 }));
-
-    return selectedIssues;
-  }, []);
+  // Get conformance level color
+  const getConformanceLevelColor = (level: string) => {
+    switch (level) {
+      case 'AA': return 'bg-green-100 text-green-800 border-green-200';
+      case 'A': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'AAA': return 'bg-blue-100 text-blue-800 border-blue-200';
+      default: return 'bg-red-100 text-red-800 border-red-200';
+    }
+  };
 
   // Handle URL input change with real-time validation
   const handleUrlChange = (value: string) => {
@@ -263,13 +234,14 @@ const WCAGCheckerSimple: React.FC = () => {
     showToast("Scan Started", "Analyzing accessibility compliance...");
 
     try {
-      // Start the scan on the backend
+      // Start the comprehensive WCAG scan
       const response = await fetch('/api/wcag-simple/scan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ url }),
+        credentials: 'include'
       });
 
       if (!response.ok) {
@@ -277,47 +249,24 @@ const WCAGCheckerSimple: React.FC = () => {
         throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
       }
 
-      // Get the direct results from the synchronous API
+      // Get the comprehensive WCAG results
       const scanData = await response.json();
       
-      const result: ScanResult = {
-        id: scanData.id,
-        url: scanData.url,
-        overallScore: scanData.overallScore,
-        totalIssues: scanData.totalIssues,
-        criticalIssues: scanData.criticalIssues,
-        seriousIssues: scanData.seriousIssues,
-        moderateIssues: scanData.moderateIssues,
-        minorIssues: scanData.minorIssues,
-        status: scanData.status as 'pending' | 'completed' | 'failed',
-        errorMessage: scanData.errorMessage,
-        scanDuration: scanData.scanDuration,
-        createdAt: scanData.createdAt,
-        issues: scanData.issues?.map((issue: any) => ({
-          id: issue.id,
-          issueType: issue.issueType,
-          severity: issue.severity as 'critical' | 'serious' | 'moderate' | 'minor',
-          wcagGuideline: issue.wcagGuideline,
-          element: issue.element,
-          message: issue.message,
-          recommendation: issue.recommendation
-        })) || []
-      };
-
-      setCurrentScan(result);
-      setIsScanning(false);
-      
-      if (result.status === 'completed') {
-        showToast("Scan Complete", `Found ${result.totalIssues} accessibility issues. Score: ${result.overallScore}/100`);
+      if (scanData.success) {
+        setCurrentScan(scanData);
+        setIsScanning(false);
         
-        // Add to local history and save to localStorage
+        showToast("Scan Complete", 
+          `Found ${scanData.summary.totalIssues} accessibility issues. Score: ${scanData.summary.overallScore}/100`);
+        
+        // Add to local history and save to localStorage  
         if (user) {
-          const newHistory = [result, ...scanHistory.slice(0, 9)];
+          const newHistory = [scanData, ...scanHistory.slice(0, 9)];
           setScanHistory(newHistory);
           localStorage.setItem(`wcag-scan-history-${user.id}`, JSON.stringify(newHistory));
         }
-      } else if (result.status === 'failed') {
-        showToast("Scan Failed", result.errorMessage || "The accessibility scan failed to complete", "destructive");
+      } else {
+        throw new Error(scanData.message || 'Scan failed');
       }
       
     } catch (error) {
@@ -325,17 +274,7 @@ const WCAGCheckerSimple: React.FC = () => {
       setIsScanning(false);
       showToast("Scan Failed", error instanceof Error ? error.message : "Failed to start accessibility scan", "destructive");
     }
-  }, [url, user]);
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'critical': return 'bg-red-500 text-white';
-      case 'serious': return 'bg-orange-500 text-white';
-      case 'moderate': return 'bg-yellow-500 text-white';
-      case 'minor': return 'bg-blue-500 text-white';
-      default: return 'bg-gray-500 text-white';
-    }
-  };
+  }, [url, user, scanHistory]);
 
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-green-600';
@@ -351,33 +290,50 @@ const WCAGCheckerSimple: React.FC = () => {
 
     if (format === 'json') {
       content = JSON.stringify(scanResult, null, 2);
-      filename = `wcag-scan-${scanResult.id}.json`;
+      filename = `wcag-scan-${scanResult.scanId}.json`;
       mimeType = 'application/json';
     } else {
       content = `WCAG Accessibility Scan Report
 ========================================
 
-URL: ${scanResult.url}
-Scan Date: ${new Date(scanResult.createdAt).toLocaleDateString()}
-Overall Score: ${scanResult.overallScore}/100
-Total Issues: ${scanResult.totalIssues}
+URL: ${scanResult.scanMetadata.url}
+Scan Date: ${new Date(scanResult.scanMetadata.timestamp).toLocaleDateString()}
+Overall Score: ${scanResult.summary.overallScore}/100
+Total Issues: ${scanResult.summary.totalIssues}
+Conformance Level: ${scanResult.summary.conformanceLevel}
+Scan Duration: ${scanResult.scanMetadata.scanDuration}ms
 
 Summary:
-- Critical Issues: ${scanResult.criticalIssues}
-- Serious Issues: ${scanResult.seriousIssues}
-- Moderate Issues: ${scanResult.moderateIssues}
-- Minor Issues: ${scanResult.minorIssues}
+- Critical Issues: ${scanResult.summary.severityBreakdown.critical}
+- Serious Issues: ${scanResult.summary.severityBreakdown.serious}
+- Moderate Issues: ${scanResult.summary.severityBreakdown.moderate}
+- Minor Issues: ${scanResult.summary.severityBreakdown.minor}
+- Passed Checks: ${scanResult.summary.passedChecks}
 
-Issues Found:
-${scanResult.issues?.map((issue, index) => `
-${index + 1}. ${issue.message}
+Issues by WCAG Principle:
+- Perceivable: ${scanResult.issuesByPrinciple.perceivable.count} issues
+- Operable: ${scanResult.issuesByPrinciple.operable.count} issues
+- Understandable: ${scanResult.issuesByPrinciple.understandable.count} issues
+- Robust: ${scanResult.issuesByPrinciple.robust.count} issues
+
+Detailed Issues:
+${scanResult.issues.map((issue, index) => `
+${index + 1}. ${issue.description}
+   WCAG Rule: ${issue.wcagRule} (${issue.ruleName})
    Severity: ${issue.severity}
-   WCAG Guideline: ${issue.wcagGuideline || 'N/A'}
-   Recommendation: ${issue.recommendation || 'N/A'}
-   Element: ${issue.element || 'N/A'}
-`).join('\n') || 'No issues found'}
+   Principle: ${issue.principle}
+   Recommendation: ${issue.recommendation}
+   Element: ${issue.element}
+   Location: ${issue.location}
+`).join('\n')}
+
+Passed Checks:
+${scanResult.passedChecks.map((check, index) => `
+${index + 1}. ${check.description}
+   WCAG Rule: ${check.wcagRule}
+`).join('\n')}
 `;
-      filename = `wcag-scan-${scanResult.id}.txt`;
+      filename = `wcag-scan-${scanResult.scanId}.txt`;
       mimeType = 'text/plain';
     }
 
@@ -577,14 +533,17 @@ ${index + 1}. ${issue.message}
                               </CardTitle>
                               <CardDescription className="flex items-center gap-2 text-base">
                                 <ExternalLink className="w-4 h-4" />
-                                <span className="break-all">{currentScan.url}</span>
+                                <span className="break-all">{currentScan.scanMetadata.url}</span>
                               </CardDescription>
                             </div>
-                            <div className="text-center lg:text-right">
-                              <div className={`text-4xl lg:text-5xl font-bold ${getScoreColor(currentScan.overallScore)} mb-1`}>
-                                {currentScan.overallScore}<span className="text-2xl lg:text-3xl">/100</span>
+                            <div className="text-center lg:text-right space-y-2">
+                              <div className={`text-4xl lg:text-5xl font-bold ${getScoreColor(currentScan.summary.overallScore)} mb-1`}>
+                                {currentScan.summary.overallScore}<span className="text-2xl lg:text-3xl">/100</span>
                               </div>
                               <div className="text-sm text-gray-500 dark:text-gray-400">Accessibility Score</div>
+                              <Badge className={`${getConformanceLevelColor(currentScan.summary.conformanceLevel)} text-xs px-2 py-1`}>
+                                WCAG {currentScan.summary.conformanceLevel} Level
+                              </Badge>
                             </div>
                           </div>
                         </CardHeader>
@@ -592,10 +551,10 @@ ${index + 1}. ${issue.message}
                           {/* Issues Grid - Enhanced Responsive */}
                           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                             {[
-                              { label: 'Critical', count: currentScan.criticalIssues, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' },
-                              { label: 'Serious', count: currentScan.seriousIssues, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' },
-                              { label: 'Moderate', count: currentScan.moderateIssues, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
-                              { label: 'Minor', count: currentScan.minorIssues, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' }
+                              { label: 'Critical', count: currentScan.summary.severityBreakdown.critical, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' },
+                              { label: 'Serious', count: currentScan.summary.severityBreakdown.serious, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' },
+                              { label: 'Moderate', count: currentScan.summary.severityBreakdown.moderate, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
+                              { label: 'Minor', count: currentScan.summary.severityBreakdown.minor, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' }
                             ].map((item) => (
                               <div key={item.label} className={`text-center p-4 rounded-lg ${item.bg} transition-colors`}>
                                 <div className={`text-2xl lg:text-3xl font-bold ${item.color}`}>
@@ -632,13 +591,151 @@ ${index + 1}. ${issue.message}
                         </CardContent>
                       </Card>
 
+                      {/* WCAG Principles Breakdown */}
+                      <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                        <CardHeader>
+                          <CardTitle className="text-xl lg:text-2xl flex items-center gap-3">
+                            <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                            WCAG Principles Analysis
+                          </CardTitle>
+                          <CardDescription className="text-base">
+                            Issues categorized by the four WCAG principles
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {[
+                              { 
+                                key: 'perceivable', 
+                                title: 'Perceivable', 
+                                count: currentScan.issuesByPrinciple.perceivable.count,
+                                description: currentScan.wcagGuidelines.principles.perceivable,
+                                color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200',
+                                textColor: 'text-blue-600 dark:text-blue-400'
+                              },
+                              { 
+                                key: 'operable', 
+                                title: 'Operable', 
+                                count: currentScan.issuesByPrinciple.operable.count,
+                                description: currentScan.wcagGuidelines.principles.operable,
+                                color: 'bg-green-50 dark:bg-green-900/20 border-green-200',
+                                textColor: 'text-green-600 dark:text-green-400'
+                              },
+                              { 
+                                key: 'understandable', 
+                                title: 'Understandable', 
+                                count: currentScan.issuesByPrinciple.understandable.count,
+                                description: currentScan.wcagGuidelines.principles.understandable,
+                                color: 'bg-purple-50 dark:bg-purple-900/20 border-purple-200',
+                                textColor: 'text-purple-600 dark:text-purple-400'
+                              },
+                              { 
+                                key: 'robust', 
+                                title: 'Robust', 
+                                count: currentScan.issuesByPrinciple.robust.count,
+                                description: currentScan.wcagGuidelines.principles.robust,
+                                color: 'bg-orange-50 dark:bg-orange-900/20 border-orange-200',
+                                textColor: 'text-orange-600 dark:text-orange-400'
+                              }
+                            ].map((principle) => (
+                              <div key={principle.key} className={`p-4 rounded-lg border-2 ${principle.color} transition-all`}>
+                                <div className={`text-2xl font-bold ${principle.textColor} mb-2`}>
+                                  {principle.count}
+                                </div>
+                                <div className="font-medium text-gray-900 dark:text-white mb-2">
+                                  {principle.title}
+                                </div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                                  {principle.description}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Passed Checks Section */}
+                      {currentScan.passedChecks && currentScan.passedChecks.length > 0 && (
+                        <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                          <CardHeader>
+                            <CardTitle className="text-xl lg:text-2xl flex items-center gap-3">
+                              <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+                              Passed Checks ({currentScan.passedChecks.length})
+                            </CardTitle>
+                            <CardDescription className="text-base">
+                              WCAG requirements that your website successfully meets
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                              {currentScan.passedChecks.map((check, index) => (
+                                <div 
+                                  key={`${check.wcagRule}-${index}`}
+                                  className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg"
+                                >
+                                  <div className="flex items-start gap-2">
+                                    <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                                    <div className="min-w-0">
+                                      <div className="font-medium text-green-800 dark:text-green-300 text-sm">
+                                        {check.wcagRule}
+                                      </div>
+                                      <div className="text-xs text-green-700 dark:text-green-400 mt-1">
+                                        {check.description}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {/* Scan Metadata */}
+                      <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                        <CardHeader>
+                          <CardTitle className="text-xl lg:text-2xl flex items-center gap-3">
+                            <Clock className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                            Scan Details
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="text-center p-3 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                              <div className="text-lg font-bold text-gray-900 dark:text-white">
+                                {currentScan.scanMetadata.scanDuration}ms
+                              </div>
+                              <div className="text-sm text-gray-600 dark:text-gray-400">Scan Duration</div>
+                            </div>
+                            <div className="text-center p-3 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                              <div className="text-lg font-bold text-gray-900 dark:text-white">
+                                {currentScan.wcagGuidelines.version}
+                              </div>
+                              <div className="text-sm text-gray-600 dark:text-gray-400">WCAG Version</div>
+                            </div>
+                            <div className="text-center p-3 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                              <div className="text-lg font-bold text-gray-900 dark:text-white">
+                                {new Date(currentScan.scanMetadata.timestamp).toLocaleDateString()}
+                              </div>
+                              <div className="text-sm text-gray-600 dark:text-gray-400">Scan Date</div>
+                            </div>
+                            <div className="text-center p-3 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                              <div className="text-lg font-bold text-gray-900 dark:text-white">
+                                #{currentScan.scanId}
+                              </div>
+                              <div className="text-sm text-gray-600 dark:text-gray-400">Scan ID</div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
                       {/* Issues List - Enhanced Responsive Design */}
                       {currentScan.issues && currentScan.issues.length > 0 && (
                         <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
                           <CardHeader>
                             <CardTitle className="text-xl lg:text-2xl flex items-center gap-3">
                               <AlertCircle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-                              Issues Found
+                              Detailed Issues ({currentScan.issues.length})
                             </CardTitle>
                             <CardDescription className="text-base">
                               Detailed list of accessibility issues with recommendations for fixes
@@ -646,16 +743,16 @@ ${index + 1}. ${issue.message}
                           </CardHeader>
                           <CardContent>
                             <div className="space-y-4">
-                              {currentScan.issues.map((issue) => (
+                              {currentScan.issues.map((issue, index) => (
                                 <motion.div
-                                  key={issue.id}
+                                  key={`${issue.wcagRule}-${index}`}
                                   initial={{ opacity: 0, y: 10 }}
                                   animate={{ opacity: 1, y: 0 }}
                                   className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md"
                                 >
                                   <div 
                                     className="p-4 sm:p-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                                    onClick={() => setExpandedIssue(expandedIssue === issue.id ? null : issue.id)}
+                                    onClick={() => setExpandedIssue(expandedIssue === index ? null : index)}
                                   >
                                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                                       <div className="flex-1 space-y-3 sm:space-y-0">
@@ -665,18 +762,22 @@ ${index + 1}. ${issue.message}
                                           >
                                             {issue.severity.toUpperCase()}
                                           </Badge>
-                                          {issue.wcagGuideline && (
-                                            <Badge variant="outline" className="border-gray-300 dark:border-gray-600">
-                                              WCAG {issue.wcagGuideline}
-                                            </Badge>
-                                          )}
+                                          <Badge variant="outline" className="border-gray-300 dark:border-gray-600">
+                                            {issue.wcagRule}
+                                          </Badge>
+                                          <Badge variant="outline" className="border-gray-300 dark:border-gray-600">
+                                            {issue.principle}
+                                          </Badge>
                                         </div>
                                         <h4 className="font-medium text-gray-900 dark:text-white text-base sm:text-lg leading-relaxed">
-                                          {issue.message}
+                                          {issue.ruleName}
                                         </h4>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                          {issue.description}
+                                        </p>
                                       </div>
                                       <div className="flex items-center justify-end">
-                                        {expandedIssue === issue.id ? 
+                                        {expandedIssue === index ? 
                                           <ChevronDown className="w-5 h-5 text-gray-400 transition-transform" /> : 
                                           <ChevronRight className="w-5 h-5 text-gray-400 transition-transform" />
                                         }
@@ -685,7 +786,7 @@ ${index + 1}. ${issue.message}
                                   </div>
                                   
                                   <AnimatePresence>
-                                    {expandedIssue === issue.id && (
+                                    {expandedIssue === index && (
                                       <motion.div
                                         initial={{ opacity: 0, height: 0 }}
                                         animate={{ opacity: 1, height: 'auto' }}
@@ -702,6 +803,20 @@ ${index + 1}. ${issue.message}
                                               <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed pl-6">
                                                 {issue.recommendation}
                                               </p>
+                                            </div>
+                                          )}
+                                          
+                                          {issue.selector && (
+                                            <div className="space-y-2">
+                                              <h5 className="font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                <ExternalLink className="w-4 h-4" />
+                                                CSS Selector:
+                                              </h5>
+                                              <div className="bg-gray-800 dark:bg-slate-800 rounded-lg p-3 overflow-x-auto">
+                                                <code className="text-sm text-blue-400 font-mono whitespace-pre">
+                                                  {issue.selector}
+                                                </code>
+                                              </div>
                                             </div>
                                           )}
                                           
@@ -773,7 +888,7 @@ ${index + 1}. ${issue.message}
                       <div className="grid gap-4 sm:gap-6">
                         {scanHistory.map((scan) => (
                           <motion.div
-                            key={scan.id}
+                            key={scan.scanId}
                             whileHover={{ scale: 1.02 }}
                             className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
                             onClick={() => setCurrentScan(scan)}
