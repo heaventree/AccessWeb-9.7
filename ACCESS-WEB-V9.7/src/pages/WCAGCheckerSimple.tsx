@@ -397,33 +397,33 @@ const WCAGCheckerSimple: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       {/* Main Content */}
-      <main id="main-content" className="max-w-6xl mx-auto px-4 pt-24 pb-8">
-        <div className="text-center space-y-12">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-8">
+        <div className="text-center space-y-8 sm:space-y-12">
           {/* Header */}
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+          <div className="space-y-4 sm:space-y-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
               WCAG 2.1 Accessibility Checker
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 px-4">
               Test your website against WCAG 2.1 standards
             </p>
           </div>
 
           {/* Main Container with all sections */}
           <div className="w-full">
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 p-8 space-y-6">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
               
               {/* Region Selection */}
               <div className="flex justify-center">
-                <div className="flex gap-2 flex-wrap justify-center">
+                <div className="flex gap-2 sm:gap-3 flex-wrap justify-center max-w-full">
                   {regions.map((region) => (
                     <button
                       key={region}
                       onClick={() => setSelectedRegion(region)}
-                      className={`w-20 py-2 text-sm font-medium transition-all rounded-lg border text-center ${
+                      className={`w-20 sm:w-24 md:w-28 py-2.5 sm:py-3 text-sm sm:text-base font-medium transition-all duration-200 rounded-lg border text-center ${
                         selectedRegion === region
-                          ? 'bg-blue-100 text-blue-700 border-blue-200'
-                          : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 dark:bg-slate-700 dark:text-gray-300 dark:border-slate-600 dark:hover:bg-slate-600'
+                          ? 'bg-blue-100 text-blue-700 border-blue-300 shadow-sm'
+                          : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 hover:border-gray-300 dark:bg-slate-700 dark:text-gray-300 dark:border-slate-600 dark:hover:bg-slate-600'
                       }`}
                     >
                       {region}
@@ -434,12 +434,12 @@ const WCAGCheckerSimple: React.FC = () => {
 
               {/* Standards Selection */}
               <div className="flex justify-center">
-                <div className="flex gap-3 justify-center flex-wrap">
+                <div className="flex gap-2 sm:gap-3 justify-center flex-wrap max-w-full">
                   {currentStandards.map((standard) => (
                     <span
                       key={standard.id}
-                      className={`px-4 py-2 rounded-full text-sm font-medium ${standard.color} ${
-                        standard.highlighted ? 'ring-2 ring-offset-2 ring-blue-500 font-bold' : ''
+                      className={`w-24 sm:w-28 md:w-32 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium text-center transition-all duration-200 ${standard.color} ${
+                        standard.highlighted ? 'ring-2 ring-offset-2 ring-blue-500 font-bold transform scale-105' : ''
                       }`}
                     >
                       {standard.label}
@@ -457,7 +457,7 @@ const WCAGCheckerSimple: React.FC = () => {
                     onChange={(e) => handleUrlChange(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="https://google.com"
-                    className={`text-base h-14 pr-36 pl-4 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full ${
+                    className={`text-sm sm:text-base h-12 sm:h-14 pr-32 sm:pr-36 pl-4 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full ${
                       urlError 
                         ? 'text-red-600 dark:text-red-400 border-red-300' 
                         : 'text-gray-900 dark:text-white'
@@ -469,17 +469,19 @@ const WCAGCheckerSimple: React.FC = () => {
                   <Button
                     onClick={startScan}
                     disabled={isScanning || !url.trim() || !!urlError}
-                    className="absolute right-2 top-2 h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50 flex items-center gap-2 font-medium text-sm"
+                    className="absolute right-2 top-2 h-8 sm:h-10 px-4 sm:px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50 flex items-center gap-2 font-medium text-xs sm:text-sm"
                   >
                     {isScanning ? (
                       <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        Scanning...
+                        <RefreshCw className="w-3 sm:w-4 h-3 sm:h-4 animate-spin" />
+                        <span className="hidden sm:inline">Scanning...</span>
+                        <span className="sm:hidden">Scan...</span>
                       </>
                     ) : (
                       <>
-                        <Search className="w-4 h-4" />
-                        {showResults ? 'Check Site Again' : 'Check Site'}
+                        <Search className="w-3 sm:w-4 h-3 sm:h-4" />
+                        <span className="hidden sm:inline">{showResults ? 'Check Site Again' : 'Check Site'}</span>
+                        <span className="sm:hidden">Check</span>
                       </>
                     )}
                   </Button>
@@ -491,7 +493,7 @@ const WCAGCheckerSimple: React.FC = () => {
                   </div>
                 )}
 
-                <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-medium text-center">
                   The scan typically takes 30-60 seconds depending on the size of your website
                 </p>
               </div>
@@ -505,17 +507,17 @@ const WCAGCheckerSimple: React.FC = () => {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-8 w-full space-y-4 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+            className="mt-6 sm:mt-8 w-full space-y-4 p-4 sm:p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
           >
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+              <span className="text-sm sm:text-base font-medium text-blue-600 dark:text-blue-400">
                 Analyzing website for accessibility issues...
               </span>
               <div className="flex items-center space-x-2">
                 <RefreshCw className="w-4 h-4 animate-spin text-blue-600 dark:text-blue-400" />
               </div>
             </div>
-            <div className="text-xs text-blue-600/80 dark:text-blue-400/80">
+            <div className="text-xs sm:text-sm text-blue-600/80 dark:text-blue-400/80">
               Fetching HTML content and running WCAG compliance checks...
             </div>
           </motion.div>
@@ -526,107 +528,107 @@ const WCAGCheckerSimple: React.FC = () => {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-8 w-full space-y-6"
+            className="mt-6 sm:mt-8 w-full space-y-4 sm:space-y-6"
           >
             {/* Report Header - Clean Title without Shadow */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 p-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Accessibility Report for {scanResult.scanMetadata?.url || url}
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
                 Comprehensive WCAG 2.2 compliance analysis
               </p>
             </div>
 
             {/* Separated Issue Count Boxes - Second image style */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
               {/* Critical Box */}
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center dark:bg-red-900/10 dark:border-red-800">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 text-center dark:bg-red-900/10 dark:border-red-800">
+                <div className="flex items-center justify-center gap-1 sm:gap-2 mb-2">
+                  <div className="w-4 sm:w-5 h-4 sm:h-5 bg-red-600 rounded-full flex items-center justify-center">
+                    <svg className="w-2 sm:w-3 h-2 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-red-700 dark:text-red-300">Critical</span>
+                  <span className="text-xs sm:text-sm font-medium text-red-700 dark:text-red-300">Critical</span>
                 </div>
-                <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                <div className="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">
                   {scanResult.summary?.severityBreakdown?.critical || 1}
                 </div>
               </div>
 
               {/* Serious Box */}
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center dark:bg-orange-900/10 dark:border-orange-800">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 sm:p-4 text-center dark:bg-orange-900/10 dark:border-orange-800">
+                <div className="flex items-center justify-center gap-1 sm:gap-2 mb-2">
+                  <div className="w-4 sm:w-5 h-4 sm:h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                    <svg className="w-2 sm:w-3 h-2 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Serious</span>
+                  <span className="text-xs sm:text-sm font-medium text-orange-700 dark:text-orange-300">Serious</span>
                 </div>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                <div className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">
                   {scanResult.summary?.severityBreakdown?.serious || 2}
                 </div>
               </div>
 
               {/* Moderate Box */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center dark:bg-yellow-900/10 dark:border-yellow-800">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4 text-center dark:bg-yellow-900/10 dark:border-yellow-800">
+                <div className="flex items-center justify-center gap-1 sm:gap-2 mb-2">
+                  <div className="w-4 sm:w-5 h-4 sm:h-5 bg-yellow-500 rounded-full flex items-center justify-center">
+                    <svg className="w-2 sm:w-3 h-2 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-yellow-700 dark:text-yellow-300">Moderate</span>
+                  <span className="text-xs sm:text-sm font-medium text-yellow-700 dark:text-yellow-300">Moderate</span>
                 </div>
-                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                <div className="text-xl sm:text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                   {scanResult.summary?.severityBreakdown?.moderate || 0}
                 </div>
               </div>
 
               {/* Minor Box */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center dark:bg-blue-900/10 dark:border-blue-800">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 text-center dark:bg-blue-900/10 dark:border-blue-800">
+                <div className="flex items-center justify-center gap-1 sm:gap-2 mb-2">
+                  <div className="w-4 sm:w-5 h-4 sm:h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <svg className="w-2 sm:w-3 h-2 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
                       <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Minor</span>
+                  <span className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300">Minor</span>
                 </div>
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {scanResult.summary?.severityBreakdown?.minor || 0}
                 </div>
               </div>
 
               {/* Passed Box */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center dark:bg-green-900/10 dark:border-green-800">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 text-center dark:bg-green-900/10 dark:border-green-800">
+                <div className="flex items-center justify-center gap-1 sm:gap-2 mb-2">
+                  <div className="w-4 sm:w-5 h-4 sm:h-5 bg-green-500 rounded-full flex items-center justify-center">
+                    <svg className="w-2 sm:w-3 h-2 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-green-700 dark:text-green-300">Passed</span>
+                  <span className="text-xs sm:text-sm font-medium text-green-700 dark:text-green-300">Passed</span>
                 </div>
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
                   {scanResult.summary?.passedChecks || 0}
                 </div>
               </div>
 
               {/* Warnings Box */}
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center dark:bg-amber-900/10 dark:border-amber-800">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4 text-center dark:bg-amber-900/10 dark:border-amber-800">
+                <div className="flex items-center justify-center gap-1 sm:gap-2 mb-2">
+                  <div className="w-4 sm:w-5 h-4 sm:h-5 bg-amber-500 rounded-full flex items-center justify-center">
+                    <svg className="w-2 sm:w-3 h-2 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Warnings</span>
+                  <span className="text-xs sm:text-sm font-medium text-amber-700 dark:text-amber-300">Warnings</span>
                 </div>
-                <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                <div className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">
                   5
                 </div>
               </div>
@@ -635,7 +637,7 @@ const WCAGCheckerSimple: React.FC = () => {
             {/* Issues List */}
             {scanResult.issues && scanResult.issues.length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                   Issues Found ({scanResult.issues.length})
                 </h3>
                 
@@ -668,7 +670,7 @@ const WCAGCheckerSimple: React.FC = () => {
                     >
                       {/* Issue Header - Collapsible */}
                       <div 
-                        className="p-4 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-800/50"
+                        className="p-3 sm:p-4 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-800/50"
                         onClick={() => toggleIssue(index.toString())}
                       >
                         <div className="flex items-start justify-between">
