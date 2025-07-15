@@ -278,28 +278,71 @@ const WCAGCheckerSimple: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
       {/* Main Content */}
-      <main id="main-content" className="max-w-4xl mx-auto px-4 pt-20 pb-8">
-        {/* Main Card Container */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 space-y-8"
-        >
+      <main id="main-content" className="max-w-4xl mx-auto px-4 pt-24 pb-8">
+        <div className="text-center space-y-8">
+          {/* Header */}
+          <div className="space-y-3">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              WCAG 2.1 Accessibility Checker
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Test your website against WCAG 2.1 standards
+            </p>
+          </div>
+
+          {/* Region Selection */}
+          <div className="flex justify-center">
+            <div className="flex bg-gray-100 dark:bg-slate-700 rounded-lg p-1 gap-1">
+              {regions.map((region) => (
+                <button
+                  key={region}
+                  onClick={() => setSelectedRegion(region)}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    selectedRegion === region
+                      ? 'bg-blue-500 text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-slate-600'
+                  }`}
+                >
+                  {region}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Standards Selection */}
+          <div className="flex justify-center">
+            <div className="flex flex-wrap gap-2 justify-center">
+              {standards.map((standard) => (
+                <button
+                  key={standard.id}
+                  onClick={() => toggleStandard(standard.id)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    selectedStandards.includes(standard.id)
+                      ? standard.color
+                      : 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600'
+                  }`}
+                >
+                  {standard.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* URL Input Section */}
-          <div className="text-center space-y-6">
-            <div className="relative max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto space-y-4">
+            <div className="relative">
               <Input
                 type="url"
                 value={url}
                 onChange={(e) => handleUrlChange(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="www.google.com"
-                className={`text-lg h-14 pr-40 text-center border-2 rounded-full ${
+                placeholder="Enter website URL (e.g., example.com)"
+                className={`text-lg h-14 pr-40 pl-6 border-2 rounded-lg ${
                   urlError 
                     ? 'border-red-300 dark:border-red-600 focus:border-red-500 focus:ring-red-200' 
-                    : 'border-gray-200 dark:border-gray-600 focus:border-[#0fae96] focus:ring-[#0fae96]/20'
+                    : 'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-200'
                 }`}
                 disabled={isScanning}
                 aria-describedby={urlError ? 'url-error' : undefined}
@@ -308,7 +351,7 @@ const WCAGCheckerSimple: React.FC = () => {
               <Button
                 onClick={startScan}
                 disabled={isScanning || !url.trim() || !!urlError}
-                className="absolute right-2 top-2 h-10 px-6 bg-[#0fae96] hover:bg-[#0fae96]/90 text-white rounded-full disabled:opacity-50"
+                className="absolute right-2 top-2 h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50"
               >
                 {isScanning ? (
                   <>
@@ -325,140 +368,34 @@ const WCAGCheckerSimple: React.FC = () => {
             </div>
             
             {urlError && (
-              <div id="url-error" className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800 max-w-md mx-auto">
+              <div id="url-error" className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
                 {urlError}
               </div>
             )}
 
-            <p className="text-sm text-[#0fae96] dark:text-[#5eead4]">
+            <p className="text-sm text-blue-600 dark:text-blue-400">
               The scan typically takes 30-60 seconds depending on the size of your website
             </p>
           </div>
+        </div>
 
-          {/* Region Selection */}
-          <div className="space-y-4">
-            <div className="flex justify-center">
-              <div className="flex flex-wrap gap-2 bg-gray-100 dark:bg-slate-700 p-2 rounded-full">
-                {regions.map((region) => (
-                  <button
-                    key={region}
-                    onClick={() => setSelectedRegion(region)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      selectedRegion === region
-                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                    }`}
-                  >
-                    {region}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Standards Selection */}
-            <div className="flex justify-center">
-              <div className="flex flex-wrap gap-2">
-                {standards.map((standard) => (
-                  <button
-                    key={standard.id}
-                    onClick={() => toggleStandard(standard.id)}
-                    className={`px-3 py-2 rounded-full text-sm font-medium transition-all border ${
-                      selectedStandards.includes(standard.id)
-                        ? `${standard.color} border-current`
-                        : 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-gray-300 border-gray-200 dark:border-slate-600 hover:bg-gray-200 dark:hover:bg-slate-600'
-                    }`}
-                  >
-                    {standard.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Advanced Testing Options */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Advanced Testing Options
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {advancedTestingOptions.map((option) => (
-                <div key={option.id} className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    id={option.id}
-                    checked={advancedOptions.includes(option.id)}
-                    onChange={() => toggleAdvancedOption(option.id)}
-                    className="w-4 h-4 text-[#0fae96] bg-gray-100 border-gray-300 rounded focus:ring-[#0fae96] dark:focus:ring-[#0fae96] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  />
-                  <label 
-                    htmlFor={option.id}
-                    className="text-sm font-medium text-gray-900 dark:text-gray-300 flex items-center"
-                  >
-                    {option.label}
-                    {option.isPro && (
-                      <span className="ml-2 px-2 py-1 text-xs font-medium bg-[#0fae96] text-white rounded-full">
-                        PRO
-                      </span>
-                    )}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Progress Section */}
-          {isScanning && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="space-y-4 p-6 bg-[#0fae96]/5 dark:bg-[#0fae96]/10 rounded-xl"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-[#0fae96] dark:text-[#5eead4]">
-                  Analyzing website for accessibility issues...
-                </span>
-                <div className="flex items-center space-x-2">
-                  <RefreshCw className="w-4 h-4 animate-spin text-[#0fae96] dark:text-[#5eead4]" />
-                </div>
-              </div>
-              <div className="text-xs text-[#0fae96]/80 dark:text-[#5eead4]/80">
-                Fetching HTML content and running WCAG compliance checks...
-              </div>
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Recent Scans History */}
-        {scanHistory.length > 0 && activeTab === 'history' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 space-y-6"
+        {/* Progress Section */}
+        {isScanning && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-8 space-y-4 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
           >
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Recent Scans
-            </h2>
-            <div className="space-y-4">
-              {scanHistory.slice(0, 5).map((scan, index) => (
-                <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {scan.scanMetadata.url}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(scan.scanMetadata.timestamp).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                        Score: {scan.summary.overallScore}%
-                      </span>
-                      <ExternalLink className="w-4 h-4 text-gray-400" />
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                Analyzing website for accessibility issues...
+              </span>
+              <div className="flex items-center space-x-2">
+                <RefreshCw className="w-4 h-4 animate-spin text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+            <div className="text-xs text-blue-600/80 dark:text-blue-400/80">
+              Fetching HTML content and running WCAG compliance checks...
             </div>
           </motion.div>
         )}
