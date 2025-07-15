@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { RefreshCw, Search, History, ExternalLink, AlertTriangle, ExternalLinkIcon, Eye, Lightbulb, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { IssueFixModal } from '../components/IssueFixModal';
+import { AISuggestionModal } from '../components/AISuggestionModal';
 import type { AccessibilityIssue } from '../types';
 
 interface ScanResult {
@@ -88,6 +89,8 @@ const WCAGCheckerSimple: React.FC = () => {
   const [allExpanded, setAllExpanded] = useState(false);
   const [fixModalOpen, setFixModalOpen] = useState(false);
   const [selectedIssueForFix, setSelectedIssueForFix] = useState<AccessibilityIssue | null>(null);
+  const [aiSuggestionModalOpen, setAiSuggestionModalOpen] = useState(false);
+  const [selectedIssueForAI, setSelectedIssueForAI] = useState<AccessibilityIssue | null>(null);
   
   // New state for the redesigned UI
   const [selectedRegion, setSelectedRegion] = useState('EU');
@@ -474,6 +477,20 @@ const WCAGCheckerSimple: React.FC = () => {
   const closeFixModal = () => {
     setFixModalOpen(false);
     setSelectedIssueForFix(null);
+  };
+
+  // Open AI suggestion modal
+  const openAISuggestionModal = (issue: Issue) => {
+    console.log('Opening AI suggestion modal for issue:', issue);
+    const accessibilityIssue = convertToAccessibilityIssue(issue);
+    setSelectedIssueForAI(accessibilityIssue);
+    setAiSuggestionModalOpen(true);
+  };
+
+  // Close AI suggestion modal
+  const closeAISuggestionModal = () => {
+    setAiSuggestionModalOpen(false);
+    setSelectedIssueForAI(null);
   };
 
   return (
@@ -885,7 +902,10 @@ const WCAGCheckerSimple: React.FC = () => {
                                 Apply Fix
                                 <span className="bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded font-bold ml-1">PRO</span>
                               </button>
-                              <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">
+                              <button 
+                                onClick={() => openAISuggestionModal(issue)}
+                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+                              >
                                 <Users className="w-4 h-4" />
                                 Get AI Suggestions
                                 <span className="bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded font-bold ml-1">PRO</span>
@@ -921,6 +941,13 @@ const WCAGCheckerSimple: React.FC = () => {
         isOpen={fixModalOpen}
         onClose={closeFixModal}
         issue={selectedIssueForFix}
+      />
+
+      {/* AI Suggestion Modal */}
+      <AISuggestionModal
+        isOpen={aiSuggestionModalOpen}
+        onClose={closeAISuggestionModal}
+        issue={selectedIssueForAI}
       />
     </div>
   );
