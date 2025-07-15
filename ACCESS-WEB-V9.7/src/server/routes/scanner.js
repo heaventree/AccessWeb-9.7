@@ -1,13 +1,13 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authenticateToken } from '../middleware/auth.js';
+import { requireAuth } from '../../middleware/userAuth.js';
 import { logRequest } from '../utils/logger.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Apply authentication middleware to all scanner routes
-router.use(authenticateToken);
+router.use(requireAuth);
 
 /**
  * Trigger manual accessibility scan for a specific site connection
@@ -16,7 +16,7 @@ router.use(authenticateToken);
 router.post('/trigger/:connectionId', logRequest, async (req, res) => {
   try {
     const { connectionId } = req.params;
-    const userId = req.user.userId;
+    const userId = req.user.id;
 
     // Production logging: `🔍 [SCANNER] Manual scan trigger requested for connection ${connectionId} by user ${userId};
 
@@ -90,7 +90,7 @@ router.post('/trigger/:connectionId', logRequest, async (req, res) => {
 router.get('/history/:connectionId', logRequest, async (req, res) => {
   try {
     const { connectionId } = req.params;
-    const userId = req.user.userId;
+    const userId = req.user.id;
     const { limit = 10, offset = 0 } = req.query;
 
     // Verify the connection belongs to the authenticated user
@@ -147,7 +147,7 @@ router.get('/history/:connectionId', logRequest, async (req, res) => {
 router.get('/status/:connectionId', logRequest, async (req, res) => {
   try {
     const { connectionId } = req.params;
-    const userId = req.user.userId;
+    const userId = req.user.id;
 
     // Verify the connection belongs to the authenticated user
     const connection = await prisma.siteConnection.findFirst({
@@ -285,7 +285,7 @@ router.get('/schedule/status', logRequest, async (req, res) => {
 router.post('/trigger-manual-scan', logRequest, async (req, res) => {
   try {
     const { connectionId } = req.body;
-    const userId = req.user.userId;
+    const userId = req.user.id;
 
     // Production logging: `🔍 [SCANNER] Manual WCAG scan trigger requested for connection ${connectionId} by user ${userId};
 
@@ -347,7 +347,7 @@ router.post('/trigger-manual-scan', logRequest, async (req, res) => {
  */
 router.get('/stats', logRequest, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
 
     // Production logging: `📊 [SCANNER] Fetching scanner statistics for user ${userId};
 
@@ -418,7 +418,7 @@ router.get('/stats', logRequest, async (req, res) => {
  */
 router.get('/recent-scans', logRequest, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const filter = req.query.filter || 'all';
@@ -523,7 +523,7 @@ router.get('/recent-scans', logRequest, async (req, res) => {
  */
 router.get('/scan-details/:scanId', logRequest, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     const scanId = parseInt(req.params.scanId);
 
     const scanResult = await prisma.scanResult.findFirst({

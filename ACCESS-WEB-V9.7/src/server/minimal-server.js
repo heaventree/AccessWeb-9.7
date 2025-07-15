@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import wcagTestRouter from './routes/wcag-test.js';
 import siteConnectionsRouter from './routes/siteConnections.js';
+import scannerRouter from './routes/scanner.js';
 import { getAllPricingPlans, getPricingPlan } from '../api/pricing-plans.js';
 import authRouter from '../api/auth.js';
 import adminRouter from '../api/admin.js';
@@ -39,6 +40,9 @@ app.use('/api/admin', adminRouter);
 
 // Site connections routes
 app.use('/api/site-connections', siteConnectionsRouter);
+
+// Scanner routes
+app.use('/api/scanner', scannerRouter);
 
 // WCAG test routes
 app.use('/api/wcag-test', wcagTestRouter);
