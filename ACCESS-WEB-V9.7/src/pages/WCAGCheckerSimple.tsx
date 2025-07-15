@@ -471,11 +471,14 @@ const WCAGCheckerSimple: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 w-full space-y-6"
           >
-            {/* Report Header - Title Only */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            {/* Report Header - Clean Title without Shadow */}
+            <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 p-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Accessibility Report for {scanResult.scanMetadata?.url || url}
               </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Comprehensive WCAG 2.2 compliance analysis
+              </p>
             </div>
 
             {/* Separated Issue Count Boxes - Second image style */}
