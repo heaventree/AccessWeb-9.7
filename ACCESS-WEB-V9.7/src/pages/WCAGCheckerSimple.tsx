@@ -244,7 +244,7 @@ const WCAGCheckerSimple: React.FC = () => {
     setShowResults(false);
     setIsScanning(true);
 
-    showToast("Scan Started", "Analyzing accessibility compliance...");
+    // Toast removed for cleaner scanning experience
 
     try {
       console.log('Starting WCAG scan for URL:', url);
@@ -271,7 +271,7 @@ const WCAGCheckerSimple: React.FC = () => {
       // Update scan result and show results section
       setScanResult(data);
       setShowResults(true);
-      showToast("Scan Complete", "Accessibility analysis completed successfully!");
+      // Toast removed for cleaner scanning experience
 
       // Save to scan history
       if (user) {
@@ -659,7 +659,7 @@ const WCAGCheckerSimple: React.FC = () => {
                               <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Affected Elements:
                               </h5>
-                              <div className="bg-gray-100 dark:bg-slate-700 p-3 rounded text-sm font-mono text-gray-800 dark:text-gray-200 overflow-x-auto">
+                              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 rounded text-sm font-mono text-red-900 dark:text-red-100 overflow-x-auto">
                                 {issue.htmlSnippet || issue.element || issue.selector || '<textarea class="gtf7f" aria-controls="AlhGid" aria-owns="AlhGid" autofocus="" title="Search" value="" aria-label="Search" placeholder="" aria-autocomplete="both" aria-expanded="false" aria-haspopup="...'}
                               </div>
                             </div>
@@ -669,7 +669,7 @@ const WCAGCheckerSimple: React.FC = () => {
                               <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 WCAG Criteria:
                               </h5>
-                              <div className="bg-gray-100 dark:bg-slate-700 px-3 py-2 rounded text-sm text-gray-800 dark:text-gray-200">
+                              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-3 py-2 rounded text-sm text-red-900 dark:text-red-100">
                                 {issue.wcagRule || 'aria-allowed-role'}
                               </div>
                             </div>
