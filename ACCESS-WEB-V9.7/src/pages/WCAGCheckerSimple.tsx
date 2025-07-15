@@ -291,85 +291,90 @@ const WCAGCheckerSimple: React.FC = () => {
             </p>
           </div>
 
-          {/* Region Selection */}
-          <div className="flex justify-center">
-            <div className="flex gap-4 flex-wrap justify-center">
-              {regions.map((region) => (
-                <button
-                  key={region}
-                  onClick={() => setSelectedRegion(region)}
-                  className={`px-6 py-3 text-sm font-medium transition-all ${
-                    selectedRegion === region
-                      ? 'bg-blue-200 text-blue-800 rounded-lg'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {region}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Standards Selection */}
-          <div className="flex justify-center">
-            <div className="flex gap-4 justify-center flex-wrap">
-              {standards.map((standard) => (
-                <span
-                  key={standard.id}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium ${standard.color}`}
-                >
-                  {standard.label}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* URL Input Section */}
+          {/* Main Container with all sections */}
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 p-6">
-              <div className="relative">
-                <Input
-                  type="url"
-                  value={url}
-                  onChange={(e) => handleUrlChange(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Enter website URL (e.g., example.com)"
-                  className={`text-lg h-16 pr-44 pl-6 border-0 rounded-lg bg-gray-50 dark:bg-slate-700 focus:ring-0 focus:border-0 w-full ${
-                    urlError 
-                      ? 'text-red-600 dark:text-red-400' 
-                      : 'text-gray-900 dark:text-white'
-                  }`}
-                  disabled={isScanning}
-                  aria-describedby={urlError ? 'url-error' : undefined}
-                  required
-                />
-                <Button
-                  onClick={startScan}
-                  disabled={isScanning || !url.trim() || !!urlError}
-                  className="absolute right-3 top-3 h-10 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 flex items-center gap-2 font-medium"
-                >
-                  {isScanning ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      Scanning...
-                    </>
-                  ) : (
-                    <>
-                      🔍 Check Site
-                    </>
-                  )}
-                </Button>
-              </div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 p-8 space-y-6">
               
-              {urlError && (
-                <div id="url-error" className="mt-4 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
-                  {urlError}
+              {/* Region Selection */}
+              <div className="flex justify-center">
+                <div className="flex gap-4 flex-wrap justify-center">
+                  {regions.map((region) => (
+                    <button
+                      key={region}
+                      onClick={() => setSelectedRegion(region)}
+                      className={`px-6 py-3 text-sm font-medium transition-all ${
+                        selectedRegion === region
+                          ? 'bg-blue-200 text-blue-800 rounded-lg'
+                          : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                      }`}
+                    >
+                      {region}
+                    </button>
+                  ))}
                 </div>
-              )}
+              </div>
 
-              <p className="mt-6 text-sm text-blue-600 dark:text-blue-400 font-medium">
-                The scan typically takes 30-60 seconds depending on the size of your website
-              </p>
+              {/* Standards Selection */}
+              <div className="flex justify-center">
+                <div className="flex gap-4 justify-center flex-wrap">
+                  {standards.map((standard) => (
+                    <span
+                      key={standard.id}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium ${standard.color}`}
+                    >
+                      {standard.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* URL Input Section */}
+              <div className="space-y-4">
+                <div className="relative">
+                  <Input
+                    type="url"
+                    value={url}
+                    onChange={(e) => handleUrlChange(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Enter website URL (e.g., example.com)"
+                    className={`text-lg h-16 pr-44 pl-6 border-0 rounded-lg bg-gray-50 dark:bg-slate-700 focus:ring-0 focus:border-0 w-full ${
+                      urlError 
+                        ? 'text-red-600 dark:text-red-400' 
+                        : 'text-gray-900 dark:text-white'
+                    }`}
+                    disabled={isScanning}
+                    aria-describedby={urlError ? 'url-error' : undefined}
+                    required
+                  />
+                  <Button
+                    onClick={startScan}
+                    disabled={isScanning || !url.trim() || !!urlError}
+                    className="absolute right-3 top-3 h-10 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 flex items-center gap-2 font-medium"
+                  >
+                    {isScanning ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        Scanning...
+                      </>
+                    ) : (
+                      <>
+                        🔍 Check Site
+                      </>
+                    )}
+                  </Button>
+                </div>
+                
+                {urlError && (
+                  <div id="url-error" className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                    {urlError}
+                  </div>
+                )}
+
+                <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                  The scan typically takes 30-60 seconds depending on the size of your website
+                </p>
+              </div>
+
             </div>
           </div>
         </div>
