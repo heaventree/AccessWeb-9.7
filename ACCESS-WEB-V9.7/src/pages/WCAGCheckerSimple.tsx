@@ -291,7 +291,13 @@ const WCAGCheckerSimple: React.FC = () => {
     // Toast removed for cleaner scanning experience
 
     try {
+      // Get fresh standards for current region
+      const currentRegionStandards = getStandardsForRegion(selectedRegion);
+      const activeStandards = currentRegionStandards.filter(s => s.highlighted).map(s => s.id);
+      
       console.log('Starting WCAG scan for URL:', url);
+      console.log('Region:', selectedRegion);
+      console.log('Standards:', activeStandards);
       
       const response = await fetch(`${API_ENDPOINTS.WCAG_SCAN}`, {
         method: 'POST',
@@ -301,7 +307,7 @@ const WCAGCheckerSimple: React.FC = () => {
         body: JSON.stringify({ 
           url: url,
           region: selectedRegion,
-          standards: currentStandards.filter(s => s.highlighted).map(s => s.id),
+          standards: activeStandards,
           advancedOptions 
         }),
       });
@@ -350,7 +356,7 @@ const WCAGCheckerSimple: React.FC = () => {
     } finally {
       setIsScanning(false);
     }
-  }, [url, user, scanHistory]);
+  }, [url, user, scanHistory, selectedRegion, advancedOptions]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !isScanning && url.trim()) {
