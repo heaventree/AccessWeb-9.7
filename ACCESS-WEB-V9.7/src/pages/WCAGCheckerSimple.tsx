@@ -556,21 +556,43 @@ const WCAGCheckerSimple: React.FC = () => {
                   Issues Found ({scanResult.issues.length})
                 </h3>
                 
-                {scanResult.issues.map((issue, index) => (
-                  <div 
-                    key={index}
-                    className="bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-700 rounded-lg overflow-hidden"
-                  >
-                    {/* Issue Header - Matching the provided design */}
+                {scanResult.issues.map((issue, index) => {
+                  // Get the background color based on severity
+                  const getSeverityBackground = (severity: string) => {
+                    switch (severity) {
+                      case 'critical': return 'bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-800';
+                      case 'serious': return 'bg-orange-50 border-orange-200 dark:bg-orange-900/10 dark:border-orange-800';  
+                      case 'moderate': return 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/10 dark:border-yellow-800';
+                      case 'minor': return 'bg-blue-50 border-blue-200 dark:bg-blue-900/10 dark:border-blue-800';
+                      default: return 'bg-gray-50 border-gray-200 dark:bg-gray-900/10 dark:border-gray-800';
+                    }
+                  };
+
+                  const getSeverityBadgeColor = (severity: string) => {
+                    switch (severity) {
+                      case 'critical': return 'bg-red-500 text-white';
+                      case 'serious': return 'bg-orange-500 text-white';
+                      case 'moderate': return 'bg-yellow-500 text-white';
+                      case 'minor': return 'bg-blue-500 text-white';
+                      default: return 'bg-gray-500 text-white';
+                    }
+                  };
+
+                  return (
                     <div 
-                      className="p-4 cursor-pointer flex items-start justify-between hover:bg-gray-50 dark:hover:bg-slate-700"
-                      onClick={() => toggleIssue(index.toString())}
+                      key={index}
+                      className={`rounded-lg border overflow-hidden ${getSeverityBackground(issue.severity)}`}
                     >
-                      <div className="flex-1">
-                        {/* Expand/Collapse Icon */}
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-2">
-                            <button className="text-gray-400 hover:text-gray-600">
+                      {/* Issue Header - Collapsible */}
+                      <div 
+                        className="p-4 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-800/50"
+                        onClick={() => toggleIssue(index.toString())}
+                      >
+                        <div className="flex items-start justify-between">
+                          {/* Left side with expand icon and title */}
+                          <div className="flex items-start gap-3 flex-1">
+                            {/* Expand/Collapse Icon */}
+                            <button className="mt-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
                               <svg 
                                 className={`w-4 h-4 transform transition-transform ${
                                   expandedIssues[index.toString()] ? 'rotate-90' : ''
@@ -581,99 +603,80 @@ const WCAGCheckerSimple: React.FC = () => {
                                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                               </svg>
                             </button>
+                            
+                            {/* Issue Title */}
+                            <div className="flex-1">
+                              <h4 className="text-base font-medium text-gray-900 dark:text-white">
+                                {issue.ruleName || issue.wcagRule || 'ARIA role should be appropriate for the element'}
+                              </h4>
+                            </div>
                           </div>
                           
-                          {/* Severity Badge */}
-                          <span className="bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded">
+                          {/* Right side with severity badge */}
+                          <span className={`text-xs font-medium px-2 py-1 rounded ${getSeverityBadgeColor(issue.severity)}`}>
                             {issue.severity}
                           </span>
                         </div>
-                        
-                        {/* Issue Title */}
-                        <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                          {issue.ruleName || issue.wcagRule}
-                        </h4>
-                        
-                        {/* Affected Elements Section */}
-                        <div className="mb-4">
-                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Affected Elements:
-                          </h5>
-                          <div className="bg-gray-100 dark:bg-slate-700 p-3 rounded text-sm font-mono text-gray-800 dark:text-gray-200">
-                            {issue.htmlSnippet || issue.element || issue.selector || '{"selector":"div:nth-of-type(1)"}'}
-                          </div>
-                        </div>
-                        
-                        {/* WCAG Criteria Section */}
-                        <div className="mb-4">
-                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            WCAG Criteria:
-                          </h5>
-                          <div className="bg-gray-100 dark:bg-slate-700 px-3 py-2 rounded text-sm text-gray-800 dark:text-gray-200">
-                            {issue.wcagRule || '1.4.3'}
-                          </div>
-                        </div>
-                        
-                        {/* Action Buttons */}
-                        <div className="flex flex-wrap gap-3">
-                          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 border border-blue-200 rounded hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20">
-                            <Eye className="w-4 h-4" />
-                            View Fix
-                          </button>
-                          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-purple-600 border border-purple-200 rounded hover:bg-purple-50 dark:text-purple-400 dark:border-purple-700 dark:hover:bg-purple-900/20">
-                            <Lightbulb className="w-4 h-4" />
-                            Learn More
-                          </button>
-                          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded hover:bg-green-100 dark:text-green-400 dark:bg-green-900/20 dark:border-green-700 dark:hover:bg-green-900/30">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                            </svg>
-                            Apply Fix
-                            <span className="bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded font-bold ml-1">PRO</span>
-                          </button>
-                          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">
-                            <Users className="w-4 h-4" />
-                            Get AI Suggestions
-                            <span className="bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded font-bold ml-1">PRO</span>
-                          </button>
-                        </div>
                       </div>
-                    </div>
 
-                    {/* Expanded Issue Details */}
-                    {expandedIssues[index.toString()] && (
-                      <motion.div 
-                        initial={{ height: 0 }}
-                        animate={{ height: 'auto' }}
-                        className="border-t border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 p-4"
-                      >
-                        <div className="space-y-4">
-                          <div>
-                            <h5 className="font-medium text-gray-900 dark:text-white mb-2">Description:</h5>
-                            <p className="text-sm text-gray-700 dark:text-gray-300">{issue.description}</p>
-                          </div>
-                          
-                          <div>
-                            <h5 className="font-medium text-gray-900 dark:text-white mb-2">How to Fix:</h5>
-                            <p className="text-sm text-gray-700 dark:text-gray-300">{issue.recommendation}</p>
-                          </div>
-                          
-                          <div>
-                            <h5 className="font-medium text-gray-900 dark:text-white mb-2">WCAG Principle:</h5>
-                            <p className="text-sm text-gray-700 dark:text-gray-300">{issue.principle}</p>
-                          </div>
-                          
-                          {issue.location && (
+                      {/* Expanded Issue Details */}
+                      {expandedIssues[index.toString()] && (
+                        <motion.div 
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="border-t border-gray-200 dark:border-slate-600"
+                        >
+                          <div className="p-4 space-y-4">
+                            {/* Affected Elements Section */}
                             <div>
-                              <h5 className="font-medium text-gray-900 dark:text-white mb-2">Location:</h5>
-                              <p className="text-sm text-gray-700 dark:text-gray-300">{issue.location}</p>
+                              <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Affected Elements:
+                              </h5>
+                              <div className="bg-gray-100 dark:bg-slate-700 p-3 rounded text-sm font-mono text-gray-800 dark:text-gray-200 overflow-x-auto">
+                                {issue.htmlSnippet || issue.element || issue.selector || '<textarea class="gtf7f" aria-controls="AlhGid" aria-owns="AlhGid" autofocus="" title="Search" value="" aria-label="Search" placeholder="" aria-autocomplete="both" aria-expanded="false" aria-haspopup="...'}
+                              </div>
                             </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </div>
-                ))}
+                            
+                            {/* WCAG Criteria Section */}
+                            <div>
+                              <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                WCAG Criteria:
+                              </h5>
+                              <div className="bg-gray-100 dark:bg-slate-700 px-3 py-2 rounded text-sm text-gray-800 dark:text-gray-200">
+                                {issue.wcagRule || 'aria-allowed-role'}
+                              </div>
+                            </div>
+                            
+                            {/* Action Buttons */}
+                            <div className="flex flex-wrap gap-3 pt-2">
+                              <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 border border-blue-200 rounded hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20">
+                                <Eye className="w-4 h-4" />
+                                View Fix
+                              </button>
+                              <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-purple-600 border border-purple-200 rounded hover:bg-purple-50 dark:text-purple-400 dark:border-purple-700 dark:hover:bg-purple-900/20">
+                                <Lightbulb className="w-4 h-4" />
+                                Learn More
+                              </button>
+                              <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded hover:bg-green-100 dark:text-green-400 dark:bg-green-900/20 dark:border-green-700 dark:hover:bg-green-900/30">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                                </svg>
+                                Apply Fix
+                                <span className="bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded font-bold ml-1">PRO</span>
+                              </button>
+                              <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">
+                                <Users className="w-4 h-4" />
+                                Get AI Suggestions
+                                <span className="bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded font-bold ml-1">PRO</span>
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
