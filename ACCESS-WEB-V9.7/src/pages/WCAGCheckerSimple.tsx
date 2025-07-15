@@ -365,7 +365,7 @@ const WCAGCheckerSimple: React.FC = () => {
                     <button
                       key={region}
                       onClick={() => setSelectedRegion(region)}
-                      className={`px-4 py-2 text-sm font-medium transition-all rounded-lg border ${
+                      className={`w-20 py-2 text-sm font-medium transition-all rounded-lg border text-center ${
                         selectedRegion === region
                           ? 'bg-blue-100 text-blue-700 border-blue-200'
                           : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 dark:bg-slate-700 dark:text-gray-300 dark:border-slate-600 dark:hover:bg-slate-600'
