@@ -10,7 +10,12 @@ interface IssueFixModalProps {
 }
 
 export function IssueFixModal({ isOpen, onClose, issue }: IssueFixModalProps) {
-  if (!isOpen || !issue) return null;
+  console.log('IssueFixModal render:', { isOpen, issue: issue?.description });
+  
+  if (!isOpen || !issue) {
+    console.log('Modal not showing because:', { isOpen, hasIssue: !!issue });
+    return null;
+  }
 
   const wcagInfo = getWCAGInfo(issue.id);
 

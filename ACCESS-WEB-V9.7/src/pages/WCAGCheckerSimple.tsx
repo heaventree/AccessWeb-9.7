@@ -7,6 +7,8 @@ import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { RefreshCw, Search, History, ExternalLink, AlertTriangle, ExternalLinkIcon, Eye, Lightbulb, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { IssueFixModal } from '../components/IssueFixModal';
+import type { AccessibilityIssue } from '../types';
 
 interface ScanResult {
   success: boolean;
@@ -84,6 +86,8 @@ const WCAGCheckerSimple: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
   const [expandedIssues, setExpandedIssues] = useState<Record<string, boolean>>({});
   const [allExpanded, setAllExpanded] = useState(false);
+  const [fixModalOpen, setFixModalOpen] = useState(false);
+  const [selectedIssueForFix, setSelectedIssueForFix] = useState<AccessibilityIssue | null>(null);
   
   // New state for the redesigned UI
   const [selectedRegion, setSelectedRegion] = useState('EU');
@@ -438,6 +442,32 @@ const WCAGCheckerSimple: React.FC = () => {
     URL.revokeObjectURL(url_export);
     
     showToast("Report Exported", "WCAG accessibility report has been downloaded", "default");
+  };
+
+  // Convert Issue to AccessibilityIssue format for the modal
+  const convertToAccessibilityIssue = (issue: Issue): AccessibilityIssue => {
+    return {
+      id: issue.wcagRule || issue.ruleName || 'unknown',
+      description: issue.description || issue.ruleName || 'No description available',
+      impact: issue.severity as AccessibilityIssue['impact'],
+      nodes: [issue.htmlSnippet || issue.element || issue.selector || 'No element information'],
+      wcagCriteria: [issue.wcagRule || 'Unknown WCAG rule'],
+      fixSuggestion: issue.recommendation || 'No specific recommendation available'
+    };
+  };
+
+  // Open fix modal
+  const openFixModal = (issue: Issue) => {
+    console.log('Opening fix modal for issue:', issue);
+    const accessibilityIssue = convertToAccessibilityIssue(issue);
+    setSelectedIssueForFix(accessibilityIssue);
+    setFixModalOpen(true);
+  };
+
+  // Close fix modal
+  const closeFixModal = () => {
+    setFixModalOpen(false);
+    setSelectedIssueForFix(null);
   };
 
   return (
@@ -831,7 +861,10 @@ const WCAGCheckerSimple: React.FC = () => {
                             
                             {/* Action Buttons */}
                             <div className="flex flex-wrap gap-3 pt-2">
-                              <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 border border-blue-200 rounded hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20">
+                              <button 
+                                onClick={() => openFixModal(issue)}
+                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 border border-blue-200 rounded hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20"
+                              >
                                 <Eye className="w-4 h-4" />
                                 View Fix
                               </button>
@@ -876,6 +909,13 @@ const WCAGCheckerSimple: React.FC = () => {
           </motion.div>
         )}
       </main>
+
+      {/* Issue Fix Modal */}
+      <IssueFixModal
+        isOpen={fixModalOpen}
+        onClose={closeFixModal}
+        issue={selectedIssueForFix}
+      />
     </div>
   );
 };

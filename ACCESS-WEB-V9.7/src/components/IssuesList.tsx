@@ -84,8 +84,10 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
   };
 
   const openIssueFix = (issue: AccessibilityIssue) => {
+    console.log('Opening fix modal for issue:', issue);
     setSelectedIssue(issue);
     setModalView('fix');
+    console.log('Modal view set to fix, selectedIssue:', issue);
   };
 
   const closeModal = () => {
