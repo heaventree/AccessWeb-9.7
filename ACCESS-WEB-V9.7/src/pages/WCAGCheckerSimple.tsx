@@ -394,6 +394,34 @@ const WCAGCheckerSimple: React.FC = () => {
     }
   };
 
+  // Export report function
+  const exportReport = () => {
+    if (!scanResult) return;
+    
+    const reportData = {
+      url: scanResult.scanMetadata?.url || url,
+      timestamp: new Date().toISOString(),
+      summary: scanResult.summary,
+      issues: scanResult.issues,
+      passedChecks: scanResult.passedChecks,
+      scanMetadata: scanResult.scanMetadata
+    };
+    
+    const dataStr = JSON.stringify(reportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url_export = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url_export;
+    link.download = `wcag-report-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url_export);
+    
+    showToast("Report Exported", "WCAG accessibility report has been downloaded", "default");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       {/* Main Content */}
@@ -415,12 +443,12 @@ const WCAGCheckerSimple: React.FC = () => {
               
               {/* Region Selection */}
               <div className="flex justify-center">
-                <div className="flex gap-3 sm:gap-4 flex-wrap justify-center max-w-full">
+                <div className="flex gap-3 flex-wrap justify-center max-w-full">
                   {regions.map((region) => (
                     <button
                       key={region}
                       onClick={() => setSelectedRegion(region)}
-                      className={`w-20 sm:w-24 md:w-28 py-2 text-sm sm:text-base font-medium transition-all duration-200 rounded-lg border text-center ${
+                      className={`w-20 sm:w-24 md:w-28 py-1.5 text-sm font-medium transition-all duration-200 rounded-md border text-center ${
                         selectedRegion === region
                           ? 'bg-blue-100 text-blue-700 border-blue-300 shadow-sm'
                           : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 hover:border-gray-300 dark:bg-slate-700 dark:text-gray-300 dark:border-slate-600 dark:hover:bg-slate-600'
@@ -434,11 +462,11 @@ const WCAGCheckerSimple: React.FC = () => {
 
               {/* Standards Selection */}
               <div className="flex justify-center">
-                <div className="flex gap-3 sm:gap-4 justify-center flex-wrap max-w-full">
+                <div className="flex gap-3 justify-center flex-wrap max-w-full">
                   {currentStandards.map((standard) => (
                     <span
                       key={standard.id}
-                      className={`w-24 sm:w-28 md:w-32 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium text-center transition-all duration-200 ${standard.color} ${
+                      className={`w-24 sm:w-28 md:w-32 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-center transition-all duration-200 ${standard.color} ${
                         standard.highlighted ? 'ring-2 ring-offset-2 ring-blue-500 font-bold transform scale-105' : ''
                       }`}
                     >
@@ -532,12 +560,25 @@ const WCAGCheckerSimple: React.FC = () => {
           >
             {/* Report Header - Clean Title without Shadow */}
             <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Accessibility Report for {scanResult.scanMetadata?.url || url}
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-                Comprehensive WCAG 2.2 compliance analysis
-              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    Test Results
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+                    {scanResult.scanMetadata?.url || url}
+                  </p>
+                </div>
+                <button
+                  onClick={() => exportReport()}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-slate-700 dark:border-slate-600 dark:text-gray-300 dark:hover:bg-slate-600"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Export Report
+                </button>
+              </div>
             </div>
 
             {/* Separated Issue Count Boxes - Second image style */}
