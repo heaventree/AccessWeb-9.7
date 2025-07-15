@@ -278,31 +278,31 @@ const WCAGCheckerSimple: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       {/* Main Content */}
       <main id="main-content" className="max-w-4xl mx-auto px-4 pt-24 pb-8">
         <div className="text-center space-y-8">
           {/* Header */}
-          <div className="space-y-3">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <div className="space-y-4">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
               WCAG 2.1 Accessibility Checker
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-lg text-gray-600 dark:text-gray-400">
               Test your website against WCAG 2.1 standards
             </p>
           </div>
 
           {/* Region Selection */}
           <div className="flex justify-center">
-            <div className="flex bg-gray-100 dark:bg-slate-700 rounded-lg p-1 gap-1">
+            <div className="flex bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 overflow-hidden">
               {regions.map((region) => (
                 <button
                   key={region}
                   onClick={() => setSelectedRegion(region)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  className={`px-6 py-3 text-sm font-medium transition-all border-r border-gray-200 dark:border-slate-600 last:border-r-0 ${
                     selectedRegion === region
-                      ? 'bg-blue-500 text-white shadow-sm'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-slate-600'
+                      ? 'bg-blue-500 text-white'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-700'
                   }`}
                 >
                   {region}
@@ -313,36 +313,31 @@ const WCAGCheckerSimple: React.FC = () => {
 
           {/* Standards Selection */}
           <div className="flex justify-center">
-            <div className="flex flex-wrap gap-2 justify-center">
+            <div className="flex gap-3 justify-center">
               {standards.map((standard) => (
-                <button
+                <span
                   key={standard.id}
-                  onClick={() => toggleStandard(standard.id)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    selectedStandards.includes(standard.id)
-                      ? standard.color
-                      : 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600'
-                  }`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${standard.color}`}
                 >
                   {standard.label}
-                </button>
+                </span>
               ))}
             </div>
           </div>
 
           {/* URL Input Section */}
-          <div className="max-w-2xl mx-auto space-y-4">
-            <div className="relative">
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="relative bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 shadow-sm">
               <Input
                 type="url"
                 value={url}
                 onChange={(e) => handleUrlChange(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Enter website URL (e.g., example.com)"
-                className={`text-lg h-14 pr-40 pl-6 border-2 rounded-lg ${
+                className={`text-lg h-16 pr-40 pl-6 border-0 rounded-lg bg-transparent focus:ring-0 focus:border-0 ${
                   urlError 
-                    ? 'border-red-300 dark:border-red-600 focus:border-red-500 focus:ring-red-200' 
-                    : 'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-200'
+                    ? 'text-red-600 dark:text-red-400' 
+                    : 'text-gray-900 dark:text-white'
                 }`}
                 disabled={isScanning}
                 aria-describedby={urlError ? 'url-error' : undefined}
@@ -351,16 +346,15 @@ const WCAGCheckerSimple: React.FC = () => {
               <Button
                 onClick={startScan}
                 disabled={isScanning || !url.trim() || !!urlError}
-                className="absolute right-2 top-2 h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50"
+                className="absolute right-3 top-3 h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50 flex items-center gap-2"
               >
                 {isScanning ? (
                   <>
-                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    <RefreshCw className="w-4 h-4 animate-spin" />
                     Scanning...
                   </>
                 ) : (
                   <>
-                    <Search className="w-4 h-4 mr-2" />
                     Check Site
                   </>
                 )}
@@ -373,7 +367,7 @@ const WCAGCheckerSimple: React.FC = () => {
               </div>
             )}
 
-            <p className="text-sm text-blue-600 dark:text-blue-400">
+            <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
               The scan typically takes 30-60 seconds depending on the size of your website
             </p>
           </div>
