@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from '../config/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { RefreshCw, Search, History, ExternalLink } from 'lucide-react';
+import { RefreshCw, Search, History, ExternalLink, AlertTriangle, ExternalLinkIcon, Eye, Lightbulb, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ScanResult {
@@ -80,6 +80,9 @@ const WCAGCheckerSimple: React.FC = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [activeTab, setActiveTab] = useState('scanner');
   const [scanHistory, setScanHistory] = useState<ScanResult[]>([]);
+  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+  const [showResults, setShowResults] = useState(false);
+  const [expandedIssues, setExpandedIssues] = useState<Record<string, boolean>>({});
   
   // New state for the redesigned UI
   const [selectedRegion, setSelectedRegion] = useState('EU');
@@ -234,41 +237,69 @@ const WCAGCheckerSimple: React.FC = () => {
       return;
     }
 
-    // Clear any previous errors
+    // Clear any previous errors and results
     setUrlError('');
+    setScanResult(null);
+    setShowResults(false);
     setIsScanning(true);
 
     showToast("Scan Started", "Analyzing accessibility compliance...");
 
     try {
-      // Just navigate to results page - API call will happen there
-      setIsScanning(false);
+      console.log('Starting WCAG scan for URL:', url);
       
-      showToast("Scan Started", "Redirecting to results page...");
-      
-      // Navigate to results page with just the URL - fetch data on the results page
-      console.log('Navigating to scan results for URL:', url);
-      const resultsUrl = `/checker/result?url=${encodeURIComponent(url)}`;
-      console.log('Navigating to:', resultsUrl);
-      
-      try {
-        // Try React Router navigation first
-        navigate(resultsUrl);
-      } catch (navError) {
-        console.error('React Router navigation failed, using window.location:', navError);
-        // Fallback to direct navigation
-        setTimeout(() => {
-          window.location.href = resultsUrl;
-        }, 500);
+      const response = await fetch(`${API_ENDPOINTS.WCAG_TEST}?url=${encodeURIComponent(url)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('WCAG API Response:', data);
+
+      if (!data.success) {
+        throw new Error(data.error || 'Scan failed');
+      }
+
+      // Update scan result and show results section
+      setScanResult(data);
+      setShowResults(true);
+      showToast("Scan Complete", "Accessibility analysis completed successfully!");
+
+      // Save to scan history
+      if (user) {
+        const newScanResult = {
+          ...data,
+          scanMetadata: {
+            ...data.scanMetadata,
+            url: url,
+            timestamp: new Date().toISOString(),
+          }
+        };
+        
+        const updatedHistory = [newScanResult, ...scanHistory.slice(0, 9)];
+        setScanHistory(updatedHistory);
+        
+        try {
+          localStorage.setItem(`wcag-scan-history-${user.id}`, JSON.stringify(updatedHistory));
+        } catch (error) {
+          console.error('Error saving scan history to localStorage:', error);
+        }
       }
       
     } catch (error) {
-      console.error('Error starting WCAG scan:', error);
-      setIsScanning(false);
+      console.error('Error during WCAG scan:', error);
       setUrlError((error as Error).message || 'An error occurred while scanning');
       showToast("Scan Failed", (error as Error).message || 'An error occurred while scanning', "destructive");
+    } finally {
+      setIsScanning(false);
     }
-  }, [url, navigate, user, scanHistory]);
+  }, [url, user, scanHistory]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !isScanning && url.trim()) {
@@ -276,10 +307,40 @@ const WCAGCheckerSimple: React.FC = () => {
     }
   };
 
+  // Helper function to toggle issue expansion
+  const toggleIssue = (index: string) => {
+    setExpandedIssues(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
+
+  // Helper function to get severity color
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'bg-red-100 border-red-200 text-red-800';
+      case 'serious': return 'bg-orange-100 border-orange-200 text-orange-800';  
+      case 'moderate': return 'bg-yellow-100 border-yellow-200 text-yellow-800';
+      case 'minor': return 'bg-blue-100 border-blue-200 text-blue-800';
+      default: return 'bg-gray-100 border-gray-200 text-gray-800';
+    }
+  };
+
+  // Helper function to get severity badge
+  const getSeverityBadge = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'bg-red-600 text-white';
+      case 'serious': return 'bg-orange-600 text-white';
+      case 'moderate': return 'bg-yellow-600 text-white';
+      case 'minor': return 'bg-blue-600 text-white';
+      default: return 'bg-gray-600 text-white';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       {/* Main Content */}
-      <main id="main-content" className="max-w-4xl mx-auto px-4 pt-24 pb-8">
+      <main id="main-content" className="max-w-6xl mx-auto px-4 pt-24 pb-8">
         <div className="text-center space-y-12">
           {/* Header */}
           <div className="space-y-4">
@@ -396,6 +457,160 @@ const WCAGCheckerSimple: React.FC = () => {
             </div>
             <div className="text-xs text-blue-600/80 dark:text-blue-400/80">
               Fetching HTML content and running WCAG compliance checks...
+            </div>
+          </motion.div>
+        )}
+
+        {/* Results Section */}
+        {showResults && scanResult && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 space-y-6"
+          >
+            {/* Summary Header */}
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 p-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Accessibility Report for {scanResult.scanMetadata?.url || url}
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                    {scanResult.summary?.severityBreakdown?.critical || 0}
+                  </div>
+                  <div className="text-sm text-red-600 dark:text-red-400">Critical Issues</div>
+                </div>
+                
+                <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                    {scanResult.summary?.severityBreakdown?.serious || 0}
+                  </div>
+                  <div className="text-sm text-orange-600 dark:text-orange-400">Serious Issues</div>
+                </div>
+                
+                <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                    {scanResult.summary?.severityBreakdown?.moderate || 0}
+                  </div>
+                  <div className="text-sm text-yellow-600 dark:text-yellow-400">Moderate Issues</div>
+                </div>
+                
+                <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {scanResult.summary?.passedChecks || 0}
+                  </div>
+                  <div className="text-sm text-green-600 dark:text-green-400">Passed Checks</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Issues List */}
+            {scanResult.issues && scanResult.issues.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Issues Found ({scanResult.issues.length})
+                </h3>
+                
+                {scanResult.issues.map((issue, index) => (
+                  <div 
+                    key={index}
+                    className={`border rounded-lg overflow-hidden ${getSeverityColor(issue.severity)}`}
+                  >
+                    {/* Issue Header - Matching the provided image */}
+                    <div 
+                      className="p-4 cursor-pointer flex items-center justify-between hover:bg-opacity-80"
+                      onClick={() => toggleIssue(index.toString())}
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className={`px-2 py-1 text-xs font-medium rounded ${getSeverityBadge(issue.severity)}`}>
+                            {issue.severity}
+                          </span>
+                          <h4 className="font-medium text-gray-900">
+                            {issue.ruleName || issue.wcagRule}
+                          </h4>
+                        </div>
+                        
+                        <div className="text-sm text-gray-700 mb-3">
+                          <strong>Affected Elements:</strong>
+                        </div>
+                        
+                        <div className="bg-gray-100 p-3 rounded text-sm font-mono text-gray-800 mb-3">
+                          {issue.htmlSnippet || issue.element || issue.selector}
+                        </div>
+                        
+                        <div className="flex gap-3">
+                          <button className="flex items-center gap-1 text-blue-600 text-sm font-medium hover:underline">
+                            <Eye className="w-4 h-4" />
+                            View Fix
+                          </button>
+                          <button className="flex items-center gap-1 text-purple-600 text-sm font-medium hover:underline">
+                            <Lightbulb className="w-4 h-4" />
+                            Learn More
+                          </button>
+                          <button className="flex items-center gap-1 text-purple-600 text-sm font-medium hover:underline bg-purple-100 px-3 py-1 rounded">
+                            <Users className="w-4 h-4" />
+                            Get AI Suggestions
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="ml-4">
+                        <AlertTriangle className={`w-5 h-5 transform transition-transform ${
+                          expandedIssues[index.toString()] ? 'rotate-180' : ''
+                        }`} />
+                      </div>
+                    </div>
+
+                    {/* Expanded Issue Details */}
+                    {expandedIssues[index.toString()] && (
+                      <motion.div 
+                        initial={{ height: 0 }}
+                        animate={{ height: 'auto' }}
+                        className="border-t bg-white bg-opacity-50 p-4"
+                      >
+                        <div className="space-y-3">
+                          <div>
+                            <h5 className="font-medium text-gray-900 mb-1">Description:</h5>
+                            <p className="text-sm text-gray-700">{issue.description}</p>
+                          </div>
+                          
+                          <div>
+                            <h5 className="font-medium text-gray-900 mb-1">How to Fix:</h5>
+                            <p className="text-sm text-gray-700">{issue.recommendation}</p>
+                          </div>
+                          
+                          <div>
+                            <h5 className="font-medium text-gray-900 mb-1">WCAG Rule:</h5>
+                            <p className="text-sm text-gray-700">{issue.wcagRule} - {issue.principle}</p>
+                          </div>
+                          
+                          {issue.location && (
+                            <div>
+                              <h5 className="font-medium text-gray-900 mb-1">Location:</h5>
+                              <p className="text-sm text-gray-700">{issue.location}</p>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Call to Action */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 text-center">
+              <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                Need Help Fixing These Issues?
+              </h3>
+              <p className="text-blue-700 dark:text-blue-300 mb-4">
+                Our team of accessibility experts can help you implement these fixes and ensure ongoing compliance.
+              </p>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                Get Expert Help
+              </Button>
             </div>
           </motion.div>
         )}

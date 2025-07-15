@@ -114,6 +114,9 @@ The WCAG Accessibility Audit Tool is a comprehensive platform for testing, monit
 
 ## Changelog
 
+- July 15, 2025: Redesigned WCAG Checker page to display results inline instead of redirecting to separate result page
+- July 15, 2025: Updated issue display UI to match provided design with collapsible issue cards, severity badges, and action buttons
+- July 15, 2025: Removed separate /checker/result and /scan-results routes in favor of single-page experience
 - July 14, 2025: Upgraded WCAG scanner to use industry-standard axe-core library with Puppeteer for accurate accessibility testing
 - July 14, 2025: Implemented functional WCAG 2.1 compliance scanner replacing static mock data with real accessibility testing
 - July 14, 2025: Fixed Express trust proxy configuration to resolve rate limiting errors
