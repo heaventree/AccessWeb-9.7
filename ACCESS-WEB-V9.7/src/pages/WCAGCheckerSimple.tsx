@@ -94,9 +94,10 @@ const WCAGCheckerSimple: React.FC = () => {
   
   // Standards options with colors - matching the screenshot
   const standards = [
-    { id: 'EN 301 549', label: 'EN 301 549', color: 'bg-purple-200 text-purple-800' },
-    { id: 'EAA', label: 'EAA', color: 'bg-orange-200 text-orange-800' },
-    { id: 'WCAG 2.1', label: 'WCAG 2.1', color: 'bg-blue-200 text-blue-800' }
+    { id: 'EN 301 549', label: 'EN 301 549', color: 'bg-red-100 text-red-700 border border-red-200' },
+    { id: 'EAA', label: 'EAA', color: 'bg-orange-100 text-orange-700 border border-orange-200' },
+    { id: 'WCAG 2.1', label: 'WCAG 2.1', color: 'bg-blue-100 text-blue-700 border border-blue-200' },
+    { id: 'WCAG 2.2', label: 'WCAG 2.2', color: 'bg-purple-100 text-purple-700 border border-purple-200' }
   ];
 
   // Advanced testing options
@@ -359,15 +360,15 @@ const WCAGCheckerSimple: React.FC = () => {
               
               {/* Region Selection */}
               <div className="flex justify-center">
-                <div className="flex gap-4 flex-wrap justify-center">
+                <div className="flex gap-2 flex-wrap justify-center">
                   {regions.map((region) => (
                     <button
                       key={region}
                       onClick={() => setSelectedRegion(region)}
-                      className={`px-6 py-3 text-sm font-medium transition-all ${
+                      className={`px-4 py-2 text-sm font-medium transition-all rounded-lg border ${
                         selectedRegion === region
-                          ? 'bg-blue-200 text-blue-800 rounded-lg'
-                          : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                          ? 'bg-blue-100 text-blue-700 border-blue-200'
+                          : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 dark:bg-slate-700 dark:text-gray-300 dark:border-slate-600 dark:hover:bg-slate-600'
                       }`}
                     >
                       {region}
@@ -378,11 +379,11 @@ const WCAGCheckerSimple: React.FC = () => {
 
               {/* Standards Selection */}
               <div className="flex justify-center">
-                <div className="flex gap-4 justify-center flex-wrap">
+                <div className="flex gap-3 justify-center flex-wrap">
                   {standards.map((standard) => (
                     <span
                       key={standard.id}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium ${standard.color}`}
+                      className={`px-4 py-2 rounded-full text-sm font-medium ${standard.color}`}
                     >
                       {standard.label}
                     </span>
@@ -398,10 +399,10 @@ const WCAGCheckerSimple: React.FC = () => {
                     value={url}
                     onChange={(e) => handleUrlChange(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Enter website URL (e.g., example.com)"
-                    className={`text-lg h-16 pr-44 pl-6 border-0 rounded-lg bg-gray-50 dark:bg-slate-700 focus:ring-0 focus:border-0 w-full ${
+                    placeholder="https://google.com"
+                    className={`text-base h-14 pr-36 pl-4 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full ${
                       urlError 
-                        ? 'text-red-600 dark:text-red-400' 
+                        ? 'text-red-600 dark:text-red-400 border-red-300' 
                         : 'text-gray-900 dark:text-white'
                     }`}
                     disabled={isScanning}
@@ -411,7 +412,7 @@ const WCAGCheckerSimple: React.FC = () => {
                   <Button
                     onClick={startScan}
                     disabled={isScanning || !url.trim() || !!urlError}
-                    className="absolute right-3 top-3 h-10 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 flex items-center gap-2 font-medium"
+                    className="absolute right-2 top-2 h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50 flex items-center gap-2 font-medium text-sm"
                   >
                     {isScanning ? (
                       <>
@@ -420,7 +421,8 @@ const WCAGCheckerSimple: React.FC = () => {
                       </>
                     ) : (
                       <>
-                        🔍 Check Site
+                        <Search className="w-4 h-4" />
+                        Scanning...
                       </>
                     )}
                   </Button>
