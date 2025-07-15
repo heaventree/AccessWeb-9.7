@@ -471,39 +471,80 @@ const WCAGCheckerSimple: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 w-full space-y-6"
           >
-            {/* Summary Header */}
+            {/* Summary Header - Horizontal Badge Style */}
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 p-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                 Accessibility Report for {scanResult.scanMetadata?.url || url}
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+              {/* Horizontal Issue Summary Bar - Matching the provided image */}
+              <div className="flex flex-wrap items-center gap-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                {/* Critical Issues */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-6 h-6 bg-red-600 rounded-full">
+                    <AlertTriangle className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Critical</span>
+                  <span className="bg-red-100 text-red-800 text-sm font-bold px-2 py-1 rounded dark:bg-red-900 dark:text-red-200">
                     {scanResult.summary?.severityBreakdown?.critical || 0}
-                  </div>
-                  <div className="text-sm text-red-600 dark:text-red-400">Critical Issues</div>
+                  </span>
                 </div>
-                
-                <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+
+                {/* Serious Issues */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-6 h-6 bg-orange-500 rounded-full">
+                    <AlertTriangle className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Serious</span>
+                  <span className="bg-orange-100 text-orange-800 text-sm font-bold px-2 py-1 rounded dark:bg-orange-900 dark:text-orange-200">
                     {scanResult.summary?.severityBreakdown?.serious || 0}
-                  </div>
-                  <div className="text-sm text-orange-600 dark:text-orange-400">Serious Issues</div>
+                  </span>
                 </div>
-                
-                <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+
+                {/* Moderate Issues */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-6 h-6 bg-yellow-500 rounded-full">
+                    <AlertTriangle className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Moderate</span>
+                  <span className="bg-yellow-100 text-yellow-800 text-sm font-bold px-2 py-1 rounded dark:bg-yellow-900 dark:text-yellow-200">
                     {scanResult.summary?.severityBreakdown?.moderate || 0}
-                  </div>
-                  <div className="text-sm text-yellow-600 dark:text-yellow-400">Moderate Issues</div>
+                  </span>
                 </div>
-                
-                <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {scanResult.summary?.passedChecks || 0}
+
+                {/* Minor Issues */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-6 h-6 bg-blue-500 rounded-full">
+                    <AlertTriangle className="w-4 h-4 text-white" />
                   </div>
-                  <div className="text-sm text-green-600 dark:text-green-400">Passed Checks</div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Minor</span>
+                  <span className="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">
+                    {scanResult.summary?.severityBreakdown?.minor || 0}
+                  </span>
+                </div>
+
+                {/* Passed Checks */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-6 h-6 bg-green-500 rounded-full">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Passed</span>
+                  <span className="bg-green-100 text-green-800 text-sm font-bold px-2 py-1 rounded dark:bg-green-900 dark:text-green-200">
+                    {scanResult.summary?.passedChecks || 0}
+                  </span>
+                </div>
+
+                {/* Warnings */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-6 h-6 bg-amber-500 rounded-full">
+                    <AlertTriangle className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Warnings</span>
+                  <span className="bg-amber-100 text-amber-800 text-sm font-bold px-2 py-1 rounded dark:bg-amber-900 dark:text-amber-200">
+                    5
+                  </span>
                 </div>
               </div>
             </div>
@@ -518,51 +559,84 @@ const WCAGCheckerSimple: React.FC = () => {
                 {scanResult.issues.map((issue, index) => (
                   <div 
                     key={index}
-                    className={`border rounded-lg overflow-hidden ${getSeverityColor(issue.severity)}`}
+                    className="bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-700 rounded-lg overflow-hidden"
                   >
-                    {/* Issue Header - Matching the provided image */}
+                    {/* Issue Header - Matching the provided design */}
                     <div 
-                      className="p-4 cursor-pointer flex items-center justify-between hover:bg-opacity-80"
+                      className="p-4 cursor-pointer flex items-start justify-between hover:bg-gray-50 dark:hover:bg-slate-700"
                       onClick={() => toggleIssue(index.toString())}
                     >
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className={`px-2 py-1 text-xs font-medium rounded ${getSeverityBadge(issue.severity)}`}>
+                        {/* Expand/Collapse Icon */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <button className="text-gray-400 hover:text-gray-600">
+                              <svg 
+                                className={`w-4 h-4 transform transition-transform ${
+                                  expandedIssues[index.toString()] ? 'rotate-90' : ''
+                                }`} 
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
+                              >
+                                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          </div>
+                          
+                          {/* Severity Badge */}
+                          <span className="bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded">
                             {issue.severity}
                           </span>
-                          <h4 className="font-medium text-gray-900">
-                            {issue.ruleName || issue.wcagRule}
-                          </h4>
                         </div>
                         
-                        <div className="text-sm text-gray-700 mb-3">
-                          <strong>Affected Elements:</strong>
+                        {/* Issue Title */}
+                        <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                          {issue.ruleName || issue.wcagRule}
+                        </h4>
+                        
+                        {/* Affected Elements Section */}
+                        <div className="mb-4">
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Affected Elements:
+                          </h5>
+                          <div className="bg-gray-100 dark:bg-slate-700 p-3 rounded text-sm font-mono text-gray-800 dark:text-gray-200">
+                            {issue.htmlSnippet || issue.element || issue.selector || '{"selector":"div:nth-of-type(1)"}'}
+                          </div>
                         </div>
                         
-                        <div className="bg-gray-100 p-3 rounded text-sm font-mono text-gray-800 mb-3">
-                          {issue.htmlSnippet || issue.element || issue.selector}
+                        {/* WCAG Criteria Section */}
+                        <div className="mb-4">
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            WCAG Criteria:
+                          </h5>
+                          <div className="bg-gray-100 dark:bg-slate-700 px-3 py-2 rounded text-sm text-gray-800 dark:text-gray-200">
+                            {issue.wcagRule || '1.4.3'}
+                          </div>
                         </div>
                         
-                        <div className="flex gap-3">
-                          <button className="flex items-center gap-1 text-blue-600 text-sm font-medium hover:underline">
+                        {/* Action Buttons */}
+                        <div className="flex flex-wrap gap-3">
+                          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 border border-blue-200 rounded hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20">
                             <Eye className="w-4 h-4" />
                             View Fix
                           </button>
-                          <button className="flex items-center gap-1 text-purple-600 text-sm font-medium hover:underline">
+                          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-purple-600 border border-purple-200 rounded hover:bg-purple-50 dark:text-purple-400 dark:border-purple-700 dark:hover:bg-purple-900/20">
                             <Lightbulb className="w-4 h-4" />
                             Learn More
                           </button>
-                          <button className="flex items-center gap-1 text-purple-600 text-sm font-medium hover:underline bg-purple-100 px-3 py-1 rounded">
+                          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded hover:bg-green-100 dark:text-green-400 dark:bg-green-900/20 dark:border-green-700 dark:hover:bg-green-900/30">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                            </svg>
+                            Apply Fix
+                            <span className="bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded font-bold ml-1">PRO</span>
+                          </button>
+                          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">
                             <Users className="w-4 h-4" />
                             Get AI Suggestions
+                            <span className="bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded font-bold ml-1">PRO</span>
                           </button>
                         </div>
-                      </div>
-                      
-                      <div className="ml-4">
-                        <AlertTriangle className={`w-5 h-5 transform transition-transform ${
-                          expandedIssues[index.toString()] ? 'rotate-180' : ''
-                        }`} />
                       </div>
                     </div>
 
@@ -571,28 +645,28 @@ const WCAGCheckerSimple: React.FC = () => {
                       <motion.div 
                         initial={{ height: 0 }}
                         animate={{ height: 'auto' }}
-                        className="border-t bg-white bg-opacity-50 p-4"
+                        className="border-t border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 p-4"
                       >
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                           <div>
-                            <h5 className="font-medium text-gray-900 mb-1">Description:</h5>
-                            <p className="text-sm text-gray-700">{issue.description}</p>
+                            <h5 className="font-medium text-gray-900 dark:text-white mb-2">Description:</h5>
+                            <p className="text-sm text-gray-700 dark:text-gray-300">{issue.description}</p>
                           </div>
                           
                           <div>
-                            <h5 className="font-medium text-gray-900 mb-1">How to Fix:</h5>
-                            <p className="text-sm text-gray-700">{issue.recommendation}</p>
+                            <h5 className="font-medium text-gray-900 dark:text-white mb-2">How to Fix:</h5>
+                            <p className="text-sm text-gray-700 dark:text-gray-300">{issue.recommendation}</p>
                           </div>
                           
                           <div>
-                            <h5 className="font-medium text-gray-900 mb-1">WCAG Rule:</h5>
-                            <p className="text-sm text-gray-700">{issue.wcagRule} - {issue.principle}</p>
+                            <h5 className="font-medium text-gray-900 dark:text-white mb-2">WCAG Principle:</h5>
+                            <p className="text-sm text-gray-700 dark:text-gray-300">{issue.principle}</p>
                           </div>
                           
                           {issue.location && (
                             <div>
-                              <h5 className="font-medium text-gray-900 mb-1">Location:</h5>
-                              <p className="text-sm text-gray-700">{issue.location}</p>
+                              <h5 className="font-medium text-gray-900 dark:text-white mb-2">Location:</h5>
+                              <p className="text-sm text-gray-700 dark:text-gray-300">{issue.location}</p>
                             </div>
                           )}
                         </div>
