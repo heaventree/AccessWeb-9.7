@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import wcagTestRouter from './routes/wcag-test.js';
+import { getAllPricingPlans, getPricingPlan } from '../api/pricing-plans.js';
 
 const app = express();
 const PORT = 3001;
@@ -24,6 +25,10 @@ app.get('/api/health', (req, res) => {
 
 // WCAG test routes
 app.use('/api/wcag-test', wcagTestRouter);
+
+// Pricing plans routes
+app.get('/api/pricing-plans', getAllPricingPlans);
+app.get('/api/pricing-plans/:id', getPricingPlan);
 
 // Error handling
 app.use((error, req, res, next) => {
