@@ -141,6 +141,7 @@ app.get('/api/health', async (req, res) => {
 // Import site connections router at the top
 import siteConnectionsRouter from './routes/siteConnections.js';
 
+
 // Import scanner routes
 import scannerRouter from './routes/scanner.js';
 
