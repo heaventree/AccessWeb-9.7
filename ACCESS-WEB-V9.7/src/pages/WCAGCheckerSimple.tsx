@@ -659,7 +659,7 @@ const WCAGCheckerSimple: React.FC = () => {
                               <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Affected Elements:
                               </h5>
-                              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 rounded text-sm font-mono text-red-900 dark:text-red-100 overflow-x-auto">
+                              <div className="bg-slate-100 dark:bg-slate-700 border-l-4 border-red-500 p-3 rounded text-sm font-mono text-slate-800 dark:text-slate-200 overflow-x-auto">
                                 {issue.htmlSnippet || issue.element || issue.selector || '<textarea class="gtf7f" aria-controls="AlhGid" aria-owns="AlhGid" autofocus="" title="Search" value="" aria-label="Search" placeholder="" aria-autocomplete="both" aria-expanded="false" aria-haspopup="...'}
                               </div>
                             </div>
@@ -669,7 +669,7 @@ const WCAGCheckerSimple: React.FC = () => {
                               <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 WCAG Criteria:
                               </h5>
-                              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-3 py-2 rounded text-sm text-red-900 dark:text-red-100">
+                              <div className="bg-slate-100 dark:bg-slate-700 border-l-4 border-red-500 px-3 py-2 rounded text-sm text-slate-800 dark:text-slate-200">
                                 {issue.wcagRule || 'aria-allowed-role'}
                               </div>
                             </div>
