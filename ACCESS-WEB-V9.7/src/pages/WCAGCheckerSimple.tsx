@@ -622,7 +622,7 @@ const WCAGCheckerSimple: React.FC = () => {
                   <span className="text-xs sm:text-sm font-medium text-red-700 dark:text-red-300">Critical</span>
                 </div>
                 <div className="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">
-                  {scanResult.summary?.severityBreakdown?.critical || 1}
+                  {scanResult.summary?.severityBreakdown?.critical || 0}
                 </div>
               </div>
 
@@ -637,7 +637,7 @@ const WCAGCheckerSimple: React.FC = () => {
                   <span className="text-xs sm:text-sm font-medium text-orange-700 dark:text-orange-300">Serious</span>
                 </div>
                 <div className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">
-                  {scanResult.summary?.severityBreakdown?.serious || 2}
+                  {scanResult.summary?.severityBreakdown?.serious || 0}
                 </div>
               </div>
 
@@ -698,7 +698,7 @@ const WCAGCheckerSimple: React.FC = () => {
                   <span className="text-xs sm:text-sm font-medium text-amber-700 dark:text-amber-300">Warnings</span>
                 </div>
                 <div className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">
-                  5
+                  {scanResult.summary?.severityBreakdown?.warnings || 0}
                 </div>
               </div>
             </div>
