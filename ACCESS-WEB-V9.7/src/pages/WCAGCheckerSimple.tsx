@@ -659,7 +659,12 @@ const WCAGCheckerSimple: React.FC = () => {
                               <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Affected Elements:
                               </h5>
-                              <div className="bg-slate-100 dark:bg-slate-700 border-l-4 border-red-500 p-3 rounded text-sm font-mono text-slate-800 dark:text-slate-200 overflow-x-auto">
+                              <div className={`bg-gray-100 dark:bg-gray-800 border-l-4 p-3 rounded text-sm font-mono text-gray-800 dark:text-gray-200 overflow-x-auto ${
+                                issue.severity === 'critical' ? 'border-red-500' :
+                                issue.severity === 'serious' ? 'border-orange-500' :
+                                issue.severity === 'moderate' ? 'border-yellow-500' :
+                                issue.severity === 'minor' ? 'border-blue-500' : 'border-gray-500'
+                              }`}>
                                 {issue.htmlSnippet || issue.element || issue.selector || '<textarea class="gtf7f" aria-controls="AlhGid" aria-owns="AlhGid" autofocus="" title="Search" value="" aria-label="Search" placeholder="" aria-autocomplete="both" aria-expanded="false" aria-haspopup="...'}
                               </div>
                             </div>
@@ -669,7 +674,12 @@ const WCAGCheckerSimple: React.FC = () => {
                               <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 WCAG Criteria:
                               </h5>
-                              <div className="bg-slate-100 dark:bg-slate-700 border-l-4 border-red-500 px-3 py-2 rounded text-sm text-slate-800 dark:text-slate-200">
+                              <div className={`bg-gray-100 dark:bg-gray-800 border-l-4 px-3 py-2 rounded text-sm text-gray-800 dark:text-gray-200 ${
+                                issue.severity === 'critical' ? 'border-red-500' :
+                                issue.severity === 'serious' ? 'border-orange-500' :
+                                issue.severity === 'moderate' ? 'border-yellow-500' :
+                                issue.severity === 'minor' ? 'border-blue-500' : 'border-gray-500'
+                              }`}>
                                 {issue.wcagRule || 'aria-allowed-role'}
                               </div>
                             </div>
