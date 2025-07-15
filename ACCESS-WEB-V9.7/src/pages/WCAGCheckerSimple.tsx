@@ -415,12 +415,12 @@ const WCAGCheckerSimple: React.FC = () => {
               
               {/* Region Selection */}
               <div className="flex justify-center">
-                <div className="flex gap-2 sm:gap-3 flex-wrap justify-center max-w-full">
+                <div className="flex gap-3 sm:gap-4 flex-wrap justify-center max-w-full">
                   {regions.map((region) => (
                     <button
                       key={region}
                       onClick={() => setSelectedRegion(region)}
-                      className={`w-20 sm:w-24 md:w-28 py-2.5 sm:py-3 text-sm sm:text-base font-medium transition-all duration-200 rounded-lg border text-center ${
+                      className={`w-20 sm:w-24 md:w-28 py-2 text-sm sm:text-base font-medium transition-all duration-200 rounded-lg border text-center ${
                         selectedRegion === region
                           ? 'bg-blue-100 text-blue-700 border-blue-300 shadow-sm'
                           : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 hover:border-gray-300 dark:bg-slate-700 dark:text-gray-300 dark:border-slate-600 dark:hover:bg-slate-600'
@@ -434,11 +434,11 @@ const WCAGCheckerSimple: React.FC = () => {
 
               {/* Standards Selection */}
               <div className="flex justify-center">
-                <div className="flex gap-2 sm:gap-3 justify-center flex-wrap max-w-full">
+                <div className="flex gap-3 sm:gap-4 justify-center flex-wrap max-w-full">
                   {currentStandards.map((standard) => (
                     <span
                       key={standard.id}
-                      className={`w-24 sm:w-28 md:w-32 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium text-center transition-all duration-200 ${standard.color} ${
+                      className={`w-24 sm:w-28 md:w-32 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium text-center transition-all duration-200 ${standard.color} ${
                         standard.highlighted ? 'ring-2 ring-offset-2 ring-blue-500 font-bold transform scale-105' : ''
                       }`}
                     >
