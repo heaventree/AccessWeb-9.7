@@ -83,6 +83,7 @@ const WCAGCheckerSimple: React.FC = () => {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [expandedIssues, setExpandedIssues] = useState<Record<string, boolean>>({});
+  const [allExpanded, setAllExpanded] = useState(false);
   
   // New state for the redesigned UI
   const [selectedRegion, setSelectedRegion] = useState('EU');
@@ -372,6 +373,23 @@ const WCAGCheckerSimple: React.FC = () => {
     }));
   };
 
+  // Helper function to expand all issues
+  const expandAllIssues = () => {
+    if (!scanResult?.issues) return;
+    const newExpandedState: Record<string, boolean> = {};
+    scanResult.issues.forEach((_, index) => {
+      newExpandedState[index.toString()] = true;
+    });
+    setExpandedIssues(newExpandedState);
+    setAllExpanded(true);
+  };
+
+  // Helper function to collapse all issues
+  const collapseAllIssues = () => {
+    setExpandedIssues({});
+    setAllExpanded(false);
+  };
+
   // Helper function to get severity color
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -443,7 +461,7 @@ const WCAGCheckerSimple: React.FC = () => {
               
               {/* Region Selection */}
               <div className="flex justify-center">
-                <div className="flex gap-3 flex-wrap justify-center max-w-full">
+                <div className="flex gap-4 flex-wrap justify-center max-w-full">
                   {regions.map((region) => (
                     <button
                       key={region}
@@ -462,12 +480,12 @@ const WCAGCheckerSimple: React.FC = () => {
 
               {/* Standards Selection */}
               <div className="flex justify-center">
-                <div className="flex gap-3 justify-center flex-wrap max-w-full">
+                <div className="flex gap-4 justify-center flex-wrap max-w-full">
                   {currentStandards.map((standard) => (
                     <span
                       key={standard.id}
                       className={`w-24 sm:w-28 md:w-32 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-center transition-all duration-200 ${standard.color} ${
-                        standard.highlighted ? 'ring-2 ring-offset-2 ring-blue-500 font-bold transform scale-105' : ''
+                        standard.highlighted ? 'ring-2 ring-offset-2 ring-gray-400 font-bold transform scale-105' : ''
                       }`}
                     >
                       {standard.label}
@@ -581,8 +599,19 @@ const WCAGCheckerSimple: React.FC = () => {
               </div>
             </div>
 
-            {/* Separated Issue Count Boxes - Second image style */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            {/* Result Count Section */}
+            <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Results Overview
+                </h3>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Scanned: {new Date(scanResult.scanMetadata?.timestamp || Date.now()).toLocaleString()}
+                </div>
+              </div>
+              
+              {/* Separated Issue Count Boxes */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
               {/* Critical Box */}
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 text-center dark:bg-red-900/10 dark:border-red-800">
                 <div className="flex items-center justify-center gap-1 sm:gap-2 mb-2">
@@ -674,13 +703,30 @@ const WCAGCheckerSimple: React.FC = () => {
                 </div>
               </div>
             </div>
+            </div>
 
             {/* Issues List */}
             {scanResult.issues && scanResult.issues.length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-                  Issues Found ({scanResult.issues.length})
-                </h3>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+                    Issues Found ({scanResult.issues.length})
+                  </h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={expandAllIssues}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-slate-700 dark:border-slate-600 dark:text-gray-300 dark:hover:bg-slate-600"
+                    >
+                      Expand All
+                    </button>
+                    <button
+                      onClick={collapseAllIssues}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-slate-700 dark:border-slate-600 dark:text-gray-300 dark:hover:bg-slate-600"
+                    >
+                      Collapse All
+                    </button>
+                  </div>
+                </div>
                 
                 {scanResult.issues.map((issue, index) => {
                   // Get the background color based on severity
