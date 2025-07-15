@@ -555,7 +555,7 @@ const WCAGCheckerSimple: React.FC = () => {
                     value={url}
                     onChange={(e) => handleUrlChange(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="https://google.com"
+                    placeholder="www.example.com"
                     className={`text-sm sm:text-base h-12 sm:h-14 pr-32 sm:pr-36 pl-4 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full ${
                       urlError 
                         ? 'text-red-600 dark:text-red-400 border-red-300' 
