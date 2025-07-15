@@ -122,10 +122,10 @@ export default function PaymentSuccess() {
 
           <div className="space-y-3">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/my-account')}
               className="w-full py-3 px-4 bg-[#0fae96] text-white rounded-full font-medium hover:bg-[#0fae96]/90 transition-colors"
             >
-              Go to Dashboard
+              Go to Account
             </button>
             
             <button

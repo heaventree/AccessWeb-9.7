@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './providers/AppProvider';
 // Removed duplicate ErrorBoundary import - using CustomErrorBoundary instead
 import { LandingPage } from './pages/LandingPage';
@@ -196,7 +196,7 @@ function App() {
               <Route path="/signup" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
 
               {/* User-Only Routes (No Admin Access) */}
-              <Route path="/dashboard" element={<UserOnlyRoute><><Navigation /><main id="main-content"><SubscriptionDashboard /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
+              <Route path="/dashboard" element={<Navigate to="/my-account" replace />} />
               <Route path="/dashboard/billing" element={<UserOnlyRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
               {/* Keep old routes for backwards compatibility */}
               <Route path="/billing" element={<UserOnlyRoute><><Navigation /><main id="main-content"><BillingPage /></main><Footer /><BackToTop /></></UserOnlyRoute>} />
