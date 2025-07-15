@@ -9,7 +9,7 @@ export async function handleStripeWebhook(req, res) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
-      // // console.error("Missing STRIPE_WEBHOOK_SECRET environment variable");
+      console.error("Missing STRIPE_WEBHOOK_SECRET environment variable");
       return res.status(400).send("Webhook secret not configured");
     }
 
@@ -25,22 +25,22 @@ export async function handleStripeWebhook(req, res) {
       // Verify webhook signature
       event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
     } catch (err) {
-      // // console.error("Webhook signature verification failed:", err.message);
-      // console.log("Received signature:", sig);
-      // console.log("Using webhook secret:", webhookSecret);
+      console.error("Webhook signature verification failed:", err.message);
+      console.log("Received signature:", sig);
+      console.log("Using webhook secret:", webhookSecret);
 
       // For development, let's temporarily skip signature verification
       // In production, you must verify signatures for security
-      // console.log("⚠️ Skipping signature verification for development");
+      console.log("⚠️ Skipping signature verification for development");
       try {
         event = JSON.parse(req.body);
       } catch (parseErr) {
-        // // console.error("Failed to parse webhook body:", parseErr.message);
+        console.error("Failed to parse webhook body:", parseErr.message);
         return res.status(400).send("Invalid JSON");
       }
     }
 
-    // console.log("Received Stripe webhook event:", event.type);
+    console.log("Received Stripe webhook event:", event.type);
 
     // Handle different event types
     switch (event.type) {
@@ -57,12 +57,12 @@ export async function handleStripeWebhook(req, res) {
         break;
 
       default:
-        // Logging disabled: Unhandled event type: ${event.type};
+        console.log(`Unhandled event type: ${event.type}`);
     }
 
     res.json({ received: true });
   } catch (error) {
-    // // console.error("Webhook error:", error);
+    console.error("Webhook error:", error);
     res.status(500).json({ error: "Webhook handler failed" });
   }
 }
@@ -70,14 +70,14 @@ export async function handleStripeWebhook(req, res) {
 // Handle successful one-time payment
 async function handlePaymentSuccess(paymentIntent) {
   try {
-    // console.log("Processing successful payment:", paymentIntent.id);
+    console.log("Processing successful payment:", paymentIntent.id);
 
     const planId = paymentIntent.metadata.planId;
     const planName = paymentIntent.metadata.planName;
     const userIdFromMetadata = paymentIntent.metadata.userId;
 
     if (!planId || !userIdFromMetadata) {
-      // // console.error("Missing plan ID or user ID in payment metadata");
+      console.error("Missing plan ID or user ID in payment metadata");
       return;
     }
 
@@ -88,7 +88,7 @@ async function handlePaymentSuccess(paymentIntent) {
       .where(eq(pricingPlans.id, parseInt(planId)));
 
     if (!plan) {
-      // // console.error("Plan not found:", planId);
+      console.error("Plan not found:", planId);
       return;
     }
 
@@ -101,7 +101,7 @@ async function handlePaymentSuccess(paymentIntent) {
     });
 
     if (!user) {
-      // // console.error("User not found:", userIdFromMetadata);
+      console.error("User not found:", userIdFromMetadata);
       await prisma.$disconnect();
       return;
     }
@@ -136,16 +136,18 @@ async function handlePaymentSuccess(paymentIntent) {
       },
     });
 
-    // Payment processing logged in production monitoring
+    console.log(
+      `✅ Successfully processed payment for user ${userIdFromMetadata}: ${plan.name} plan`,
+    );
   } catch (error) {
-    // Error processing logged in production monitoring
+    console.error("Error processing payment success:", error);
   }
 }
 
 // Handle failed payment
 async function handlePaymentFailure(paymentIntent) {
   try {
-    // console.log("Processing failed payment:", paymentIntent.id);
+    console.log("Processing failed payment:", paymentIntent.id);
 
     const userIdFromMetadata = paymentIntent.metadata.userId;
 
@@ -163,21 +165,21 @@ async function handlePaymentFailure(paymentIntent) {
         updatedAt: new Date(),
       });
 
-      // Logging disabled: ❌ Recorded failed payment for user ${userIdFromMetadata};
+      console.log(`❌ Recorded failed payment for user ${userIdFromMetadata}`);
     }
   } catch (error) {
-    // // console.error("Error processing payment failure:", error);
+    console.error("Error processing payment failure:", error);
   }
 }
 
 // Handle recurring subscription payments
 async function handleRecurringPaymentSuccess(invoice) {
   try {
-    // console.log("Processing recurring payment:", invoice.id);
+    console.log("Processing recurring payment:", invoice.id);
 
     // Handle subscription renewals here
     // This would extend the subscription period for existing users
   } catch (error) {
-    // // console.error("Error processing recurring payment:", error);
+    console.error("Error processing recurring payment:", error);
   }
 }

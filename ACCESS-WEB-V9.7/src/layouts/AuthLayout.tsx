@@ -77,33 +77,7 @@ export const AdminRoute: React.FC<{ children?: React.ReactNode }> = ({ children 
   return <>{children || <Outlet />}</>;
 };
 
-// User-only route wrapper that prevents admins from accessing normal user routes
-export const UserOnlyRoute: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useAuth();
-  const location = useLocation();
-  
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
-        <div className="animate-spin w-12 h-12 border-4 border-[#0fae96] border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
-  
-  // Not authenticated? Redirect to regular login
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-  
-  // Admin trying to access user routes? Redirect to admin dashboard
-  if (user.isAdmin) {
-    return <Navigate to="/admin" replace />;
-  }
-  
-  return <>{children || <Outlet />}</>;
-};
-
-// Public only route wrapper that redirects to appropriate dashboard if already authenticated
+// Public only route wrapper that redirects to dashboard if already authenticated
 export const PublicOnlyRoute: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
@@ -117,14 +91,10 @@ export const PublicOnlyRoute: React.FC<{ children?: React.ReactNode }> = ({ chil
   }
   
   if (user) {
-    // Redirect based on user role
-    if (user.isAdmin) {
-      return <Navigate to="/admin" replace />;
-    } else {
-      // Regular user - redirect to user dashboard
-      const from = (location.state as any)?.from?.pathname || '/dashboard';
-      return <Navigate to={from} replace />;
-    }
+    // Redirect to the page they were trying to access before logging in
+    // or to the dashboard as a fallback
+    const from = (location.state as any)?.from?.pathname || '/dashboard';
+    return <Navigate to={from} replace />;
   }
   
   return <>{children || <Outlet />}</>;

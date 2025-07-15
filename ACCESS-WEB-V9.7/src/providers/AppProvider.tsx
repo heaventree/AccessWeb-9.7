@@ -13,7 +13,7 @@ import { AuthProvider } from '../contexts/AuthContext';
 import { SecurityProvider } from './SecurityProvider';
 import { ThemeProvider } from './ThemeProvider';
 import { AccessibilityTipsProvider } from '../contexts/AccessibilityTipsContext';
-import ErrorBoundary from '../components/errorBoundaries/ErrorBoundary';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { isDevelopment } from '../utils/environment';
 
 // App provider props

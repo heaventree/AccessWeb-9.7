@@ -9,24 +9,24 @@ import accessibilityRouter from '../api/accessibility.js';
 const logger = {
   info: (message, data = null) => {
     const timestamp = new Date().toISOString();
-    // Logging disabled: [${timestamp}] [INFO] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+    console.log(`[${timestamp}] [INFO] ${message}`, data ? JSON.stringify(data, null, 2) : '');
   },
   error: (message, error = null) => {
     const timestamp = new Date().toISOString();
-    // console.error(`[${timestamp}] [ERROR] ${message};
+    console.error(`[${timestamp}] [ERROR] ${message}`);
     if (error) {
-      // console.error(`[${timestamp}] [ERROR] Stack:`, error.stack || error);
-      // console.error(`[${timestamp}] [ERROR] Details:`, JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      console.error(`[${timestamp}] [ERROR] Stack:`, error.stack || error);
+      console.error(`[${timestamp}] [ERROR] Details:`, JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
     }
   },
   warn: (message, data = null) => {
     const timestamp = new Date().toISOString();
-    // console.warn(`[${timestamp}] [WARN] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+    console.warn(`[${timestamp}] [WARN] ${message}`, data ? JSON.stringify(data, null, 2) : '');
   },
   debug: (message, data = null) => {
     if (process.env.NODE_ENV === 'development') {
       const timestamp = new Date().toISOString();
-      // Logging disabled: [${timestamp}] [DEBUG] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+      console.log(`[${timestamp}] [DEBUG] ${message}`, data ? JSON.stringify(data, null, 2) : '');
     }
   }
 };
@@ -62,9 +62,6 @@ const prisma = new PrismaClient();
 // Create Express app
 const app = express();
 const PORT = process.env.SERVER_PORT || 3001;
-
-// Configure trust proxy for rate limiting to work properly
-app.set('trust proxy', 1);
 
 // Validate critical environment variables
 const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
@@ -141,7 +138,6 @@ app.get('/api/health', async (req, res) => {
 // Import site connections router at the top
 import siteConnectionsRouter from './routes/siteConnections.js';
 
-
 // Import scanner routes
 import scannerRouter from './routes/scanner.js';
 
@@ -154,10 +150,6 @@ import siteScannerQueue from './jobs/siteScanner.js';
 // Import admin routes
 import adminRouter from './routes/admin.js';
 
-// Import WCAG checker routes
-import wcagRouter from './routes/wcag.js';
-import wcagTestRouter from './routes/wcag-test.js';
-
 // API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/accessibility', accessibilityRouter);
@@ -165,8 +157,6 @@ app.use('/api/site-connections', siteConnectionsRouter);
 app.use('/api/scanner', scannerRouter);
 app.use('/api/wordpress', wordpressRouter);
 app.use('/api/admin', requireAuth, adminRouter);
-app.use('/api/wcag-simple', wcagRouter);
-app.use('/api/wcag-test', wcagTestRouter);
 
 // Pricing Plans Routes
 app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed

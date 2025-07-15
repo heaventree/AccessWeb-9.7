@@ -8,7 +8,6 @@
 import { apiClient } from '../utils/api/apiClient';
 import { AccountLockoutManager } from '../utils/security/passwordPolicy';
 import { ErrorType, createError } from '../utils/errorHandler';
-import { API_ENDPOINTS } from '../config/api';
 
 // Auth API endpoints
 const AUTH_ENDPOINTS = {
@@ -89,9 +88,9 @@ export async function login(
     // Log the login attempt for debugging
     console.log('Attempting login with:', { email, password: '********', isAdminLogin });
     
-    // Make login request directly to the API using centralized configuration
+    // Make login request directly to the API
     // Send the isAdminLogin flag in the request body for clarity
-    const directResponse = await fetch(`${API_ENDPOINTS.AUTH}/login`, {
+    const directResponse = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -241,7 +240,7 @@ export async function changePassword(
  */
 export async function me(): Promise<any> {
   try {
-    const response = await fetch(`${API_ENDPOINTS.AUTH}/me`, {
+    const response = await fetch('/api/auth/me', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,

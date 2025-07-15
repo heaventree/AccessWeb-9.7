@@ -29,7 +29,7 @@ export async function checkAndExpireSubscriptions() {
     });
 
     if (expiredSubscriptions.length === 0) {
-      // console.log('No expired subscriptions found');
+      console.log('No expired subscriptions found');
       return { expiredCount: 0 };
     }
 
@@ -45,11 +45,11 @@ export async function checkAndExpireSubscriptions() {
       }
     });
 
-    // Logging disabled: Automatically expired ${result.count} subscriptions;
+    console.log(`Automatically expired ${result.count} subscriptions`);
     
     // Log expired subscriptions for monitoring
     expiredSubscriptions.forEach(sub => {
-      // Logging disabled: Expired subscription for user ${sub.email} (${sub.subscriptionPlan} plan);
+      console.log(`Expired subscription for user ${sub.email} (${sub.subscriptionPlan} plan)`);
     });
 
     return { 
@@ -58,7 +58,7 @@ export async function checkAndExpireSubscriptions() {
     };
 
   } catch (error) {
-    // console.error('Error checking subscription expiry:', error);
+    console.error('Error checking subscription expiry:', error);
     throw error;
   }
 }
@@ -74,5 +74,5 @@ export function startSubscriptionExpiryChecker() {
   // Then run every 24 hours
   setInterval(checkAndExpireSubscriptions, 24 * 60 * 60 * 1000);
   
-  // console.log('Subscription expiry checker started - running every 24 hours');
+  console.log('Subscription expiry checker started - running every 24 hours');
 }

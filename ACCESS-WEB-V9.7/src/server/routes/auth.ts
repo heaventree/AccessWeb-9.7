@@ -65,7 +65,7 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
         }
       });
     } catch (error) {
-      // Registration error logged in production monitoring
+      console.error('Registration error:', error);
       res.status(500).json({ error: 'Failed to register user' });
     }
   });

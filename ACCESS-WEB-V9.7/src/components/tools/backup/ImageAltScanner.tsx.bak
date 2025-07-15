@@ -1,0 +1,834 @@
+import { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { Scan, AlertTriangle, RefreshCw } from 'lucide-react';
+import type { ScanResult, ImageIssue, ScanOptions } from '../../services/imageAltScanService';
+
+// Mock data for development and testing
+const mockIssues: ImageIssue[] = [
+  {
+    id: uuidv4(),
+    url: 'https://example.com/images/product1.jpg',
+    element: '<img src="/images/product1.jpg">',
+    selector: 'main > div:nth-child(2) > img',
+    issueType: 'missing',
+    impact: 'critical',
+    description: 'Image is missing an alt attribute',
+    wcagCriteria: 'WCAG 1.1.1 (A)',
+    suggestedFix: 'Add an alt attribute that describes the image content',
+    suggestedAlt: 'Blue denim jacket with metal buttons',
+    fixed: false
+  },
+  {
+    id: uuidv4(),
+    url: 'https://example.com/images/banner.jpg',
+    element: '<img src="/images/banner.jpg" alt="">',
+    selector: 'header > div.banner > img',
+    issueType: 'empty',
+    impact: 'serious',
+    description: 'Image has an empty alt attribute',
+    wcagCriteria: 'WCAG 1.1.1 (A)',
+    suggestedFix: 'Add descriptive alt text or confirm image is decorative',
+    suggestedAlt: 'Spring sale promotional banner',
+    fixed: false
+  },
+  {
+    id: uuidv4(),
+    url: 'https://example.com/images/icon-settings.svg',
+    element: '<img src="/images/icon-settings.svg" alt="settings icon settings">',
+    selector: 'nav > ul > li:nth-child(3) > img',
+    issueType: 'redundant',
+    impact: 'moderate',
+    description: 'Alt text contains redundant words ("icon", "settings" repeated)',
+    wcagCriteria: 'WCAG 1.1.1 (A)',
+    suggestedFix: 'Remove redundant words from alt text',
+    suggestedAlt: 'Settings',
+    fixed: false
+  }
+];
+
+// Component props definition
+type ImageAltScannerProps = {
+  /** URL to scan, defaults to current page if not provided */
+  url?: string;
+  /** Initial options for scanning */
+  initialOptions?: Partial<ScanOptions>;
+  /** Callback when scan is complete */
+  onScanComplete?: (result: ScanResult) => void;
+  /** Callback when issues are fixed */
+  onIssuesFixed?: (fixedIssues: ImageIssue[]) => void;
+  /** Integration type - changes scanning approach */
+  integrationType?: 'browser' | 'wordpress' | 'shopify';
+  /** Integration settings (API keys, etc.) */
+  integrationSettings?: Record<string, string>;
+}
+
+const ImageAltScanner = ({
+  url,
+  initialOptions,
+  onScanComplete,
+  onIssuesFixed,
+  integrationType = 'browser',
+  integrationSettings = {}
+}: ImageAltScannerProps) => {
+  // State management
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+
+  // Initialize with props
+  useEffect(() => {
+    if (initialOptions) {
+      // Implementation would be here
+    }
+  }, [initialOptions]);
+
+  const startScan = async () => {
+    setIsScanning(true);
+    // In a real implementation, this would call an API or run a DOM scan
+    // For demo purposes, we'll use mock data after a delay
+    setTimeout(() => {
+      const mockResult: ScanResult = {
+        id: uuidv4(),
+        url: url || window.location.href,
+        timestamp: Date.now(),
+        totalImages: 17,
+        issuesFound: mockIssues.length,
+        issues: mockIssues
+      };
+      
+      setScanResult(mockResult);
+      setIsScanning(false);
+      
+      if (onScanComplete) {
+        onScanComplete(mockResult);
+      }
+    }, 2500);
+  };
+
+  return (
+    <div className="space-y-8 pb-6">
+      <div className="bg-white dark:bg-slate-800 shadow-sm rounded-xl p-6 border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+          Scan for Image Accessibility Issues
+        </h2>
+        
+        <div className="mb-6">
+          <p className="text-gray-600 dark:text-gray-300 text-lg">
+            This tool scans for WCAG 1.1.1 compliance issues with images, detecting missing or improper alt text.
+          </p>
+        </div>
+        
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4">
+          <div className="flex-1">
+            <button
+              onClick={startScan}
+              disabled={isScanning}
+              className="w-full md:w-auto flex items-center justify-center px-6 py-3 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-[#0fae96] hover:bg-[#0d9a85] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              aria-label={isScanning ? "Currently scanning for image issues" : "Start scanning for image accessibility issues"}
+            >
+              {isScanning ? (
+                <>
+                  <RefreshCw className="animate-spin -ml-1 mr-3 h-5 w-5" aria-hidden="true" />
+                  Scanning...
+                </>
+              ) : (
+                <>
+                  <Scan className="-ml-1 mr-3 h-5 w-5" aria-hidden="true" />
+                  Start Scan
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+        
+        {scanResult && (
+          <div className="mt-8">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              Scan Results
+            </h3>
+            <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-4">
+              <p className="text-gray-700 dark:text-gray-300">Found {scanResult.issuesFound} issues with {scanResult.totalImages} images.</p>
+              
+              {scanResult.issues.length > 0 ? (
+                <div className="mt-4 space-y-4">
+                  <p className="font-medium text-gray-900 dark:text-white">Issues:</p>
+                  <ul className="mt-2 divide-y divide-gray-200 dark:divide-slate-600">
+                    {scanResult.issues.map((issue) => (
+                      <li key={issue.id} className="py-4">
+                        <div className="flex items-start">
+                          <div className="ml-3 flex-1">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{issue.description}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Impact: {issue.impact}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Suggested Fix: {issue.suggestedFix}</p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p className="mt-4 text-green-600 dark:text-green-400">No issues found!</p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ImageAltScanner;
+            >
+              {isScanning ? (
+                <>
+                  <RefreshCw className="animate-spin -ml-1 mr-3 h-5 w-5" aria-hidden="true" />
+                  Scanning...
+                </>
+              ) : (
+                <>
+                  <Scan className="-ml-1 mr-3 h-5 w-5" aria-hidden="true" />
+                  Start Scan
+                </>
+              )}
+            </button>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+              className="flex items-center px-6 py-3 text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 hover:text-[#0fae96] dark:hover:text-[#5eead4] rounded-full border border-gray-300 dark:border-slate-600 shadow-sm transition-colors"
+              aria-expanded={showAdvancedOptions}
+              aria-controls="advanced-options-panel"
+            >
+              <Settings className="h-5 w-5 mr-2" aria-hidden="true" />
+              <span>{showAdvancedOptions ? 'Hide' : 'Show'} Advanced Options</span>
+            </button>
+          </div>
+        </div>
+        
+        <AnimatePresence>
+          {showAdvancedOptions && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-8 pt-6 border-t border-gray-200 dark:border-slate-700 overflow-hidden"
+              id="advanced-options-panel"
+            >
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+                Advanced Scan Options
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h4 className="text-lg font-medium text-gray-700 dark:text-white mb-4">Issue Detection</h4>
+                  <div className="space-y-6">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="include-duplicate-check"
+                        checked={scanOptions.includeDuplicateCheck}
+                        onChange={(e) => handleOptionChange('includeDuplicateCheck', e.target.checked)}
+                        className="rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96] w-5 h-5"
+                        aria-describedby="duplicate-check-desc"
+                      />
+                      <span className="ml-3 text-base text-gray-700 dark:text-gray-300">Check for duplicate images with same alt text</span>
+                    </label>
+                    <span id="duplicate-check-desc" className="sr-only">When enabled, the scanner will identify multiple images using identical alt text</span>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="include-redundant-check"
+                        checked={scanOptions.includeRedundantCheck}
+                        onChange={(e) => handleOptionChange('includeRedundantCheck', e.target.checked)}
+                        className="rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96] w-5 h-5"
+                        aria-describedby="redundant-check-desc"
+                      />
+                      <span className="ml-3 text-base text-gray-700 dark:text-gray-300">Check for redundant terms in alt text</span>
+                    </label>
+                    <span id="redundant-check-desc" className="sr-only">When enabled, the scanner will identify alt text containing redundant words like 'image' or 'photo'</span>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="include-suspicious-check"
+                        checked={scanOptions.includeSuspiciousCheck}
+                        onChange={(e) => handleOptionChange('includeSuspiciousCheck', e.target.checked)}
+                        className="rounded border-gray-300 text-[#0fae96] focus:ring-[#0fae96] w-5 h-5"
+                        aria-describedby="suspicious-check-desc"
+                      />
+                      <span className="ml-3 text-base text-gray-700 dark:text-gray-300">Check for suspicious alt text patterns</span>
+                    </label>
+                    <span id="suspicious-check-desc" className="sr-only">When enabled, the scanner will identify alt text that may be auto-generated filenames or placeholder text</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="text-lg font-medium text-gray-700 dark:text-white mb-4">Pattern Settings</h4>
+                  <div className="space-y-6">
+                    <div>
+                      <label htmlFor="redundant-patterns" className="block text-base font-medium text-gray-700 dark:text-gray-300">
+                        Redundant Terms
+                      </label>
+                      <input
+                        id="redundant-patterns"
+                        type="text"
+                        value={scanOptions.redundantPatterns.join(', ')}
+                        onChange={(e) => handleOptionChange('redundantPatterns', e.target.value.split(',').map(s => s.trim()))}
+                        className="mt-2 block w-full rounded-full border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-[#0fae96] focus:ring-[#0fae96] text-base px-6 py-3"
+                        aria-describedby="redundant-terms-desc"
+                      />
+                      <p id="redundant-terms-desc" className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Words like 'image' or 'photo' that are redundant in alt text. Separate with commas.
+                      </p>
+                    </div>
+                    <div>
+                      <label htmlFor="suspicious-patterns" className="block text-base font-medium text-gray-700 dark:text-gray-300">
+                        Suspicious Patterns
+                      </label>
+                      <input
+                        id="suspicious-patterns"
+                        type="text"
+                        value={scanOptions.suspiciousPatterns.join(', ')}
+                        onChange={(e) => handleOptionChange('suspiciousPatterns', e.target.value.split(',').map(s => s.trim()))}
+                        className="mt-2 block w-full rounded-full border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-[#0fae96] focus:ring-[#0fae96] text-base px-6 py-3"
+                        aria-describedby="suspicious-patterns-desc"
+                      />
+                      <p id="suspicious-patterns-desc" className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Terms that indicate auto-generated or placeholder alt text. Separate with commas.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+      
+      {/* Results Section */}
+      {scanResult && (
+        <div className="bg-white dark:bg-slate-800 shadow-sm rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+          <div className="border-b border-gray-200 dark:border-slate-700">
+            <div className="px-6 py-5 flex flex-wrap items-center justify-between">
+              <div className="flex items-center space-x-3 text-base text-gray-600 dark:text-gray-300">
+                <ImageIcon className="h-6 w-6 text-[#0fae96]" aria-hidden="true" />
+                <span className="text-lg">
+                  <span className="font-medium">{scanResult.totalImages}</span> images scanned,{' '}
+                  <span className="font-medium">{scanResult.issuesFound}</span> issues found
+                </span>
+              </div>
+              
+              <div className="mt-3 sm:mt-0 flex space-x-3">
+                <button
+                  onClick={() => setActiveTab('issues')}
+                  className={`px-4 py-2 text-base font-medium rounded-full transition-colors ${activeTab === 'issues' 
+                    ? 'bg-[#0fae96] text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600'
+                  }`}
+                  aria-current={activeTab === 'issues' ? 'page' : undefined}
+                  aria-pressed={activeTab === 'issues'}
+                  role="tab"
+                >
+                  Issues ({filteredIssues.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('fixed')}
+                  className={`px-4 py-2 text-base font-medium rounded-full transition-colors ${activeTab === 'fixed'
+                    ? 'bg-[#0fae96] text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600'
+                  }`}
+                  aria-current={activeTab === 'fixed' ? 'page' : undefined}
+                  aria-pressed={activeTab === 'fixed'}
+                  role="tab"
+                >
+                  Fixed ({fixedIssues.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('settings')}
+                  className={`px-4 py-2 text-base font-medium rounded-full transition-colors ${activeTab === 'settings'
+                    ? 'bg-[#0fae96] text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600'
+                  }`}
+                  aria-current={activeTab === 'settings' ? 'page' : undefined}
+                  aria-pressed={activeTab === 'settings'}
+                  role="tab"
+                >
+                  <div className="flex items-center">
+                    <Filter className="h-5 w-5 mr-2" aria-hidden="true" />
+                    <span>Filter</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+                aria-controls="panel-issues"
+                aria-selected={activeTab === 'issues'}
+                className={`flex-1 md:flex-none whitespace-nowrap px-6 py-4 border-b-2 font-medium text-base ${
+                  activeTab === 'issues'
+                    ? 'border-[#0fae96] text-[#0fae96] dark:text-[#5eead4]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
+              >
+                <AlertTriangle className="w-4 h-4 mr-2 inline" aria-hidden="true" />
+                Issues ({scanResult.issues.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('fixed')}
+                role="tab"
+                id="tab-fixed"
+                aria-controls="panel-fixed"
+                aria-selected={activeTab === 'fixed'}
+                className={`flex-1 md:flex-none whitespace-nowrap px-6 py-4 border-b-2 font-medium text-base ${
+                  activeTab === 'fixed'
+                    ? 'border-[#0fae96] text-[#0fae96] dark:text-[#5eead4]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
+              >
+                <CheckCircle className="w-4 h-4 mr-2 inline" aria-hidden="true" />
+                Fixed ({fixedIssues.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('settings')}
+                role="tab"
+                id="tab-settings"
+                aria-controls="panel-settings"
+                aria-selected={activeTab === 'settings'}
+                className={`flex-1 md:flex-none whitespace-nowrap px-6 py-4 border-b-2 font-medium text-base ${
+                  activeTab === 'settings'
+                    ? 'border-[#0fae96] text-[#0fae96] dark:text-[#5eead4]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
+              >
+                <Settings className="w-4 h-4 mr-2 inline" aria-hidden="true" />
+                Settings
+              </button>
+            </nav>
+          </div>
+          
+          <div className="p-6">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <ImageIcon className="h-6 w-6 text-[#0fae96]" />
+                  </div>
+                  <div className="ml-3">
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-300">Total Images</div>
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">{scanResult.totalImages}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <AlertTriangle className="h-6 w-6 text-orange-500" />
+                  </div>
+                  <div className="ml-3">
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-300">Issues Found</div>
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">{scanResult.issues.length}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <CheckCircle className="h-6 w-6 text-green-500" />
+                  </div>
+                  <div className="ml-3">
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-300">Issues Fixed</div>
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">{fixedIssues.length}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <BarChart className="h-6 w-6 text-[#0fae96]" />
+                  </div>
+                  <div className="ml-3">
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-300">Compliance</div>
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {scanResult.totalImages > 0
+                        ? Math.round(((scanResult.totalImages - scanResult.issues.length) / scanResult.totalImages) * 100)
+                        : 0}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {activeTab === 'issues' && (
+              <div>
+                {scanResult.issues.length > 0 ? (
+                  <>
+                    {/* Filter Controls */}
+                    <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div className="flex items-center">
+                        <Filter className="h-5 w-5 text-[#0fae96] dark:text-[#5eead4] mr-2" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter Issues:</span>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2">
+                        <select
+                          className="rounded-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-1 pl-4 pr-10 text-base focus:outline-none focus:ring-[#0fae96] focus:border-[#0fae96] sm:text-sm"
+                          value={filterOptions.issueTypes.length === 5 ? 'all' : filterOptions.issueTypes.join(',')}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setFilterOptions(prev => ({
+                              ...prev,
+                              issueTypes: value === 'all' 
+                                ? ['missing', 'empty', 'redundant', 'suspicious', 'duplicate']
+                                : value.split(',')
+                            }));
+                          }}
+                        >
+                          <option value="all">All Issue Types</option>
+                          <option value="missing">Missing Alt</option>
+                          <option value="empty">Empty Alt</option>
+                          <option value="redundant">Redundant Alt</option>
+                          <option value="suspicious">Suspicious Alt</option>
+                          <option value="duplicate">Duplicate Alt</option>
+                        </select>
+                        
+                        <select
+                          className="rounded-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-1 pl-4 pr-10 text-base focus:outline-none focus:ring-[#0fae96] focus:border-[#0fae96] sm:text-sm"
+                          value={filterOptions.impacts.length === 4 ? 'all' : filterOptions.impacts.join(',')}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setFilterOptions(prev => ({
+                              ...prev,
+                              impacts: value === 'all' 
+                                ? ['critical', 'serious', 'moderate', 'minor']
+                                : value.split(',')
+                            }));
+                          }}
+                        >
+                          <option value="all">All Impact Levels</option>
+                          <option value="critical">Critical</option>
+                          <option value="serious">Serious</option>
+                          <option value="moderate">Moderate</option>
+                          <option value="minor">Minor</option>
+                        </select>
+                      </div>
+                      
+                      <button
+                        onClick={handleBatchFix}
+                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                      >
+                        <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
+                        Fix All Issues
+                      </button>
+                    </div>
+                    
+                    {/* Issue Cards */}
+                    <div className="space-y-4">
+                      {filteredIssues.map((issue, index) => (
+                        <motion.div
+                          key={issue.id}
+                          variants={cardVariants}
+                          initial="hidden"
+                          animate="visible"
+                          transition={{ delay: index * 0.1 }}
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md p-5"
+                        >
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-start">
+                                <div className="flex-shrink-0 pt-0.5">
+                                  {getIssueTypeIcon(issue.issueType)}
+                                </div>
+                                <div className="ml-3 flex-1">
+                                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                                    {issue.description}
+                                  </h3>
+                                  <div className="mt-1 flex items-center text-xs">
+                                    <span className={`inline-flex items-center ${getImpactColor(issue.impact)}`}>
+                                      {issue.impact.charAt(0).toUpperCase() + issue.impact.slice(1)} Impact
+                                    </span>
+                                    <span className="mx-2 text-gray-500">•</span>
+                                    <span className="text-gray-500 dark:text-gray-400">{issue.wcagCriteria}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div>
+                                    <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Element</h4>
+                                    <div className="bg-gray-50 dark:bg-gray-900 rounded p-2 text-xs font-mono overflow-x-auto">
+                                      {issue.element}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Image URL</h4>
+                                    <div className="bg-gray-50 dark:bg-gray-900 rounded p-2 text-xs font-mono truncate">
+                                      {issue.url}
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="mt-3">
+                                  <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Suggested Fix</h4>
+                                  <p className="text-sm text-gray-700 dark:text-gray-300">{issue.suggestedFix}</p>
+                                  
+                                  {issue.suggestedAlt && (
+                                    <div className="mt-2">
+                                      <label htmlFor={`alt-text-${issue.id}`} className="block text-xs font-medium text-gray-500 mb-1">
+                                        Suggested Alt Text
+                                      </label>
+                                      <div className="mt-1 flex rounded-md shadow-sm">
+                                        <input
+                                          type="text"
+                                          name={`alt-text-${issue.id}`}
+                                          id={`alt-text-${issue.id}`}
+                                          defaultValue={issue.suggestedAlt}
+                                          className="flex-1 min-w-0 block w-full px-4 py-2 rounded-l-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-[#0fae96] focus:border-[#0fae96] sm:text-sm"
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={() => handleFixIssue(issue.id, issue.suggestedAlt || '')}
+                                          className="inline-flex items-center px-4 py-2 border border-transparent rounded-r-full shadow-sm text-sm font-medium text-white bg-[#0fae96] hover:bg-[#0c9a85] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0fae96]"
+                                        >
+                                          <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
+                                          Apply Fix
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-12">
+                    <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+                    <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">No issues found!</h3>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
+                      All images appear to have proper alt text attributes.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {activeTab === 'fixed' && (
+              <div>
+                {fixedIssues.length > 0 ? (
+                  <div className="space-y-4">
+                    {fixedIssues.map((issue) => (
+                      <div
+                        key={issue.id}
+                        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4"
+                      >
+                        <div className="flex items-start">
+                          <div className="flex-shrink-0 pt-0.5">
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          </div>
+                          <div className="ml-3 flex-1">
+                            <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                              {issue.description} (Fixed)
+                            </h3>
+                            <div className="mt-1 flex items-center text-xs">
+                              <span className={`inline-flex items-center ${getImpactColor(issue.impact)}`}>
+                                {issue.impact.charAt(0).toUpperCase() + issue.impact.slice(1)} Impact
+                              </span>
+                              <span className="mx-2 text-gray-500">•</span>
+                              <span className="text-gray-500 dark:text-gray-400">{issue.wcagCriteria}</span>
+                            </div>
+                            
+                            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Original Element</h4>
+                                <div className="bg-gray-50 dark:bg-gray-900 rounded p-2 text-xs font-mono overflow-x-auto">
+                                  {issue.element}
+                                </div>
+                              </div>
+                              <div>
+                                <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Fixed Element</h4>
+                                <div className="bg-gray-50 dark:bg-gray-900 rounded p-2 text-xs font-mono overflow-x-auto">
+                                  {issue.element.includes('alt=') 
+                                    ? issue.element.replace(/alt="[^"]*"/, `alt="${issue.suggestedAlt}"`)
+                                    : issue.element.replace(/<img/, `<img alt="${issue.suggestedAlt}"`)
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Info className="mx-auto h-12 w-12 text-[#0fae96] dark:text-[#5eead4]" />
+                    <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">No fixed issues yet</h3>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
+                      After you fix issues, they will appear here for reference.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {activeTab === 'settings' && (
+              <div>
+                <div className="max-w-3xl mx-auto">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                    Scan Configuration
+                  </h3>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Integration Settings</h4>
+                      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label htmlFor="integration-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Integration Type
+                            </label>
+                            <select
+                              id="integration-type"
+                              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                              value={integrationType}
+                              disabled
+                            >
+                              <option value="browser">Browser (Current Page)</option>
+                              <option value="wordpress">WordPress Integration</option>
+                              <option value="shopify">Shopify Integration</option>
+                            </select>
+                          </div>
+                          
+                          {integrationType !== 'browser' && (
+                            <div>
+                              <label htmlFor="api-key" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                API Key
+                              </label>
+                              <input
+                                type="password"
+                                id="api-key"
+                                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                                value={integrationSettings['apiKey'] || ''}
+                                placeholder="Enter API key"
+                                disabled
+                              />
+                            </div>
+                          )}
+                        </div>
+                        
+                        {(integrationType === 'wordpress' || integrationType === 'shopify') && (
+                          <div className="mt-4 rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-4">
+                            <div className="flex">
+                              <div className="flex-shrink-0">
+                                <Info className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+                              </div>
+                              <div className="ml-3">
+                                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-400">
+                                  Integration Setup Required
+                                </h3>
+                                <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                                  <p>
+                                    {integrationType === 'wordpress'
+                                      ? 'Please install the WordPress plugin and configure the API key to enable scanning of your WordPress site.'
+                                      : 'Please install the Shopify app and configure the API key to enable scanning of your Shopify store.'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Scan Settings</h4>
+                      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div className="grid grid-cols-1 gap-4">
+                          <div>
+                            <label htmlFor="scan-depth" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Scan Depth
+                            </label>
+                            <select
+                              id="scan-depth"
+                              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                              defaultValue="current"
+                            >
+                              <option value="current">Current Page Only</option>
+                              <option value="section">Current Section</option>
+                              <option value="full">Full Site</option>
+                            </select>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                              Determines how many pages will be scanned
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <label htmlFor="compliance-level" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Compliance Level
+                            </label>
+                            <select
+                              id="compliance-level"
+                              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                              defaultValue="strict"
+                            >
+                              <option value="minimum">Minimum (A)</option>
+                              <option value="recommended">Recommended (AA)</option>
+                              <option value="strict">Strict (AAA)</option>
+                            </select>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                              Sets the WCAG compliance level for the scan
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Reporting Options</h4>
+                      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div className="space-y-2">
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              defaultChecked={true}
+                              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                            />
+                            <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Generate PDF report</span>
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              defaultChecked={true}
+                              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                            />
+                            <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Include screenshots in report</span>
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              defaultChecked={false}
+                              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                            />
+                            <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Email report when completed</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ImageAltScanner;

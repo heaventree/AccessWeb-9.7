@@ -27,7 +27,7 @@ export async function getAllPricingPlans(req, res) {
       data: plans
     });
   } catch (error) {
-    // Error logged in production monitoring
+    console.error('Error fetching pricing plans:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch pricing plans'
@@ -48,7 +48,7 @@ export async function getAdminPricingPlans(req, res) {
       data: plans
     });
   } catch (error) {
-    // console.error('Error fetching admin pricing plans:', error);
+    console.error('Error fetching admin pricing plans:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch pricing plans'
@@ -78,7 +78,7 @@ export async function getPricingPlan(req, res) {
       data: plan
     });
   } catch (error) {
-    // console.error('Error fetching pricing plan:', error);
+    console.error('Error fetching pricing plan:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch pricing plan'
@@ -103,7 +103,7 @@ export async function createPricingPlan(req, res) {
       accentColor = 'text-primary'
     } = req.body;
 
-    // console.log('Creating pricing plan with data:', req.body);
+    console.log('Creating pricing plan with data:', req.body);
 
     // Validate required fields
     if (!name || !price || !description) {
@@ -146,7 +146,7 @@ export async function createPricingPlan(req, res) {
       message: 'Pricing plan created successfully'
     });
   } catch (error) {
-    // console.error('Error creating pricing plan:', error);
+    console.error('Error creating pricing plan:', error);
     
     if (error.code === '23505') { // Unique constraint violation
       return res.status(409).json({
@@ -216,7 +216,7 @@ export async function updatePricingPlan(req, res) {
       message: 'Pricing plan updated successfully'
     });
   } catch (error) {
-    // console.error('Error updating pricing plan:', error);
+    console.error('Error updating pricing plan:', error);
 
     if (error.code === '23505') { // Unique constraint violation
       return res.status(409).json({
@@ -254,7 +254,7 @@ export async function deletePricingPlan(req, res) {
       message: 'Pricing plan deleted successfully'
     });
   } catch (error) {
-    // console.error('Error deleting pricing plan:', error);
+    console.error('Error deleting pricing plan:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to delete pricing plan'

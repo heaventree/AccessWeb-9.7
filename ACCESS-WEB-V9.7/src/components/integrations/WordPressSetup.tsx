@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Save, RefreshCw, Activity, Code, Key, Info, Book, ArrowRight, ArrowLeft, X, CheckCircle, Globe, Zap, FileText, HelpCircle, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { API_CONFIG } from '../../config/api';
 import { wordPressAPI } from '../../lib/integrations/wordpress';
 import type { WordPressSettings } from '../../types/integrations';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -74,7 +73,7 @@ export function WordPressSetup() {
       
       // Check if we have existing WordPress site connections
       console.log('Fetching existing site connections...');
-      const connectionsResponse = await fetch(`${API_CONFIG.BASE_URL}/api/site-connections`, {
+      const connectionsResponse = await fetch('/api/site-connections', {
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }
@@ -101,7 +100,7 @@ export function WordPressSetup() {
       } else {
         // Create a default WordPress connection
         console.log('Creating new WordPress connection...');
-        const createResponse = await fetch(`${API_CONFIG.BASE_URL}/api/site-connections`, {
+        const createResponse = await fetch('/api/site-connections', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

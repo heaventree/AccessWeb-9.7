@@ -5,7 +5,7 @@ import { eq, asc } from 'drizzle-orm';
 // Create new pricing plan - matches admin form payload exactly
 export async function createAdminPricingPlan(req, res) {
   try {
-    // console.log('Creating pricing plan with payload:', req.body);
+    console.log('Creating pricing plan with payload:', req.body);
     
     const {
       name,
@@ -59,7 +59,7 @@ export async function createAdminPricingPlan(req, res) {
       })
       .returning();
 
-    // console.log('Successfully created plan:', newPlan);
+    console.log('Successfully created plan:', newPlan);
 
     res.status(201).json({
       success: true,
@@ -67,7 +67,7 @@ export async function createAdminPricingPlan(req, res) {
       message: 'Pricing plan created successfully'
     });
   } catch (error) {
-    // // console.error('Error creating pricing plan:', error);
+    console.error('Error creating pricing plan:', error);
 
     res.status(500).json({
       success: false,
@@ -81,7 +81,7 @@ export async function createAdminPricingPlan(req, res) {
 export async function updateAdminPricingPlan(req, res) {
   try {
     const { id } = req.params;
-    // console.log('Updating pricing plan:', id, 'with payload:', req.body);
+    console.log('Updating pricing plan:', id, 'with payload:', req.body);
     
     const {
       name,
@@ -129,7 +129,7 @@ export async function updateAdminPricingPlan(req, res) {
       message: 'Pricing plan updated successfully'
     });
   } catch (error) {
-    // // console.error('Error updating pricing plan:', error);
+    console.error('Error updating pricing plan:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to update pricing plan',
@@ -142,7 +142,7 @@ export async function updateAdminPricingPlan(req, res) {
 export async function deleteAdminPricingPlan(req, res) {
   try {
     const { id } = req.params;
-    // console.log('Deleting pricing plan:', id);
+    console.log('Deleting pricing plan:', id);
 
     const [deletedPlan] = await db
       .delete(pricingPlans)
@@ -161,7 +161,7 @@ export async function deleteAdminPricingPlan(req, res) {
       message: 'Pricing plan deleted successfully'
     });
   } catch (error) {
-    // // console.error('Error deleting pricing plan:', error);
+    console.error('Error deleting pricing plan:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to delete pricing plan',

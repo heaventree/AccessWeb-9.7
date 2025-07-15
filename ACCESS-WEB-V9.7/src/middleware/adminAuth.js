@@ -58,7 +58,7 @@ export async function requireAdmin(req, res, next) {
     req.user = user;
     next();
   } catch (error) {
-    // console.error("Admin authentication error:", error);
+    console.error("Admin authentication error:", error);
 
     if (error.name === "JsonWebTokenError") {
       return res.status(401).json({

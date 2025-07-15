@@ -29,8 +29,8 @@ const parseRawBody = (req, res, next) => {
  */
 router.post('/test-url', parseRawBody, async (req, res) => {
   try {
-    // console.log('Request body received:', req.body);
-    // console.log('Request headers:', req.headers);
+    console.log('Request body received:', req.body);
+    console.log('Request headers:', req.headers);
     
     // Handle case where body might be undefined or sent as text
     let requestData = req.body;
@@ -42,7 +42,7 @@ router.post('/test-url', parseRawBody, async (req, res) => {
         try {
           requestData = JSON.parse(requestData);
         } catch (e) {
-          // console.log('Failed to parse body as JSON, treating as URL');
+          console.log('Failed to parse body as JSON, treating as URL');
           requestData = { url: requestData };
         }
       } else {
@@ -60,7 +60,7 @@ router.post('/test-url', parseRawBody, async (req, res) => {
       }
     }
     
-    // console.log('Parsed request data:', requestData);
+    console.log('Parsed request data:', requestData);
     
     const { url, wcagLevel = 'AA', includePdf = false, includeScreenshots = false } = requestData;
 
@@ -75,7 +75,7 @@ router.post('/test-url', parseRawBody, async (req, res) => {
       return res.status(400).json({ error: 'Invalid URL format' });
     }
 
-    // Logging disabled: Testing accessibility for URL: ${url};
+    console.log(`Testing accessibility for URL: ${url}`);
 
     // Fetch the webpage content
     let response;
@@ -92,7 +92,7 @@ router.post('/test-url', parseRawBody, async (req, res) => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
-      // // console.error('Fetch error:', error);
+      console.error('Fetch error:', error);
       return res.status(400).json({ 
         error: 'Failed to fetch URL', 
         details: error.message 
@@ -256,7 +256,7 @@ router.post('/test-url', parseRawBody, async (req, res) => {
 
     res.json(result);
   } catch (error) {
-    // // console.error('Accessibility test error:', error);
+    console.error('Accessibility test error:', error);
     res.status(500).json({ 
       error: 'Internal server error during accessibility test',
       details: error.message 
@@ -301,7 +301,7 @@ router.post('/test-html', async (req, res) => {
 
     res.json(result);
   } catch (error) {
-    // // console.error('HTML accessibility test error:', error);
+    console.error('HTML accessibility test error:', error);
     res.status(500).json({ 
       error: 'Internal server error during HTML accessibility test',
       details: error.message 
@@ -324,7 +324,7 @@ router.get('/report/:reportId', async (req, res) => {
       message: 'Report not found in storage. Please run a new test.'
     });
   } catch (error) {
-    // // console.error('Get report error:', error);
+    console.error('Get report error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -342,7 +342,7 @@ router.get('/reports', async (req, res) => {
       limit: 10
     });
   } catch (error) {
-    // // console.error('List reports error:', error);
+    console.error('List reports error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

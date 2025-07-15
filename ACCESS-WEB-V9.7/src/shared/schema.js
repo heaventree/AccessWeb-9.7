@@ -4,7 +4,6 @@ import {
   varchar,
   timestamp,
   jsonb,
-  json,
   index,
   serial,
   boolean,
@@ -94,50 +93,4 @@ export const menuItemsRelations = relations(menuItems, ({ one, many }) => ({
     references: [menuItems.id],
   }),
   children: many(menuItems),
-}));
-
-// WCAG Scans table for storing accessibility scan history
-export const wcagScans = pgTable("wcag_scans", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id"), // References Prisma User.id, nullable for anonymous scans
-  url: varchar("url", { length: 2048 }).notNull(),
-  overallScore: integer("overall_score").default(0),
-  totalIssues: integer("total_issues").default(0),
-  criticalIssues: integer("critical_issues").default(0),
-  seriousIssues: integer("serious_issues").default(0),
-  moderateIssues: integer("moderate_issues").default(0),
-  minorIssues: integer("minor_issues").default(0),
-  scanData: json("scan_data"), // Full scan results as JSON
-  status: varchar("status", { length: 20 }).default("pending").notNull(), // 'pending', 'completed', 'failed'
-  errorMessage: text("error_message"), // Store error details if scan fails
-  scanDuration: integer("scan_duration"), // Duration in milliseconds
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-// WCAG Scan Issues table for detailed issue tracking
-export const wcagScanIssues = pgTable("wcag_scan_issues", {
-  id: serial("id").primaryKey(),
-  scanId: integer("scan_id").references(() => wcagScans.id).notNull(),
-  issueType: varchar("issue_type", { length: 100 }).notNull(), // 'missing-alt', 'color-contrast', etc.
-  severity: varchar("severity", { length: 20 }).notNull(), // 'critical', 'serious', 'moderate', 'minor'
-  wcagGuideline: varchar("wcag_guideline", { length: 20 }), // '1.1.1', '1.4.3', etc.
-  element: text("element"), // HTML element causing the issue
-  message: text("message").notNull(),
-  recommendation: text("recommendation"),
-  xpath: text("xpath"), // XPath to the element
-  selector: text("selector"), // CSS selector
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// Relations for WCAG scans
-export const wcagScansRelations = relations(wcagScans, ({ many }) => ({
-  issues: many(wcagScanIssues),
-}));
-
-export const wcagScanIssuesRelations = relations(wcagScanIssues, ({ one }) => ({
-  scan: one(wcagScans, {
-    fields: [wcagScanIssues.scanId],
-    references: [wcagScans.id],
-  }),
 }));

@@ -126,8 +126,8 @@ export function buildCSPContent(): string {
       // Image sources
       `img-src 'self' data: https:`,
       
-      // Connect sources (include localhost for development)  
-      `connect-src 'self' ${getEnvString('VITE_NODE_ENV', 'development') === 'development' ? 'http://localhost:* ' : ''}https://api.accessibility-checker.org`,
+      // Connect sources
+      `connect-src 'self' https://api.accessibility-checker.org`,
       
       // Frame sources
       `frame-src 'self' https://js.stripe.com`,

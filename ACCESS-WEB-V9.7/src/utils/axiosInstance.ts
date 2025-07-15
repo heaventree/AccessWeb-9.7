@@ -12,8 +12,8 @@ export const axiosInstance = axios.create({
 // Add a request interceptor to include authentication token
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Get the token from localStorage (using the correct key from auth system)
-    const token = localStorage.getItem('auth_token');
+    // Get the token from localStorage
+    const token = localStorage.getItem('token');
     
     // If token exists, add it to the Authorization header
     if (token) {
@@ -35,16 +35,12 @@ axiosInstance.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized errors (token expired or invalid)
     if (error.response && error.response.status === 401) {
-      // Clear local storage using correct keys
-      localStorage.removeItem('auth_token');
+      // Clear local storage
+      localStorage.removeItem('token');
       localStorage.removeItem('user');
       
-      // Check if this is an admin route and redirect accordingly
-      if (window.location.pathname.startsWith('/admin')) {
-        if (window.location.pathname !== '/admin/login') {
-          window.location.href = `/admin/login?redirect=${encodeURIComponent(window.location.pathname)}`;
-        }
-      } else if (window.location.pathname !== '/login') {
+      // Redirect to login page
+      if (window.location.pathname !== '/login') {
         window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
       }
     }

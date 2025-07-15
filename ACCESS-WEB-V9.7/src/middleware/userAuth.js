@@ -24,7 +24,7 @@ export async function requireAuth(req, res, next) {
         process.env.JWT_SECRET || "your-secret-key",
       );
     } catch (jwtError) {
-      // console.log("JWT verification failed:", jwtError.message);
+      console.log("JWT verification failed:", jwtError.message);
       return res.status(401).json({
         success: false,
         message: "Invalid or expired token. Please log in again.",
@@ -32,7 +32,7 @@ export async function requireAuth(req, res, next) {
       });
     }
 
-    // console.log("Decoded JWT:", decoded);
+    console.log("Decoded JWT:", decoded);
     // Get user from database using Prisma
     const { PrismaClient } = await import('@prisma/client');
     const prisma = new PrismaClient();
@@ -66,7 +66,7 @@ export async function requireAuth(req, res, next) {
     req.user = user;
     next();
   } catch (error) {
-    // console.error("User authentication error:", error);
+    console.error("User authentication error:", error);
 
     if (error.name === "JsonWebTokenError") {
       return res.status(401).json({

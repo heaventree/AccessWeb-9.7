@@ -16,7 +16,6 @@ import {
 import toast from 'react-hot-toast';
 import type { AccessibilityIssue, WCAGInfo } from '../types';
 import { Modal } from './Modal';
-import { IssueFixModal } from './IssueFixModal';
 import { getWCAGInfo } from '../utils/accessibility/wcagHelper';
 import { AIRecommendations } from './AIRecommendations'; 
 import { EmptyState } from './EmptyState';
@@ -84,10 +83,8 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
   };
 
   const openIssueFix = (issue: AccessibilityIssue) => {
-    console.log('Opening fix modal for issue:', issue);
     setSelectedIssue(issue);
     setModalView('fix');
-    console.log('Modal view set to fix, selectedIssue:', issue);
   };
 
   const closeModal = () => {
@@ -494,53 +491,46 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
         })}
       </div>
 
-      {/* Issue Fix Modal */}
-      <IssueFixModal
-        isOpen={modalView === 'fix'}
-        onClose={closeModal}
-        issue={selectedIssue}
-      />
-
-      {/* Issue Info Modal */}
       <Modal
-        isOpen={modalView === 'info'}
+        isOpen={modalView !== null}
         onClose={closeModal}
-        title="Issue Information"
+        title={modalView === 'fix' ? 'How to Fix This Issue' : 'Issue Information'}
       >
         {selectedIssue && (
           <div className="space-y-6">
-            <>
-              <div>
-                <h4 className="font-medium text-gray-900 mb-2">Issue Description</h4>
-                <p className="text-gray-600">{selectedIssue.description}</p>
-              </div>
-
-              {selectedIssue.wcagCriteria && selectedIssue.wcagCriteria.length > 0 && (
+            {modalView === 'info' ? (
+              <>
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">WCAG Criteria</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedIssue.wcagCriteria.map((criteria, index) => (
-                      <span
-                        key={index}
-                        className="px-2.5 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium"
-                      >
-                        {criteria}
-                      </span>
+                  <h4 className="font-medium text-gray-900 mb-2">Issue Description</h4>
+                  <p className="text-gray-600">{selectedIssue.description}</p>
+                </div>
+
+                {selectedIssue.wcagCriteria && selectedIssue.wcagCriteria.length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-2">WCAG Criteria</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedIssue.wcagCriteria.map((criteria, index) => (
+                        <span
+                          key={index}
+                          className="px-2.5 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium"
+                        >
+                          {criteria}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">Affected Elements</h4>
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                    {selectedIssue.nodes.map((node, index) => (
+                      <pre key={index} className="text-sm text-gray-600 font-mono overflow-x-auto">
+                        {node}
+                      </pre>
                     ))}
                   </div>
                 </div>
-              )}
-
-              <div>
-                <h4 className="font-medium text-gray-900 mb-2">Affected Elements</h4>
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                  {selectedIssue.nodes.map((node, index) => (
-                    <pre key={index} className="text-sm text-gray-600 font-mono overflow-x-auto">
-                      {node}
-                    </pre>
-                  ))}
-                </div>
-              </div>
                 
                 {/* PDF document details in modal */}
                 {selectedIssue.documentType === 'pdf' && selectedIssue.documentDetails && (
@@ -692,9 +682,299 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                   </div>
                 )}
               </>
-            </div>
-          )}
-        </Modal>
-      </>
-    );
-  }
+            ) : (
+              <>
+                {(() => {
+                  const wcagInfo = getIssueWCAGInfo(selectedIssue);
+                  return (
+                    <div>
+                      <>
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-2">Success Criteria</h4>
+                          <p className="text-gray-600 mb-6">
+                            {wcagInfo?.successCriteria || 'Please refer to the WCAG documentation for this criterion.'}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-2">Suggested Fix</h4>
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            {selectedIssue.documentType === 'pdf' ? (
+                              <div>
+                                <h5 className="font-medium text-purple-800 mb-2">PDF Accessibility Improvement</h5>
+                                <ul className="list-disc list-inside space-y-2 text-gray-600">
+                                  {!selectedIssue.documentDetails?.hasStructure && (
+                                    <li>
+                                      <strong>Add document structure:</strong> Use Adobe Acrobat Pro or similar professional 
+                                      tools to add proper document structure. Add tags to define headings, paragraphs, lists, 
+                                      tables, and other content elements.
+                                    </li>
+                                  )}
+                                  {!selectedIssue.documentDetails?.hasLanguage && (
+                                    <li>
+                                      <strong>Define document language:</strong> Set the document language in the document 
+                                      properties to ensure proper pronunciation by screen readers.
+                                    </li>
+                                  )}
+                                  {!selectedIssue.documentDetails?.hasAltText && (
+                                    <li>
+                                      <strong>Add alternative text:</strong> Provide descriptive alternative text for all 
+                                      images, figures, and graphics in the document.
+                                    </li>
+                                  )}
+                                  {!selectedIssue.documentDetails?.readingOrder && (
+                                    <li>
+                                      <strong>Fix reading order:</strong> Ensure the reading order matches the visual 
+                                      order of content using the Order panel in Acrobat Pro.
+                                    </li>
+                                  )}
+                                  {!selectedIssue.documentDetails?.hasTags && (
+                                    <li>
+                                      <strong>Add document tags:</strong> Make sure all content is properly tagged 
+                                      to ensure screen readers can interpret the document structure.
+                                    </li>
+                                  )}
+                                  {selectedIssue.documentDetails?.formAccessibility === false && (
+                                    <li>
+                                      <strong>Make forms accessible:</strong> Ensure all form fields have proper labels 
+                                      and instructions that screen readers can interpret.
+                                    </li>
+                                  )}
+                                </ul>
+                                <p className="mt-4 text-purple-700">
+                                  For comprehensive PDF remediation, we recommend using Adobe Acrobat Pro DC, CommonLook, 
+                                  or other specialized PDF accessibility tools.
+                                </p>
+                              </div>
+                            ) : selectedIssue.mediaType ? (
+                              <div>
+                                <h5 className="font-medium text-indigo-800 mb-2">
+                                  {selectedIssue.mediaType === 'audio' ? 'Audio' : 
+                                   selectedIssue.mediaType === 'video' ? 'Video' : 
+                                   'Embedded Media'} Accessibility Improvement
+                                </h5>
+                                <ul className="list-disc list-inside space-y-2 text-gray-600">
+                                  {selectedIssue.mediaType === 'video' && selectedIssue.mediaDetails?.hasCaptions === false && (
+                                    <li>
+                                      <strong>Add captions:</strong> Provide synchronized captions for all video content. 
+                                      Captions should include dialogue and important sound effects.
+                                    </li>
+                                  )}
+                                  {(selectedIssue.mediaType === 'audio' || selectedIssue.mediaType === 'video') && 
+                                   selectedIssue.mediaDetails?.hasTranscript === false && (
+                                    <li>
+                                      <strong>Provide a transcript:</strong> Include a text transcript that contains all 
+                                      spoken information and relevant non-speech sounds from the {selectedIssue.mediaType}.
+                                    </li>
+                                  )}
+                                  {selectedIssue.mediaType === 'video' && selectedIssue.mediaDetails?.hasAudioDescription === false && (
+                                    <li>
+                                      <strong>Add audio descriptions:</strong> Include audio descriptions for important 
+                                      visual content that is not conveyed through the main audio track.
+                                    </li>
+                                  )}
+                                  {selectedIssue.mediaDetails?.hasAccessibleControls === false && (
+                                    <li>
+                                      <strong>Ensure accessible controls:</strong> Media player controls must be accessible 
+                                      with keyboard navigation and properly labeled for screen readers.
+                                    </li>
+                                  )}
+                                  {selectedIssue.mediaDetails?.keyboardAccessible === false && (
+                                    <li>
+                                      <strong>Make it keyboard accessible:</strong> Ensure all player functionality is 
+                                      operable through a keyboard, including play, pause, volume, and seeking controls.
+                                    </li>
+                                  )}
+                                  {selectedIssue.mediaDetails?.autoplay === true && (
+                                    <li>
+                                      <strong>Disable autoplay:</strong> Avoid automatically playing media content, or provide 
+                                      a way to pause, stop, or mute it within 3 seconds of starting.
+                                    </li>
+                                  )}
+                                </ul>
+                                <p className="mt-4 text-indigo-700">
+                                  For {selectedIssue.mediaType === 'video' ? 'video' : 'audio'} content, use players that 
+                                  support accessibility features like {selectedIssue.mediaType === 'video' ? 'captions, audio descriptions,' : ''} 
+                                  keyboard controls, and screen reader compatibility.
+                                </p>
+                              </div>
+                            ) : (
+                              <p className="text-gray-600 whitespace-pre-line">
+                                {wcagInfo?.suggestedFix || selectedIssue.fixSuggestion || 
+                                  'Please refer to the WCAG documentation for fixing this issue.'}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {wcagInfo?.codeExample && !selectedIssue.documentType && (
+                          <div className="mt-4">
+                            <h4 className="font-medium text-gray-900 mb-2">Code Example</h4>
+                            <pre className="bg-gray-800 text-white p-4 rounded-lg text-sm font-mono overflow-x-auto">
+                              {wcagInfo.codeExample}
+                            </pre>
+                          </div>
+                        )}
+                        
+                        {selectedIssue.documentType === 'pdf' && (
+                          <div className="mt-4">
+                            <h4 className="font-medium text-gray-900 mb-2">Resources</h4>
+                            <ul className="list-disc list-inside space-y-1 text-gray-600">
+                              <li>
+                                <a 
+                                  href="https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Adobe PDF Accessibility Overview
+                                </a>
+                              </li>
+                              <li>
+                                <a 
+                                  href="https://www.w3.org/TR/WCAG-TECHS/pdf.html" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  W3C PDF Techniques for WCAG 2.0
+                                </a>
+                              </li>
+                              <li>
+                                <a 
+                                  href="https://www.section508.gov/create/pdfs/" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Section508.gov PDF Accessibility Guidance
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                        )}
+                        
+                        {selectedIssue.mediaType && (
+                          <div className="mt-4">
+                            <h4 className="font-medium text-gray-900 mb-2">Resources</h4>
+                            <ul className="list-disc list-inside space-y-1 text-gray-600">
+                              {selectedIssue.mediaType === 'video' && (
+                                <>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/media/av/" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      W3C Web Accessibility Initiative - Media Accessibility
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/WCAG21/Understanding/captions-prerecorded.html" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      Understanding WCAG 1.2.2: Captions (Prerecorded)
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/WCAG21/Understanding/audio-description-or-media-alternative-prerecorded.html" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      Understanding WCAG 1.2.3: Audio Description
+                                    </a>
+                                  </li>
+                                </>
+                              )}
+                              
+                              {selectedIssue.mediaType === 'audio' && (
+                                <>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/WCAG21/Understanding/audio-only-and-video-only-prerecorded.html" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      Understanding WCAG 1.2.1: Audio-only and Video-only (Prerecorded)
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/TR/WCAG20-TECHS/G158.html" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      G158: Providing an alternative for time-based media for audio-only content
+                                    </a>
+                                  </li>
+                                </>
+                              )}
+                              
+                              {selectedIssue.mediaType === 'embedded' && (
+                                <>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/media/av/planning/" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      Planning Media Accessibility
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a 
+                                      href="https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      Understanding WCAG 4.1.2: Name, Role, Value
+                                    </a>
+                                  </li>
+                                </>
+                              )}
+                              
+                              <li>
+                                <a 
+                                  href="https://www.w3.org/WAI/WCAG21/Understanding/audio-control.html" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Understanding WCAG 1.4.2: Audio Control
+                                </a>
+                              </li>
+                              <li>
+                                <a 
+                                  href="https://www.w3.org/WAI/WCAG21/Understanding/keyboard.html" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Understanding WCAG 2.1.1: Keyboard
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                        )}
+                      </>
+                    </div>
+                  );
+                })()}
+              </>
+            )}
+          </div>
+        )}
+      </Modal>
+    </>
+  );
+}

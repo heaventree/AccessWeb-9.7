@@ -11,7 +11,7 @@ export default function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
-        <Toaster position="top-center"on  />
+        <Toaster position="top-center" />
         <Navigation />
         <div className="py-10">
           <Routes>

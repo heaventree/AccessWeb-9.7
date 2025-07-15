@@ -7,7 +7,7 @@ import { Footer } from '../components/Footer';
 import { BackToTop } from '../components/BackToTop';
 import { useHelpArticle } from '../hooks/useHelpArticle';
 import { useDocumentation } from '../hooks/useDocumentation';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 import { EmptyState } from '../components/EmptyState';
 import { useEffect } from 'react';
 

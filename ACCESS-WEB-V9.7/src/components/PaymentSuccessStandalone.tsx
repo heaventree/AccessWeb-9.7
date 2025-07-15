@@ -70,10 +70,10 @@ export default function PaymentSuccessStandalone() {
 
           <div className="space-y-3">
             <a
-              href="/my-account"
+              href="/dashboard"
               className="block w-full py-3 px-4 bg-[#0fae96] text-white rounded-full font-medium hover:bg-[#0fae96]/90 transition-colors text-center"
             >
-              Go to Account
+              Go to Dashboard
             </a>
             
             <a

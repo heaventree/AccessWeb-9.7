@@ -66,11 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       setError(null);
 
-      console.log('AuthContext login called:', { email, hasPassword: !!password, options });
-
       const data = await authApi.login(email, password, options);
-
-      console.log('AuthAPI login response:', { success: data?.success, hasUser: !!data?.user });
 
       if (data && data.user) {
         setUser(data.user);
@@ -78,14 +74,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       return data; // Return the full response for additional handling
     } catch (err: any) {
-      console.error('AuthContext login error:', err);
-      
       if (err.response && err.response.data && err.response.data.error) {
         setError(err.response.data.error);
-      } else if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
-      } else if (err.message) {
-        setError(err.message);
       } else {
         setError('An error occurred during login');
       }

@@ -48,7 +48,7 @@ function LoginPage(): JSX.Element {
   
   // Get redirect URL from query params
   const searchParams = new URLSearchParams(location.search);
-  const redirectUrl = searchParams.get('redirect') || '/my-account';
+  const redirectUrl = searchParams.get('redirect') || '/dashboard';
   
   /**
    * Handle form input change

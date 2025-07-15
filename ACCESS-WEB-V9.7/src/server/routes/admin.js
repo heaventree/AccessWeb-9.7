@@ -23,7 +23,7 @@ const requireAdmin = async (req, res, next) => {
 
     next();
   } catch (error) {
-    // console.error('Admin auth error:', error);
+    console.error('Admin auth error:', error);
     res.status(500).json({ error: 'Authentication check failed' });
   }
 };
@@ -35,7 +35,7 @@ async function readDataFile(filename) {
     const content = await fs.readFile(filePath, 'utf-8');
     return content;
   } catch (error) {
-    // console.error(`Error reading ${filename}:`, error);
+    console.error(`Error reading ${filename}:`, error);
     throw new Error(`Failed to read ${filename}`);
   }
 }
@@ -45,7 +45,7 @@ async function writeDataFile(filename, content) {
     const filePath = path.join(process.cwd(), 'src', 'data', filename);
     await fs.writeFile(filePath, content, 'utf-8');
   } catch (error) {
-    // console.error(`Error writing ${filename}:`, error);
+    console.error(`Error writing ${filename}:`, error);
     throw new Error(`Failed to write ${filename}`);
   }
 }
@@ -70,7 +70,7 @@ router.get('/debug', requireAdmin, async (req, res) => {
       data: { content: itemsText }
     });
   } catch (error) {
-    // console.error('Error getting debug items:', error);
+    console.error('Error getting debug items:', error);
     res.status(500).json({ error: 'Failed to get debug items' });
   }
 });
@@ -94,7 +94,7 @@ router.put('/debug/:id', requireAdmin, async (req, res) => {
       data: { id, updates }
     });
   } catch (error) {
-    // console.error('Error updating debug item:', error);
+    console.error('Error updating debug item:', error);
     res.status(500).json({ error: 'Failed to update debug item' });
   }
 });
@@ -120,7 +120,7 @@ router.post('/debug', requireAdmin, async (req, res) => {
       data: newItem
     });
   } catch (error) {
-    // console.error('Error creating debug item:', error);
+    console.error('Error creating debug item:', error);
     res.status(500).json({ error: 'Failed to create debug item' });
   }
 });
@@ -144,7 +144,7 @@ router.get('/roadmap', requireAdmin, async (req, res) => {
       data: { content: featuresText }
     });
   } catch (error) {
-    // console.error('Error getting roadmap features:', error);
+    console.error('Error getting roadmap features:', error);
     res.status(500).json({ error: 'Failed to get roadmap features' });
   }
 });
@@ -166,7 +166,7 @@ router.put('/roadmap/:id', requireAdmin, async (req, res) => {
       data: { id, updates }
     });
   } catch (error) {
-    // console.error('Error updating roadmap feature:', error);
+    console.error('Error updating roadmap feature:', error);
     res.status(500).json({ error: 'Failed to update roadmap feature' });
   }
 });
@@ -191,7 +191,7 @@ router.post('/roadmap', requireAdmin, async (req, res) => {
       data: newFeature
     });
   } catch (error) {
-    // console.error('Error creating roadmap feature:', error);
+    console.error('Error creating roadmap feature:', error);
     res.status(500).json({ error: 'Failed to create roadmap feature' });
   }
 });
@@ -208,7 +208,7 @@ function updateDebugItemInContent(content, itemId, updates) {
     Object.entries(updates).forEach(([key, value]) => {
       const fieldRegex = new RegExp(`(${key}:\\s*)([^,}]+)`, 'g');
       const newValue = typeof value === 'string' ? `'${value}'` : value;
-      updatedItem = updatedItem.replace(fieldRegex, '$1' + newValue + '$2');
+      updatedItem = updatedItem.replace(fieldRegex, `$1${newValue}`);
     });
     
     return updatedItem;
@@ -219,11 +219,11 @@ function addDebugItemToContent(content, newItem) {
   const itemsEndRegex = /(\];)/;
   const newItemString = formatDebugItemForFile(newItem);
   
-  return content.replace(itemsEndRegex, ',' + '\n  ' + newItemString + '\n$1');
+  return content.replace(itemsEndRegex, `,\n  ${newItemString}\n$1`);
 }
 
 function updateRoadmapFeatureInContent(content, featureId, updates) {
-  const featureRegex = new RegExp('(\\\\{[^}]*id:\\\\s*[\'"`]' + featureId + '[\'"`][^}]*\\\\})', 'gs');
+  const featureRegex = new RegExp(`(\\{[^}]*id:\\s*['"\`]${featureId}['"\`][^}]*\\})`, 'gs');
   
   return content.replace(featureRegex, (match) => {
     let updatedFeature = match;
@@ -231,7 +231,7 @@ function updateRoadmapFeatureInContent(content, featureId, updates) {
     Object.entries(updates).forEach(([key, value]) => {
       const fieldRegex = new RegExp(`(${key}:\\s*)([^,}]+)`, 'g');
       const newValue = typeof value === 'string' ? `'${value}'` : value;
-      updatedFeature = updatedFeature.replace(fieldRegex, '$1' + newValue + '$2');
+      updatedFeature = updatedFeature.replace(fieldRegex, `$1${newValue}`);
     });
     
     return updatedFeature;
@@ -242,7 +242,7 @@ function addRoadmapFeatureToContent(content, newFeature) {
   const featuresEndRegex = /(\];)/;
   const newFeatureString = formatRoadmapFeatureForFile(newFeature);
   
-  return content.replace(featuresEndRegex, ',\n  ' + newFeatureString + '\n$1');
+  return content.replace(featuresEndRegex, `,\n  ${newFeatureString}\n$1`);
 }
 
 function formatDebugItemForFile(item) {

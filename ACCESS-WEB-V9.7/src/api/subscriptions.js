@@ -76,7 +76,7 @@ export async function getUserSubscription(req, res) {
       }
     });
   } catch (error) {
-    // // console.error('Error fetching user subscription:', error);
+    console.error('Error fetching user subscription:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch subscription',
@@ -173,7 +173,7 @@ export async function createPaymentIntent(req, res) {
     });
 
   } catch (error) {
-    // // console.error('Error creating payment intent:', error);
+    console.error('Error creating payment intent:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to create payment intent',
@@ -217,7 +217,7 @@ export async function getPaymentHistory(req, res) {
       data: paymentHistory
     });
   } catch (error) {
-    // // console.error('Error fetching payment history:', error);
+    console.error('Error fetching payment history:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch payment history',
@@ -286,7 +286,7 @@ async function verifyPayment(req, res) {
           });
 
         // Payment history recording will be implemented when payment table is added
-        // console.log('Payment completed for user:', userId, 'Amount:', paymentIntent.amount);
+        console.log('Payment completed for user:', userId, 'Amount:', paymentIntent.amount);
       }
 
       res.json({
@@ -307,7 +307,7 @@ async function verifyPayment(req, res) {
     }
 
   } catch (error) {
-    // // console.error('Error verifying payment:', error);
+    console.error('Error verifying payment:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to verify payment',
