@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import wcagTestRouter from './routes/wcag-test.js';
 import { getAllPricingPlans, getPricingPlan } from '../api/pricing-plans.js';
+import authRouter from '../api/auth.js';
 
 const app = express();
 const PORT = 3001;
@@ -27,6 +28,9 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
+
+// Authentication routes
+app.use('/api/auth', authRouter);
 
 // WCAG test routes
 app.use('/api/wcag-test', wcagTestRouter);
