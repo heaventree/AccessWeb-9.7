@@ -485,7 +485,7 @@ const WCAGCheckerSimple: React.FC = () => {
                     <span
                       key={standard.id}
                       className={`w-24 sm:w-28 md:w-32 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-center transition-all duration-200 ${standard.color} ${
-                        standard.highlighted ? 'ring-2 ring-offset-2 ring-gray-400 font-bold transform scale-105' : ''
+                        standard.highlighted ? 'font-bold transform scale-105' : ''
                       }`}
                     >
                       {standard.label}
@@ -576,9 +576,10 @@ const WCAGCheckerSimple: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mt-6 sm:mt-8 w-full space-y-4 sm:space-y-6"
           >
-            {/* Report Header - Clean Title without Shadow */}
+            {/* Combined Test Results and Overview Section */}
             <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              {/* Header with Title and Export Button */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
                   <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2">
                     Test Results
@@ -597,10 +598,8 @@ const WCAGCheckerSimple: React.FC = () => {
                   Export Report
                 </button>
               </div>
-            </div>
 
-            {/* Result Count Section */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 p-4 sm:p-6">
+              {/* Results Overview with Timestamp */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Results Overview
@@ -610,7 +609,7 @@ const WCAGCheckerSimple: React.FC = () => {
                 </div>
               </div>
               
-              {/* Separated Issue Count Boxes */}
+              {/* Issue Count Boxes */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
               {/* Critical Box */}
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 text-center dark:bg-red-900/10 dark:border-red-800">
