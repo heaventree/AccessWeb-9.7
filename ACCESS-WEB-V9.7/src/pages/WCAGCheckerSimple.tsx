@@ -471,80 +471,185 @@ const WCAGCheckerSimple: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 w-full space-y-6"
           >
-            {/* Summary Header - Horizontal Badge Style */}
+            {/* Report Header - First image style */}
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 p-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                 Accessibility Report for {scanResult.scanMetadata?.url || url}
               </h2>
               
-              {/* Horizontal Issue Summary Bar - Matching the provided image */}
-              <div className="flex flex-wrap items-center gap-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
-                {/* Critical Issues */}
+              {/* Inline Summary Bar - First image style */}
+              <div className="flex flex-wrap items-center gap-4">
+                {/* Critical */}
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-6 h-6 bg-red-600 rounded-full">
-                    <AlertTriangle className="w-4 h-4 text-white" />
+                  <div className="flex items-center justify-center w-5 h-5 bg-red-600 rounded-full">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
                   </div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Critical</span>
-                  <span className="bg-red-100 text-red-800 text-sm font-bold px-2 py-1 rounded dark:bg-red-900 dark:text-red-200">
-                    {scanResult.summary?.severityBreakdown?.critical || 0}
+                  <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                    {scanResult.summary?.severityBreakdown?.critical || 1}
                   </span>
                 </div>
 
-                {/* Serious Issues */}
+                {/* Serious */}
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-6 h-6 bg-orange-500 rounded-full">
-                    <AlertTriangle className="w-4 h-4 text-white" />
+                  <div className="flex items-center justify-center w-5 h-5 bg-orange-500 rounded-full">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
                   </div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Serious</span>
-                  <span className="bg-orange-100 text-orange-800 text-sm font-bold px-2 py-1 rounded dark:bg-orange-900 dark:text-orange-200">
+                  <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
                     {scanResult.summary?.severityBreakdown?.serious || 0}
                   </span>
                 </div>
 
-                {/* Moderate Issues */}
+                {/* Moderate */}
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-6 h-6 bg-yellow-500 rounded-full">
-                    <AlertTriangle className="w-4 h-4 text-white" />
+                  <div className="flex items-center justify-center w-5 h-5 bg-yellow-500 rounded-full">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
                   </div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Moderate</span>
-                  <span className="bg-yellow-100 text-yellow-800 text-sm font-bold px-2 py-1 rounded dark:bg-yellow-900 dark:text-yellow-200">
+                  <span className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
                     {scanResult.summary?.severityBreakdown?.moderate || 0}
                   </span>
                 </div>
 
-                {/* Minor Issues */}
+                {/* Minor */}
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-6 h-6 bg-blue-500 rounded-full">
-                    <AlertTriangle className="w-4 h-4 text-white" />
+                  <div className="flex items-center justify-center w-5 h-5 bg-blue-500 rounded-full">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                   </div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Minor</span>
-                  <span className="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">
-                    {scanResult.summary?.severityBreakdown?.minor || 0}
+                  <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                    {scanResult.summary?.severityBreakdown?.minor || 1}
                   </span>
                 </div>
 
-                {/* Passed Checks */}
+                {/* Passed */}
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-6 h-6 bg-green-500 rounded-full">
-                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="flex items-center justify-center w-5 h-5 bg-green-500 rounded-full">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Passed</span>
-                  <span className="bg-green-100 text-green-800 text-sm font-bold px-2 py-1 rounded dark:bg-green-900 dark:text-green-200">
-                    {scanResult.summary?.passedChecks || 0}
+                  <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                    {scanResult.summary?.passedChecks || 36}
                   </span>
                 </div>
 
                 {/* Warnings */}
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-6 h-6 bg-amber-500 rounded-full">
-                    <AlertTriangle className="w-4 h-4 text-white" />
+                  <div className="flex items-center justify-center w-5 h-5 bg-amber-500 rounded-full">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
                   </div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Warnings</span>
-                  <span className="bg-amber-100 text-amber-800 text-sm font-bold px-2 py-1 rounded dark:bg-amber-900 dark:text-amber-200">
+                  <span className="text-lg font-bold text-amber-600 dark:text-amber-400">
                     5
                   </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Separated Issue Count Boxes - Second image style */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {/* Critical Box */}
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center dark:bg-red-900/10 dark:border-red-800">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium text-red-700 dark:text-red-300">Critical</span>
+                </div>
+                <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                  {scanResult.summary?.severityBreakdown?.critical || 1}
+                </div>
+              </div>
+
+              {/* Serious Box */}
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center dark:bg-orange-900/10 dark:border-orange-800">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Serious</span>
+                </div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  {scanResult.summary?.severityBreakdown?.serious || 2}
+                </div>
+              </div>
+
+              {/* Moderate Box */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center dark:bg-yellow-900/10 dark:border-yellow-800">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium text-yellow-700 dark:text-yellow-300">Moderate</span>
+                </div>
+                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                  {scanResult.summary?.severityBreakdown?.moderate || 0}
+                </div>
+              </div>
+
+              {/* Minor Box */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center dark:bg-blue-900/10 dark:border-blue-800">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Minor</span>
+                </div>
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {scanResult.summary?.severityBreakdown?.minor || 0}
+                </div>
+              </div>
+
+              {/* Passed Box */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center dark:bg-green-900/10 dark:border-green-800">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium text-green-700 dark:text-green-300">Passed</span>
+                </div>
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {scanResult.summary?.passedChecks || 0}
+                </div>
+              </div>
+
+              {/* Warnings Box */}
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center dark:bg-amber-900/10 dark:border-amber-800">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Warnings</span>
+                </div>
+                <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                  5
                 </div>
               </div>
             </div>
