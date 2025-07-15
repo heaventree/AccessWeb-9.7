@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import wcagTestRouter from './routes/wcag-test.js';
+import siteConnectionsRouter from './routes/siteConnections.js';
 import { getAllPricingPlans, getPricingPlan } from '../api/pricing-plans.js';
 import authRouter from '../api/auth.js';
 import adminRouter from '../api/admin.js';
@@ -35,6 +36,9 @@ app.use('/api/auth', authRouter);
 
 // Admin routes
 app.use('/api/admin', adminRouter);
+
+// Site connections routes
+app.use('/api/site-connections', siteConnectionsRouter);
 
 // WCAG test routes
 app.use('/api/wcag-test', wcagTestRouter);
