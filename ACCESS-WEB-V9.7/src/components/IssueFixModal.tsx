@@ -25,20 +25,26 @@ export function IssueFixModal({ isOpen, onClose, issue }: IssueFixModalProps) {
       return wcagInfo.successCriteria;
     }
 
-    // Fallback based on common accessibility issues
-    if (issue.description.toLowerCase().includes('contrast')) {
+    // If we have the actual issue data, use it directly
+    if (issue.fixSuggestion && issue.fixSuggestion.length > 10) {
+      return issue.fixSuggestion;
+    }
+
+    // Fallback based on WCAG rule or issue description
+    const desc = issue.description.toLowerCase();
+    if (desc.includes('contrast') || issue.id === '1.4.3') {
       return 'Text must have sufficient contrast against its background: 4.5:1 for normal text, 3:1 for large text.';
-    } else if (issue.description.toLowerCase().includes('alt')) {
+    } else if (desc.includes('alt') || desc.includes('image') || issue.id === '1.1.1') {
       return 'All images must have alternative text that describes their content or purpose.';
-    } else if (issue.description.toLowerCase().includes('heading')) {
+    } else if (desc.includes('heading') || desc.includes('order')) {
       return 'Headings must be properly structured in a logical hierarchy (h1, h2, h3, etc.).';
-    } else if (issue.description.toLowerCase().includes('label')) {
+    } else if (desc.includes('label') || desc.includes('form')) {
       return 'All form controls must have associated labels that clearly describe their purpose.';
-    } else if (issue.description.toLowerCase().includes('focus')) {
+    } else if (desc.includes('focus') || desc.includes('indicator')) {
       return 'All interactive elements must be keyboard accessible and have visible focus indicators.';
     }
     
-    return 'This element must meet WCAG accessibility guidelines for proper accessibility support.';
+    return issue.description || 'This element must meet WCAG accessibility guidelines for proper accessibility support.';
   };
 
   // Function to get suggested fix based on issue type
@@ -47,15 +53,21 @@ export function IssueFixModal({ isOpen, onClose, issue }: IssueFixModalProps) {
       return wcagInfo.suggestedFix;
     }
 
-    if (issue.description.toLowerCase().includes('contrast')) {
+    // If we have specific recommendation from the scan, use it
+    if (issue.fixSuggestion && issue.fixSuggestion !== 'No specific recommendation available') {
+      return issue.fixSuggestion;
+    }
+
+    const desc = issue.description.toLowerCase();
+    if (desc.includes('contrast') || issue.id === '1.4.3') {
       return 'Adjust text or background colors to meet minimum contrast requirements. Use a color contrast checker to verify ratios.';
-    } else if (issue.description.toLowerCase().includes('alt')) {
+    } else if (desc.includes('alt') || desc.includes('image') || issue.id === '1.1.1') {
       return 'Add meaningful alternative text to the image that describes its content or function.';
-    } else if (issue.description.toLowerCase().includes('heading')) {
+    } else if (desc.includes('heading') || desc.includes('order')) {
       return 'Restructure headings to follow proper hierarchy without skipping levels.';
-    } else if (issue.description.toLowerCase().includes('label')) {
+    } else if (desc.includes('label') || desc.includes('form')) {
       return 'Associate form controls with descriptive labels using the "for" attribute or aria-labelledby.';
-    } else if (issue.description.toLowerCase().includes('focus')) {
+    } else if (desc.includes('focus') || desc.includes('indicator')) {
       return 'Ensure all interactive elements can receive keyboard focus and have visible focus indicators.';
     }
     
@@ -68,7 +80,10 @@ export function IssueFixModal({ isOpen, onClose, issue }: IssueFixModalProps) {
       return wcagInfo.codeExample;
     }
 
-    if (issue.description.toLowerCase().includes('contrast')) {
+    const desc = issue.description.toLowerCase();
+    const affectedElement = issue.nodes?.[0] || '';
+    
+    if (desc.includes('contrast') || issue.id === '1.4.3') {
       return `/* Good Example */
 .text-content {
   color: #333333; /* Dark gray text */
@@ -82,14 +97,14 @@ export function IssueFixModal({ isOpen, onClose, issue }: IssueFixModalProps) {
   background-color: #FFFFFF; /* White background */
   /* Contrast ratio: 2.85:1 */
 }`;
-    } else if (issue.description.toLowerCase().includes('alt')) {
+    } else if (desc.includes('alt') || desc.includes('image') || issue.id === '1.1.1') {
       return `<!-- Good Example -->
 <img src="chart.png" alt="Sales increased 25% from Q1 to Q2 2024">
 
 <!-- Bad Example -->
 <img src="chart.png" alt="">
 <img src="chart.png" alt="chart">`;
-    } else if (issue.description.toLowerCase().includes('heading')) {
+    } else if (desc.includes('heading') || desc.includes('order')) {
       return `<!-- Good Example -->
 <h1>Page Title</h1>
   <h2>Section Title</h2>
@@ -99,14 +114,14 @@ export function IssueFixModal({ isOpen, onClose, issue }: IssueFixModalProps) {
 <h1>Page Title</h1>
   <h3>Section Title</h3> <!-- Skips h2 -->
     <h2>Subsection Title</h2>`;
-    } else if (issue.description.toLowerCase().includes('label')) {
+    } else if (desc.includes('label') || desc.includes('form')) {
       return `<!-- Good Example -->
 <label for="email">Email Address</label>
 <input type="email" id="email" name="email">
 
 <!-- Bad Example -->
 <input type="email" placeholder="Email">`;
-    } else if (issue.description.toLowerCase().includes('focus')) {
+    } else if (desc.includes('focus') || desc.includes('indicator')) {
       return `/* Good Example */
 button:focus {
   outline: 2px solid #0066cc;
@@ -117,6 +132,15 @@ button:focus {
 button:focus {
   outline: none; /* Removes focus indicator */
 }`;
+    }
+
+    // If we have the actual affected element, show a targeted example
+    if (affectedElement) {
+      return `<!-- Affected Element: -->
+${affectedElement}
+
+<!-- Example implementation will depend on the specific issue -->
+<!-- Refer to WCAG documentation for detailed examples -->`;
     }
 
     return `<!-- Example implementation will depend on the specific issue -->

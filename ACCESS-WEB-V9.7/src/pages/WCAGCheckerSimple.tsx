@@ -446,13 +446,19 @@ const WCAGCheckerSimple: React.FC = () => {
 
   // Convert Issue to AccessibilityIssue format for the modal
   const convertToAccessibilityIssue = (issue: Issue): AccessibilityIssue => {
+    // Use the actual issue data from the WCAG scan
+    const issueDescription = issue.issue || issue.description || issue.ruleName || 'Accessibility issue detected';
+    const wcagRule = issue.wcagRule || 'Unknown';
+    const elementInfo = issue.selector || issue.element || issue.htmlSnippet || 'No element information available';
+    const recommendation = issue.recommendation || 'Please review WCAG guidelines for this issue';
+    
     return {
-      id: issue.wcagRule || issue.ruleName || 'unknown',
-      description: issue.description || issue.ruleName || 'No description available',
+      id: wcagRule,
+      description: issueDescription,
       impact: issue.severity as AccessibilityIssue['impact'],
-      nodes: [issue.htmlSnippet || issue.element || issue.selector || 'No element information'],
-      wcagCriteria: [issue.wcagRule || 'Unknown WCAG rule'],
-      fixSuggestion: issue.recommendation || 'No specific recommendation available'
+      nodes: [elementInfo],
+      wcagCriteria: [wcagRule],
+      fixSuggestion: recommendation
     };
   };
 
