@@ -11,7 +11,12 @@ app.set('trust proxy', 1);
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:5000', 'http://localhost:3001'],
+  origin: [
+    'http://localhost:5000', 
+    'http://localhost:3001',
+    /\.replit\.dev$/,
+    /\.replit\.app$/
+  ],
   credentials: true
 }));
 

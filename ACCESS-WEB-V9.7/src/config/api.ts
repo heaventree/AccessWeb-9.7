@@ -7,10 +7,10 @@
 // API Base URLs from environment variables
 export const API_CONFIG = {
   // Main API server
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && window.location.origin.includes('replit.dev') ? `${window.location.protocol}//${window.location.hostname}:3001` : 'http://localhost:3001'),
   
   // WCAG Testing API
-  WCAG_URL: import.meta.env.VITE_WCAG_API_URL || 'http://localhost:3001',
+  WCAG_URL: import.meta.env.VITE_WCAG_API_URL || (typeof window !== 'undefined' && window.location.origin.includes('replit.dev') ? `${window.location.protocol}//${window.location.hostname}:3001` : 'http://localhost:3001'),
   
   // External APIs
   EXTERNAL_API: import.meta.env.VITE_EXTERNAL_API_URL || 'https://api.accessibility-checker.org',
@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
   // WCAG endpoints
   WCAG_SCAN: `${API_CONFIG.WCAG_URL}/api/wcag-test/scan`,
   WCAG_REPORT: `${API_CONFIG.WCAG_URL}/api/wcag-test/report`,
+  WCAG_TEST: `${API_CONFIG.WCAG_URL}/api/wcag-test`,
   
   // Main API endpoints
   AUTH: `${API_CONFIG.BASE_URL}/api/auth`,

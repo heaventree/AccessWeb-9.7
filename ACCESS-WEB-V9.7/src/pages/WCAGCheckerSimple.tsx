@@ -248,11 +248,12 @@ const WCAGCheckerSimple: React.FC = () => {
     try {
       console.log('Starting WCAG scan for URL:', url);
       
-      const response = await fetch(`${API_ENDPOINTS.WCAG_TEST}?url=${encodeURIComponent(url)}`, {
-        method: 'GET',
+      const response = await fetch(`${API_ENDPOINTS.WCAG_SCAN}`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ url: url }),
       });
 
       if (!response.ok) {
