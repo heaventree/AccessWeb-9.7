@@ -355,7 +355,7 @@ const WCAGCheckerSimple: React.FC = () => {
           </div>
 
           {/* Main Container with all sections */}
-          <div className="max-w-4xl mx-auto">
+          <div className="w-full">
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 p-8 space-y-6">
               
               {/* Region Selection */}
@@ -422,7 +422,7 @@ const WCAGCheckerSimple: React.FC = () => {
                     ) : (
                       <>
                         <Search className="w-4 h-4" />
-                        Scanning...
+                        {showResults ? 'Check Site Again' : 'Check Site'}
                       </>
                     )}
                   </Button>
@@ -448,7 +448,7 @@ const WCAGCheckerSimple: React.FC = () => {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-8 space-y-4 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+            className="mt-8 w-full space-y-4 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
@@ -469,7 +469,7 @@ const WCAGCheckerSimple: React.FC = () => {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-8 space-y-6"
+            className="mt-8 w-full space-y-6"
           >
             {/* Summary Header */}
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 p-6">
