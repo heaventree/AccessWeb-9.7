@@ -92,13 +92,57 @@ const WCAGCheckerSimple: React.FC = () => {
   // Region options
   const regions = ['EU', 'UK', 'USA', 'Canada', 'Australia', 'Japan', 'Global'];
   
-  // Standards options with colors - matching the screenshot
-  const standards = [
-    { id: 'EN 301 549', label: 'EN 301 549', color: 'bg-red-100 text-red-700 border border-red-200' },
-    { id: 'EAA', label: 'EAA', color: 'bg-orange-100 text-orange-700 border border-orange-200' },
-    { id: 'WCAG 2.1', label: 'WCAG 2.1', color: 'bg-blue-100 text-blue-700 border border-blue-200' },
-    { id: 'WCAG 2.2', label: 'WCAG 2.2', color: 'bg-purple-100 text-purple-700 border border-purple-200' }
-  ];
+  // Region-specific standards mapping
+  const getStandardsForRegion = (region: string) => {
+    switch (region) {
+      case 'EU':
+        return [
+          { id: 'EN 301 549', label: 'EN 301 549', color: 'bg-red-100 text-red-700 border border-red-200', highlighted: true },
+          { id: 'EAA', label: 'EAA', color: 'bg-orange-100 text-orange-700 border border-orange-200', highlighted: false },
+          { id: 'WCAG 2.1', label: 'WCAG 2.1', color: 'bg-blue-100 text-blue-700 border border-blue-200', highlighted: false },
+          { id: 'WCAG 2.2', label: 'WCAG 2.2', color: 'bg-purple-100 text-purple-700 border border-purple-200', highlighted: false }
+        ];
+      case 'UK':
+        return [
+          { id: 'EN 301 549', label: 'EN 301 549', color: 'bg-red-100 text-red-700 border border-red-200', highlighted: true },
+          { id: 'WCAG 2.1', label: 'WCAG 2.1', color: 'bg-blue-100 text-blue-700 border border-blue-200', highlighted: false },
+          { id: 'WCAG 2.2', label: 'WCAG 2.2', color: 'bg-purple-100 text-purple-700 border border-purple-200', highlighted: false }
+        ];
+      case 'USA':
+        return [
+          { id: 'ADA', label: 'ADA', color: 'bg-green-100 text-green-700 border border-green-200', highlighted: true },
+          { id: 'Section 508', label: 'Section 508', color: 'bg-indigo-100 text-indigo-700 border border-indigo-200', highlighted: true },
+          { id: 'WCAG 2.1', label: 'WCAG 2.1', color: 'bg-blue-100 text-blue-700 border border-blue-200', highlighted: false },
+          { id: 'WCAG 2.2', label: 'WCAG 2.2', color: 'bg-purple-100 text-purple-700 border border-purple-200', highlighted: false }
+        ];
+      case 'Canada':
+        return [
+          { id: 'AODA', label: 'AODA', color: 'bg-red-100 text-red-700 border border-red-200', highlighted: true },
+          { id: 'WCAG 2.1', label: 'WCAG 2.1', color: 'bg-blue-100 text-blue-700 border border-blue-200', highlighted: false },
+          { id: 'WCAG 2.2', label: 'WCAG 2.2', color: 'bg-purple-100 text-purple-700 border border-purple-200', highlighted: false }
+        ];
+      case 'Australia':
+        return [
+          { id: 'DDA', label: 'DDA', color: 'bg-yellow-100 text-yellow-700 border border-yellow-200', highlighted: true },
+          { id: 'WCAG 2.1', label: 'WCAG 2.1', color: 'bg-blue-100 text-blue-700 border border-blue-200', highlighted: false },
+          { id: 'WCAG 2.2', label: 'WCAG 2.2', color: 'bg-purple-100 text-purple-700 border border-purple-200', highlighted: false }
+        ];
+      case 'Japan':
+        return [
+          { id: 'JIS X 8341', label: 'JIS X 8341', color: 'bg-pink-100 text-pink-700 border border-pink-200', highlighted: true },
+          { id: 'WCAG 2.1', label: 'WCAG 2.1', color: 'bg-blue-100 text-blue-700 border border-blue-200', highlighted: false },
+          { id: 'WCAG 2.2', label: 'WCAG 2.2', color: 'bg-purple-100 text-purple-700 border border-purple-200', highlighted: false }
+        ];
+      default: // Global
+        return [
+          { id: 'WCAG 2.1', label: 'WCAG 2.1', color: 'bg-blue-100 text-blue-700 border border-blue-200', highlighted: true },
+          { id: 'WCAG 2.2', label: 'WCAG 2.2', color: 'bg-purple-100 text-purple-700 border border-purple-200', highlighted: true }
+        ];
+    }
+  };
+
+  // Get current standards based on selected region
+  const currentStandards = getStandardsForRegion(selectedRegion);
 
   // Advanced testing options
   const advancedTestingOptions = [
@@ -254,7 +298,12 @@ const WCAGCheckerSimple: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url: url }),
+        body: JSON.stringify({ 
+          url: url,
+          region: selectedRegion,
+          standards: currentStandards.filter(s => s.highlighted).map(s => s.id),
+          advancedOptions 
+        }),
       });
 
       if (!response.ok) {
@@ -380,10 +429,12 @@ const WCAGCheckerSimple: React.FC = () => {
               {/* Standards Selection */}
               <div className="flex justify-center">
                 <div className="flex gap-3 justify-center flex-wrap">
-                  {standards.map((standard) => (
+                  {currentStandards.map((standard) => (
                     <span
                       key={standard.id}
-                      className={`px-4 py-2 rounded-full text-sm font-medium ${standard.color}`}
+                      className={`px-4 py-2 rounded-full text-sm font-medium ${standard.color} ${
+                        standard.highlighted ? 'ring-2 ring-offset-2 ring-blue-500 font-bold' : ''
+                      }`}
                     >
                       {standard.label}
                     </span>

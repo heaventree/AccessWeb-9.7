@@ -100,8 +100,8 @@ function generateRecommendation(ruleId, description) {
   return 'Review the element and ensure it follows WCAG accessibility guidelines';
 }
 
-// Real WCAG scan function using axe-core
-async function performWCAGScan(url) {
+// Real WCAG scan function using axe-core with region-specific standards
+async function performWCAGScan(url, region = 'Global', standards = ['WCAG 2.1']) {
   const startTime = Date.now();
   let browser;
   
@@ -167,16 +167,80 @@ async function performWCAGScan(url) {
     // Wait for axe to load
     await page.waitForFunction(() => typeof window.axe !== 'undefined', { timeout: 10000 });
     
-    // Run axe-core accessibility analysis
-    const results = await page.evaluate(async () => {
-      return await window.axe.run({
-        tags: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice'],
+    // Configure axe-core based on region and standards
+    const getAxeConfig = (region, standards) => {
+      let tags = ['wcag2a', 'wcag2aa'];
+      let rules = {};
+      
+      // Base WCAG tags
+      if (standards.includes('WCAG 2.1')) tags.push('wcag21aa');
+      if (standards.includes('WCAG 2.2')) tags.push('wcag22aa');
+      
+      // Region-specific configurations
+      switch (region) {
+        case 'EU':
+        case 'UK':
+          // EN 301 549 is based on WCAG 2.1 Level AA
+          tags.push('wcag21aa');
+          if (standards.includes('EN 301 549')) {
+            // Additional EN 301 549 specific rules
+            rules['document-title'] = { enabled: true };
+            rules['html-has-lang'] = { enabled: true };
+          }
+          break;
+          
+        case 'USA':
+          // ADA and Section 508 compliance
+          if (standards.includes('ADA') || standards.includes('Section 508')) {
+            tags.push('section508', 'wcag21aa');
+            // Section 508 specific rules
+            rules['color-contrast'] = { enabled: true };
+            rules['focus-order-semantics'] = { enabled: true };
+          }
+          break;
+          
+        case 'Canada':
+          // AODA compliance (similar to WCAG 2.1 AA)
+          if (standards.includes('AODA')) {
+            tags.push('wcag21aa');
+          }
+          break;
+          
+        case 'Australia':
+          // DDA compliance
+          if (standards.includes('DDA')) {
+            tags.push('wcag21aa');
+          }
+          break;
+          
+        case 'Japan':
+          // JIS X 8341 compliance
+          if (standards.includes('JIS X 8341')) {
+            tags.push('wcag21aa');
+          }
+          break;
+          
+        default:
+          // Global - standard WCAG
+          tags.push('best-practice');
+      }
+      
+      return {
+        tags: [...new Set(tags)], // Remove duplicates
+        rules,
         runOnly: {
           type: 'tag',
-          values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice']
+          values: [...new Set(tags)]
         }
-      });
-    });
+      };
+    };
+    
+    const axeConfig = getAxeConfig(region, standards);
+    
+    // Run axe-core accessibility analysis with region-specific configuration
+    const results = await page.evaluate(async (config) => {
+      return await window.axe.run(config);
+    }, axeConfig);
     
     // Process violations (issues)
     const issues = results.violations.map(violation => {
@@ -515,7 +579,7 @@ async function performBasicWCAGScan(url) {
 // POST /api/wcag-test/scan - Start a new WCAG scan
 router.post('/scan', scanLimiter, async (req, res) => {
   try {
-    const { url } = req.body;
+    const { url, region = 'Global', standards = ['WCAG 2.1'], advancedOptions = [] } = req.body;
     
     if (!url) {
       return res.status(400).json({
@@ -529,7 +593,7 @@ router.post('/scan', scanLimiter, async (req, res) => {
     console.log(`Starting test WCAG scan for URL: ${sanitizedUrl}`);
     
     const startTime = Date.now();
-    const scanResult = await performWCAGScan(sanitizedUrl);
+    const scanResult = await performWCAGScan(sanitizedUrl, region, standards);
     const endTime = Date.now();
     
     console.log(`Test WCAG scan completed for ${sanitizedUrl} in ${endTime - startTime}ms`);
