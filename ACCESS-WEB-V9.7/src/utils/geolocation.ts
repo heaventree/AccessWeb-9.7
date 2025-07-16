@@ -148,27 +148,24 @@ export async function getRegionFromGeolocation(): Promise<{
   country?: string;
 }> {
   try {
-    // First try to get precise location
+    // Try precise geolocation first
     const position = await getCurrentPosition();
     
-    // Try to get country from coordinates
-    const countryFromCoords = await getCountryFromCoordinates(
-      position.coords.latitude,
-      position.coords.longitude
-    );
+    // Use rough geolocation-based region detection
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
     
-    if (countryFromCoords) {
-      const region = getRegionFromCountryCode(countryFromCoords);
-      return {
-        region,
-        method: 'geolocation',
-        country: countryFromCoords
-      };
-    }
+    // Simple geographical region detection based on coordinates
+    const region = getRegionFromCoordinates(lat, lng);
+    
+    return {
+      region,
+      method: 'geolocation'
+    };
   } catch (geoError) {
     console.info('Geolocation not available or denied:', geoError.message);
   }
-  
+
   try {
     // Fallback to IP-based location
     const countryFromIP = await getCountryFromIP();
@@ -190,6 +187,43 @@ export async function getRegionFromGeolocation(): Promise<{
     region: 'global',
     method: 'default'
   };
+}
+
+/**
+ * Get region from coordinates using rough geographical boundaries
+ */
+function getRegionFromCoordinates(lat: number, lng: number): string {
+  // Europe (rough boundaries)
+  if (lat >= 35 && lat <= 71 && lng >= -10 && lng <= 40) {
+    // UK specific
+    if (lat >= 50 && lat <= 61 && lng >= -8 && lng <= 2) {
+      return 'uk';
+    }
+    return 'eu';
+  }
+  
+  // North America
+  if (lat >= 25 && lat <= 83 && lng >= -168 && lng <= -52) {
+    // Canada (rough northern boundary)
+    if (lat >= 45) {
+      return 'canada';
+    }
+    // USA
+    return 'usa';
+  }
+  
+  // Australia/Oceania
+  if (lat >= -50 && lat <= -10 && lng >= 110 && lng <= 180) {
+    return 'australia';
+  }
+  
+  // Japan (rough boundaries)
+  if (lat >= 30 && lat <= 46 && lng >= 129 && lng <= 146) {
+    return 'japan';
+  }
+  
+  // Default to global for other regions
+  return 'global';
 }
 
 /**

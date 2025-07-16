@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, X, Globe, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -14,6 +14,11 @@ export function LocationPermissionBanner({ onLocationDetected, onDismiss }: Loca
     country?: string;
     method: 'geolocation' | 'ip' | 'default';
   } | null>(null);
+
+  // Auto-detect location on mount
+  useEffect(() => {
+    handleDetectLocation();
+  }, []);
 
   const handleDetectLocation = async () => {
     setIsDetecting(true);
@@ -41,6 +46,19 @@ export function LocationPermissionBanner({ onLocationDetected, onDismiss }: Loca
   };
 
   if (detectionResult) {
+    const getRegionDisplayName = (region: string) => {
+      const regionMap: Record<string, string> = {
+        'eu': 'EU',
+        'uk': 'UK', 
+        'usa': 'USA',
+        'canada': 'Canada',
+        'australia': 'Australia',
+        'japan': 'Japan',
+        'global': 'Global'
+      };
+      return regionMap[region] || region.toUpperCase();
+    };
+
     return (
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -53,13 +71,15 @@ export function LocationPermissionBanner({ onLocationDetected, onDismiss }: Loca
             <Check className="h-5 w-5 text-green-600" />
             <div>
               <p className="text-sm font-medium text-green-800">
-                Location detected! 
-                {detectionResult.country && (
-                  <span className="ml-1">Region set to {detectionResult.region.toUpperCase()}</span>
+                Location detected! Region set to {getRegionDisplayName(detectionResult.region)}
+                {detectionResult.country && detectionResult.method !== 'default' && (
+                  <span className="ml-1">({detectionResult.country})</span>
                 )}
               </p>
               <p className="text-xs text-green-600 mt-1">
-                Detection method: {detectionResult.method === 'geolocation' ? 'GPS location' : detectionResult.method === 'ip' ? 'IP address' : 'default'}
+                {detectionResult.method === 'ip' ? 'Detected from IP address' : 
+                 detectionResult.method === 'geolocation' ? 'Detected from GPS location' : 
+                 'Using global standards (location detection failed)'}
               </p>
             </div>
           </div>
@@ -75,41 +95,16 @@ export function LocationPermissionBanner({ onLocationDetected, onDismiss }: Loca
       exit={{ opacity: 0, y: -10 }}
       className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6"
     >
-      <div className="flex items-start justify-between">
-        <div className="flex items-start space-x-3">
-          <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
-          <div className="flex-1">
-            <h3 className="text-sm font-medium text-blue-800">
-              Auto-select your region
-            </h3>
-            <p className="text-sm text-blue-700 mt-1">
-              We can detect your location to automatically select the appropriate accessibility standards for your region.
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+          <div>
+            <p className="text-sm font-medium text-blue-800">
+              Detecting your location...
             </p>
-            <div className="mt-3 flex items-center space-x-3">
-              <button
-                onClick={handleDetectLocation}
-                disabled={isDetecting}
-                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isDetecting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2"></div>
-                    Detecting...
-                  </>
-                ) : (
-                  <>
-                    <Globe className="h-3 w-3 mr-2" />
-                    Detect Location
-                  </>
-                )}
-              </button>
-              <button
-                onClick={onDismiss}
-                className="text-xs text-blue-600 hover:text-blue-800 underline"
-              >
-                No thanks, I'll select manually
-              </button>
-            </div>
+            <p className="text-xs text-blue-600 mt-1">
+              Auto-selecting the appropriate accessibility standards for your region
+            </p>
           </div>
         </div>
         <button

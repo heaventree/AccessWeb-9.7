@@ -64,6 +64,7 @@ export function WCAGCheckerPage() {
     const lastRegion = localStorage.getItem('lastSelectedRegion');
     const bannerDismissed = localStorage.getItem('locationBannerDismissed');
     
+    // Only show banner if location hasn't been detected and banner hasn't been dismissed
     if (locationDetected === 'true' && lastRegion) {
       setHasDetectedLocation(true);
       setSelectedRegion(lastRegion);
@@ -71,6 +72,7 @@ export function WCAGCheckerPage() {
     } else if (bannerDismissed === 'true') {
       setShowLocationBanner(false);
     }
+    // If neither condition is met, banner will show and auto-detect
   }, []);
 
   const handleLocationDetected = (region: string, country?: string) => {
