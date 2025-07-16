@@ -11,7 +11,8 @@ import {
   Video, 
   Headphones, 
   MonitorSmartphone,
-  Zap
+  Zap,
+  Brain
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { AccessibilityIssue, WCAGInfo } from '../types';
@@ -20,6 +21,7 @@ import { getWCAGInfo } from '../utils/accessibility/wcagHelper';
 import { AIRecommendations } from './AIRecommendations'; 
 import { EmptyState } from './EmptyState';
 import { fixEngine } from '../lib/accessibility-fixes';
+import { AISuggestionsModal } from './AISuggestionsModal';
 
 type ModalView = 'info' | 'fix' | null;
 
@@ -32,6 +34,8 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
   const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
   const [selectedIssue, setSelectedIssue] = useState<AccessibilityIssue | null>(null);
   const [modalView, setModalView] = useState<ModalView>(null);
+  const [aiSuggestionsOpen, setAiSuggestionsOpen] = useState(false);
+  const [aiSuggestionsIssue, setAiSuggestionsIssue] = useState<AccessibilityIssue | null>(null);
   
   // For live region announcements
   const [ariaLiveText, setAriaLiveText] = useState<string>('');
@@ -87,9 +91,19 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
     setModalView('fix');
   };
 
+  const openAISuggestions = (issue: AccessibilityIssue) => {
+    setAiSuggestionsIssue(issue);
+    setAiSuggestionsOpen(true);
+  };
+
   const closeModal = () => {
     setModalView(null);
     setSelectedIssue(null);
+  };
+
+  const closeAISuggestions = () => {
+    setAiSuggestionsOpen(false);
+    setAiSuggestionsIssue(null);
   };
 
   const getIssueWCAGInfo = (issue: AccessibilityIssue): WCAGInfo | undefined => {
@@ -431,6 +445,14 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                         >
                           <Info className="w-4 h-4 mr-2" aria-hidden="true" />
                           Learn More
+                        </button>
+                        <button
+                          onClick={() => openAISuggestions(issue)}
+                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition-colors border border-green-200 shadow-sm"
+                          aria-label={`Get AI suggestions for ${issue.description}`}
+                        >
+                          <Brain className="w-4 h-4 mr-2" aria-hidden="true" />
+                          Get AI Suggestions
                         </button>
                         <button
                           onClick={() => {
@@ -983,6 +1005,15 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
           </div>
         )}
       </Modal>
+
+      {/* AI Suggestions Modal */}
+      {aiSuggestionsIssue && (
+        <AISuggestionsModal 
+          isOpen={aiSuggestionsOpen}
+          onClose={closeAISuggestions}
+          issue={aiSuggestionsIssue}
+        />
+      )}
     </>
   );
 }
