@@ -72,6 +72,7 @@ import { ComplianceIntegrationPage } from './pages/integrations/ComplianceIntegr
 import { ShopifyIntegrationPage } from './pages/integrations/ShopifyIntegrationPage';
 import BillingPage from './pages/BillingPage';
 import PaymentSuccessStandalone from './components/PaymentSuccessStandalone';
+import PaymentSuccess from './pages/PaymentSuccess';
 import { EnterpriseIntegrationPage } from './pages/integrations/EnterpriseIntegrationPage';
 import { AnalyticsPage } from './pages/analytics/AnalyticsPage';
 import { CompliancePage } from './pages/compliance/CompliancePage';
@@ -205,7 +206,7 @@ function App() {
                 {import.meta.env.DEV ? <CheckoutSimple /> : <Checkout />}
               </main><Footer /><BackToTop /></>} />
               <Route path="/subscribe" element={<><Navigation /><main id="main-content" className="pt-32"><Subscribe /></main><Footer /><BackToTop /></>} />
-              <Route path="/payment-success" element={<PaymentSuccessStandalone />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
 
               {/* Admin Routes - Admin Only */}
               <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
