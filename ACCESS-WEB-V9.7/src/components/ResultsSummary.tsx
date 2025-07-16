@@ -14,11 +14,13 @@ export function ResultsSummary({ results, onExportPDF }: ResultsSummaryProps) {
   }
   
   const { summary } = results;
-  const hasPDFIssues = summary.pdfIssues && summary.pdfIssues > 0;
-  const hasDocumentIssues = summary.documentIssues && summary.documentIssues > 0;
-  const hasMediaIssues = summary.mediaIssues && summary.mediaIssues > 0;
-  const hasAudioIssues = summary.audioIssues && summary.audioIssues > 0;
-  const hasVideoIssues = summary.videoIssues && summary.videoIssues > 0;
+  
+  // More robust checks - only consider as having issues if the field exists AND is greater than 0
+  const hasPDFIssues = summary.pdfIssues !== undefined && summary.pdfIssues > 0;
+  const hasDocumentIssues = summary.documentIssues !== undefined && summary.documentIssues > 0;
+  const hasMediaIssues = summary.mediaIssues !== undefined && summary.mediaIssues > 0;
+  const hasAudioIssues = summary.audioIssues !== undefined && summary.audioIssues > 0;
+  const hasVideoIssues = summary.videoIssues !== undefined && summary.videoIssues > 0;
   
   // Calculate total issues for screen reader announcement
   const totalIssues = (summary.critical || 0) + (summary.serious || 0) + 
