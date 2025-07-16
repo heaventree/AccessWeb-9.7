@@ -46,7 +46,8 @@ import {
 import {
   getUserSubscription,
   createPaymentIntent,
-  getPaymentHistory
+  getPaymentHistory,
+  verifyPayment
 } from '../api/subscriptions.js';
 // import siteScannerQueue from './jobs/siteScanner.js';
 import { PrismaClient } from '@prisma/client';
@@ -175,6 +176,7 @@ app.delete('/api/admin/pricing-plans/:id', requireAdmin, deletePricingPlan);
 app.get('/api/subscription', requireAuth, getUserSubscription);
 app.post('/api/subscription/payment-intent', requireAuth, createPaymentIntent);
 app.get('/api/subscription/payment-history', requireAuth, getPaymentHistory);
+app.post('/api/subscription/verify-payment', requireAuth, verifyPayment);
 app.post('/api/subscription/cancel', requireAuth, cancelSubscription);
 
 // Site Scanner Job Queue Routes (temporarily disabled)

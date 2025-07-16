@@ -227,7 +227,7 @@ export async function getPaymentHistory(req, res) {
 }
 
 // Verify payment after completion
-async function verifyPayment(req, res) {
+export async function verifyPayment(req, res) {
   try {
     const { paymentIntentId } = req.body;
     const userId = req.user?.id;
@@ -289,9 +289,23 @@ async function verifyPayment(req, res) {
         console.log('Payment completed for user:', userId, 'Amount:', paymentIntent.amount);
       }
 
+      // Also update user subscription in the database
+      try {
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            subscriptionPlan: planName ? planName.toLowerCase() : plan?.name?.toLowerCase() || 'basic',
+            subscriptionStatus: 'active',
+            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+          }
+        });
+      } catch (updateError) {
+        console.error('Error updating user subscription:', updateError);
+      }
+
       res.json({
         success: true,
-        payment: {
+        paymentDetails: {
           id: paymentIntent.id,
           amount: paymentIntent.amount,
           currency: paymentIntent.currency,

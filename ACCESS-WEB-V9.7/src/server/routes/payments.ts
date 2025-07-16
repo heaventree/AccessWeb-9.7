@@ -192,6 +192,76 @@ export function registerPaymentRoutes(app: any, apiPrefix: string, stripe: Strip
   });
 
   /**
+   * @route   POST /api/v1/payments/verify-payment
+   * @desc    Verify payment after completion
+   * @access  Private
+   */
+  router.post('/verify-payment', authenticate, async (req: Request, res: Response) => {
+    try {
+      const { paymentIntentId } = req.body;
+      
+      if (!req.user) {
+        return res.status(401).json({ 
+          success: false,
+          message: 'User not authenticated' 
+        });
+      }
+
+      if (!paymentIntentId) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'Payment intent ID is required' 
+        });
+      }
+
+      // Retrieve the payment intent from Stripe
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+      if (paymentIntent.status === 'succeeded') {
+        // Get plan information from metadata
+        const planName = paymentIntent.metadata.planName || 'Subscription Plan';
+        const planId = paymentIntent.metadata.planId;
+
+        // Update user subscription if planId is available
+        if (planId && req.user.id) {
+          try {
+            await storage.updateUser(req.user.id, {
+              subscriptionPlan: planName.toLowerCase(),
+              subscriptionStatus: 'active',
+              subscriptionPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+            });
+          } catch (error) {
+            console.error('Error updating user subscription:', error);
+          }
+        }
+
+        res.json({
+          success: true,
+          paymentDetails: {
+            id: paymentIntent.id,
+            amount: paymentIntent.amount,
+            currency: paymentIntent.currency,
+            status: paymentIntent.status,
+            planName: planName
+          }
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          message: 'Payment not completed'
+        });
+      }
+    } catch (err) {
+      console.error('Error verifying payment:', err);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to verify payment',
+        error: err instanceof Error ? err.message : 'Unknown error'
+      });
+    }
+  });
+
+  /**
    * @route   GET /api/v1/payments/payment-methods
    * @desc    Get user's payment methods
    * @access  Private

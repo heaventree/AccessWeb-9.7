@@ -506,7 +506,7 @@ export default function BillingPage() {
               <dl className="grid grid-cols-1 gap-4">
                 <div>
                   <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">{user.name || 'Not provided'}</dd>
+                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">{user.name || user.username || 'Not provided'}</dd>
                 </div>
                 
                 <div>
@@ -520,6 +520,46 @@ export default function BillingPage() {
                     {user.isAdmin ? 'Administrator' : 'Subscriber'}
                   </dd>
                 </div>
+                
+                {subscription && (
+                  <>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Current Plan</dt>
+                      <dd className="mt-1 text-sm text-gray-900 dark:text-white capitalize">
+                        {subscription.plan} Plan
+                      </dd>
+                    </div>
+                    
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Subscription Status</dt>
+                      <dd className="mt-1">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          subscription.status === 'active' 
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                            : subscription.status === 'expired'
+                            ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                            : subscription.status === 'canceled'
+                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+                        }`}>
+                          {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+                        </span>
+                      </dd>
+                    </div>
+                    
+                    {subscription.currentPeriodEnd && (
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                          {subscription.status === 'expired' ? 'Expired On' : 
+                           subscription.status === 'canceled' ? 'Access Ends' : 'Next Billing'}
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900 dark:text-white">
+                          {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                        </dd>
+                      </div>
+                    )}
+                  </>
+                )}
               </dl>
             </div>
           )}
@@ -539,14 +579,16 @@ export default function BillingPage() {
                 {paymentHistory.slice(0, 5).map((payment) => (
                   <div key={payment.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-slate-700 last:border-b-0">
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{payment.plan} Plan</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {payment.planName || payment.plan || 'Subscription'} Plan
+                      </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {new Date(payment.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        ${payment.amount} {payment.currency.toUpperCase()}
+                        ${typeof payment.amount === 'number' ? (payment.amount / 100).toFixed(2) : payment.amount} {(payment.currency || 'USD').toUpperCase()}
                       </p>
                       <p className={`text-xs ${payment.status === 'succeeded' ? 'text-green-600' : 'text-red-600'}`}>
                         {payment.status}

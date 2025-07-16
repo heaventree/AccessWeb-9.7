@@ -22,22 +22,30 @@ export default function PaymentSuccess() {
       }
 
       try {
-        // For now, show success for valid payment intents
-        // In production, this would verify with your backend
+        // Verify payment with backend to get actual payment details
+        const response = await axios.post('/api/subscription/verify-payment', {
+          paymentIntentId: paymentIntent
+        });
+
+        if (response.data.success) {
+          setPaymentDetails(response.data.paymentDetails);
+        } else {
+          setError(response.data.message || 'Payment verification failed');
+        }
+      } catch (error) {
+        console.error('Error verifying payment:', error);
+        // If backend verification fails, still show basic success info
         if (paymentIntent && paymentIntent.startsWith('pi_')) {
           setPaymentDetails({
             id: paymentIntent,
-            amount: 19900, // $199 in cents
+            amount: null, // Will be handled in UI
             currency: 'usd',
             status: 'succeeded',
-            planName: 'Enterprise Plan'
+            planName: 'Subscription Plan'
           });
         } else {
           setError('Invalid payment confirmation');
         }
-      } catch (error) {
-        console.error('Error processing payment confirmation:', error);
-        setError('Failed to process payment confirmation');
       } finally {
         setLoading(false);
       }
@@ -108,10 +116,12 @@ export default function PaymentSuccess() {
                   <span className="text-gray-500 dark:text-gray-400">Plan:</span>
                   <span className="text-gray-900 dark:text-white">{paymentDetails.planName || 'Subscription'}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">Amount:</span>
-                  <span className="text-gray-900 dark:text-white">${(paymentDetails.amount / 100).toFixed(2)}</span>
-                </div>
+                {paymentDetails.amount && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500 dark:text-gray-400">Amount:</span>
+                    <span className="text-gray-900 dark:text-white">${(paymentDetails.amount / 100).toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-gray-500 dark:text-gray-400">Payment ID:</span>
                   <span className="text-gray-900 dark:text-white font-mono text-xs">{paymentIntent}</span>
@@ -129,7 +139,7 @@ export default function PaymentSuccess() {
             </button>
             
             <button
-              onClick={() => navigate('/billing')}
+              onClick={() => navigate('/my-account/billing')}
               className="w-full py-3 px-4 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-full font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
             >
               View Billing
