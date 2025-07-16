@@ -38,7 +38,7 @@ const AdminSubscriptions: React.FC = () => {
     }
 
     if (user?.role !== 'admin') {
-      navigate('/dashboard');
+      navigate('/my-account');
       return;
     }
 

@@ -56,7 +56,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       } else {
         // Get the redirect location from state (if any)
         const state = location.state as any;
-        const from = state?.from?.pathname || '/dashboard';
+        const from = state?.from?.pathname || '/my-account';
         navigate(from, { replace: true });
       }
     } catch (err) {

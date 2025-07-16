@@ -52,7 +52,7 @@ export function PaymentPage() {
   }, [plan, navigate]);
 
   const handlePaymentSuccess = () => {
-    navigate('/dashboard');
+    navigate('/my-account');
   };
 
   const handlePaymentError = (error: string) => {

@@ -25,12 +25,12 @@ export function AuthPage() {
   // Auto-redirect if already authenticated or in development mode
   useEffect(() => {
     if (isAuthenticated) {
-      const redirectPath = redirect ? decodeURIComponent(redirect) : '/dashboard';
+      const redirectPath = redirect ? decodeURIComponent(redirect) : '/my-account';
       navigate(redirectPath, { replace: true });
     } else if (isDevelopmentMode) {
       // In development mode, automatically log in
       console.info('🔓 Development mode: Auto-logging in user');
-      const redirectPath = redirect ? decodeURIComponent(redirect) : '/dashboard';
+      const redirectPath = redirect ? decodeURIComponent(redirect) : '/my-account';
       navigate(redirectPath, { replace: true });
     }
   }, [isAuthenticated, isDevelopmentMode, navigate, redirect]);
@@ -45,8 +45,8 @@ export function AuthPage() {
         const result = await login(email, password);
         if (result.success) {
           toast.success('Login successful!');
-          // Redirect user to the previous page or dashboard
-          const redirectPath = redirect ? decodeURIComponent(redirect) : '/dashboard';
+          // Redirect user to the previous page or my-account
+          const redirectPath = redirect ? decodeURIComponent(redirect) : '/my-account';
           navigate(redirectPath);
         } else {
           toast.error(result.error?.message || 'Login failed');

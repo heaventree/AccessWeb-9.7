@@ -93,7 +93,7 @@ export const PublicOnlyRoute: React.FC<{ children?: React.ReactNode }> = ({ chil
   if (user) {
     // Redirect to the page they were trying to access before logging in
     // or to the dashboard as a fallback
-    const from = (location.state as any)?.from?.pathname || '/dashboard';
+    const from = (location.state as any)?.from?.pathname || '/my-account';
     return <Navigate to={from} replace />;
   }
   
