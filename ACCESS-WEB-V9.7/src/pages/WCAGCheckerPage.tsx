@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { URLInput } from '../components/URLInput';
 import { ResultsSummary } from '../components/ResultsSummary';
 import { IssuesList } from '../components/IssuesList';
 import { RegionSelector } from '../components/RegionSelector';
+import { LocationPermissionBanner } from '../components/LocationPermissionBanner';
 import { EmbedBadge } from '../components/EmbedBadge';
 import { StructureAnalysisPanel } from '../components/StructureAnalysisPanel';
 import { ResponsiveAnalysisPanel } from '../components/ResponsiveAnalysisPanel';
@@ -47,11 +48,47 @@ export function WCAGCheckerPage() {
   const [enableMediaTesting, setEnableMediaTesting] = useState(false);
   const [enabledStandards, setEnabledStandards] = useState<string[]>(['WCAG 2.1', 'WCAG 2.2']);
 
+  // Location permission state
+  const [showLocationBanner, setShowLocationBanner] = useState(true);
+  const [hasDetectedLocation, setHasDetectedLocation] = useState(false);
+
   // New state for connection error details
   const [connectionError, setConnectionError] = useState<{ 
     url: string; 
     details: any;
   } | null>(null);
+
+  // Check if location was already detected on mount
+  useEffect(() => {
+    const locationDetected = localStorage.getItem('locationDetected');
+    const lastRegion = localStorage.getItem('lastSelectedRegion');
+    const bannerDismissed = localStorage.getItem('locationBannerDismissed');
+    
+    if (locationDetected === 'true' && lastRegion) {
+      setHasDetectedLocation(true);
+      setSelectedRegion(lastRegion);
+      setShowLocationBanner(false);
+    } else if (bannerDismissed === 'true') {
+      setShowLocationBanner(false);
+    }
+  }, []);
+
+  const handleLocationDetected = (region: string, country?: string) => {
+    setSelectedRegion(region);
+    setHasDetectedLocation(true);
+    
+    // Remember that we've detected location
+    localStorage.setItem('locationDetected', 'true');
+    localStorage.setItem('lastSelectedRegion', region);
+    if (country) {
+      localStorage.setItem('detectedCountry', country);
+    }
+  };
+
+  const handleDismissLocationBanner = () => {
+    setShowLocationBanner(false);
+    localStorage.setItem('locationBannerDismissed', 'true');
+  };
 
   const handleSubmit = async (url: string) => {
     // Normalize the URL (ensure it has a protocol)
@@ -171,6 +208,14 @@ export function WCAGCheckerPage() {
             Test any website for WCAG compliance and accessibility issues
           </p>
         </motion.div>
+
+        {/* Location Permission Banner */}
+        {showLocationBanner && !hasDetectedLocation && (
+          <LocationPermissionBanner
+            onLocationDetected={handleLocationDetected}
+            onDismiss={handleDismissLocationBanner}
+          />
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
