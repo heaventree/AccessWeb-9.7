@@ -1,12 +1,13 @@
 
-import { AlertTriangle, AlertOctagon, AlertCircle, Info, CheckCircle, AlertCircle as Warning, FileText, Headphones, Video, MonitorSmartphone } from 'lucide-react';
+import { AlertTriangle, AlertOctagon, AlertCircle, Info, CheckCircle, AlertCircle as Warning, FileText, Headphones, Video, MonitorSmartphone, Download } from 'lucide-react';
 import type { TestResult } from '../types';
 
 interface ResultsSummaryProps {
   results: TestResult;
+  onExportPDF?: () => void;
 }
 
-export function ResultsSummary({ results }: ResultsSummaryProps) {
+export function ResultsSummary({ results, onExportPDF }: ResultsSummaryProps) {
   // Add null check for results and summary
   if (!results || !results.summary) {
     return <div>No results data available</div>;
@@ -24,10 +25,31 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
                      (summary.moderate || 0) + (summary.minor || 0);
 
   return (
-    <section 
-      aria-labelledby="results-summary-heading"
-      className="mb-6"
-    >
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+      {/* Header with Title and Export Button */}
+      <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Test Results</h2>
+            <p className="text-sm text-gray-600 mt-1">{results.url}</p>
+          </div>
+          {onExportPDF && (
+            <button
+              onClick={onExportPDF}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export Report
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Results Summary */}
+      <section 
+        aria-labelledby="results-summary-heading"
+        className="p-6"
+      >
       <h2 id="results-summary-heading" className="sr-only">
         Accessibility Test Results Summary - {totalIssues} total issues found
       </h2>
@@ -202,6 +224,7 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
           </div>
         )}
       </div>
-    </section>
+      </section>
+    </div>
   );
 }
