@@ -79,7 +79,7 @@ export function WCAGCheckerPage() {
         timestamp: apiResult.timestamp,
         score: apiResult.score,
         passCount: apiResult.summary.passed || 0,
-        warningCount: 5, // Default value
+        warningCount: 0, // Currently not provided by axe-core
         issueCount: apiResult.summary.total,
         region: selectedRegion,
         summary: {
@@ -87,7 +87,7 @@ export function WCAGCheckerPage() {
           serious: apiResult.summary.serious,
           moderate: apiResult.summary.moderate,
           minor: apiResult.summary.minor,
-          warnings: 5,
+          warnings: 0,
           passes: apiResult.summary.passed || 0,
           pdfIssues: 0,
           documentIssues: 0,
@@ -106,19 +106,19 @@ export function WCAGCheckerPage() {
           type: issue.type,
           impact: issue.impact as 'critical' | 'serious' | 'moderate' | 'minor',
           message: issue.message,
-          element: issue.selector,
+          element: issue.element || issue.selector,
           wcagGuideline: issue.wcagGuideline,
-          description: issue.recommendation,
-          howToFix: issue.recommendation,
-          helpUrl: `https://www.w3.org/WAI/WCAG21/Understanding/${issue.wcagGuideline}.html`,
+          description: issue.message || issue.description, // Use message as the main title
+          howToFix: issue.howToFix || issue.description,
+          helpUrl: issue.helpUrl || `https://www.w3.org/WAI/WCAG21/Understanding/${issue.wcagGuideline}.html`,
           context: issue.context,
           selector: issue.selector,
-          htmlCode: issue.htmlCode,
-          nodes: [{
-            html: issue.htmlCode,
+          htmlCode: issue.element,
+          nodes: issue.nodes || [{
+            html: issue.element,
             selector: issue.selector
           }],
-          wcagCriteria: [issue.wcagGuideline]
+          wcagCriteria: issue.wcagCriteria || [issue.wcagGuideline]
         }))
       };
 
