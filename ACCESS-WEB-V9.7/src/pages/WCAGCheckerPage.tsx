@@ -45,6 +45,7 @@ export function WCAGCheckerPage() {
   const [enablePDFAccessibility, setEnablePDFAccessibility] = useState(false);
   const [enableOfficeDocuments, setEnableOfficeDocuments] = useState(false);
   const [enableMediaTesting, setEnableMediaTesting] = useState(false);
+  const [enabledStandards, setEnabledStandards] = useState<string[]>(['WCAG 2.1', 'WCAG 2.2']);
 
   // New state for connection error details
   const [connectionError, setConnectionError] = useState<{ 
