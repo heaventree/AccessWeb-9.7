@@ -166,22 +166,20 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
             >
               <div className="flex justify-between items-start">
                 <button 
-                  className="flex-1 text-left flex items-center transition-colors duration-300"
+                  className="flex-1 text-left flex items-center justify-between transition-colors duration-300"
                   onClick={() => toggleIssue(issue.id, issue.description)}
                   aria-expanded={isExpanded}
                   aria-controls={`issue-content-${issue.id}`}
                 >
-                  <div className="flex items-center">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {issue.description}
-                    </h3>
-                    <div className="transform transition-transform duration-300">
-                      {isExpanded ? (
-                        <ChevronUp className="w-5 h-5 ml-2 text-gray-500" aria-hidden="true" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 ml-2 text-gray-500" aria-hidden="true" />
-                      )}
-                    </div>
+                  <h3 className="text-base font-medium text-gray-900 pr-4">
+                    {issue.description}
+                  </h3>
+                  <div className="transform transition-transform duration-300 flex-shrink-0">
+                    {isExpanded ? (
+                      <ChevronUp className="w-5 h-5 text-gray-500" aria-hidden="true" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
+                    )}
                   </div>
                 </button>
                 {type !== 'passes' && (
