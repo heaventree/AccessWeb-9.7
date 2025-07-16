@@ -203,13 +203,23 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                     <h4 className="font-medium text-gray-700">Affected Elements:</h4>
                     <ul className="mt-2 space-y-1">
                       {issue.nodes.map((node, index) => (
-                        <li key={index} className="text-sm text-gray-600 font-mono bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                          {/* Handle both string and object values */}
-                          {typeof node === 'string' 
-                            ? node 
-                            : typeof node === 'object' && node !== null
-                              ? JSON.stringify(node) 
-                              : String(node)}
+                        <li key={index} className="text-sm text-gray-600 font-mono bg-gray-50 p-3 rounded-lg border border-gray-200">
+                          <div className="bg-white p-2 rounded border border-gray-100 overflow-x-auto">
+                            <code className="text-blue-700">
+                              {typeof node === 'string' 
+                                ? node 
+                                : typeof node === 'object' && node !== null && node.html
+                                  ? node.html
+                                  : typeof node === 'object' && node !== null
+                                    ? node.selector || 'Element'
+                                    : String(node)}
+                            </code>
+                          </div>
+                          {typeof node === 'object' && node !== null && node.selector && (
+                            <div className="mt-2 text-xs text-gray-500">
+                              Selector: <span className="font-mono bg-yellow-50 px-1 rounded">{node.selector}</span>
+                            </div>
+                          )}
                         </li>
                       ))}
                     </ul>
