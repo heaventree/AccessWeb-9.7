@@ -635,6 +635,7 @@ export default function BillingPage() {
                   amount={selectedPlan.price * 100} // Convert dollars to cents for Stripe
                   onSuccess={handlePaymentSuccess}
                   onError={handlePaymentCancel}
+                  planName={selectedPlan.name}
                 />
               </div>
             </div>

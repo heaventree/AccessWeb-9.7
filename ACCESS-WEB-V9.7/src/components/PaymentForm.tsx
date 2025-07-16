@@ -18,9 +18,10 @@ interface PaymentFormWrapperProps {
   amount: number;
   onSuccess: () => void;
   onError: (error: string) => void;
+  planName?: string;
 }
 
-export function PaymentFormWrapper({ clientSecret, amount, onSuccess, onError }: PaymentFormWrapperProps) {
+export function PaymentFormWrapper({ clientSecret, amount, onSuccess, onError, planName }: PaymentFormWrapperProps) {
   const [stripe, setStripe] = useState<any>(null);
   const [elements, setElements] = useState<any>(null);
   const paymentElementRef = useRef<HTMLDivElement>(null);
@@ -91,7 +92,8 @@ export function PaymentFormWrapper({ clientSecret, amount, onSuccess, onError }:
         onSuccess={onSuccess} 
         onError={onError}
         stripe={stripe}
-        elements={elements} 
+        elements={elements}
+        planName={planName}
       />
     </div>
   );
@@ -103,9 +105,10 @@ interface PaymentFormProps {
   onError: (error: string) => void;
   stripe?: any;
   elements?: any;
+  planName?: string;
 }
 
-function PaymentForm({ amount, onSuccess, onError, stripe, elements }: PaymentFormProps) {
+function PaymentForm({ amount, onSuccess, onError, stripe, elements, planName }: PaymentFormProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
@@ -120,10 +123,19 @@ function PaymentForm({ amount, onSuccess, onError, stripe, elements }: PaymentFo
     setPaymentError(null);
 
     try {
+      // Create return URL with plan and amount information
+      const returnUrl = new URL(`${window.location.origin}/payment-success`);
+      if (planName) {
+        returnUrl.searchParams.set('plan', planName);
+      }
+      if (amount) {
+        returnUrl.searchParams.set('amount', (amount / 100).toString());
+      }
+
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/payment-success`,
+          return_url: returnUrl.toString(),
         },
       });
 

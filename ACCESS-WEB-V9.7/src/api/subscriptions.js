@@ -253,41 +253,19 @@ export async function verifyPayment(req, res) {
       const planId = paymentIntent.metadata.planId;
       const planName = paymentIntent.metadata.planName;
 
-      // Get plan details
-      const [plan] = await db
-        .select()
-        .from(pricingPlans)
-        .where(eq(pricingPlans.id, parseInt(planId)));
-
-      if (plan) {
-        // Create or update subscription
-        await db
-          .insert(subscriptions)
-          .values({
-            userId: userId,
-            planId: parseInt(planId),
-            status: 'active',
-            currentPeriodStart: new Date(),
-            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-            stripeSubscriptionId: paymentIntent.id,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          })
-          .onConflictDoUpdate({
-            target: subscriptions.userId,
-            set: {
-              planId: parseInt(planId),
-              status: 'active',
-              currentPeriodStart: new Date(),
-              currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-              stripeSubscriptionId: paymentIntent.id,
-              updatedAt: new Date()
-            }
+      // Get plan details from metadata if available
+      let plan = null;
+      if (planId) {
+        try {
+          plan = await prisma.pricingPlan.findUnique({
+            where: { id: parseInt(planId) }
           });
-
-        // Payment history recording will be implemented when payment table is added
-        console.log('Payment completed for user:', userId, 'Amount:', paymentIntent.amount);
+        } catch (error) {
+          console.error('Error fetching plan:', error);
+        }
       }
+
+      console.log('Payment completed for user:', userId, 'Amount:', paymentIntent.amount);
 
       // Also update user subscription in the database
       try {
