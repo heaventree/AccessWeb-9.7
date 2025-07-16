@@ -512,7 +512,7 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                         </button>
                       </div>
                       
-                      <AIRecommendations issue={issue} />
+
                     </>
                   )}
               </div>

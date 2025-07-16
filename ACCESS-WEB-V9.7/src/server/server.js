@@ -151,9 +151,15 @@ import siteScannerQueue from './jobs/siteScanner.js';
 // Import admin routes
 import adminRouter from './routes/admin.js';
 
-// API Routes
+
+
+// API Routes - Move AI suggestions before accessibility router to avoid conflicts
 app.use('/api/auth', authRouter);
+
+// Debug: Add logging to verify accessibility router mounting
+console.log('Mounting accessibility router at /api/accessibility');
 app.use('/api/accessibility', accessibilityRouter);
+console.log('Accessibility router mounted successfully');
 app.use('/api/site-connections', siteConnectionsRouter);
 app.use('/api/scanner', scannerRouter);
 app.use('/api/wordpress', wordpressRouter);

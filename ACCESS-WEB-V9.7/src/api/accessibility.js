@@ -3,6 +3,8 @@ import puppeteer from 'puppeteer';
 
 const router = express.Router();
 
+
+
 // Middleware to handle raw body parsing for text/plain requests
 const parseRawBody = (req, res, next) => {
   if (req.headers['content-type'] === 'text/plain;charset=UTF-8') {
@@ -359,10 +361,15 @@ router.post('/test-html', async (req, res) => {
   }
 });
 
+// Simple test route to verify this location works
+router.get('/test-ai', (req, res) => {
+  res.json({ success: true, message: 'AI route location works!' });
+});
+
 /**
  * Get AI suggestions for fixing accessibility issues
  */
-router.post('/ai-suggestions', express.json(), async (req, res) => {
+router.post('/ai-suggestions', async (req, res) => {
   try {
     const { issue, issueElement, issueType } = req.body;
 
@@ -543,5 +550,7 @@ function getFallbackSuggestions(issue, issueType) {
     testingTips: "Use automated accessibility testing tools and manual testing with assistive technologies"
   };
 }
+
+
 
 export default router;
