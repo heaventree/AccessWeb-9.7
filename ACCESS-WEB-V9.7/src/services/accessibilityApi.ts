@@ -89,6 +89,8 @@ export async function testUrl(
     includeScreenshots?: boolean;
     userAgent?: string;
     waitTime?: number;
+    region?: string;
+    standards?: string[];
   } = {}
 ): Promise<AccessibilityTestResult> {
   // Sanitize URL for security

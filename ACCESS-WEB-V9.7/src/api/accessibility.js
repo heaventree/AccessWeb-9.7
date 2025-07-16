@@ -1,6 +1,7 @@
 import express from 'express';
 import { JSDOM } from 'jsdom';
 import axeCore from 'axe-core';
+import puppeteer from 'puppeteer';
 
 const router = express.Router();
 
@@ -62,7 +63,7 @@ router.post('/test-url', parseRawBody, async (req, res) => {
     
     console.log('Parsed request data:', requestData);
     
-    const { url, wcagLevel = 'AA', includePdf = false, includeScreenshots = false } = requestData;
+    const { url, wcagLevel = 'AA', includePdf = false, includeScreenshots = false, region = 'eu', standards = [] } = requestData;
 
     if (!url) {
       return res.status(400).json({ error: 'URL is required' });
@@ -75,174 +76,161 @@ router.post('/test-url', parseRawBody, async (req, res) => {
       return res.status(400).json({ error: 'Invalid URL format' });
     }
 
-    console.log(`Testing accessibility for URL: ${url}`);
+    console.log(`Testing accessibility for URL: ${url} with region: ${region} and standards:`, standards);
 
-    // Fetch the webpage content
-    let response;
+    // Launch puppeteer for real browser testing
+    let browser;
+    let page;
     try {
-      const fetch = (await import('node-fetch')).default;
-      response = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        },
-        timeout: 30000
+      browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--disable-gpu'
+        ]
+      });
+      
+      page = await browser.newPage();
+      
+      // Set a realistic viewport and user agent
+      await page.setViewport({ width: 1920, height: 1080 });
+      await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+      
+      // Navigate to the URL with timeout
+      await page.goto(url, { 
+        waitUntil: 'networkidle2', 
+        timeout: 30000 
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+      // Inject axe-core into the page
+      await page.addScriptTag({ content: axeCore.source });
+      
     } catch (error) {
-      console.error('Fetch error:', error);
+      console.error('Browser/Page setup error:', error);
+      if (browser) await browser.close();
       return res.status(400).json({ 
         error: 'Failed to fetch URL', 
         details: error.message 
       });
     }
 
-    // Get the HTML content
-    const html = await response.text();
-    
-    // Create a virtual DOM
-    const dom = new JSDOM(html, { url });
-    const document = dom.window.document;
-
-    // Perform accessibility analysis
-    const issues = [];
-    let passedCount = 0;
-
-    // Check for missing alt text on images
-    const images = document.querySelectorAll('img');
-    images.forEach((img, index) => {
-      if (!img.hasAttribute('alt')) {
-        issues.push({
-          id: `missing-alt-${index}`,
-          type: 'missing-alt-text',
-          impact: 'serious',
-          message: 'Image missing alternative text',
-          element: img.outerHTML.substring(0, 100) + '...',
-          wcagGuideline: '1.1.1',
-          description: 'All images must have alternative text for screen readers',
-          howToFix: 'Add an alt attribute describing the image content',
-          helpUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html',
-          selector: `img:nth-child(${index + 1})`,
-          nodes: [{ html: img.outerHTML, selector: `img:nth-child(${index + 1})` }],
-          tags: ['wcag2a', 'wcag111'],
-          wcagCriteria: ['1.1.1']
-        });
-      } else {
-        passedCount++;
+    // Configure axe-core based on region and standards
+    const getAxeConfig = (region, standards, wcagLevel) => {
+      let tags = [`wcag2${wcagLevel.toLowerCase()}`];
+      
+      // Add region-specific tags based on compliance requirements
+      switch (region) {
+        case 'eu':
+          tags.push('EN-301-549'); // European EN 301 549 standard
+          if (standards.includes('EN 301 549')) tags.push('section508');
+          break;
+        case 'us':
+        case 'usa':
+          tags.push('section508'); // US Section 508
+          break;
+        case 'uk':
+          tags.push('EN-301-549'); // UK follows EN 301 549
+          break;
+        case 'canada':
+          tags.push('section508'); // Similar to US standards
+          break;
+        case 'australia':
+          tags.push('wcag2a', 'wcag2aa'); // Australia follows WCAG
+          break;
+        case 'japan':
+          tags.push('wcag2a', 'wcag2aa'); // Japan follows WCAG
+          break;
+        default:
+          tags.push('wcag2a', 'wcag2aa'); // Global WCAG standards
       }
-    });
 
-    // Check for proper heading structure
-    const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    let hasH1 = false;
-    headings.forEach((heading, index) => {
-      if (heading.tagName === 'H1') {
-        if (hasH1) {
-          issues.push({
-            id: `multiple-h1-${index}`,
-            type: 'multiple-h1',
-            impact: 'moderate',
-            message: 'Multiple H1 elements found',
-            element: heading.outerHTML,
-            wcagGuideline: '1.3.1',
-            description: 'Pages should have only one H1 element',
-            howToFix: 'Use only one H1 per page for the main heading',
-            helpUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html',
-            selector: `h1:nth-of-type(${index + 1})`,
-            nodes: [{ html: heading.outerHTML, selector: `h1:nth-of-type(${index + 1})` }],
-            tags: ['wcag2a', 'wcag131'],
-            wcagCriteria: ['1.3.1']
-          });
+      // Add specific standards if provided
+      if (standards.includes('WCAG 2.1')) tags.push('wcag21a', 'wcag21aa');
+      if (standards.includes('WCAG 2.2')) tags.push('wcag22a', 'wcag22aa');
+      if (standards.includes('EAA')) tags.push('EN-301-549');
+
+      return {
+        tags,
+        runOnly: {
+          type: 'tag',
+          values: tags
         }
-        hasH1 = true;
-      }
-    });
+      };
+    };
 
-    if (!hasH1 && headings.length > 0) {
-      issues.push({
-        id: 'missing-h1',
-        type: 'missing-h1',
-        impact: 'serious',
-        message: 'No H1 element found',
-        element: 'Document structure',
-        wcagGuideline: '1.3.1',
-        description: 'Pages should have one H1 element for the main heading',
-        howToFix: 'Add an H1 element with the page\'s main heading',
-        helpUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html',
-        selector: 'body',
-        nodes: [{ html: '<body>', selector: 'body' }],
-        tags: ['wcag2a', 'wcag131'],
-        wcagCriteria: ['1.3.1']
+    // Run axe-core accessibility analysis
+    let axeResults;
+    try {
+      const axeConfig = getAxeConfig(region, standards, wcagLevel);
+      console.log('Running axe-core with config:', axeConfig);
+      
+      axeResults = await page.evaluate((config) => {
+        return new Promise((resolve, reject) => {
+          window.axe.run(config).then(results => {
+            resolve(results);
+          }).catch(err => {
+            reject(err);
+          });
+        });
+      }, axeConfig);
+      
+    } catch (error) {
+      console.error('Axe-core analysis error:', error);
+      await browser.close();
+      return res.status(500).json({ 
+        error: 'Failed to analyze accessibility', 
+        details: error.message 
       });
+    } finally {
+      if (browser) {
+        await browser.close();
+      }
     }
 
-    // Check for form labels
-    const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], textarea, select');
-    inputs.forEach((input, index) => {
-      const id = input.getAttribute('id');
-      const hasLabel = id && document.querySelector(`label[for="${id}"]`);
-      const hasAriaLabel = input.hasAttribute('aria-label') || input.hasAttribute('aria-labelledby');
-      
-      if (!hasLabel && !hasAriaLabel) {
-        issues.push({
-          id: `missing-label-${index}`,
-          type: 'missing-form-label',
-          impact: 'critical',
-          message: 'Form element missing label',
-          element: input.outerHTML,
-          wcagGuideline: '3.3.2',
-          description: 'All form elements must have associated labels',
-          howToFix: 'Add a label element or aria-label attribute',
-          helpUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/labels-or-instructions.html',
-          selector: `${input.tagName.toLowerCase()}:nth-of-type(${index + 1})`,
-          nodes: [{ html: input.outerHTML, selector: `${input.tagName.toLowerCase()}:nth-of-type(${index + 1})` }],
-          tags: ['wcag2a', 'wcag332'],
-          wcagCriteria: ['3.3.2']
-        });
-      } else {
-        passedCount++;
-      }
-    });
+    // Transform axe-core results to our format
+    const issues = axeResults.violations.map(violation => ({
+      id: violation.id,
+      type: violation.id,
+      impact: violation.impact || 'moderate',
+      message: violation.description,
+      element: violation.nodes[0]?.html || '',
+      wcagGuideline: violation.tags.find(tag => tag.match(/wcag\d+/))?.replace('wcag', '').replace(/[a-z]/g, '.') || 'Unknown',
+      description: violation.help,
+      howToFix: violation.helpUrl,
+      helpUrl: violation.helpUrl,
+      selector: violation.nodes[0]?.target?.join(', ') || '',
+      nodes: violation.nodes.map(node => ({
+        html: node.html,
+        selector: node.target?.join(', ') || ''
+      })),
+      tags: violation.tags,
+      wcagCriteria: violation.tags.filter(tag => tag.startsWith('wcag'))
+    }));
 
-    // Check color contrast (simplified check)
-    const elements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div, a, button');
-    let contrastIssues = 0;
-    elements.forEach((element, index) => {
-      if (element.textContent.trim() && index < 5) { // Check first 5 elements only for performance
-        contrastIssues++;
-        if (contrastIssues <= 2) { // Limit to 2 contrast issues for demo
-          issues.push({
-            id: `color-contrast-${index}`,
-            type: 'color-contrast',
-            impact: 'serious',
-            message: 'Text may not have sufficient color contrast',
-            element: element.outerHTML.substring(0, 100) + '...',
-            wcagGuideline: '1.4.3',
-            description: 'Text must have sufficient contrast against its background',
-            howToFix: 'Ensure text has a contrast ratio of at least 4.5:1',
-            helpUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html',
-            selector: `${element.tagName.toLowerCase()}:nth-of-type(${index + 1})`,
-            nodes: [{ html: element.outerHTML, selector: `${element.tagName.toLowerCase()}:nth-of-type(${index + 1})` }],
-            tags: ['wcag2aa', 'wcag143'],
-            wcagCriteria: ['1.4.3']
-          });
-        }
-      }
-    });
+    const passedChecks = axeResults.passes || [];
+    const incompleteChecks = axeResults.incomplete || [];
 
-    // Calculate summary statistics
+    // Calculate summary statistics from axe-core results
     const criticalCount = issues.filter(issue => issue.impact === 'critical').length;
     const seriousCount = issues.filter(issue => issue.impact === 'serious').length;
     const moderateCount = issues.filter(issue => issue.impact === 'moderate').length;
     const minorCount = issues.filter(issue => issue.impact === 'minor').length;
+    const totalChecks = passedChecks.length + issues.length + incompleteChecks.length;
+    const passedCount = passedChecks.length;
+
+    // Calculate accessibility score based on actual results
+    const score = totalChecks > 0 ? Math.round((passedCount / totalChecks) * 100) : 100;
 
     const result = {
       id: `test-${Date.now()}`,
       timestamp: new Date().toISOString(),
       url: url,
-      score: Math.max(0, Math.round(100 - (issues.length * 5))),
+      score: score,
       issues: issues,
       summary: {
         critical: criticalCount,
@@ -250,7 +238,8 @@ router.post('/test-url', parseRawBody, async (req, res) => {
         moderate: moderateCount,
         minor: minorCount,
         total: issues.length,
-        passRate: Math.round((passedCount / (passedCount + issues.length)) * 100)
+        passed: passedCount,
+        passRate: score
       }
     };
 

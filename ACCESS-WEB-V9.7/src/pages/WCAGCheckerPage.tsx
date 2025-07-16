@@ -67,7 +67,9 @@ export function WCAGCheckerPage() {
       const apiResult = await testUrl(normalizedUrl, {
         wcagLevel: 'AA',
         includeScreenshots: false,
-        includePdf: enablePDFAccessibility
+        includePdf: enablePDFAccessibility,
+        region: selectedRegion,
+        standards: enabledStandards
       });
 
       // Transform API result to match the frontend TestResult interface
