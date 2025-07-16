@@ -112,6 +112,12 @@ body * {
   padding: 5px;
   font-size: 12px;
   text-align: center;
+  /* Only show if alt text exists and is not empty */
+  display: none;
+}
+
+.wcag-show-alt img[alt]:not([alt=""]):not([alt="000"])::after {
+  display: block;
 }
 
 /* Toolbar Layout */

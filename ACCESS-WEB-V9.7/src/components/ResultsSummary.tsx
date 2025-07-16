@@ -27,16 +27,16 @@ export function ResultsSummary({ results, onExportPDF }: ResultsSummaryProps) {
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
       {/* Header with Title and Export Button */}
-      <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 px-6 py-5">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">Test Results</h2>
-            <p className="text-sm text-gray-600 mt-1">{results.url}</p>
+          <div className="flex-1">
+            <h2 className="text-xl font-bold text-gray-900 mb-1">Test Results</h2>
+            <p className="text-sm text-gray-600 font-medium">{results.url}</p>
           </div>
           {onExportPDF && (
             <button
               onClick={onExportPDF}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+              className="inline-flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg"
             >
               <Download className="w-4 h-4 mr-2" />
               Export Report
