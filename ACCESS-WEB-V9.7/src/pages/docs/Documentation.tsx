@@ -101,13 +101,13 @@ export function Documentation() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 pt-[130px] pb-[130px]">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-[130px] pb-[130px]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6 font-display">
+            <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6 font-display">
               Documentation
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Comprehensive guides for all features of the WCAG Accessibility Platform
             </p>
           </div>
@@ -121,13 +121,13 @@ export function Documentation() {
                 aria-label="Search documentation"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg transition-shadow hover:shadow-md"
+                className="w-full pl-12 pr-12 py-4 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg transition-shadow hover:shadow-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
               <Search className="absolute left-4 top-4 text-gray-400 w-6 h-6" />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-4 top-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                   aria-label="Clear search"
                 >
                   <X className="w-6 h-6" />
@@ -152,7 +152,7 @@ export function Documentation() {
           ) : (
             Object.entries(filteredAndGrouped).map(([category, guides]) => (
               <div key={category} className="mb-16">
-                <h2 className="text-2xl font-bold text-gray-900 mb-8 font-display">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8 font-display">
                   {category}
                 </h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -160,21 +160,21 @@ export function Documentation() {
                     <Link
                       key={guide.id}
                       to={`/docs/${guide.slug}`}
-                      className="bg-white rounded-xl shadow-sm p-8 hover:shadow-md transition-all hover:-translate-y-1 border border-gray-100 flex flex-col h-full"
+                      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 hover:shadow-md transition-all hover:-translate-y-1 border border-gray-100 dark:border-gray-700 flex flex-col h-full"
                     >
                       <div className="flex items-center mb-4">
-                        <div className="p-3 bg-blue-50 rounded-xl">
+                        <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
                           {getIconComponent(guide.icon)}
                         </div>
-                        <h3 className="ml-3 text-xl font-semibold text-gray-900 font-display">
+                        <h3 className="ml-3 text-xl font-semibold text-gray-900 dark:text-gray-100 font-display">
                           {guide.title}
                         </h3>
                       </div>
-                      <p className="text-gray-600 mb-6 text-base flex-grow">
+                      <p className="text-gray-600 dark:text-gray-300 mb-6 text-base flex-grow">
                         {guide.description}
                       </p>
                       <div className="flex justify-end mt-auto">
-                        <span className="text-blue-600 font-medium flex items-center">
+                        <span className="text-blue-600 dark:text-blue-400 font-medium flex items-center">
                           Read documentation
                           <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -192,7 +192,7 @@ export function Documentation() {
           <div className="mt-16 text-center space-x-4">
             <Link
               to="/"
-              className="inline-flex items-center px-8 py-4 border border-gray-200 text-lg font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm hover:shadow-md"
+              className="inline-flex items-center px-8 py-4 border border-gray-200 dark:border-gray-600 text-lg font-medium rounded-xl text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm hover:shadow-md"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -201,7 +201,7 @@ export function Documentation() {
             </Link>
             <Link
               to="/wcag-resources"
-              className="inline-flex items-center px-8 py-4 border border-gray-200 text-lg font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm hover:shadow-md"
+              className="inline-flex items-center px-8 py-4 border border-gray-200 dark:border-gray-600 text-lg font-medium rounded-xl text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm hover:shadow-md"
             >
               <Book className="w-5 h-5 mr-2" />
               WCAG Resources

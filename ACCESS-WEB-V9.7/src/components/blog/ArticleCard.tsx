@@ -11,7 +11,7 @@ interface ArticleCardProps {
 export function ArticleCard({ article, featured = false }: ArticleCardProps) {
   return (
     <div 
-      className={`bg-white rounded-xl shadow-sm overflow-hidden transition-transform duration-300 hover:-translate-y-1 ${
+      className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden transition-transform duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700 ${
         featured ? 'lg:col-span-2 md:flex' : ''
       }`}
     >
@@ -53,22 +53,22 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
             className="w-10 h-10 rounded-full"
           />
           <div className="ml-3">
-            <p className="text-sm font-medium text-gray-900">{article.author.name}</p>
-            <p className="text-sm text-gray-500">{article.author.role}</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{article.author.name}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{article.author.role}</p>
           </div>
         </div>
 
-        <h3 className="text-xl font-bold text-gray-900 mb-2">
-          <Link to={`/blog/${article.slug}`} className="hover:text-blue-600">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <Link to={`/blog/${article.slug}`} className="hover:text-blue-600 dark:hover:text-blue-400">
             {article.title}
           </Link>
         </h3>
 
-        <p className="text-gray-600 mb-4 line-clamp-2">
+        <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
           {article.description}
         </p>
 
-        <div className="flex flex-wrap items-center text-sm text-gray-500 gap-x-4 gap-y-2">
+        <div className="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 gap-x-4 gap-y-2">
           <div className="flex items-center">
             <Calendar className="w-4 h-4 mr-1" />
             <span title={`Published on ${new Date(article.publishedAt).toLocaleDateString('en-GB')}`}>

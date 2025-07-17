@@ -14,7 +14,7 @@ export function HelpCenter() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-[130px] pb-[130px] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-[130px] pb-[130px] flex items-center justify-center">
         <LoadingSpinner size="large" className="text-blue-600" />
       </div>
     );
@@ -22,7 +22,7 @@ export function HelpCenter() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-[130px] pb-[130px]">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-[130px] pb-[130px]">
         <div className="max-w-3xl mx-auto px-4">
           <EmptyState
             title="Error Loading Help Center"
@@ -49,13 +49,13 @@ export function HelpCenter() {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gray-50 pt-[130px] pb-[130px]">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-[130px] pb-[130px]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6 font-display">
+            <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6 font-display">
               Help Center
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Find answers to common questions and learn how to make your website accessible
             </p>
             <div className="mt-8 flex flex-wrap gap-4 justify-center">
@@ -85,13 +85,13 @@ export function HelpCenter() {
                 aria-label="Search help articles"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg transition-shadow hover:shadow-md"
+                className="w-full pl-12 pr-12 py-4 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg transition-shadow hover:shadow-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
-              <Search className="absolute left-4 top-4 text-gray-400 w-6 h-6" />
+              <Search className="absolute left-4 top-4 text-gray-400 dark:text-gray-500 w-6 h-6" />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-4 top-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                   aria-label="Clear search"
                 >
                   <X className="w-6 h-6" />
@@ -114,10 +114,10 @@ export function HelpCenter() {
               filteredCategories.map((category) => (
                 <div
                   key={category.id}
-                  className="bg-white rounded-xl shadow-sm p-8 hover:shadow-md transition-all hover:-translate-y-1 border border-gray-100"
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 hover:shadow-md transition-all hover:-translate-y-1 border border-gray-100 dark:border-gray-700"
                 >
                   <div className="flex items-center mb-4">
-                    <div className="p-3 bg-blue-50 rounded-xl">
+                    <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
                       {React.createElement(
                         category.icon === 'Book' ? Book :
                         category.icon === 'FileText' ? FileText :
@@ -126,15 +126,15 @@ export function HelpCenter() {
                         category.icon === 'Globe' ? Globe :
                         category.icon === 'HelpCircle' ? HelpCircle :
                         Shield,
-                        { className: "w-7 h-7 text-blue-600" }
+                        { className: "w-7 h-7 text-blue-600 dark:text-blue-400" }
                       )}
                     </div>
-                    <h2 className="ml-3 text-xl font-semibold text-gray-900 font-display truncate">
+                    <h2 className="ml-3 text-xl font-semibold text-gray-900 dark:text-gray-100 font-display truncate">
                       {category.name}
                     </h2>
                   </div>
                   
-                  <p className="text-gray-600 mb-6 text-base">
+                  <p className="text-gray-600 dark:text-gray-300 mb-6 text-base">
                     {category.description}
                   </p>
 
@@ -143,9 +143,9 @@ export function HelpCenter() {
                       <li key={article.id}>
                         <Link
                           to={`/help/${article.slug}`}
-                          className="group flex items-center text-gray-700 hover:text-blue-600 transition-colors"
+                          className="group flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                         >
-                          <FileText className="w-4 h-4 mr-2 text-gray-400 group-hover:text-blue-500" />
+                          <FileText className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:group-hover:text-blue-400" />
                           {article.title}
                         </Link>
                       </li>
@@ -157,16 +157,16 @@ export function HelpCenter() {
           </div>
 
           {/* Contact Support */}
-          <div className="mt-16 bg-blue-600 rounded-xl shadow-sm p-8 text-center">
+          <div className="mt-16 bg-blue-600 dark:bg-blue-700 rounded-xl shadow-sm p-8 text-center">
             <h2 className="text-2xl font-bold text-white mb-4">
               Can't find what you're looking for?
             </h2>
-            <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
+            <p className="text-blue-100 dark:text-blue-200 mb-8 max-w-2xl mx-auto">
               Our support team is here to help. Get in touch with us and we'll help you resolve any issues.
             </p>
             <Link
               to="/contact"
-              className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl text-blue-700 bg-white hover:bg-blue-50 transition-colors shadow-lg hover:shadow-xl"
+              className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl text-blue-700 dark:text-blue-800 bg-white dark:bg-gray-100 hover:bg-blue-50 dark:hover:bg-gray-200 transition-colors shadow-lg hover:shadow-xl"
             >
               Contact Support
             </Link>
