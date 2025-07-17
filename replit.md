@@ -62,6 +62,8 @@ The WCAG Accessibility Audit Tool is a comprehensive platform for testing, monit
 - Interactive design tools integration
 - Customizable export functionality
 - Real-time monitoring capabilities
+- **Accessibility Score Visualization**: Advanced scoring algorithm with visual progress indicators, grade ratings (A+ to F), and category breakdowns
+- **AI-Powered Fix Suggestions**: OpenAI integration for intelligent remediation recommendations with streamlined modal interface
 
 ## Data Flow
 
@@ -114,6 +116,8 @@ The WCAG Accessibility Audit Tool is a comprehensive platform for testing, monit
 
 ## Changelog
 
+- July 17, 2025: Accessibility Score Visualization system implemented with comprehensive scoring algorithm
+- July 17, 2025: AI Suggestions modal enhanced with streamlined UI and duplicate button/API call fixes
 - June 17, 2025: WordPress webhook endpoint (`/wcag-compliance/schedule-response`) optimized with async scan processing for fast responses
 - June 17, 2025: WordPress Code Change Detection system completed with full API integration
 - June 17, 2025: Extended timeout support for WordPress "Run Once" scans (10 minutes)

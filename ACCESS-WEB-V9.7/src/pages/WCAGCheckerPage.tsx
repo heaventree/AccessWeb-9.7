@@ -9,6 +9,7 @@ import { EmbedBadge } from '../components/EmbedBadge';
 import { StructureAnalysisPanel } from '../components/StructureAnalysisPanel';
 import { ResponsiveAnalysisPanel } from '../components/ResponsiveAnalysisPanel';
 import { MediaAnalysisPanel } from '../components/MediaAnalysisPanel';
+import { AccessibilityScoreVisualization } from '../components/AccessibilityScoreVisualization';
 import { testUrl } from '../services/accessibilityApi';
 import { WebsiteConnectionError } from '../utils/websiteConnectionChecker';
 import { WebsiteConnectionError as WebsiteConnectionErrorComponent } from '../components/WebsiteConnectionError';
@@ -324,6 +325,9 @@ export function WCAGCheckerPage() {
             transition={{ duration: 0.5 }}
             className="space-y-8"
           >
+            {/* Accessibility Score Visualization */}
+            <AccessibilityScoreVisualization results={results} />
+            
             {/* Summary */}
             <ResultsSummary 
               results={results}
