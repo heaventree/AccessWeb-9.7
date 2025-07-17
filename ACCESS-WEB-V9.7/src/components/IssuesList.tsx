@@ -22,6 +22,8 @@ import { AIRecommendations } from './AIRecommendations';
 import { EmptyState } from './EmptyState';
 import { fixEngine } from '../lib/accessibility-fixes';
 import { AISuggestionsModal } from './AISuggestionsModal';
+import { useAuth } from '../hooks/useAuth';
+import { useSubscription } from '../hooks/useSubscription';
 
 type ModalView = 'info' | 'fix' | null;
 
@@ -36,6 +38,11 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
   const [modalView, setModalView] = useState<ModalView>(null);
   const [aiSuggestionsOpen, setAiSuggestionsOpen] = useState(false);
   const [aiSuggestionsIssue, setAiSuggestionsIssue] = useState<AccessibilityIssue | null>(null);
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
+  
+  // Authentication and subscription hooks
+  const { isAuthenticated, user } = useAuth();
+  const { subscription, fetchCurrentSubscription } = useSubscription();
   
   // For live region announcements
   const [ariaLiveText, setAriaLiveText] = useState<string>('');
@@ -92,6 +99,23 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
   };
 
   const openAISuggestions = (issue: AccessibilityIssue) => {
+    // Check authentication first
+    if (!isAuthenticated) {
+      toast.error('Please log in to access AI suggestions');
+      // Redirect to login - you might want to implement this based on your routing
+      window.location.href = '/login';
+      return;
+    }
+
+    // Check subscription status
+    const hasValidSubscription = subscription && subscription.status === 'active';
+    
+    if (!hasValidSubscription) {
+      setSubscriptionModalOpen(true);
+      return;
+    }
+
+    // User is authenticated and has subscription - open AI suggestions
     setAiSuggestionsIssue(issue);
     setAiSuggestionsOpen(true);
   };
@@ -448,11 +472,14 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                         </button>
                         <button
                           onClick={() => openAISuggestions(issue)}
-                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition-colors border border-green-200 shadow-sm"
+                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm relative"
                           aria-label={`Get AI suggestions for ${issue.description}`}
                         >
                           <Brain className="w-4 h-4 mr-2" aria-hidden="true" />
                           Get AI Suggestions
+                          <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-orange-500 text-white rounded-full">
+                            PRO
+                          </span>
                         </button>
                         <button
                           onClick={() => {
@@ -1014,6 +1041,44 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
           issue={aiSuggestionsIssue}
         />
       )}
+
+      {/* Subscription Required Modal */}
+      <Modal
+        isOpen={subscriptionModalOpen}
+        onClose={() => setSubscriptionModalOpen(false)}
+        title="Upgrade Required"
+      >
+        <div className="p-4">
+          <div className="text-center">
+            <Brain className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              AI Suggestions - PRO Feature
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Get intelligent, personalized accessibility fix suggestions powered by AI. 
+              Upgrade to a paid plan to unlock this premium feature.
+            </p>
+            
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  setSubscriptionModalOpen(false);
+                  window.location.href = '/pricing';
+                }}
+                className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                View Pricing Plans
+              </button>
+              <button
+                onClick={() => setSubscriptionModalOpen(false)}
+                className="w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Maybe Later
+              </button>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }
