@@ -15,7 +15,6 @@ import {
 import toast from 'react-hot-toast';
 import { Modal } from './Modal';
 import type { AccessibilityIssue } from '../types';
-import { getAIRecommendations } from '../utils/aiRecommendations';
 
 interface AISuggestionsModalProps {
   isOpen: boolean;
@@ -43,22 +42,37 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
     setError(null);
     
     try {
-      const aiRecommendations = await getAIRecommendations(issue);
-      
-      // Convert AIRecommendation format to AISuggestion format
-      const formattedSuggestions: AISuggestion = {
-        explanation: aiRecommendations.explanation,
-        suggestedFix: aiRecommendations.suggestedFix,
-        codeExample: aiRecommendations.codeExample,
-        additionalResources: aiRecommendations.additionalResources,
-        wcagReference: issue.wcagCriteria?.join(', ') || 'Not specified',
-        testingTips: 'Use automated testing tools and manual verification to ensure the fix works correctly.'
-      };
+      const response = await fetch('/api/accessibility/ai-suggestions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          issue: {
+            description: issue.description,
+            message: issue.message,
+            impact: issue.impact,
+            wcagCriteria: issue.wcagCriteria,
+            element: issue.element,
+            selector: issue.selector,
+            htmlCode: issue.htmlCode,
+            nodes: issue.nodes
+          },
+          issueElement: issue.element || issue.selector,
+          issueType: issue.type || issue.id
+        })
+      });
 
-      setSuggestions(formattedSuggestions);
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to get AI suggestions');
+      }
+
+      setSuggestions(data.data);
     } catch (err) {
-      console.error('Error getting AI suggestions:', err);
-      setError(err instanceof Error ? err.message : 'Failed to get suggestions');
+      console.error('Error fetching AI suggestions:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch suggestions');
     } finally {
       setIsLoading(false);
     }
