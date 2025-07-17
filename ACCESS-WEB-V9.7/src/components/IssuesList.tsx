@@ -15,6 +15,7 @@ import {
   Brain
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import type { AccessibilityIssue, WCAGInfo } from '../types';
 import { Modal } from './Modal';
 import { getWCAGInfo } from '../utils/accessibility/wcagHelper';
@@ -39,6 +40,9 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
   const [aiSuggestionsOpen, setAiSuggestionsOpen] = useState(false);
   const [aiSuggestionsIssue, setAiSuggestionsIssue] = useState<AccessibilityIssue | null>(null);
   const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
+  
+  // Navigation hook
+  const navigate = useNavigate();
   
   // Authentication and subscription hooks
   const { isAuthenticated, user } = useAuth();
@@ -99,18 +103,21 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
   };
 
   const openAISuggestions = (issue: AccessibilityIssue) => {
+    // Debug logging
+    console.log('Auth check:', { isAuthenticated, user, subscription });
+    
     // Check authentication first
     if (!isAuthenticated) {
       toast.error('Please log in to access AI suggestions');
-      // Redirect to login - you might want to implement this based on your routing
-      window.location.href = '/login';
+      navigate('/login');
       return;
     }
 
-    // Check subscription status
-    const hasValidSubscription = subscription && subscription.status === 'active';
+    // Check subscription status - in development mode, user should have active subscription
+    const hasValidSubscription = user?.subscription?.status === 'active' || subscription?.status === 'active';
     
     if (!hasValidSubscription) {
+      console.log('No valid subscription found:', { userSubscription: user?.subscription, hookSubscription: subscription });
       setSubscriptionModalOpen(true);
       return;
     }
@@ -1063,7 +1070,7 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
               <button
                 onClick={() => {
                   setSubscriptionModalOpen(false);
-                  window.location.href = '/pricing';
+                  navigate('/pricing');
                 }}
                 className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
