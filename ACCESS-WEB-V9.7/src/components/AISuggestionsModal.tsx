@@ -79,7 +79,7 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
     if (isOpen && !suggestions && !isLoading) {
       fetchAISuggestions();
     }
-  }, [isOpen, suggestions, isLoading]);
+  }, [isOpen]);
 
   const copyToClipboard = async (text: string, section: string) => {
     try {
@@ -115,26 +115,26 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
 
   const modalContent = (
     <div className="max-w-4xl mx-auto">
-      <div className="flex items-center justify-between p-6 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center">
-          <Brain className="w-6 h-6 text-blue-600 mr-3" />
-          <h2 className="text-xl font-semibold text-gray-900">AI Suggestions</h2>
+          <Brain className="w-5 h-5 text-blue-600 mr-2" />
+          <h2 className="text-lg font-semibold text-gray-900">AI Suggestions</h2>
         </div>
         <button
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600 transition-colors"
           aria-label="Close modal"
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5" />
         </button>
       </div>
 
-      <div className="p-6">
+      <div className="p-4">
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-blue-600 animate-spin mr-3" />
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 text-blue-600 animate-spin mr-2" />
             <span className="text-gray-600">Generating AI suggestions...</span>
           </div>
         )}
@@ -158,13 +158,13 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
 
         {/* Suggestions Content */}
         {suggestions && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* How to Fix */}
-            <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+            <div className="bg-green-50 rounded-lg p-3 border border-green-200">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center mb-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+                  <div className="flex items-center mb-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
                     <h3 className="font-medium text-green-900">How to Fix</h3>
                   </div>
                   <div className="text-green-800 text-sm leading-relaxed">
@@ -179,7 +179,7 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
                 </div>
                 <button
                   onClick={() => copyToClipboard(suggestions.suggestedFix, 'Fix Steps')}
-                  className="ml-2 p-1 text-green-600 hover:text-green-800 transition-colors"
+                  className="ml-2 p-1 text-green-600 hover:text-green-800 transition-colors flex-shrink-0"
                   aria-label="Copy fix steps"
                 >
                   {copiedSection === 'Fix Steps' ? (
@@ -193,20 +193,22 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
 
             {/* Code Example */}
             {suggestions.codeExample && (
-              <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+              <div className="bg-gray-900 rounded-lg p-3 border border-gray-700">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center mb-3">
-                      <Code className="w-5 h-5 text-gray-300 mr-2" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center mb-2">
+                      <Code className="w-4 h-4 text-gray-300 mr-2" />
                       <h3 className="font-medium text-gray-100">Code Example</h3>
                     </div>
-                    <pre className="text-gray-300 text-sm overflow-x-auto">
-                      <code>{formatCodeExample(suggestions.codeExample)}</code>
-                    </pre>
+                    <div className="bg-gray-800 rounded p-2 overflow-x-auto">
+                      <pre className="text-gray-300 text-xs whitespace-pre-wrap break-all">
+                        <code>{formatCodeExample(suggestions.codeExample)}</code>
+                      </pre>
+                    </div>
                   </div>
                   <button
                     onClick={() => copyToClipboard(formatCodeExample(suggestions.codeExample), 'Code')}
-                    className="ml-2 p-1 text-gray-300 hover:text-gray-100 transition-colors"
+                    className="ml-2 p-1 text-gray-300 hover:text-gray-100 transition-colors flex-shrink-0"
                     aria-label="Copy code"
                   >
                     {copiedSection === 'Code' ? (
@@ -222,19 +224,13 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
         )}
 
         {/* Footer */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-gray-500">
+        {suggestions && (
+          <div className="mt-4 pt-3 border-t border-gray-200">
+            <p className="text-xs text-gray-500 text-center">
               AI suggestions are recommendations. Always test thoroughly before implementing.
             </p>
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-            >
-              Close
-            </button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
