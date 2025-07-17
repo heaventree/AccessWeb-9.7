@@ -32,6 +32,7 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
+  const [hasRequested, setHasRequested] = useState(false);
 
   const fetchAISuggestions = async () => {
     setIsLoading(true);
@@ -76,8 +77,19 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
 
   // Trigger fetching when modal opens
   useEffect(() => {
-    if (isOpen && !suggestions && !isLoading) {
+    if (isOpen && !suggestions && !isLoading && !hasRequested) {
+      setHasRequested(true);
       fetchAISuggestions();
+    }
+  }, [isOpen]);
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSuggestions(null);
+      setError(null);
+      setHasRequested(false);
+      setCopiedSection(null);
     }
   }, [isOpen]);
 
@@ -115,21 +127,7 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
 
   const modalContent = (
     <div className="max-w-4xl mx-auto">
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="flex items-center">
-          <Brain className="w-5 h-5 text-blue-600 mr-2" />
-          <h2 className="text-lg font-semibold text-gray-900">AI Suggestions</h2>
-        </div>
-        <button
-          onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
-          aria-label="Close modal"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-
-      <div className="p-4">
+      <div className="space-y-4">
 
         {/* Loading State */}
         {isLoading && (
@@ -236,7 +234,7 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-4xl">
+    <Modal isOpen={isOpen} onClose={onClose} title="AI Suggestions" maxWidth="max-w-4xl">
       {modalContent}
     </Modal>
   );

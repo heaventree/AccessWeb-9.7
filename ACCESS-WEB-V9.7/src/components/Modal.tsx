@@ -11,9 +11,10 @@ interface ModalProps {
    * focus will return to this element when modal closes
    */
   triggerRef?: React.RefObject<HTMLElement>;
+  maxWidth?: string;
 }
 
-export function Modal({ isOpen, onClose, children, title, triggerRef }: ModalProps) {
+export function Modal({ isOpen, onClose, children, title, triggerRef, maxWidth = "max-w-2xl" }: ModalProps) {
   // Refs for focus management
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -121,7 +122,7 @@ export function Modal({ isOpen, onClose, children, title, triggerRef }: ModalPro
         ></div>
 
         {/* Modal Panel */}
-        <div className="relative inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+        <div className={`relative inline-block w-full ${maxWidth} p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl`}>
           <div className="flex justify-between items-center mb-4">
             <h3 
               id="modal-title" 
