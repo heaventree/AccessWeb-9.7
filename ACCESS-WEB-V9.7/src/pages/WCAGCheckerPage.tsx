@@ -195,7 +195,7 @@ export function WCAGCheckerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -203,10 +203,10 @@ export function WCAGCheckerPage() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Accessibility Checker
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Test any website for WCAG compliance and accessibility issues
           </p>
         </motion.div>
@@ -223,7 +223,7 @@ export function WCAGCheckerPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white rounded-lg shadow-lg p-8 mb-8"
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8"
         >
           <URLInput 
             onSubmit={handleSubmit} 
@@ -238,17 +238,17 @@ export function WCAGCheckerPage() {
           </div>
 
           {/* Advanced Options */}
-          <div className="mt-6 border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Advanced Testing Options</h3>
+          <div className="mt-6 border-t dark:border-gray-700 pt-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Advanced Testing Options</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   checked={enableDocumentTesting}
                   onChange={(e) => setEnableDocumentTesting(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">Document Testing</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Document Testing</span>
                 <span className={proPillStyle}>PRO</span>
               </label>
               
@@ -257,9 +257,9 @@ export function WCAGCheckerPage() {
                   type="checkbox"
                   checked={enablePDFAccessibility}
                   onChange={(e) => setEnablePDFAccessibility(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">PDF Accessibility</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">PDF Accessibility</span>
                 <span className={proPillStyle}>PRO</span>
               </label>
               
@@ -268,9 +268,9 @@ export function WCAGCheckerPage() {
                   type="checkbox"
                   checked={enableOfficeDocuments}
                   onChange={(e) => setEnableOfficeDocuments(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">Office Documents</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Office Documents</span>
                 <span className={proPillStyle}>PRO</span>
               </label>
               
@@ -279,9 +279,9 @@ export function WCAGCheckerPage() {
                   type="checkbox"
                   checked={enableMediaTesting}
                   onChange={(e) => setEnableMediaTesting(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">Media Testing</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Media Testing</span>
                 <span className={proPillStyle}>PRO</span>
               </label>
             </div>
@@ -293,11 +293,11 @@ export function WCAGCheckerPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8"
+            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-8"
           >
             <div className="flex items-center">
-              <AlertTriangle className="h-5 w-5 text-red-500 mr-3" />
-              <p className="text-red-700">{error}</p>
+              <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400 mr-3" />
+              <p className="text-red-700 dark:text-red-300">{error}</p>
             </div>
           </motion.div>
         )}
@@ -331,15 +331,15 @@ export function WCAGCheckerPage() {
             />
 
             {/* Tabs Navigation */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="border-b border-gray-200">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+              <div className="border-b border-gray-200 dark:border-gray-700">
                 <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
                   <button
                     onClick={() => handleTabClick('issues')}
                     className={`py-4 px-1 border-b-2 font-medium text-sm ${
                       activeTab === 'issues'
-                        ? 'border-red-500 text-red-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'border-red-500 text-red-600 dark:text-red-400'
+                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <AlertTriangle className="w-4 h-4 inline mr-2" />
@@ -350,8 +350,8 @@ export function WCAGCheckerPage() {
                     onClick={() => handleTabClick('warnings')}
                     className={`py-4 px-1 border-b-2 font-medium text-sm ${
                       activeTab === 'warnings'
-                        ? 'border-yellow-500 text-yellow-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'border-yellow-500 text-yellow-600 dark:text-yellow-400'
+                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <HelpCircle className="w-4 h-4 inline mr-2" />
@@ -362,8 +362,8 @@ export function WCAGCheckerPage() {
                     onClick={() => handleTabClick('passes')}
                     className={`py-4 px-1 border-b-2 font-medium text-sm ${
                       activeTab === 'passes'
-                        ? 'border-green-500 text-green-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'border-green-500 text-green-600 dark:text-green-400'
+                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <CheckCircle className="w-4 h-4 inline mr-2" />
@@ -374,8 +374,8 @@ export function WCAGCheckerPage() {
                     onClick={() => handleTabClick('contrast')}
                     className={`py-4 px-1 border-b-2 font-medium text-sm ${
                       activeTab === 'contrast'
-                        ? 'border-purple-500 text-purple-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'border-purple-500 text-purple-600 dark:text-purple-400'
+                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <Palette className="w-4 h-4 inline mr-2" />
@@ -387,8 +387,8 @@ export function WCAGCheckerPage() {
                     onClick={() => handleTabClick('structure')}
                     className={`py-4 px-1 border-b-2 font-medium text-sm ${
                       activeTab === 'structure'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <Layout className="w-4 h-4 inline mr-2" />
@@ -400,8 +400,8 @@ export function WCAGCheckerPage() {
                     onClick={() => handleTabClick('responsive')}
                     className={`py-4 px-1 border-b-2 font-medium text-sm ${
                       activeTab === 'responsive'
-                        ? 'border-indigo-500 text-indigo-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <Smartphone className="w-4 h-4 inline mr-2" />
@@ -413,8 +413,8 @@ export function WCAGCheckerPage() {
                     onClick={() => handleTabClick('media')}
                     className={`py-4 px-1 border-b-2 font-medium text-sm ${
                       activeTab === 'media'
-                        ? 'border-pink-500 text-pink-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'border-pink-500 text-pink-600 dark:text-pink-400'
+                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <Video className="w-4 h-4 inline mr-2" />
@@ -433,24 +433,24 @@ export function WCAGCheckerPage() {
                 {activeTab === 'warnings' && (
                   <div className="text-center py-12">
                     <HelpCircle className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No warnings found</h3>
-                    <p className="text-gray-500">This website has no accessibility warnings.</p>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No warnings found</h3>
+                    <p className="text-gray-500 dark:text-gray-400">This website has no accessibility warnings.</p>
                   </div>
                 )}
                 
                 {activeTab === 'passes' && (
                   <div className="text-center py-12">
                     <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Accessibility checks passed</h3>
-                    <p className="text-gray-500">{results.summary.passes} accessibility checks passed successfully.</p>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Accessibility checks passed</h3>
+                    <p className="text-gray-500 dark:text-gray-400">{results.summary.passes} accessibility checks passed successfully.</p>
                   </div>
                 )}
                 
                 {activeTab === 'contrast' && (
                   <div className="text-center py-12">
                     <Palette className="h-12 w-12 text-purple-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Color Contrast Analysis</h3>
-                    <p className="text-gray-500">Color contrast analysis requires a PRO subscription.</p>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Color Contrast Analysis</h3>
+                    <p className="text-gray-500 dark:text-gray-400">Color contrast analysis requires a PRO subscription.</p>
                   </div>
                 )}
                 

@@ -67,8 +67,8 @@ export function RegionSelector({ selectedRegion, onRegionChange }: RegionSelecto
             onClick={() => onRegionChange(region.id)}
             className={`py-2 px-3 rounded-lg border transition-all duration-200 text-center ${
               selectedRegion === region.id
-                ? `${region.color} shadow-sm border-transparent`
-                : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                ? `${region.color} dark:bg-opacity-20 dark:text-white shadow-sm border-transparent`
+                : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100'
             }`}
           >
             <span className="text-sm font-medium">{region.name}</span>
@@ -113,7 +113,7 @@ export function RegionSelector({ selectedRegion, onRegionChange }: RegionSelecto
               return (
                 <span
                   key={index}
-                  className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium ${colorClass}`}
+                  className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium ${colorClass} dark:bg-opacity-20 dark:text-gray-200`}
                 >
                   {standard}
                 </span>
