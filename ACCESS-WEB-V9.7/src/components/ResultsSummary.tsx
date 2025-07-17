@@ -1,7 +1,6 @@
 
 import { AlertTriangle, AlertOctagon, AlertCircle, Info, CheckCircle, AlertCircle as Warning, FileText, Headphones, Video, MonitorSmartphone, Download } from 'lucide-react';
 import type { TestResult } from '../types';
-import { AccessibilityScoreBadge } from './AccessibilityScoreBadge';
 
 interface ResultsSummaryProps {
   results: TestResult;
@@ -33,10 +32,7 @@ export function ResultsSummary({ results, onExportPDF }: ResultsSummaryProps) {
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 px-6 py-5">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <div className="flex items-center space-x-3 mb-2">
-              <h2 className="text-xl font-bold text-gray-900">Test Results</h2>
-              <AccessibilityScoreBadge results={results} size="md" />
-            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-1">Test Results</h2>
             <p className="text-sm text-gray-600 font-medium">{results.url}</p>
           </div>
           {onExportPDF && (
