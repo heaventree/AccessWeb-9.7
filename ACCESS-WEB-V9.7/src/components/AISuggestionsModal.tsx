@@ -2,11 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Brain, 
-  Lightbulb, 
   Code, 
-  BookOpen, 
-  TestTube, 
-  ExternalLink,
   Copy,
   CheckCircle,
   AlertCircle,
@@ -78,16 +74,12 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
     }
   };
 
-  const handleOpen = () => {
+  // Trigger fetching when modal opens
+  useEffect(() => {
     if (isOpen && !suggestions && !isLoading) {
       fetchAISuggestions();
     }
-  };
-
-  // Trigger fetching when modal opens
-  useEffect(() => {
-    handleOpen();
-  }, [isOpen]);
+  }, [isOpen, suggestions, isLoading]);
 
   const copyToClipboard = async (text: string, section: string) => {
     try {
@@ -138,23 +130,6 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
       </div>
 
       <div className="p-6">
-        {/* Issue Summary */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
-          <h3 className="font-medium text-gray-900 mb-2">Issue Being Analyzed</h3>
-          <p className="text-gray-700 text-sm">{issue.description}</p>
-          {issue.wcagCriteria && issue.wcagCriteria.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1">
-              {issue.wcagCriteria.map((criteria, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                >
-                  {criteria}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
 
         {/* Loading State */}
         {isLoading && (
@@ -183,36 +158,12 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
 
         {/* Suggestions Content */}
         {suggestions && (
-          <div className="space-y-6">
-            {/* Explanation */}
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center mb-2">
-                    <Lightbulb className="w-5 h-5 text-blue-600 mr-2" />
-                    <h3 className="font-medium text-blue-900">Why This Matters</h3>
-                  </div>
-                  <p className="text-blue-800 text-sm leading-relaxed">{suggestions.explanation}</p>
-                </div>
-                <button
-                  onClick={() => copyToClipboard(suggestions.explanation, 'Explanation')}
-                  className="ml-2 p-1 text-blue-600 hover:text-blue-800 transition-colors"
-                  aria-label="Copy explanation"
-                >
-                  {copiedSection === 'Explanation' ? (
-                    <CheckCircle className="w-4 h-4" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Suggested Fix */}
+          <div className="space-y-4">
+            {/* How to Fix */}
             <div className="bg-green-50 rounded-lg p-4 border border-green-200">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center mb-2">
+                  <div className="flex items-center mb-3">
                     <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
                     <h3 className="font-medium text-green-900">How to Fix</h3>
                   </div>
@@ -265,68 +216,6 @@ export function AISuggestionsModal({ isOpen, onClose, issue }: AISuggestionsModa
                     )}
                   </button>
                 </div>
-              </div>
-            )}
-
-            {/* Testing Tips */}
-            {suggestions.testingTips && (
-              <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center mb-2">
-                      <TestTube className="w-5 h-5 text-purple-600 mr-2" />
-                      <h3 className="font-medium text-purple-900">Testing Tips</h3>
-                    </div>
-                    <p className="text-purple-800 text-sm leading-relaxed">{suggestions.testingTips}</p>
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard(suggestions.testingTips, 'Testing Tips')}
-                    className="ml-2 p-1 text-purple-600 hover:text-purple-800 transition-colors"
-                    aria-label="Copy testing tips"
-                  >
-                    {copiedSection === 'Testing Tips' ? (
-                      <CheckCircle className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* WCAG Reference */}
-            {suggestions.wcagReference && (
-              <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                <div className="flex items-center mb-2">
-                  <BookOpen className="w-5 h-5 text-yellow-600 mr-2" />
-                  <h3 className="font-medium text-yellow-900">WCAG Reference</h3>
-                </div>
-                <p className="text-yellow-800 text-sm">{suggestions.wcagReference}</p>
-              </div>
-            )}
-
-            {/* Additional Resources */}
-            {suggestions.additionalResources && suggestions.additionalResources.length > 0 && (
-              <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
-                <div className="flex items-center mb-3">
-                  <ExternalLink className="w-5 h-5 text-indigo-600 mr-2" />
-                  <h3 className="font-medium text-indigo-900">Additional Resources</h3>
-                </div>
-                <ul className="space-y-2">
-                  {suggestions.additionalResources.map((resource, index) => (
-                    <li key={index}>
-                      <a
-                        href={resource}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-indigo-700 hover:text-indigo-800 text-sm underline flex items-center"
-                      >
-                        {resource}
-                        <ExternalLink className="w-3 h-3 ml-1" />
-                      </a>
-                    </li>
-                  ))}
-                </ul>
               </div>
             )}
           </div>
