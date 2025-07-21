@@ -28,6 +28,7 @@ model User {
   cancelledAt          DateTime?        @map("cancelled_at")
   paymentHistory       PaymentHistory[]
   siteConnections      SiteConnection[]
+  apiKeys              ApiKey[]
 
   @@map("User")
 }
@@ -113,6 +114,37 @@ model ScanResult {
   siteConnection   SiteConnection @relation(fields: [siteConnectionId], references: [id], onDelete: Cascade)
 
   @@map("scan_results")
+}
+
+model ApiKey {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @map("user_id")
+  name         String    @db.VarChar(100)
+  keyId        String    @unique @map("key_id") @db.VarChar(50)
+  keyHash      String    @map("key_hash") @db.VarChar(255)
+  usageCount   Int       @default(0) @map("usage_count")
+  rateLimit    Int       @default(1000) @map("rate_limit")
+  isActive     Boolean   @default(true) @map("is_active")
+  lastUsed     DateTime? @map("last_used")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_keys")
+}
+
+model ApiUsage {
+  id            Int      @id @default(autoincrement())
+  apiKeyId      Int      @map("api_key_id")
+  endpoint      String   @db.VarChar(100)
+  requestCount  Int      @default(1) @map("request_count")
+  responseTime  Float?   @map("response_time")
+  statusCode    Int      @map("status_code")
+  userAgent     String?  @map("user_agent") @db.VarChar(255)
+  ipAddress     String?  @map("ip_address") @db.VarChar(45)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("api_usage")
 }
 
 
