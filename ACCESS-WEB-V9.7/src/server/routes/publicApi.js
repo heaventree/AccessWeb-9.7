@@ -1,67 +1,53 @@
 import express from 'express';
-import axeCore from 'axe-core';
-import { JSDOM } from 'jsdom';
+import puppeteer from 'puppeteer';
 import { authenticateApiKey, trackApiUsage } from './apiKeys.js';
 
 const router = express.Router();
 
-// Helper function to fetch and parse HTML
-async function fetchWebpage(url) {
+// Run axe analysis using Puppeteer for proper browser environment
+async function runAxeAnalysis(url, options = {}) {
+  let browser;
   try {
-    const fetch = (await import('node-fetch')).default;
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'AccessWeb-WCAG-Checker/1.0'
-      },
-      timeout: 10000 // 10 second timeout
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const html = await response.text();
-    return html;
-  } catch (error) {
-    throw new Error(`Failed to fetch webpage: ${error.message}`);
-  }
-}
-
-// Helper function to run axe-core analysis
-async function runAxeAnalysis(html, url, options = {}) {
-  try {
-    const dom = new JSDOM(html, { 
-      url: url,
-      pretendToBeVisual: true,
-      resources: 'usable'
+    // Launch browser
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     });
     
-    const { window } = dom;
-    const { document } = window;
-
-    // Set up axe for this window/document
-    const axe = axeCore;
+    const page = await browser.newPage();
     
-    // Configure axe based on region and tag
-    const axeConfig = {
-      reporter: 'v2',
-      ...options
-    };
+    // Set viewport and user agent
+    await page.setViewport({ width: 1920, height: 1080 });
+    await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
 
-    // Map region to appropriate tags/standards
+    // Navigate to the page
+    await page.goto(url, { 
+      waitUntil: 'networkidle2', 
+      timeout: 30000 
+    });
+
+    // Inject axe-core
+    await page.addScriptTag({
+      path: './node_modules/axe-core/axe.min.js'
+    });
+
+    // Configure axe based on options
+    const axeConfig = { runOnly: { type: 'tags', values: [] } };
+
+    // Set region-specific rules
     if (options.region) {
       switch (options.region.toLowerCase()) {
         case 'eu':
-          axeConfig.tags = ['wcag2a', 'wcag2aa', 'wcag21aa', 'en301549'];
+          axeConfig.runOnly.values = ['wcag2a', 'wcag2aa', 'wcag21aa', 'en301549'];
           break;
         case 'us':
-          axeConfig.tags = ['wcag2a', 'wcag2aa', 'section508'];
+          axeConfig.runOnly.values = ['wcag2a', 'wcag2aa', 'section508'];
           break;
         case 'uk':
-          axeConfig.tags = ['wcag2a', 'wcag2aa', 'wcag21aa'];
+          axeConfig.runOnly.values = ['wcag2a', 'wcag2aa', 'wcag21aa'];
           break;
         default:
-          axeConfig.tags = ['wcag2a', 'wcag2aa'];
+          axeConfig.runOnly.values = ['wcag2a', 'wcag2aa'];
       }
     }
 
@@ -78,31 +64,28 @@ async function runAxeAnalysis(html, url, options = {}) {
       };
       
       if (tagMap[options.tag.toUpperCase()]) {
-        axeConfig.tags = tagMap[options.tag.toUpperCase()];
+        axeConfig.runOnly.values = tagMap[options.tag.toUpperCase()];
       }
     }
 
     // Run axe analysis
-    return new Promise((resolve, reject) => {
-      // Since we're in Node.js, we need to use axe-core differently
-      // We'll use axe-puppeteer approach but simulate it
-      
-      const mockWindow = {
-        ...window,
-        axe: axeCore
-      };
-
-      axeCore.run(document, axeConfig, (err, results) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(results);
-        }
+    const results = await page.evaluate((config) => {
+      return new Promise((resolve, reject) => {
+        window.axe.run(document, config, (err, results) => {
+          if (err) reject(err);
+          else resolve(results);
+        });
       });
-    });
+    }, axeConfig);
+
+    return results;
 
   } catch (error) {
     throw new Error(`Failed to analyze webpage: ${error.message}`);
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 
@@ -233,12 +216,9 @@ router.post('/wcag-check', authenticateApiKey, async (req, res) => {
     }
 
     console.log(`[API] Starting WCAG check for ${url} (region: ${region}, tag: ${tag})`);
-
-    // Fetch webpage
-    const html = await fetchWebpage(url);
     
-    // Run accessibility analysis
-    const axeResults = await runAxeAnalysis(html, url, { region, tag });
+    // Run accessibility analysis directly on the URL
+    const axeResults = await runAxeAnalysis(url, { region, tag });
     
     // Format results
     const formattedResults = formatResults(axeResults, url, region, tag);
@@ -266,14 +246,10 @@ router.post('/wcag-check', authenticateApiKey, async (req, res) => {
       await trackApiUsage(
         req.apiKey.id,
         '/api/public/wcag-check',
-        'POST',
-        req.body.url,
         statusCode,
         responseTime,
         req.get('User-Agent'),
-        req.ip,
-        req.body,
-        responseData
+        req.ip
       );
     } catch (trackingError) {
       console.error('Failed to track API usage:', trackingError);
