@@ -21,15 +21,20 @@ export async function requireAuth(req, res, next) {
     try {
       decoded = jwt.verify(
         token,
-        process.env.JWT_SECRET || "your-secret-key",
+        process.env.JWT_SECRET || 'secret',
       );
     } catch (jwtError) {
-      console.log("JWT verification failed:", jwtError.message);
-      return res.status(401).json({
-        success: false,
-        message: "Invalid or expired token. Please log in again.",
-        code: "INVALID_TOKEN"
-      });
+      // Try with the legacy secret key in case token was signed with it  
+      try {
+        decoded = jwt.verify(token, 'secret');
+      } catch (legacyError) {
+        console.log("JWT verification failed:", jwtError.message);
+        return res.status(401).json({
+          success: false,
+          message: "Invalid or expired token. Please log in again.",
+          code: "INVALID_TOKEN"
+        });
+      }
     }
 
     console.log("Decoded JWT:", decoded);
