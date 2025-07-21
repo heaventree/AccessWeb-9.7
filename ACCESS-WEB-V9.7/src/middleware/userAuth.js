@@ -5,7 +5,7 @@ export async function requireAuth(req, res, next) {
   try {
     // Get token from authorization header or cookies
     const authHeader = req.headers.authorization;
-    const cookieToken = req.cookies?.accessToken;
+    const cookieToken = req.cookies?.accessweb_token;
 
     const token = authHeader?.replace("Bearer ", "") || cookieToken;
 
