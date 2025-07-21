@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
-import { apiClient } from '../../lib/apiClient';
+import apiClient from '../../lib/apiClient';
 
 interface ApiKey {
   id: number;
