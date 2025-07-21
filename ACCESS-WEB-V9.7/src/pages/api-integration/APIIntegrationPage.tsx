@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 interface ApiKey {
   id: number;
@@ -34,16 +35,15 @@ export default function APIIntegrationPage(): JSX.Element {
 
   const fetchApiKeys = async () => {
     try {
-      const response = await fetch('/api/user/api-keys', {
-        credentials: 'include'
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.get('/api/user/api-keys', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        setApiKeys(data);
-      } else {
-        toast.error('Failed to load API keys');
-      }
+      setApiKeys(response.data);
     } catch (error) {
       console.error('Error fetching API keys:', error);
       toast.error('Failed to load API keys');
@@ -60,26 +60,22 @@ export default function APIIntegrationPage(): JSX.Element {
 
     setCreating(true);
     try {
-      const response = await fetch('/api/user/api-keys', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ name: keyName }),
-      });
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.post('/api/user/api-keys', 
+        { name: keyName },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 
-      if (response.ok) {
-        const data = await response.json();
-        setGeneratedKey(data.apiKey);
-        setApiKeys(prev => [...prev, data.keyInfo]);
-        setShowCreateForm(false);
-        setKeyName('');
-        toast.success('API key created successfully');
-      } else {
-        const error = await response.json();
-        toast.error(error.message || 'Failed to create API key');
-      }
+      setGeneratedKey(response.data.apiKey);
+      setApiKeys(prev => [...prev, response.data.keyInfo]);
+      setShowCreateForm(false);
+      setKeyName('');
+      toast.success('API key created successfully');
     } catch (error) {
       console.error('Error creating API key:', error);
       toast.error('Failed to create API key');
@@ -94,17 +90,16 @@ export default function APIIntegrationPage(): JSX.Element {
     }
 
     try {
-      const response = await fetch(`/api/user/api-keys/${keyId}`, {
-        method: 'DELETE',
-        credentials: 'include',
+      const token = localStorage.getItem('accessToken');
+      await axios.delete(`/api/user/api-keys/${keyId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
 
-      if (response.ok) {
-        setApiKeys(prev => prev.filter(key => key.keyId !== keyId));
-        toast.success('API key deleted successfully');
-      } else {
-        toast.error('Failed to delete API key');
-      }
+      setApiKeys(prev => prev.filter(key => key.keyId !== keyId));
+      toast.success('API key deleted successfully');
     } catch (error) {
       console.error('Error deleting API key:', error);
       toast.error('Failed to delete API key');

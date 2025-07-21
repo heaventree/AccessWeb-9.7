@@ -9,31 +9,8 @@ import { eq, and, desc } from 'drizzle-orm';
 
 const router = express.Router();
 
-// Middleware to verify JWT token
-const authenticateUser = async (req, res, next) => {
-  try {
-    const token = req.cookies.accessweb_token;
-    
-    if (!token) {
-      return res.status(401).json({ message: 'Authentication required' });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.id, decoded.userId)
-    });
-    
-    if (!user) {
-      return res.status(401).json({ message: 'User not found' });
-    }
-    
-    req.user = user;
-    next();
-  } catch (error) {
-    console.error('Auth middleware error:', error);
-    return res.status(401).json({ message: 'Invalid authentication' });
-  }
-};
+// Note: Authentication is handled by requireAuth middleware in server.js
+// req.user is already available from the parent route middleware
 
 // Generate API key with proper format
 const generateApiKey = () => {
@@ -49,7 +26,7 @@ const generateKeyId = () => {
 };
 
 // GET /api/user/api-keys - List user's API keys
-router.get('/api-keys', authenticateUser, async (req, res) => {
+router.get('/api-keys', async (req, res) => {
   try {
     const userApiKeys = await db
       .select({
@@ -74,7 +51,7 @@ router.get('/api-keys', authenticateUser, async (req, res) => {
 });
 
 // POST /api/user/api-keys - Create new API key
-router.post('/api-keys', authenticateUser, async (req, res) => {
+router.post('/api-keys', async (req, res) => {
   try {
     const { name } = req.body;
     
@@ -132,7 +109,7 @@ router.post('/api-keys', authenticateUser, async (req, res) => {
 });
 
 // DELETE /api/user/api-keys/:keyId - Delete API key
-router.delete('/api-keys/:keyId', authenticateUser, async (req, res) => {
+router.delete('/api-keys/:keyId', async (req, res) => {
   try {
     const { keyId } = req.params;
 
