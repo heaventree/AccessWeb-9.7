@@ -5,7 +5,7 @@ export async function requireAuth(req, res, next) {
   try {
     // Get token from authorization header or cookies
     const authHeader = req.headers.authorization;
-    const cookieToken = req.cookies?.accessweb_token;
+    const cookieToken = req.cookies?.accessToken;
 
     const token = authHeader?.replace("Bearer ", "") || cookieToken;
 
@@ -21,20 +21,15 @@ export async function requireAuth(req, res, next) {
     try {
       decoded = jwt.verify(
         token,
-        process.env.JWT_SECRET || 'secret',
+        process.env.JWT_SECRET || "your-secret-key",
       );
     } catch (jwtError) {
-      // Try with the legacy secret key in case token was signed with it  
-      try {
-        decoded = jwt.verify(token, 'secret');
-      } catch (legacyError) {
-        console.log("JWT verification failed:", jwtError.message);
-        return res.status(401).json({
-          success: false,
-          message: "Invalid or expired token. Please log in again.",
-          code: "INVALID_TOKEN"
-        });
-      }
+      console.log("JWT verification failed:", jwtError.message);
+      return res.status(401).json({
+        success: false,
+        message: "Invalid or expired token. Please log in again.",
+        code: "INVALID_TOKEN"
+      });
     }
 
     console.log("Decoded JWT:", decoded);

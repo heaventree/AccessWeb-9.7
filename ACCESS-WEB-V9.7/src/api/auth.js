@@ -238,7 +238,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', async (req, res) => {
   try {
     // Get token from Authorization header or cookies
-    let token = req.cookies.accessweb_token;
+    let token = req.cookies.accessToken;
 
     // If no cookie token, check Authorization header
     if (!token && req.headers.authorization) {
