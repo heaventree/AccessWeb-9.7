@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import { apiClient } from '../../lib/apiClient';
 
 interface ApiKey {
   id: number;
@@ -35,14 +35,7 @@ export default function APIIntegrationPage(): JSX.Element {
 
   const fetchApiKeys = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.get('/api/user/api-keys', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
+      const response = await apiClient.get('/user/api-keys');
       setApiKeys(response.data);
     } catch (error) {
       console.error('Error fetching API keys:', error);
@@ -60,16 +53,7 @@ export default function APIIntegrationPage(): JSX.Element {
 
     setCreating(true);
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.post('/api/user/api-keys', 
-        { name: keyName },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+      const response = await apiClient.post('/user/api-keys', { name: keyName });
 
       setGeneratedKey(response.data.apiKey);
       setApiKeys(prev => [...prev, response.data.keyInfo]);
@@ -90,13 +74,7 @@ export default function APIIntegrationPage(): JSX.Element {
     }
 
     try {
-      const token = localStorage.getItem('accessToken');
-      await axios.delete(`/api/user/api-keys/${keyId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      await apiClient.delete(`/user/api-keys/${keyId}`);
 
       setApiKeys(prev => prev.filter(key => key.keyId !== keyId));
       toast.success('API key deleted successfully');

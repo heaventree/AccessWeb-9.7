@@ -28,6 +28,14 @@ const generateKeyId = () => {
 // GET /api/user/api-keys - List user's API keys
 router.get('/api-keys', async (req, res) => {
   try {
+    // Debug logging
+    console.log('API Keys GET - req.user:', req.user);
+    console.log('API Keys object:', apiKeys);
+    
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
     const userApiKeys = await db
       .select({
         id: apiKeys.id,
@@ -53,6 +61,13 @@ router.get('/api-keys', async (req, res) => {
 // POST /api/user/api-keys - Create new API key
 router.post('/api-keys', async (req, res) => {
   try {
+    // Debug logging
+    console.log('API Keys POST - req.user:', req.user);
+    
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
     const { name } = req.body;
     
     if (!name || name.trim().length === 0) {
@@ -111,6 +126,13 @@ router.post('/api-keys', async (req, res) => {
 // DELETE /api/user/api-keys/:keyId - Delete API key
 router.delete('/api-keys/:keyId', async (req, res) => {
   try {
+    // Debug logging
+    console.log('API Keys DELETE - req.user:', req.user);
+    
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
     const { keyId } = req.params;
 
     // Delete the API key (only if it belongs to the user)
