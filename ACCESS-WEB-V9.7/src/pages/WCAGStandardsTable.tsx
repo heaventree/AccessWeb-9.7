@@ -102,17 +102,17 @@ export function WCAGStandardsTable() {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gray-50 pt-[130px] pb-[130px]">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-[130px] pb-[130px]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               WCAG Requirements
             </h1>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-gray-600 dark:text-gray-300">
               Complete list of accessibility requirements and their affected user groups
             </p>
           </motion.div>
@@ -122,7 +122,7 @@ export function WCAGStandardsTable() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-lg shadow-sm p-4 mb-8"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-8 border border-gray-100 dark:border-gray-700"
           >
             <div className="flex items-center gap-3">
               {/* Search Input - Smaller */}
@@ -132,23 +132,23 @@ export function WCAGStandardsTable() {
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <Search className="absolute left-2.5 top-2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-2.5 top-2 text-gray-400 dark:text-gray-500 w-4 h-4" />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
               
-              <div className="h-5 w-px bg-gray-300 mx-1"></div>
+              <div className="h-5 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
               
               <div className="flex items-center">
-                <Filter className="w-4 h-4 text-gray-500 mr-2" />
+                <Filter className="w-4 h-4 text-gray-500 dark:text-gray-400 mr-2" />
               </div>
               
               {/* Disability Filters - Compact */}
@@ -159,7 +159,7 @@ export function WCAGStandardsTable() {
                   className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
                     selectedDisabilities.has(disability)
                       ? disabilityColors[disability]
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   <DisabilityIcon type={disability} />
@@ -175,14 +175,14 @@ export function WCAGStandardsTable() {
                   className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
                     selectedLevels.has(level)
                       ? levelColors[level]
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   Level {level}
                 </button>
               ))}
               
-              <div className="h-5 w-px bg-gray-300 mx-1"></div>
+              <div className="h-5 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
               
               {/* Version Filters - Compact */}
               {(['2.1', '2.2'] as const).map(version => (
@@ -192,7 +192,7 @@ export function WCAGStandardsTable() {
                   className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
                     selectedVersions.has(version)
                       ? versionColors[version]
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   WCAG {version}
@@ -203,7 +203,7 @@ export function WCAGStandardsTable() {
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
-                  className="ml-auto flex items-center px-2 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="ml-auto flex items-center px-2 py-1 text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
                   Clear
                 </button>
@@ -216,34 +216,34 @@ export function WCAGStandardsTable() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-lg shadow-sm overflow-hidden"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700"
           >
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th scope="col" className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       #
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Description
                     </th>
-                    <th scope="col" className="w-64 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="w-64 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Disabilities Affected
                     </th>
-                    <th scope="col" className="w-64 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center justify-between">
+                    <th scope="col" className="w-64 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between">
                       <span>Standard Level</span>
-                      <Info className="w-4 h-4 text-gray-400" />
+                      <Info className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {filteredRequirements.map((req) => (
-                    <tr key={req.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
+                    <tr key={req.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500 dark:text-gray-400">
                         {req.id}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                         {req.description}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -268,7 +268,7 @@ export function WCAGStandardsTable() {
                             href={`https://www.w3.org/WAI/WCAG21/quickref/#${req.description.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800"
+                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                             title="View official documentation"
                           >
                             <ExternalLink className="w-5 h-5" />

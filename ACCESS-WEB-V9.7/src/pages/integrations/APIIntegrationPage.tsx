@@ -4,13 +4,13 @@ import { Code, CheckCircle, ArrowRight, FileText, Zap, Shield } from 'lucide-rea
 
 export function APIIntegrationPage() {
   return (
-    <div className="min-h-screen bg-gray-50 pt-[130px] pb-[130px]">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-[130px] pb-[130px]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             API Integration
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Integrate automated accessibility testing directly into your applications with our powerful REST API.
             Build custom solutions and automate accessibility testing in your workflow.
           </p>
@@ -18,44 +18,44 @@ export function APIIntegrationPage() {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <Zap className="w-8 h-8 text-blue-600 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700">
+            <Zap className="w-8 h-8 text-blue-600 dark:text-blue-400 mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
               RESTful API
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               Simple and powerful REST API for seamless integration with your applications.
             </p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <Shield className="w-8 h-8 text-blue-600 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700">
+            <Shield className="w-8 h-8 text-blue-600 dark:text-blue-400 mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
               Webhooks
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               Real-time notifications for scan results and accessibility issues.
             </p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <FileText className="w-8 h-8 text-blue-600 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700">
+            <FileText className="w-8 h-8 text-blue-600 dark:text-blue-400 mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
               Detailed Reports
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               Comprehensive reporting with detailed accessibility insights.
             </p>
           </div>
         </div>
 
         {/* Code Example */}
-        <div className="bg-white rounded-xl shadow-sm p-8 mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 mb-16 border border-gray-100 dark:border-gray-700">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
             Quick Start Example
           </h2>
-          <div className="bg-gray-900 rounded-lg p-6 overflow-x-auto">
-            <pre className="text-gray-100">
+          <div className="bg-gray-900 dark:bg-gray-950 rounded-lg p-6 overflow-x-auto border border-gray-100 dark:border-gray-700">
+            <pre className="text-gray-100 dark:text-gray-200">
               <code>{`// Initialize the client
 const accessWeb = new AccessWeb({
   apiKey: 'your_api_key'
@@ -83,32 +83,32 @@ await accessWeb.createWebhook({
         </div>
 
         {/* Key Benefits */}
-        <div className="bg-white rounded-xl shadow-sm p-8 mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 mb-16 border border-gray-100 dark:border-gray-700">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
             Key Benefits
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <ul className="space-y-4">
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
+                  <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400 mt-1 mr-3" />
                   <div>
-                    <h4 className="font-medium text-gray-900">Custom Integration</h4>
-                    <p className="text-gray-600">Build accessibility testing into your own applications, dashboards, and workflows</p>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">Custom Integration</h4>
+                    <p className="text-gray-600 dark:text-gray-300">Build accessibility testing into your own applications, dashboards, and workflows</p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
+                  <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400 mt-1 mr-3" />
                   <div>
-                    <h4 className="font-medium text-gray-900">CI/CD Automation</h4>
-                    <p className="text-gray-600">Integrate with GitHub, GitLab, Jenkins, and other CI/CD pipelines</p>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">CI/CD Automation</h4>
+                    <p className="text-gray-600 dark:text-gray-300">Integrate with GitHub, GitLab, Jenkins, and other CI/CD pipelines</p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
+                  <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400 mt-1 mr-3" />
                   <div>
-                    <h4 className="font-medium text-gray-900">Enterprise Scalability</h4>
-                    <p className="text-gray-600">Test thousands of pages across multiple domains with high throughput</p>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">Enterprise Scalability</h4>
+                    <p className="text-gray-600 dark:text-gray-300">Test thousands of pages across multiple domains with high throughput</p>
                   </div>
                 </li>
               </ul>
@@ -116,31 +116,31 @@ await accessWeb.createWebhook({
             <div>
               <ul className="space-y-4">
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
+                  <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400 mt-1 mr-3" />
                   <div>
-                    <h4 className="font-medium text-gray-900">Real-time Webhooks</h4>
-                    <p className="text-gray-600">Get instant notifications via webhooks with detailed payload options</p>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">Real-time Webhooks</h4>
+                    <p className="text-gray-600 dark:text-gray-300">Get instant notifications via webhooks with detailed payload options</p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
+                  <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400 mt-1 mr-3" />
                   <div>
-                    <h4 className="font-medium text-gray-900">Comprehensive Reporting</h4>
-                    <p className="text-gray-600">Access detailed accessibility data in JSON, CSV, PDF and HTML formats</p>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">Comprehensive Reporting</h4>
+                    <p className="text-gray-600 dark:text-gray-300">Access detailed accessibility data in JSON, CSV, PDF and HTML formats</p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-1 mr-3" />
+                  <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400 mt-1 mr-3" />
                   <div>
-                    <h4 className="font-medium text-gray-900">Developer Support</h4>
-                    <p className="text-gray-600">Get help from our API experts with priority support channels</p>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">Developer Support</h4>
+                    <p className="text-gray-600 dark:text-gray-300">Get help from our API experts with priority support channels</p>
                   </div>
                 </li>
               </ul>
             </div>
           </div>
           <div className="mt-6 text-center">
-            <Link to="/docs/api" className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
+            <Link to="/docs/api" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium inline-flex items-center">
               View full API documentation 
               <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
