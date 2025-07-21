@@ -67,7 +67,6 @@ import { MonitoringPage } from './pages/MonitoringPage';
 import { RealTimeMonitorPage } from './pages/RealTimeMonitorPage';
 import { WordPressIntegrationPage } from './pages/WordPressIntegrationPage';
 import { WordPressIntPage } from './pages/WordPressIntPage';
-import { APIIntegrationPage } from './pages/integrations/APIIntegrationPage';
 import { ComplianceIntegrationPage } from './pages/integrations/ComplianceIntegrationPage';
 import { ShopifyIntegrationPage } from './pages/integrations/ShopifyIntegrationPage';
 import BillingPage from './pages/BillingPage';
@@ -88,6 +87,7 @@ import JobQueueTestPage from './pages/testing/JobQueueTestPage';
 import { ErrorPage } from './components/ErrorPage';
 import AccessibilityTipsPage from './pages/help/AccessibilityTipsPage';
 import { AccessibilityTipsDemo } from './components/demo/AccessibilityTipsDemo';
+import APIIntegrationPage from './pages/api-integration/APIIntegrationPage';
 import React, { useEffect, useState } from 'react';
 import { ErrorBoundary as CustomErrorBoundary } from './components/ErrorBoundary'; //Renamed to avoid conflict
 import { registerErrorHandler, unregisterErrorHandler, StructuredError } from './utils/errorHandler';
@@ -162,6 +162,7 @@ function App() {
                 <Route path="connections/shopify" element={<ShopifyAPIPage />} />
                 <Route path="connections/wordpress" element={<WordPressAPIPage />} />
                 <Route path="connections/wordpress/:id" element={<WordPressAPIPage />} />
+                <Route path="api-integration" element={<APIIntegrationPage />} />
                 <Route path="billing" element={<BillingPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="team" element={<TeamPage />} />

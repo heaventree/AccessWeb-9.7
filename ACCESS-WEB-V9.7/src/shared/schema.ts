@@ -31,7 +31,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   payments: many(payments),
   scans: many(scans),
   content: many(content),
-  siteConnections: many(siteConnections)
+  siteConnections: many(siteConnections),
+  apiKeys: many(apiKeys)
 }));
 
 // Subscriptions table
@@ -432,6 +433,66 @@ export const pricingPlansRelations = relations(pricingPlans, ({ many }) => ({
   subscriptions: many(subscriptions)
 }));
 
+// API Keys table
+export const apiKeys = pgTable('api_keys', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 100 }).notNull(),
+  keyId: varchar('key_id', { length: 50 }).notNull().unique(), // Public identifier (visible to user)
+  keyHash: varchar('key_hash', { length: 255 }).notNull(), // Hashed API key for security
+  lastUsed: timestamp('last_used'),
+  isActive: boolean('is_active').notNull().default(true),
+  usageCount: integer('usage_count').notNull().default(0),
+  rateLimit: integer('rate_limit').default(1000), // requests per hour
+  allowedOrigins: jsonb('allowed_origins').$type<string[]>().default([]), // CORS origins
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+}, (table) => {
+  return {
+    userIdIdx: index('api_key_user_id_idx').on(table.userId),
+    keyIdIdx: index('api_key_key_id_idx').on(table.keyId),
+    activeIdx: index('api_key_active_idx').on(table.isActive)
+  };
+});
+
+// API Keys relations
+export const apiKeysRelations = relations(apiKeys, ({ one }) => ({
+  user: one(users, {
+    fields: [apiKeys.userId],
+    references: [users.id]
+  })
+}));
+
+// API Usage tracking table
+export const apiUsage = pgTable('api_usage', {
+  id: serial('id').primaryKey(),
+  apiKeyId: integer('api_key_id').notNull().references(() => apiKeys.id, { onDelete: 'cascade' }),
+  endpoint: varchar('endpoint', { length: 100 }).notNull(),
+  method: varchar('method', { length: 10 }).notNull(),
+  requestUrl: varchar('request_url', { length: 500 }),
+  statusCode: integer('status_code'),
+  responseTime: integer('response_time'), // in milliseconds
+  userAgent: varchar('user_agent', { length: 500 }),
+  ipAddress: varchar('ip_address', { length: 45 }),
+  requestData: jsonb('request_data'),
+  responseData: jsonb('response_data'),
+  createdAt: timestamp('created_at').defaultNow().notNull()
+}, (table) => {
+  return {
+    apiKeyIdIdx: index('api_usage_api_key_id_idx').on(table.apiKeyId),
+    createdAtIdx: index('api_usage_created_at_idx').on(table.createdAt),
+    endpointIdx: index('api_usage_endpoint_idx').on(table.endpoint)
+  };
+});
+
+// API Usage relations
+export const apiUsageRelations = relations(apiUsage, ({ one }) => ({
+  apiKey: one(apiKeys, {
+    fields: [apiUsage.apiKeyId],
+    references: [apiKeys.id]
+  })
+}));
+
 // Export types for use in application code
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -474,3 +535,9 @@ export type InsertSetting = typeof settings.$inferInsert;
 
 export type PricingPlan = typeof pricingPlans.$inferSelect;
 export type InsertPricingPlan = typeof pricingPlans.$inferInsert;
+
+export type ApiKey = typeof apiKeys.$inferSelect;
+export type InsertApiKey = typeof apiKeys.$inferInsert;
+
+export type ApiUsage = typeof apiUsage.$inferSelect;
+export type InsertApiUsage = typeof apiUsage.$inferInsert;

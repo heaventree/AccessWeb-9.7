@@ -151,6 +151,10 @@ import siteScannerQueue from './jobs/siteScanner.js';
 // Import admin routes
 import adminRouter from './routes/admin.js';
 
+// Import API key and public API routes
+import apiKeysRouter from './routes/apiKeys.js';
+import publicApiRouter from './routes/publicApi.js';
+
 
 
 // API Routes - Move AI suggestions before accessibility router to avoid conflicts
@@ -164,6 +168,12 @@ app.use('/api/site-connections', siteConnectionsRouter);
 app.use('/api/scanner', scannerRouter);
 app.use('/api/wordpress', wordpressRouter);
 app.use('/api/admin', requireAuth, adminRouter);
+
+// API Key management routes (protected)
+app.use('/api/user', requireAuth, apiKeysRouter);
+
+// Public API routes (API key authenticated)
+app.use('/api/public', publicApiRouter);
 
 // Pricing Plans Routes
 app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed

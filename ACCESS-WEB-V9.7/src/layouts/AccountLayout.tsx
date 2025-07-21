@@ -6,7 +6,8 @@ import {
   Activity,
   BarChart2,
   MonitorPlay,
-  Gauge
+  Gauge,
+  Key
 } from 'lucide-react';
 import { DashboardLayout } from './DashboardLayout';
 import { useAuth } from '../hooks/useAuth';
@@ -40,6 +41,11 @@ export function AccountLayout() {
       path: "/my-account/connections",
       label: "Connections",
       icon: <Activity className="w-5 h-5" />
+    },
+    {
+      path: "/my-account/api-integration",
+      label: "API Integration",
+      icon: <Key className="w-5 h-5" />
     },
     {
       path: "/my-account/settings",
