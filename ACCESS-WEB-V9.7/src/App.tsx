@@ -73,6 +73,7 @@ import BillingPage from './pages/BillingPage';
 import PaymentSuccessStandalone from './components/PaymentSuccessStandalone';
 import PaymentSuccess from './pages/PaymentSuccess';
 import { EnterpriseIntegrationPage } from './pages/integrations/EnterpriseIntegrationPage';
+import PublicAPIDocumentationPage from './pages/integrations/PublicAPIDocumentationPage';
 import { AnalyticsPage } from './pages/analytics/AnalyticsPage';
 import { CompliancePage } from './pages/compliance/CompliancePage';
 import { SettingsPage } from './pages/settings/SettingsPage';
@@ -170,7 +171,7 @@ function App() {
               <Route path="/integrations/wordpress" element={<><Navigation /><main id="main-content"><WordPressIntPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/analytics" element={<><Navigation /><main id="main-content"><AnalyticsPage /></main><Footer /><BackToTop /></>} />
               <Route path="/tools/compliance" element={<><Navigation /><main id="main-content"><CompliancePage /></main><Footer /><BackToTop /></>} />
-              <Route path="/integrations/api" element={<><Navigation /><main id="main-content"><APIIntegrationPage /></main><Footer /><BackToTop /></>} />
+              <Route path="/integrations/api" element={<><Navigation /><main id="main-content"><PublicAPIDocumentationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/integrations/compliance" element={<><Navigation /><main id="main-content"><ComplianceIntegrationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/integrations/enterprise" element={<><Navigation /><main id="main-content"><EnterpriseIntegrationPage /></main><Footer /><BackToTop /></>} />
               <Route path="/docs" element={<><Navigation /><main id="main-content"><DocumentationPage /></main><Footer /><BackToTop /></>} />
