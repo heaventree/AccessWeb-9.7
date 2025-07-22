@@ -2,9 +2,21 @@ import React from 'react';
 import { Code, Key, BookOpen, ArrowRight, CheckCircle } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function PublicAPIDocumentationPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleGetStarted = () => {
+    if (user) {
+      // User is already logged in, navigate to API integration page
+      navigate('/my-account/api-integration');
+    } else {
+      // User is not logged in, navigate to login page
+      navigate('/login');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
@@ -161,10 +173,10 @@ export default function PublicAPIDocumentationPage() {
                   To use the AccessWeb API, you need to create an account and generate an API key.
                 </p>
                 <Button
-                  onClick={() => navigate('/auth/login')}
+                  onClick={handleGetStarted}
                   className="bg-[#0fae96] hover:bg-[#0fae96]/90 text-white"
                 >
-                  Create Account & Get API Key
+                  {user ? 'Manage API Keys' : 'Create Account & Get API Key'}
                 </Button>
               </div>
             </div>
@@ -200,10 +212,10 @@ export default function PublicAPIDocumentationPage() {
             Create your account today and start integrating accessibility testing into your workflow.
           </p>
           <Button
-            onClick={() => navigate('/auth/login')}
+            onClick={handleGetStarted}
             className="bg-white text-[#0fae96] hover:bg-gray-100 text-lg px-8 py-3"
           >
-            Sign Up Now
+            {user ? 'Go to API Management' : 'Sign Up Now'}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
