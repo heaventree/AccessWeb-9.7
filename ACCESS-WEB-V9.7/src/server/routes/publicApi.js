@@ -177,7 +177,6 @@ function formatResults(axeResults, url, region, tag) {
       standard: tag || "WCAG2AA",
       region: region || "us",
       engine: "axe-core",
-      version: axeCore.version,
     },
   };
 }
