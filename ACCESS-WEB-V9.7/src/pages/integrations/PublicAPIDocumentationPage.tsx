@@ -1,5 +1,5 @@
 import React from 'react';
-import { Code, Key, BookOpen, ArrowRight, CheckCircle, Zap, Shield, Settings } from 'lucide-react';
+import { Code, Key, BookOpen, ArrowRight, CheckCircle } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,45 +11,12 @@ export default function PublicAPIDocumentationPage() {
       {/* Hero Section */}
       <div className="bg-slate-800 dark:bg-slate-900 text-white py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center">
             <h1 className="text-5xl font-bold mb-6 text-white">AccessWeb API</h1>
             <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
               Integrate WCAG accessibility testing directly into your development workflow. 
               Get comprehensive compliance reports programmatically.
             </p>
-          </div>
-
-          {/* Feature Cards */}
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="bg-slate-700 dark:bg-slate-800 rounded-xl p-6 border border-slate-600">
-              <div className="bg-[#0fae96] rounded-lg p-3 w-12 h-12 flex items-center justify-center mb-4">
-                <Zap className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">One-Click Integration</h3>
-              <p className="text-slate-300 leading-relaxed">
-                Integrate directly into your development pipeline - no complex setup required.
-              </p>
-            </div>
-
-            <div className="bg-slate-700 dark:bg-slate-800 rounded-xl p-6 border border-slate-600">
-              <div className="bg-[#0fae96] rounded-lg p-3 w-12 h-12 flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Automated Compliance</h3>
-              <p className="text-slate-300 leading-relaxed">
-                Continuous monitoring and automated fixes keep your site WCAG compliant.
-              </p>
-            </div>
-
-            <div className="bg-slate-700 dark:bg-slate-800 rounded-xl p-6 border border-slate-600">
-              <div className="bg-[#0fae96] rounded-lg p-3 w-12 h-12 flex items-center justify-center mb-4">
-                <Settings className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Framework Compatibility</h3>
-              <p className="text-slate-300 leading-relaxed">
-                Works with any development framework and popular CI/CD tools.
-              </p>
-            </div>
           </div>
         </div>
       </div>
