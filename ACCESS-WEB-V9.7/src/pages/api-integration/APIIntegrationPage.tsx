@@ -130,16 +130,16 @@ export default function APIIntegrationPage(): JSX.Element {
         {/* Generated Key Modal */}
         {generatedKey && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl border dark:border-gray-700">
               <div className="flex items-center mb-4">
                 <AlertTriangle className="h-5 w-5 text-yellow-500 mr-2" />
-                <h3 className="text-lg font-semibold">Your API Key</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Your API Key</h3>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                 Please copy this API key now. You won't be able to see it again for security reasons.
               </p>
-              <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded border">
-                <code className="text-sm break-all">{generatedKey}</code>
+              <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded border border-gray-200 dark:border-gray-600">
+                <code className="text-sm break-all font-mono text-gray-900 dark:text-gray-100 bg-transparent">{generatedKey}</code>
               </div>
               <div className="flex justify-end space-x-3 mt-6">
                 <Button
@@ -170,18 +170,20 @@ export default function APIIntegrationPage(): JSX.Element {
               <p className="text-blue-800 dark:text-blue-200 text-sm mb-3">
                 Use your API key to check WCAG compliance programmatically:
               </p>
-              <div className="bg-white dark:bg-gray-800 rounded p-3 text-sm">
-                <code className="block">
-                  <span className="text-green-600">POST</span> https://your-replit-domain.repl.co/api/public/wcag-check<br />
-                  <span className="text-gray-500">Headers:</span><br />
-                  Authorization: Bearer YOUR_API_KEY<br />
-                  Content-Type: application/json<br /><br />
-                  <span className="text-gray-500">Body:</span><br />
+              <div className="bg-white dark:bg-gray-800 rounded p-3 text-sm border dark:border-gray-600">
+                <code className="block text-gray-900 dark:text-gray-100">
+                  <span className="text-green-600 dark:text-green-400 font-semibold">POST</span> https://your-replit-domain.repl.co/api/public/wcag-check<br />
+                  <span className="text-gray-500 dark:text-gray-400 font-medium">Headers:</span><br />
+                  <span className="text-blue-600 dark:text-blue-400">Authorization:</span> Bearer YOUR_API_KEY<br />
+                  <span className="text-blue-600 dark:text-blue-400">Content-Type:</span> application/json<br /><br />
+                  <span className="text-gray-500 dark:text-gray-400 font-medium">Body:</span><br />
+                  <span className="text-purple-600 dark:text-purple-400">
                   {JSON.stringify({
                     url: "https://example.com",
                     region: "us",
                     tag: "WCAG2A"
                   }, null, 2)}
+                  </span>
                 </code>
               </div>
             </div>
