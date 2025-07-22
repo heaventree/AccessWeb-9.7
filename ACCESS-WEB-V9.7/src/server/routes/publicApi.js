@@ -41,9 +41,9 @@ async function runAxeAnalysis(url, options = {}) {
       timeout: 30000,
     });
 
-    // Inject axe-core
+    // Inject axe-core from CDN (more reliable than local file)
     await page.addScriptTag({
-      path: "./node_modules/axe-core/axe.min.js",
+      url: "https://unpkg.com/axe-core@4.8.2/axe.min.js",
     });
 
     // Configure axe based on options
