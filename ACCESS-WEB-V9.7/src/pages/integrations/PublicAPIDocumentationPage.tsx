@@ -1,5 +1,5 @@
 import React from 'react';
-import { Code, Key, BookOpen, ArrowRight, CheckCircle } from 'lucide-react';
+import { Code, Key, BookOpen, ArrowRight, CheckCircle, Zap, Shield, Settings } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,22 +9,47 @@ export default function PublicAPIDocumentationPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#0fae96] to-[#0d9488] text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <Code className="mx-auto h-16 w-16 mb-6" />
-            <h1 className="text-4xl font-bold mb-4">AccessWeb API</h1>
-            <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto">
+      <div className="bg-slate-800 dark:bg-slate-900 text-white py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h1 className="text-5xl font-bold mb-6 text-white">AccessWeb API</h1>
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
               Integrate WCAG accessibility testing directly into your development workflow. 
               Get comprehensive compliance reports programmatically.
             </p>
-            <Button
-              onClick={() => navigate('/auth/login')}
-              className="bg-white text-[#0fae96] hover:bg-gray-100 text-lg px-8 py-3"
-            >
-              Get Started
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+          </div>
+
+          {/* Feature Cards */}
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="bg-slate-700 dark:bg-slate-800 rounded-xl p-6 border border-slate-600">
+              <div className="bg-[#0fae96] rounded-lg p-3 w-12 h-12 flex items-center justify-center mb-4">
+                <Zap className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">One-Click Integration</h3>
+              <p className="text-slate-300 leading-relaxed">
+                Integrate directly into your development pipeline - no complex setup required.
+              </p>
+            </div>
+
+            <div className="bg-slate-700 dark:bg-slate-800 rounded-xl p-6 border border-slate-600">
+              <div className="bg-[#0fae96] rounded-lg p-3 w-12 h-12 flex items-center justify-center mb-4">
+                <Shield className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Automated Compliance</h3>
+              <p className="text-slate-300 leading-relaxed">
+                Continuous monitoring and automated fixes keep your site WCAG compliant.
+              </p>
+            </div>
+
+            <div className="bg-slate-700 dark:bg-slate-800 rounded-xl p-6 border border-slate-600">
+              <div className="bg-[#0fae96] rounded-lg p-3 w-12 h-12 flex items-center justify-center mb-4">
+                <Settings className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Framework Compatibility</h3>
+              <p className="text-slate-300 leading-relaxed">
+                Works with any development framework and popular CI/CD tools.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -154,34 +179,7 @@ export default function PublicAPIDocumentationPage() {
             </div>
           </div>
 
-          {/* Response Example */}
-          <div className="mb-6">
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Response Example</h4>
-            <div className="bg-gray-900 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
-              <pre className="text-sm text-gray-100">
-{`{
-  "url": "https://example.com",
-  "violations": [
-    {
-      "id": "color-contrast",
-      "impact": "serious",
-      "description": "Elements must have sufficient color contrast",
-      "help": "Ensure the contrast ratio...",
-      "nodes": [...]
-    }
-  ],
-  "passes": [...],
-  "incomplete": [...],
-  "metadata": {
-    "standard": "WCAG2AA",
-    "region": "us",
-    "engine": "axe-core",
-    "scanDate": "2025-01-22T10:30:00.000Z"
-  }
-}`}
-              </pre>
-            </div>
-          </div>
+
         </div>
 
         {/* Authentication */}
