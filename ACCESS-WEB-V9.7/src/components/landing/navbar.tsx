@@ -267,7 +267,7 @@ export default function Navbar() {
     <header className={`fixed w-full bg-background/95 dark:bg-background/95 backdrop-blur-sm z-50 ${scrolled ? 'shadow-sm' : ''} transition-shadow duration-300`}>
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-1">
-          <div className="w-10 h-10 rounded-xl bg-[#e0f5f1] dark:bg-[#0fae96]/20 flex items-center justify-center mr-1">
+          <div className="w-10 h-10 rounded-xl bg-[#e0f5f1] dark:bg-[#0fae96]/20 border-2 border-[#0fae96]/20 dark:border-[#5eead4]/30 flex items-center justify-center mr-1">
             <CheckCircle className="w-5 h-5 text-[#0fae96] dark:text-[#5eead4]" />
           </div>
           <span className="text-xl font-bold text-foreground dark:text-foreground">AccessWeb<span className="text-[#0fae96] dark:text-[#5eead4]">Pro</span></span>
@@ -284,12 +284,14 @@ export default function Navbar() {
           {/* Resources Dropdown */}
           <NavDropdown label="Resources" items={resourcesDropdownItems} />
           
-          {/* My Account Dropdown */}
-          <NavDropdown 
-            label="My Account" 
-            items={accountDropdownItems} 
-            icon={<User className="h-4 w-4 mr-1" />} 
-          />
+          {/* My Account Dropdown - Only show for authenticated users */}
+          {user && (
+            <NavDropdown 
+              label="My Account" 
+              items={accountDropdownItems} 
+              icon={<User className="h-4 w-4 mr-1" />} 
+            />
+          )}
           
           {/* Regular nav items */}
           {navItems.map((item, index) => (
@@ -433,21 +435,23 @@ export default function Navbar() {
               ))}
             </div>
             
-            {/* My Account Section */}
-            <div className="py-2 mb-2">
-              <h3 className="font-medium text-base mb-2 dark:text-[#86e4d4]">My Account</h3>
-              {accountDropdownItems.map((item, index) => (
-                <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
-                  <div className="flex items-center mb-1">
-                    <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
-                    <span className="dark:text-white">{item.label}</span>
-                  </div>
-                  <div className="pl-7 text-base text-muted-foreground dark:text-[#86e4d4] whitespace-nowrap text-ellipsis overflow-hidden">
-                    {item.description}
-                  </div>
-                </Link>
-              ))}
-            </div>
+            {/* My Account Section - Only show for authenticated users */}
+            {user && (
+              <div className="py-2 mb-2">
+                <h3 className="font-medium text-base mb-2 dark:text-[#86e4d4]">My Account</h3>
+                {accountDropdownItems.map((item, index) => (
+                  <Link key={index} to={item.href} className="block py-2 pl-3 text-muted-foreground hover:text-foreground hover:bg-[#0fae96]/5 dark:hover:bg-[#0fae96]/10 rounded-md transition-all duration-200" onClick={() => setIsMenuOpen(false)}>
+                    <div className="flex items-center mb-1">
+                      <item.icon className="h-4 w-4 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
+                      <span className="dark:text-white">{item.label}</span>
+                    </div>
+                    <div className="pl-7 text-base text-muted-foreground dark:text-[#86e4d4] whitespace-nowrap text-ellipsis overflow-hidden">
+                      {item.description}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
             
             {/* Regular Nav Items */}
             {navItems.map((item, index) => (
