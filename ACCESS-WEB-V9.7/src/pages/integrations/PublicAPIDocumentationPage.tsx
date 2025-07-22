@@ -36,13 +36,13 @@ export default function PublicAPIDocumentationPage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-0">
         {/* Features */}
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
             API Features
           </h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
               <CheckCircle className="h-8 w-8 text-green-500 mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
@@ -63,16 +63,7 @@ export default function PublicAPIDocumentationPage() {
                 accessibility standards.
               </p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-              <CheckCircle className="h-8 w-8 text-green-500 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Real-time Analysis
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Fast, server-side accessibility analysis using the latest
-                axe-core engine.
-              </p>
-            </div>
+
             <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
               <CheckCircle className="h-8 w-8 text-green-500 mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
