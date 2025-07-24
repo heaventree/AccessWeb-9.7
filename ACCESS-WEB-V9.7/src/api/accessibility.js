@@ -1,7 +1,106 @@
 import express from 'express';
 import puppeteer from 'puppeteer';
+import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
+const prisma = new PrismaClient();
+
+// Middleware to check if user is authenticated (optional for accessibility tests)
+const optionalAuth = (req, res, next) => {
+  const token = req.headers.authorization?.replace('Bearer ', '') || req.cookies?.auth_token;
+  
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.userId = decoded.userId; // Set userId for consistency with other middleware
+      req.user = decoded; // Keep user object for compatibility
+    } catch (error) {
+      // Continue without user authentication if token is invalid
+      req.userId = null;
+      req.user = null;
+    }
+  }
+  next();
+};
+
+// Function to save scan results to database
+const saveScanResult = async (scanData, userId = null) => {
+  try {
+    let siteConnectionId = null;
+
+    // If user is authenticated, create or find a site connection
+    if (userId) {
+      try {
+        // Check if a site connection already exists for this URL and user
+        let siteConnection = await prisma.siteConnection.findFirst({
+          where: {
+            userId: userId,
+            siteUrl: scanData.url
+          }
+        });
+
+        // If not, create one
+        if (!siteConnection) {
+          const urlObj = new URL(scanData.url);
+          siteConnection = await prisma.siteConnection.create({
+            data: {
+              userId: userId,
+              siteName: urlObj.hostname,
+              siteUrl: scanData.url,
+              platform: 'manual',
+              isActive: true,
+              autoScanEnabled: false,
+              scanFrequency: 'manual',
+              lastScanAt: new Date()
+            }
+          });
+        } else {
+          // Update last scan time
+          await prisma.siteConnection.update({
+            where: { id: siteConnection.id },
+            data: { lastScanAt: new Date() }
+          });
+        }
+
+        siteConnectionId = siteConnection.id;
+        console.log(`✅ [ACCESSIBILITY] Site connection ${siteConnectionId} ready for scan`);
+      } catch (error) {
+        console.error('Error creating/finding site connection:', error);
+        // For authenticated users, we need a site connection
+        return null;
+      }
+    } else {
+      // For anonymous scans, skip saving to database since we require siteConnectionId
+      console.log(`🔒 [ACCESSIBILITY] Anonymous scan completed but not saved to database`);
+      return null;
+    }
+
+    // Create scan result with site connection
+    const scanResult = await prisma.scanResult.create({
+      data: {
+        siteConnectionId: siteConnectionId,
+        scanType: 'manual',
+        scanUrl: scanData.url,
+        scanStatus: 'completed',
+        errorCount: scanData.summary.critical + scanData.summary.serious,
+        warningCount: scanData.summary.moderate,
+        noticeCount: scanData.summary.minor,
+        score: scanData.score / 100, // Convert percentage to decimal
+        rawResults: scanData,
+        scanDuration: scanData.scanDuration || 0,
+        userAgent: 'AccessWeb-WCAG-Checker',
+        scanReason: 'manual_authenticated'
+      }
+    });
+
+    console.log(`✅ [ACCESSIBILITY] Scan saved for user ${userId} - Scan ID: ${scanResult.id}`);
+    return scanResult;
+  } catch (error) {
+    console.error('Error saving scan result:', error);
+    return null;
+  }
+};
 
 
 
@@ -74,7 +173,7 @@ const getAxeConfig = (region, standards, wcagLevel) => {
 /**
  * Test URL for accessibility issues using axe-core
  */
-router.post('/test-url', parseRawBody, async (req, res) => {
+router.post('/test-url', optionalAuth, parseRawBody, async (req, res) => {
   let browser;
   
   try {
@@ -222,6 +321,26 @@ router.post('/test-url', parseRawBody, async (req, res) => {
         passRate: score
       }
     };
+
+    // Save scan result to database if user is authenticated
+    try {
+      const userId = req.userId; // Set by optionalAuth middleware
+      console.log(`🔍 [ACCESSIBILITY] Authentication check - userId: ${userId}, user:`, req.user);
+      
+      if (userId) {
+        const saveResult = await saveScanResult(result, userId);
+        if (saveResult) {
+          console.log(`✅ [ACCESSIBILITY] Scan result saved for authenticated user ${userId} - Scan ID: ${saveResult.id}`);
+        } else {
+          console.log(`❌ [ACCESSIBILITY] Failed to save scan for user ${userId}`);
+        }
+      } else {
+        console.log(`🔒 [ACCESSIBILITY] Anonymous scan completed (not saved to database)`);
+      }
+    } catch (saveError) {
+      console.error('Error saving scan result:', saveError);
+      // Continue with response even if save fails
+    }
 
     res.json(result);
 

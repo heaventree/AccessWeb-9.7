@@ -427,6 +427,8 @@ router.get('/recent-scans', logRequest, async (req, res) => {
     const skip = (page - 1) * limit;
     
     // Build where clause based on filter
+    // For now, only include scans from site connections owned by the user
+    // TODO: Add user_id field to scan_results table to directly link scans to users
     let whereClause = {
       siteConnection: {
         userId: userId
@@ -479,21 +481,27 @@ router.get('/recent-scans', logRequest, async (req, res) => {
       take: limit
     });
 
-    const formattedScans = recentScans.map(scan => ({
-      id: scan.id,
-      url: scan.scanUrl,
-      siteName: scan.siteConnection.siteName,
-      score: scan.score,
-      errorCount: scan.errorCount,
-      warningCount: scan.warningCount,
-      noticeCount: scan.noticeCount,
-      scanStatus: scan.scanStatus,
-      scanDuration: scan.scanDuration,
-      createdAt: scan.createdAt,
-      platform: scan.siteConnection.platform,
-      issues: scan.errorCount + scan.warningCount,
-      scanReason: scan.scanReason
-    }));
+    const formattedScans = recentScans.map(scan => {
+      // Handle scans with or without site connections
+      const siteName = scan.siteConnection?.siteName || new URL(scan.scanUrl).hostname;
+      const platform = scan.siteConnection?.platform || scan.scanType || 'manual';
+      
+      return {
+        id: scan.id,
+        url: scan.scanUrl,
+        siteName: siteName,
+        score: Math.round(scan.score * 100), // Convert decimal to percentage
+        errorCount: scan.errorCount,
+        warningCount: scan.warningCount,
+        noticeCount: scan.noticeCount,
+        scanStatus: scan.scanStatus,
+        scanDuration: scan.scanDuration,
+        createdAt: scan.createdAt,
+        platform: platform,
+        issues: scan.errorCount + scan.warningCount,
+        scanReason: scan.scanReason
+      };
+    });
 
     res.json({
       success: true,

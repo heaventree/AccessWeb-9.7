@@ -256,6 +256,72 @@ router.post("/wcag-check", authenticateApiKey, async (req, res) => {
     // Format results
     const formattedResults = formatResults(axeResults, url, region, tag);
 
+    // Save scan result to database linked to the API key user
+    try {
+      const { PrismaClient } = await import('@prisma/client');
+      const prisma = new PrismaClient();
+      
+      // Get user ID from the API key
+      const apiKey = await prisma.apiKey.findUnique({
+        where: { id: req.apiKey.id },
+        include: { user: true }
+      });
+
+      if (apiKey && apiKey.user) {
+        // Check if a site connection already exists for this URL and user
+        let siteConnection = await prisma.siteConnection.findFirst({
+          where: {
+            userId: apiKey.userId,
+            siteUrl: url
+          }
+        });
+
+        // If not, create one
+        if (!siteConnection) {
+          const urlObj = new URL(url);
+          siteConnection = await prisma.siteConnection.create({
+            data: {
+              userId: apiKey.userId,
+              siteName: urlObj.hostname,
+              siteUrl: url,
+              platform: 'api',
+              isActive: true,
+              autoScanEnabled: false,
+              scanFrequency: 'manual',
+              lastScanAt: new Date(),
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
+          });
+        }
+
+        // Save the scan result
+        await prisma.scanResult.create({
+          data: {
+            siteConnectionId: siteConnection.id,
+            scanType: 'api',
+            scanUrl: url,
+            scanStatus: 'completed',
+            errorCount: formattedResults.summary.criticalIssues + formattedResults.summary.seriousIssues,
+            warningCount: formattedResults.summary.moderateIssues,
+            noticeCount: formattedResults.summary.minorIssues,
+            score: formattedResults.summary.complianceScore / 100, // Convert percentage to decimal
+            rawResults: formattedResults,
+            scanDuration: Date.now() - startTime,
+            userAgent: req.get('User-Agent') || 'API Client',
+            scanReason: 'api_request'
+          }
+        });
+
+        console.log(`✅ [PUBLIC-API] Scan result saved for user ${apiKey.userId} via API key`);
+      }
+      
+      await prisma.$disconnect();
+    } catch (saveError) {
+      console.error('Error saving API scan result:', saveError);
+      // Continue with response even if save fails
+    }
+
     responseData = formattedResults;
     res.json(formattedResults);
   } catch (error) {
