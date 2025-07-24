@@ -225,17 +225,18 @@ export function WCAGCheckerPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8"
         >
-          <URLInput 
-            onSubmit={handleSubmit} 
-            isLoading={isLoading}
-          />
-          
-          <div className="mt-6">
+          {/* Region Selection */}
+          <div className="mb-6">
             <RegionSelector 
               selectedRegion={selectedRegion} 
               onRegionChange={setSelectedRegion}
             />
           </div>
+          
+          <URLInput 
+            onSubmit={handleSubmit} 
+            isLoading={isLoading}
+          />
 
           {/* Advanced Options */}
           <div className="mt-6 border-t dark:border-gray-700 pt-6">
