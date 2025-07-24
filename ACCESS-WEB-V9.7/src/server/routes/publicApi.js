@@ -268,22 +268,26 @@ router.post("/wcag-check", authenticateApiKey, async (req, res) => {
       });
 
       if (apiKey && apiKey.user) {
-        // Check if a site connection already exists for this URL and user
+        // Extract domain from URL for site connection (not individual URLs)
+        const urlObj = new URL(url);
+        const domainUrl = `${urlObj.protocol}//${urlObj.hostname}`;
+        
+        // Check if a site connection already exists for this DOMAIN and user
         let siteConnection = await prisma.siteConnection.findFirst({
           where: {
             userId: apiKey.userId,
-            siteUrl: url
+            siteUrl: domainUrl,
+            platform: 'api'
           }
         });
 
-        // If not, create one
+        // If not, create one for the domain (not the specific URL)
         if (!siteConnection) {
-          const urlObj = new URL(url);
           siteConnection = await prisma.siteConnection.create({
             data: {
               userId: apiKey.userId,
               siteName: urlObj.hostname,
-              siteUrl: url,
+              siteUrl: domainUrl,
               platform: 'api',
               isActive: true,
               autoScanEnabled: false,

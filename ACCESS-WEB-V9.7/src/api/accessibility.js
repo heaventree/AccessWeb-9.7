@@ -32,22 +32,26 @@ const saveScanResult = async (scanData, userId = null) => {
     // If user is authenticated, create or find a site connection
     if (userId) {
       try {
-        // Check if a site connection already exists for this URL and user
+        // Extract domain from URL for site connection (not individual URLs)
+        const urlObj = new URL(scanData.url);
+        const domainUrl = `${urlObj.protocol}//${urlObj.hostname}`;
+        
+        // Check if a site connection already exists for this DOMAIN and user
         let siteConnection = await prisma.siteConnection.findFirst({
           where: {
             userId: userId,
-            siteUrl: scanData.url
+            siteUrl: domainUrl,
+            platform: 'manual'
           }
         });
 
-        // If not, create one
+        // If not, create one for the domain (not the specific URL)
         if (!siteConnection) {
-          const urlObj = new URL(scanData.url);
           siteConnection = await prisma.siteConnection.create({
             data: {
               userId: userId,
               siteName: urlObj.hostname,
-              siteUrl: scanData.url,
+              siteUrl: domainUrl,
               platform: 'manual',
               isActive: true,
               autoScanEnabled: false,
