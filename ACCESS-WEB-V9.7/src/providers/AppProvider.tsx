@@ -13,6 +13,7 @@ import { AuthProvider } from '../contexts/AuthContext';
 import { SecurityProvider } from './SecurityProvider';
 import { ThemeProvider } from './ThemeProvider';
 import { AccessibilityTipsProvider } from '../contexts/AccessibilityTipsContext';
+import { FloatingToolsProvider } from '../contexts/FloatingToolsContext';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { isDevelopment } from '../utils/environment';
 
@@ -56,9 +57,11 @@ export function AppProvider({ children }: AppProviderProps): JSX.Element {
             <BrowserRouter>
               <AuthProvider>
                 <AccessibilityTipsProvider>
-                  <ThemeProvider>
-                    {children}
-                  </ThemeProvider>
+                  <FloatingToolsProvider>
+                    <ThemeProvider>
+                      {children}
+                    </ThemeProvider>
+                  </FloatingToolsProvider>
                 </AccessibilityTipsProvider>
               </AuthProvider>
             </BrowserRouter>
