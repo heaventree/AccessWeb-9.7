@@ -467,7 +467,7 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                           aria-label={`View fix for ${issue.description}`}
                         >
                           <Tool className="w-4 h-4 mr-2" aria-hidden="true" />
-                          View Fix
+                          View Sample
                         </button>
                         <button
                           onClick={() => openIssueDetails(issue)}
@@ -488,6 +488,8 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                             PRO
                           </span>
                         </button>
+                        {/* Apply Fix button - Commented out for future use */}
+                        {/*
                         <button
                           onClick={() => {
                             // Get the currently selected site from the app context
@@ -544,6 +546,7 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                           Apply Fix
                           <span className="ml-2 px-1.5 py-0.5 text-xs font-semibold bg-yellow-400 text-green-800 rounded">PRO</span>
                         </button>
+                        */}
                       </div>
                       
 
