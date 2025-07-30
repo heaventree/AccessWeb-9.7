@@ -37,6 +37,7 @@ type TabType = 'issues' | 'warnings' | 'passes' | 'contrast' | 'structure' | 're
 const proPillStyle = "ml-1 text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-[#0fae96] to-teal-500 text-white font-semibold inline-flex items-center scale-[0.85] origin-left";
 
 export function WCAGCheckerPage() {
+  // Default to EU region instead of using location detection
   const [selectedRegion, setSelectedRegion] = useState('eu');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,11 +47,10 @@ export function WCAGCheckerPage() {
   const [enablePDFAccessibility, setEnablePDFAccessibility] = useState(false);
   const [enableOfficeDocuments, setEnableOfficeDocuments] = useState(false);
   const [enableMediaTesting, setEnableMediaTesting] = useState(false);
-  const [enabledStandards, setEnabledStandards] = useState<string[]>(['WCAG 2.1', 'WCAG 2.2']);
 
-  // Location permission state
-  const [showLocationBanner, setShowLocationBanner] = useState(true);
-  const [hasDetectedLocation, setHasDetectedLocation] = useState(false);
+  // Location permission state - commented out as requested
+  // const [showLocationBanner, setShowLocationBanner] = useState(true);
+  // const [hasDetectedLocation, setHasDetectedLocation] = useState(false);
 
   // New state for connection error details
   const [connectionError, setConnectionError] = useState<{ 
@@ -58,6 +58,8 @@ export function WCAGCheckerPage() {
     details: any;
   } | null>(null);
 
+  // Location detection code commented out as requested - defaulting to EU region
+  /*
   // Check if location was already detected on mount
   useEffect(() => {
     const locationDetected = localStorage.getItem('locationDetected');
@@ -91,6 +93,28 @@ export function WCAGCheckerPage() {
     setShowLocationBanner(false);
     localStorage.setItem('locationBannerDismissed', 'true');
   };
+  */
+
+  // Function to get standards based on selected region
+  const getStandardsForRegion = (region: string): string[] => {
+    switch (region) {
+      case 'eu':
+        return ['WCAG 2.1', 'WCAG 2.2', 'EN 301 549'];
+      case 'uk':
+        return ['WCAG 2.1', 'WCAG 2.2', 'EN 301 549'];
+      case 'us':
+      case 'usa':
+        return ['WCAG 2.1', 'WCAG 2.2', 'Section 508'];
+      case 'canada':
+        return ['WCAG 2.1', 'WCAG 2.2', 'Section 508'];
+      case 'australia':
+        return ['WCAG 2.1', 'WCAG 2.2'];
+      case 'japan':
+        return ['WCAG 2.1', 'WCAG 2.2'];
+      default:
+        return ['WCAG 2.1', 'WCAG 2.2'];
+    }
+  };
 
   const handleSubmit = async (url: string) => {
     // Normalize the URL (ensure it has a protocol)
@@ -103,62 +127,45 @@ export function WCAGCheckerPage() {
     setResults(null);
     
     try {
-      // Call the actual accessibility testing API
+      // Get standards based on selected region
+      const regionStandards = getStandardsForRegion(selectedRegion);
+      
+      // Call the actual accessibility testing API with simplified payload
       const apiResult = await testUrl(normalizedUrl, {
-        wcagLevel: 'AA',
-        includeScreenshots: false,
-        includePdf: enablePDFAccessibility,
         region: selectedRegion,
-        standards: enabledStandards
+        standards: regionStandards
       });
 
       // Transform API result to match the frontend TestResult interface
       const testResults: TestResult = {
         url: normalizedUrl,
         timestamp: apiResult.timestamp,
-        score: apiResult.score,
-        passCount: apiResult.summary.passed || 0,
-        warningCount: 0, // Currently not provided by axe-core
-        issueCount: apiResult.summary.total,
-        region: selectedRegion,
+        issues: apiResult.issues.map((issue: any) => ({
+          id: issue.id,
+          impact: issue.impact as 'critical' | 'serious' | 'moderate' | 'minor',
+          description: issue.message || 'No description available',
+          helpUrl: issue.helpUrl || '',
+          nodes: issue.nodes ? issue.nodes.map((node: any) => node.html || node.selector || '') : [issue.element || issue.selector || ''],
+          wcagCriteria: issue.wcagCriteria || [issue.wcagGuideline] || [''],
+          url: normalizedUrl,
+          autoFixable: false,
+          fixSuggestion: issue.howToFix || issue.message || 'Please review and fix this issue manually'
+        })),
+        passes: [], // Empty array for now as we focus on issues
+        warnings: [], // Empty array for now as we focus on issues
         summary: {
           critical: apiResult.summary.critical,
           serious: apiResult.summary.serious,
           moderate: apiResult.summary.moderate,
           minor: apiResult.summary.minor,
+          passes: (apiResult.summary as any).passes || (apiResult.summary as any).passed || 0,
           warnings: 0,
-          passes: apiResult.summary.passed || 0,
           pdfIssues: 0,
           documentIssues: 0,
           mediaIssues: 0,
           audioIssues: 0,
           videoIssues: 0
-        },
-        standards: {
-          wcag21: { aa: true, aaa: false },
-          wcag22: { aa: true, aaa: false },
-          section508: true,
-          en301549: true
-        },
-        issues: apiResult.issues.map(issue => ({
-          id: issue.id,
-          type: issue.type,
-          impact: issue.impact as 'critical' | 'serious' | 'moderate' | 'minor',
-          message: issue.message,
-          element: issue.element || issue.selector,
-          wcagGuideline: issue.wcagGuideline,
-          description: issue.message || issue.description, // Use message as the main title
-          howToFix: issue.howToFix || issue.description,
-          helpUrl: issue.helpUrl || `https://www.w3.org/WAI/WCAG21/Understanding/${issue.wcagGuideline}.html`,
-          context: issue.context,
-          selector: issue.selector,
-          htmlCode: issue.element,
-          nodes: issue.nodes || [{
-            html: issue.element,
-            selector: issue.selector
-          }],
-          wcagCriteria: issue.wcagCriteria || [issue.wcagGuideline]
-        }))
+        }
       };
 
       console.log('Accessibility test completed successfully');
@@ -211,13 +218,15 @@ export function WCAGCheckerPage() {
           </p>
         </motion.div>
 
-        {/* Location Permission Banner */}
+        {/* Location Permission Banner - Commented out as requested */}
+        {/*
         {showLocationBanner && !hasDetectedLocation && (
           <LocationPermissionBanner
             onLocationDetected={handleLocationDetected}
             onDismiss={handleDismissLocationBanner}
           />
         )}
+        */}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -313,8 +322,10 @@ export function WCAGCheckerPage() {
             className="mb-8"
           >
             <WebsiteConnectionErrorComponent 
-              connectionError={connectionError}
-              onRetry={handleRetry}
+              url={connectionError.url}
+              details={connectionError.details}
+              onDismiss={() => setConnectionError(null)}
+              onTryAlternative={handleRetry}
             />
           </motion.div>
         )}
@@ -472,7 +483,7 @@ export function WCAGCheckerPage() {
             </div>
 
             {/* Embed Badge */}
-            <EmbedBadge url={results.url} />
+            <EmbedBadge url={results.url} timestamp={results.timestamp} />
           </motion.div>
         )}
       </div>

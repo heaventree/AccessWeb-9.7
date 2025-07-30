@@ -214,7 +214,8 @@ router.post('/test-url', optionalAuth, parseRawBody, async (req, res) => {
     
     console.log('Parsed request data:', requestData);
     
-    const { url, wcagLevel = 'AA', includePdf = false, includeScreenshots = false, region = 'eu', standards = [] } = requestData;
+    // Default to EU region and extract only URL, region, and standards from request
+    const { url, region = 'eu', standards = [] } = requestData;
 
     if (!url) {
       return res.status(400).json({ error: 'URL is required' });
@@ -262,8 +263,8 @@ router.post('/test-url', optionalAuth, parseRawBody, async (req, res) => {
       url: 'https://unpkg.com/axe-core@4.8.4/axe.min.js'
     });
     
-    // Configure axe-core based on region and standards
-    const axeConfig = getAxeConfig(region, standards, wcagLevel);
+    // Configure axe-core based on region and standards (default to AA level)
+    const axeConfig = getAxeConfig(region, standards, 'AA');
     console.log('Running axe-core with config:', axeConfig);
     
     // Run axe-core analysis
@@ -407,8 +408,8 @@ router.post('/test-html', async (req, res) => {
       url: 'https://unpkg.com/axe-core@4.8.4/axe.min.js'
     });
     
-    // Configure axe-core based on region and standards
-    const axeConfig = getAxeConfig(region, standards, wcagLevel);
+    // Configure axe-core based on region and standards (default to AA level)
+    const axeConfig = getAxeConfig(region, standards, 'AA');
     
     // Run axe-core analysis
     const axeResults = await page.evaluate((config) => {
