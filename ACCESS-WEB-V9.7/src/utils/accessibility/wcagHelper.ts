@@ -1,4 +1,4 @@
-import type { WCAGInfo } from '../../types';
+import type { WCAGInfo } from '../types';
 
 const ruleToWCAGMap: Record<string, string[]> = {
   'landmark-no-duplicate-banner': ['WCAG1.3.1', 'WCAG4.1.1'],
@@ -323,51 +323,4 @@ export function getWCAGInfo(ruleId: string | undefined): WCAGInfo | undefined {
   }
   
   return undefined;
-}
-
-/**
- * Generate the official WCAG URL for a given criteria or rule
- */
-export function getWCAGUrl(ruleId: string | undefined): string | undefined {
-  if (!ruleId) return undefined;
-
-  // Extract WCAG criteria from rule ID
-  let wcagCriteria: string[] = [];
-  
-  // First try direct lookup in database
-  if (wcagDatabase[ruleId]) {
-    wcagCriteria = [ruleId];
-  }
-  // If it's a WCAG criteria (e.g., "1.4.3" or "WCAG1.4.3")
-  else if (ruleId.startsWith('WCAG')) {
-    wcagCriteria = [ruleId];
-  }
-  // If it's a rule ID, look up its WCAG criteria
-  else if (ruleToWCAGMap[ruleId]) {
-    wcagCriteria = ruleToWCAGMap[ruleId];
-  }
-  // If it looks like a WCAG number without prefix (e.g., "1.4.3")
-  else if (/^\d+\.\d+\.\d+$/.test(ruleId)) {
-    wcagCriteria = [`WCAG${ruleId}`];
-  }
-
-  // Get the first valid WCAG criteria
-  const firstCriteria = wcagCriteria[0];
-  if (!firstCriteria) return undefined;
-
-  // Convert WCAG criteria to URL format
-  const criteriaNumber = firstCriteria.replace(/^WCAG/, '');
-  
-  // Generate URL based on WCAG version
-  if (criteriaNumber.startsWith('2.2')) {
-    // WCAG 2.2 guidelines
-    const cleanNumber = criteriaNumber.replace(/\./g, '');
-    return `https://www.w3.org/WAI/WCAG22/Understanding/${criteriaNumber.replace(/\./g, '-')}`;
-  } else if (criteriaNumber.startsWith('2.1')) {
-    // WCAG 2.1 guidelines
-    return `https://www.w3.org/WAI/WCAG21/Understanding/${criteriaNumber.replace(/\./g, '-')}`;
-  } else {
-    // Default to WCAG 2.1 for other versions
-    return `https://www.w3.org/WAI/WCAG21/Understanding/${criteriaNumber.replace(/\./g, '-')}`;
-  }
 }

@@ -18,7 +18,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import type { AccessibilityIssue, WCAGInfo } from '../types';
 import { Modal } from './Modal';
-import { getWCAGInfo, getWCAGUrl } from '../utils/accessibility/wcagHelper';
+import { getWCAGInfo } from '../utils/accessibility/wcagHelper';
 import { AIRecommendations } from './AIRecommendations'; 
 import { EmptyState } from './EmptyState';
 import { fixEngine } from '../lib/accessibility-fixes';
@@ -156,24 +156,6 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
         }
       } catch (error) {
         console.error('Error getting WCAG info:', error);
-      }
-    }
-    
-    return undefined;
-  };
-
-  const getIssueWCAGUrl = (issue: AccessibilityIssue): string | undefined => {
-    // Try rule ID first
-    if (issue.id) {
-      const ruleUrl = getWCAGUrl(issue.id);
-      if (ruleUrl) return ruleUrl;
-    }
-
-    // Then try each WCAG criteria
-    if (issue.wcagCriteria?.length > 0) {
-      for (const criteria of issue.wcagCriteria) {
-        const criteriaUrl = getWCAGUrl(criteria);
-        if (criteriaUrl) return criteriaUrl;
       }
     }
     
@@ -487,30 +469,14 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                           <Tool className="w-4 h-4 mr-2" aria-hidden="true" />
                           View Sample
                         </button>
-                        {(() => {
-                          const wcagUrl = getIssueWCAGUrl(issue);
-                          return wcagUrl ? (
-                            <a
-                              href={wcagUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors border border-purple-200 shadow-sm"
-                              aria-label={`Learn more about ${issue.description} on WCAG website (opens in new tab)`}
-                            >
-                              <Info className="w-4 h-4 mr-2" aria-hidden="true" />
-                              Learn More
-                            </a>
-                          ) : (
-                            <button
-                              onClick={() => openIssueDetails(issue)}
-                              className="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors border border-purple-200 shadow-sm"
-                              aria-label={`Learn more about ${issue.description}`}
-                            >
-                              <Info className="w-4 h-4 mr-2" aria-hidden="true" />
-                              Learn More
-                            </button>
-                          );
-                        })()}
+                        <button
+                          onClick={() => openIssueDetails(issue)}
+                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors border border-purple-200 shadow-sm"
+                          aria-label={`Learn more about ${issue.description}`}
+                        >
+                          <Info className="w-4 h-4 mr-2" aria-hidden="true" />
+                          Learn More
+                        </button>
                         <button
                           onClick={() => openAISuggestions(issue)}
                           className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm relative"
