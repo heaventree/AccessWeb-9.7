@@ -114,10 +114,6 @@ The WCAG Accessibility Audit Tool is a comprehensive platform for testing, monit
 
 ## Changelog
 
-- July 30, 2025: Added success message "Congratulations! Your site passed all accessibility tests" for websites that pass all WCAG 2.2 criteria
-- July 30, 2025: Removed location detection and set default region to 'EU' for simplified user experience
-- July 30, 2025: Streamlined API requests to send only URL and region-based standards instead of complex option objects
-- July 30, 2025: Fixed TypeScript compilation errors and interface mismatches in accessibility testing components
 - June 17, 2025: WordPress webhook endpoint (`/wcag-compliance/schedule-response`) optimized with async scan processing for fast responses
 - June 17, 2025: WordPress Code Change Detection system completed with full API integration
 - June 17, 2025: Extended timeout support for WordPress "Run Once" scans (10 minutes)
