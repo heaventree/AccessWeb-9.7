@@ -170,6 +170,17 @@ export function WCAGCheckerPage() {
 
       console.log('Accessibility test completed successfully');
       setResults(testResults);
+      
+      // Check if website passed all WCAG 2.2 criteria (no critical, serious, moderate, or minor issues)
+      const totalIssues = testResults.issues.length;
+      const hasOnlyWCAG22Issues = testResults.issues.every(issue => 
+        issue.wcagCriteria.some(criteria => criteria.includes('2.2'))
+      );
+      
+      if (totalIssues === 0 || (hasOnlyWCAG22Issues && totalIssues === 0)) {
+        // Website passed all accessibility tests
+        console.log('Website passed all WCAG 2.2 criteria!');
+      }
     } catch (error) {
       console.error('Accessibility test error:', error);
       if (error instanceof WebsiteConnectionError) {
@@ -343,6 +354,26 @@ export function WCAGCheckerPage() {
               results={results}
               onExportPDF={handleExportPDF}
             />
+
+            {/* Success Message for WCAG 2.2 Compliance */}
+            {results.issues.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg shadow-lg p-8 text-center text-white"
+              >
+                <div className="flex items-center justify-center mb-4">
+                  <CheckCircle className="w-16 h-16 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2">
+                  Congratulations! Your site passed all accessibility tests
+                </h3>
+                <p className="text-green-100 text-lg">
+                  Your website meets all WCAG 2.2 criteria and is fully accessible.
+                </p>
+              </motion.div>
+            )}
 
             {/* Tabs Navigation */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
