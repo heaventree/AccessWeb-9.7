@@ -470,9 +470,9 @@ export function IssuesList({ issues, type = 'issues' }: IssuesListProps) {
                           View Sample
                         </button>
                         <button
-                          onClick={() => openIssueDetails(issue)}
+                          onClick={() => navigate('/tools/wcag-standards')}
                           className="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors border border-purple-200 shadow-sm"
-                          aria-label={`Learn more about ${issue.description}`}
+                          aria-label={`Learn more about WCAG standards for ${issue.description}`}
                         >
                           <Info className="w-4 h-4 mr-2" aria-hidden="true" />
                           Learn More
