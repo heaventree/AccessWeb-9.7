@@ -134,7 +134,7 @@ export default function Navbar() {
     { 
       icon: NavigationIcons.tools.wcagStandards, 
       label: 'WCAG Standards',
-      description: 'Browse WCAG 2.1 standards',
+      description: 'Browse WCAG 2.2 standards',
       href: '/tools/wcag-standards'
     },
     { 

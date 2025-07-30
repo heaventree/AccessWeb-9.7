@@ -38,7 +38,7 @@ export function WCAGStandardsTable() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDisabilities, setSelectedDisabilities] = useState<Set<string>>(new Set());
   const [selectedLevels, setSelectedLevels] = useState<Set<string>>(new Set());
-  const [selectedVersions, setSelectedVersions] = useState<Set<string>>(new Set());
+  const [selectedVersions, setSelectedVersions] = useState<Set<string>>(new Set(['2.2']));
 
   const toggleDisability = (disability: string) => {
     const newSelection = new Set(selectedDisabilities);
