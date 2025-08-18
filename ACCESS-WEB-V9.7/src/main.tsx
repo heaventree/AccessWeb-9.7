@@ -10,6 +10,9 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
+// Clear corrupted storage in development
+import './utils/debug/clearStorage';
+
 // Find the root element
 const rootElement = document.getElementById('root');
 

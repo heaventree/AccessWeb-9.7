@@ -1,0 +1,107 @@
+WCAGCheckerPage.tsx:130 Submitting URL for testing: https://www.google.com
+ API Client sending POST to accessibility/test-url: {url: 'https://www.google.com', region: 'eu', standards: Array(3)}
+ Headers: {content-type: 'application/json'}
+ Request body: {"url":"https://www.google.com","region":"eu","standards":["WCAG 2.1","WCAG 2.2","EN 301 549"]}
+ [error] isRateLimited: Unexpected token '/', "/%5s b9w t"... is not valid JSON {} {message: `Unexpected token '/', "/%5s b9w t"... is not valid JSON`, stack: `SyntaxError: Unexpected token '/', "/%5s b9w t"...…/.vite/deps/chunk-P5DW6AUY.js?v=cbe34627:3699:24)`, context: 'isRateLimited', data: undefined, timestamp: 1755523851270, …}
+handleError @ src/utils/common/errorHandler.ts:101
+isRateLimited @ src/utils/security/rateLimiting.ts:41
+checkRateLimit @ src/utils/security/rateLimiting.ts:126
+request @ src/utils/api/apiClient.ts:83
+post @ src/utils/api/apiClient.ts:46
+testUrl @ src/services/accessibilityApi.ts:22
+handleSubmit @ WCAGCheckerPage.tsx:142
+handleSubmit @ src/components/URLInput.tsx:33
+callCallback2 @ node_modules/.vite/d….js?v=cbe34627:3674
+invokeGuardedCallbackDev @ node_modules/.vite/d….js?v=cbe34627:3699
+invokeGuardedCallback @ node_modules/.vite/d….js?v=cbe34627:3733
+invokeGuardedCallbackAndCatchFirstError @ node_modules/.vite/d….js?v=cbe34627:3736
+executeDispatch @ node_modules/.vite/d….js?v=cbe34627:7016
+processDispatchQueueItemsInOrder @ node_modules/.vite/d….js?v=cbe34627:7036
+processDispatchQueue @ node_modules/.vite/d….js?v=cbe34627:7045
+dispatchEventsForPlugins @ node_modules/.vite/d….js?v=cbe34627:7053
+(anonymous) @ node_modules/.vite/d….js?v=cbe34627:7177
+batchedUpdates$1 @ node_modules/.vite/d…js?v=cbe34627:18909
+batchedUpdates @ node_modules/.vite/d….js?v=cbe34627:3579
+dispatchEventForPluginEventSystem @ node_modules/.vite/d….js?v=cbe34627:7176
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ node_modules/.vite/d….js?v=cbe34627:5478
+dispatchEvent @ node_modules/.vite/d….js?v=cbe34627:5472
+dispatchDiscreteEvent @ node_modules/.vite/d….js?v=cbe34627:5449
+ [Dev] Error would be reported to monitoring service: {message: `Unexpected token '/', "/%5s b9w t"... is not valid JSON`, stack: `SyntaxError: Unexpected token '/', "/%5s b9w t"...…/.vite/deps/chunk-P5DW6AUY.js?v=cbe34627:3699:24)`, context: 'isRateLimited', data: undefined, timestamp: 1755523851270, …}
+ [error] incrementRateLimitCounter: Unexpected token '/', "/%5s b9w t"... is not valid JSON {} {message: `Unexpected token '/', "/%5s b9w t"... is not valid JSON`, stack: `SyntaxError: Unexpected token '/', "/%5s b9w t"...…/.vite/deps/chunk-P5DW6AUY.js?v=cbe34627:3699:24)`, context: 'incrementRateLimitCounter', data: undefined, timestamp: 1755523851271, …}
+handleError @ src/utils/common/errorHandler.ts:101
+incrementRateLimitCounter @ src/utils/security/rateLimiting.ts:67
+checkRateLimit @ src/utils/security/rateLimiting.ts:136
+request @ src/utils/api/apiClient.ts:83
+post @ src/utils/api/apiClient.ts:46
+testUrl @ src/services/accessibilityApi.ts:22
+handleSubmit @ WCAGCheckerPage.tsx:142
+handleSubmit @ src/components/URLInput.tsx:33
+callCallback2 @ node_modules/.vite/d….js?v=cbe34627:3674
+invokeGuardedCallbackDev @ node_modules/.vite/d….js?v=cbe34627:3699
+invokeGuardedCallback @ node_modules/.vite/d….js?v=cbe34627:3733
+invokeGuardedCallbackAndCatchFirstError @ node_modules/.vite/d….js?v=cbe34627:3736
+executeDispatch @ node_modules/.vite/d….js?v=cbe34627:7016
+processDispatchQueueItemsInOrder @ node_modules/.vite/d….js?v=cbe34627:7036
+processDispatchQueue @ node_modules/.vite/d….js?v=cbe34627:7045
+dispatchEventsForPlugins @ node_modules/.vite/d….js?v=cbe34627:7053
+(anonymous) @ node_modules/.vite/d….js?v=cbe34627:7177
+batchedUpdates$1 @ node_modules/.vite/d…js?v=cbe34627:18909
+batchedUpdates @ node_modules/.vite/d….js?v=cbe34627:3579
+dispatchEventForPluginEventSystem @ node_modules/.vite/d….js?v=cbe34627:7176
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ node_modules/.vite/d….js?v=cbe34627:5478
+dispatchEvent @ node_modules/.vite/d….js?v=cbe34627:5472
+dispatchDiscreteEvent @ node_modules/.vite/d….js?v=cbe34627:5449
+ [Dev] Error would be reported to monitoring service: {message: `Unexpected token '/', "/%5s b9w t"... is not valid JSON`, stack: `SyntaxError: Unexpected token '/', "/%5s b9w t"...…/.vite/deps/chunk-P5DW6AUY.js?v=cbe34627:3699:24)`, context: 'incrementRateLimitCounter', data: undefined, timestamp: 1755523851271, …}
+ [error] appendCsrfHeader: Failed to execute 'set' on 'Headers': Invalid value {} {message: "Failed to execute 'set' on 'Headers': Invalid value", stack: 'TypeError: Invalid value\n    at appendCsrfHeader (…/.vite/deps/chunk-P5DW6AUY.js?v=cbe34627:3736:33)', context: 'appendCsrfHeader', data: undefined, timestamp: 1755523851271, …}
+handleError @ src/utils/common/errorHandler.ts:101
+appendCsrfHeader @ src/utils/security/csrfProtection.ts:125
+request @ src/utils/api/apiClient.ts:98
+post @ src/utils/api/apiClient.ts:46
+testUrl @ src/services/accessibilityApi.ts:22
+handleSubmit @ WCAGCheckerPage.tsx:142
+handleSubmit @ src/components/URLInput.tsx:33
+callCallback2 @ node_modules/.vite/d….js?v=cbe34627:3674
+invokeGuardedCallbackDev @ node_modules/.vite/d….js?v=cbe34627:3699
+invokeGuardedCallback @ node_modules/.vite/d….js?v=cbe34627:3733
+invokeGuardedCallbackAndCatchFirstError @ node_modules/.vite/d….js?v=cbe34627:3736
+executeDispatch @ node_modules/.vite/d….js?v=cbe34627:7016
+processDispatchQueueItemsInOrder @ node_modules/.vite/d….js?v=cbe34627:7036
+processDispatchQueue @ node_modules/.vite/d….js?v=cbe34627:7045
+dispatchEventsForPlugins @ node_modules/.vite/d….js?v=cbe34627:7053
+(anonymous) @ node_modules/.vite/d….js?v=cbe34627:7177
+batchedUpdates$1 @ node_modules/.vite/d…js?v=cbe34627:18909
+batchedUpdates @ node_modules/.vite/d….js?v=cbe34627:3579
+dispatchEventForPluginEventSystem @ node_modules/.vite/d….js?v=cbe34627:7176
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ node_modules/.vite/d….js?v=cbe34627:5478
+dispatchEvent @ node_modules/.vite/d….js?v=cbe34627:5472
+dispatchDiscreteEvent @ node_modules/.vite/d….js?v=cbe34627:5449
+ [Dev] Error would be reported to monitoring service: {message: "Failed to execute 'set' on 'Headers': Invalid value", stack: 'TypeError: Invalid value\n    at appendCsrfHeader (…/.vite/deps/chunk-P5DW6AUY.js?v=cbe34627:3736:33)', context: 'appendCsrfHeader', data: undefined, timestamp: 1755523851271, …}
+WCAGCheckerPage.tsx:201 Accessibility test error: TypeError: Failed to execute 'fetch' on 'Window': Invalid value
+    at window.fetch (src/utils/csrfProtection.ts:68:16)
+    at window.fetch (src/utils/csrfProtection.ts:68:16)
+    at ApiClient.fetchWithTimeout (src/utils/api/apiClient.ts:241:30)
+    at ApiClient.request (src/utils/api/apiClient.ts:103:35)
+    at ApiClient.post (src/utils/api/apiClient.ts:46:17)
+    at testUrl (src/services/accessibilityApi.ts:22:20)
+    at handleSubmit (WCAGCheckerPage.tsx:142:31)
+    at handleSubmit (src/components/URLInput.tsx:33:7)
+    at HTMLUnknownElement.callCallback2 (node_modules/.vite/d…?v=cbe34627:3674:22)
+    at Object.invokeGuardedCallbackDev (node_modules/.vite/d…?v=cbe34627:3699:24)
+handleSubmit @ WCAGCheckerPage.tsx:201
+await in handleSubmit
+handleSubmit @ src/components/URLInput.tsx:33
+callCallback2 @ node_modules/.vite/d….js?v=cbe34627:3674
+invokeGuardedCallbackDev @ node_modules/.vite/d….js?v=cbe34627:3699
+invokeGuardedCallback @ node_modules/.vite/d….js?v=cbe34627:3733
+invokeGuardedCallbackAndCatchFirstError @ node_modules/.vite/d….js?v=cbe34627:3736
+executeDispatch @ node_modules/.vite/d….js?v=cbe34627:7016
+processDispatchQueueItemsInOrder @ node_modules/.vite/d….js?v=cbe34627:7036
+processDispatchQueue @ node_modules/.vite/d….js?v=cbe34627:7045
+dispatchEventsForPlugins @ node_modules/.vite/d….js?v=cbe34627:7053
+(anonymous) @ node_modules/.vite/d….js?v=cbe34627:7177
+batchedUpdates$1 @ node_modules/.vite/d…js?v=cbe34627:18909
+batchedUpdates @ node_modules/.vite/d….js?v=cbe34627:3579
+dispatchEventForPluginEventSystem @ node_modules/.vite/d….js?v=cbe34627:7176
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ node_modules/.vite/d….js?v=cbe34627:5478
+dispatchEvent @ node_modules/.vite/d….js?v=cbe34627:5472
+dispatchDiscreteEvent @ node_modules/.vite/d….js?v=cbe34627:5449

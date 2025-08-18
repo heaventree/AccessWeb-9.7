@@ -48,11 +48,17 @@ export function isRateLimited(
     // Generate storage key
     const storageKey = `${RATE_LIMIT_PREFIX}${key}`;
     
-    // Get current data
-    const dataString = secureLocalStorage.getItem(storageKey);
-    const data: RateLimitData = dataString 
-      ? JSON.parse(dataString) 
-      : { attempts: 0, timestamp: Date.now(), blocked: false, blockedUntil: 0 };
+    // Get current data with safe JSON parsing
+    let data: RateLimitData;
+    try {
+      const dataString = secureLocalStorage.getItem(storageKey);
+      data = dataString && dataString.trim() && dataString !== 'null' 
+        ? JSON.parse(dataString) 
+        : { attempts: 0, timestamp: Date.now(), blocked: false, blockedUntil: 0 };
+    } catch (parseError) {
+      handleError(parseError, { context: 'isRateLimited.JSON.parse' });
+      data = { attempts: 0, timestamp: Date.now(), blocked: false, blockedUntil: 0 };
+    }
     
     const now = Date.now();
     
@@ -308,9 +314,8 @@ export function checkRateLimit(options: RateLimitOptions): void {
     const formattedTime = formatRateLimitTime(remainingTime);
     
     throw createError(
-      ErrorType.RATE_LIMIT,
-      'rate_limit_exceeded',
       `Rate limit exceeded. Please try again in ${formattedTime}.`,
+      ErrorType.RATE_LIMIT,
       { key, windowMs, maxRequests, remainingTime }
     );
   }

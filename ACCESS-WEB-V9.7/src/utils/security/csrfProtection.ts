@@ -69,8 +69,15 @@ export function generateCsrfToken(): string {
  */
 export function getCsrfToken(): string | null {
   try {
-    // Try to get from storage
-    return secureLocalStorage.getItem(CSRF_TOKEN_KEY);
+    // Try to get from storage with validation
+    const token = secureLocalStorage.getItem(CSRF_TOKEN_KEY);
+    
+    // Validate token format (should be a non-empty string)
+    if (token && typeof token === 'string' && token.trim()) {
+      return token.trim();
+    }
+    
+    return null;
   } catch (error) {
     handleError(error, { context: 'getCsrfToken' });
     return null;
@@ -101,9 +108,9 @@ function setupCsrfForAjax(): void {
     // Add CSRF token to all AJAX requests
     const originalOpen = XMLHttpRequest.prototype.open;
     
-    XMLHttpRequest.prototype.open = function(...args) {
+    XMLHttpRequest.prototype.open = function(method: string, url: string | URL, async: boolean = true, user?: string | null, password?: string | null) {
       // Call original method
-      originalOpen.apply(this, args);
+      originalOpen.call(this, method, url, async, user, password);
       
       // Add event listener to set CSRF header
       this.addEventListener('readystatechange', function() {
@@ -223,7 +230,7 @@ export function appendCsrfHeader(headers: Headers): void {
   try {
     const token = getCsrfToken();
     
-    if (token) {
+    if (token && typeof token === 'string' && token.trim()) {
       headers.set(CSRF_HEADER_NAME, token);
     }
   } catch (error) {
