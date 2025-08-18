@@ -25,14 +25,20 @@ export async function exportToPDF(results: TestResult) {
     pdf.setFont("helvetica", "bold");
     pdf.text('Heaven', 20, 18);
     
+    // Calculate proper spacing for "tree" part
+    const heavenWidth = pdf.getTextWidth('Heaven');
+    
     // Accent "tree" part with brand color
     pdf.setTextColor(brandColor[0], brandColor[1], brandColor[2]);
-    pdf.text('tree', 65, 18);
+    pdf.text('tree', 20 + heavenWidth, 18);
+    
+    // Calculate total brand name width for decorative line
+    const totalWidth = heavenWidth + pdf.getTextWidth('tree');
     
     // Decorative accent line
     pdf.setDrawColor(brandColor[0], brandColor[1], brandColor[2]);
     pdf.setLineWidth(2);
-    pdf.line(20, 22, 95, 22);
+    pdf.line(20, 22, 20 + totalWidth, 22);
     
     // Report title
     pdf.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
