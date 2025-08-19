@@ -11,7 +11,7 @@ async function runAxeAnalysis(url, options = {}) {
     // Launch browser
     browser = await puppeteer.launch({
       headless: true,
-      executablePath:
+      executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || 
         "/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium",
       args: [
         "--no-sandbox",
