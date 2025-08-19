@@ -41,13 +41,13 @@ args = "cd ACCESS-WEB-V9.7 && node src/server/server.js"
 name = "Frontend Server"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd ACCESS-WEB-V9.7 && npm run start"
-waitForPort = 6000
-
-[workflows.workflow.metadata]
-outputType = "webview"
+waitForPort = 5000
 
 [deployment]
 run = ["sh", "-c", "cd ACCESS-WEB-V9.7 && npm run dev"]
