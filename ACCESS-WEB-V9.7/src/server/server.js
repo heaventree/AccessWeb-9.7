@@ -2,6 +2,14 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 import authRouter from '../api/auth.js';
 import accessibilityRouter from '../api/accessibility.js';
 
@@ -177,9 +185,6 @@ app.use('/api/public', publicApiRouter);
 
 // WordPress Plugin Download Route
 app.get('/api/wordpress/plugin/download', (req, res) => {
-  const path = require('path');
-  const fs = require('fs');
-  
   const pluginPath = path.join(__dirname, '../../server/assets/plugins/wordpress-plugin.zip');
   
   // Check if file exists
