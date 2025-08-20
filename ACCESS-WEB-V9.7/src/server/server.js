@@ -85,7 +85,7 @@ if (missingEnvVars.length > 0) {
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? true // Allow all origins temporarily for debugging
-    : ['http://localhost:5000', 'http://localhost:3001', 'http://localhost:5001', '*'],
+    : [`http://localhost:${process.env.PORT || 5000}`, 'http://localhost:3001', 'http://localhost:5001', '*'],
   credentials: true
 }));
 

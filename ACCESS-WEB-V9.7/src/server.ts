@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://your-app-domain.com'] 
-    : ['http://localhost:5000'],
+    : [`http://localhost:${process.env.PORT || 5000}`],
   credentials: true
 }));
 app.use(express.json());
