@@ -175,6 +175,59 @@ app.use('/api/user', requireAuth, apiKeysRouter);
 // Public API routes (API key authenticated)
 app.use('/api/public', publicApiRouter);
 
+// WordPress Plugin Download Route
+app.get('/api/wordpress/plugin/download', (req, res) => {
+  const path = require('path');
+  const fs = require('fs');
+  
+  const pluginPath = path.join(__dirname, '../../server/assets/plugins/wordpress-plugin.zip');
+  
+  // Check if file exists
+  if (!fs.existsSync(pluginPath)) {
+    logger.error('WordPress plugin file not found', { path: pluginPath });
+    return res.status(404).json({ 
+      success: false, 
+      error: 'Plugin file not found. Please contact support.' 
+    });
+  }
+  
+  try {
+    // Set appropriate headers for file download
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename="wordpress-accessibility-plugin.zip"');
+    res.setHeader('Cache-Control', 'no-cache');
+    
+    // Get file stats for content length
+    const stats = fs.statSync(pluginPath);
+    res.setHeader('Content-Length', stats.size);
+    
+    logger.info('WordPress plugin download initiated', { 
+      fileSize: stats.size,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    });
+    
+    // Stream the file
+    const fileStream = fs.createReadStream(pluginPath);
+    fileStream.pipe(res);
+    
+    fileStream.on('error', (error) => {
+      logger.error('Error streaming plugin file', error);
+      if (!res.headersSent) {
+        res.status(500).json({ success: false, error: 'Error downloading file' });
+      }
+    });
+    
+    fileStream.on('end', () => {
+      logger.info('WordPress plugin download completed successfully');
+    });
+    
+  } catch (error) {
+    logger.error('Error serving plugin download', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
 // Pricing Plans Routes
 app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed
 app.get('/api/pricing-plans/:id', getPricingPlan); // Public endpoint - no auth needed

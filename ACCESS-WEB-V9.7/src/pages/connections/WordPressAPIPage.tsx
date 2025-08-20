@@ -41,6 +41,7 @@ export function WordPressAPIPage() {
   const [runStatus, setRunStatus] = useState<string>('');
   const [periodicScanLoading, setPeriodicScanLoading] = useState(false);
   const [showPluginErrorModal, setShowPluginErrorModal] = useState(false);
+  const [downloadingPlugin, setDownloadingPlugin] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -291,6 +292,47 @@ export function WordPressAPIPage() {
     }
   };
 
+  const handleDownloadPlugin = async () => {
+    setDownloadingPlugin(true);
+    try {
+      const response = await fetch('/api/wordpress/plugin/download', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to download plugin');
+      }
+
+      // Get the file blob
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'wordpress-accessibility-plugin.zip';
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+      
+      toast.success('WordPress plugin downloaded successfully!');
+    } catch (error: any) {
+      console.error('Error downloading plugin:', error);
+      toast.error(error.message || 'Failed to download plugin');
+    } finally {
+      setDownloadingPlugin(false);
+    }
+  };
+
   // Initialize schedule status when component loads and API key exists
   useEffect(() => {
     if (connection?.apiToken) {
@@ -411,10 +453,27 @@ export function WordPressAPIPage() {
             
             <div className="p-6">
               <p className="text-gray-600 mb-6">
-                Before connecting your WordPress site, you'll need to install our WordPress plugin. Follow our comprehensive documentation to get started.
+                Before connecting your WordPress site, you'll need to install our WordPress plugin. Follow our comprehensive documentation to get started.????
               </p>
               
               <div className="flex flex-wrap gap-4">
+                <button
+                  onClick={handleDownloadPlugin}
+                  disabled={downloadingPlugin}
+                  className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {downloadingPlugin ? (
+                    <>
+                      <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                      Downloading...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-5 h-5 mr-2" />
+                      Download Plugin
+                    </>
+                  )}
+                </button>
                 <button
                   onClick={() => setShowInstructions(true)}
                   className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
