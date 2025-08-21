@@ -77,4 +77,19 @@ export const authApi = {
   }
 };
 
+// User API calls
+export const userApi = {
+  // Update user profile
+  updateProfile: async (userId: number, profileData: any) => {
+    const response = await apiClient.put(`/v1/users/${userId}`, profileData);
+    return response.data;
+  },
+
+  // Get user by ID
+  getUser: async (userId: number) => {
+    const response = await apiClient.get(`/v1/users/${userId}`);
+    return response.data;
+  }
+};
+
 export default apiClient;
