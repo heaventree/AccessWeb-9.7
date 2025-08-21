@@ -23,6 +23,7 @@ interface AuthContextType {
   register: (email: string, password: string, name?: string) => Promise<void>;
   logout: (redirectPath?: string) => Promise<void>;
   clearError: () => void;
+  refetchUser: () => Promise<void>;
 }
 
 // Create context with default values
@@ -34,6 +35,7 @@ const AuthContext = createContext<AuthContextType>({
   register: async () => {},
   logout: async () => {},
   clearError: () => {},
+  refetchUser: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -133,8 +135,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
   };
 
+  // Refetch user data
+  const refetchUser = async () => {
+    try {
+      const data = await authApi.getCurrentUser();
+      if (data && data.user) {
+        setUser(data.user);
+      }
+    } catch (err) {
+      console.log('Failed to refetch user:', err);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, clearError }}>
+    <AuthContext.Provider value={{ user, loading, error, login, register, logout, clearError, refetchUser }}>
       {children}
     </AuthContext.Provider>
   );

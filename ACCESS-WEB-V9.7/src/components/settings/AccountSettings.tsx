@@ -5,7 +5,7 @@ import { userApi } from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 
 export function AccountSettings() {
-  const { user } = useAuth();
+  const { user, refetchUser } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -25,6 +25,11 @@ export function AccountSettings() {
     }
   }, [user]);
 
+  // Refetch user data when component mounts to ensure fresh data
+  useEffect(() => {
+    refetchUser();
+  }, [refetchUser]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -38,6 +43,9 @@ export function AccountSettings() {
     try {
       await userApi.updateProfile(user.id, formData);
       toast.success('Profile updated successfully!');
+      
+      // Refetch user data to update the UI with latest changes
+      await refetchUser();
     } catch (error: any) {
       console.error('Error updating profile:', error);
       const errorMessage = error.response?.data?.error || 'Failed to update profile';
