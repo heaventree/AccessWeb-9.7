@@ -1,5 +1,11 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import { authApi } from '../lib/apiClient';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
+import { authApi } from "../lib/apiClient";
 
 // User type from our auth system
 interface User {
@@ -20,7 +26,11 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
-  login: (email: string, password: string, options?: LoginOptions) => Promise<any>;
+  login: (
+    email: string,
+    password: string,
+    options?: LoginOptions,
+  ) => Promise<any>;
   register: (email: string, password: string, name?: string) => Promise<void>;
   logout: (redirectPath?: string) => Promise<void>;
   clearError: () => void;
@@ -39,7 +49,9 @@ const AuthContext = createContext<AuthContextType>({
   refetchUser: async () => {},
 });
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } catch (err) {
         // User is not authenticated - that's fine
-        console.log('Not authenticated');
+        console.log("Not authenticated");
       } finally {
         setLoading(false);
       }
@@ -64,9 +76,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Login function with options
-  const login = async (email: string, password: string, options?: LoginOptions) => {
+  const login = async (
+    email: string,
+    password: string,
+    options?: LoginOptions,
+  ) => {
     try {
-      setLoading(true);
+      // Don't set loading for 2FA scenarios to prevent unnecessary re-renders
       setError(null);
 
       const data = await authApi.login(email, password, options);
@@ -74,23 +90,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Handle successful login with user data
       if (data && data.success && data.user) {
         setUser(data.user);
+        setLoading(false); // Only set loading false on successful login
       }
       // Handle 2FA requirement - don't set user yet, but return the response
       else if (data && data.requiresTwoFactor) {
-        // Don't set user yet, let LoginForm handle 2FA flow
-        console.log('2FA required, returning response to LoginForm');
+        // Don't set loading or user yet, let LoginForm handle 2FA flow
+        // Don't change loading state to prevent re-renders
+        console.log("2FA required, returning response to LoginForm");
       }
-      
+
       return data; // Return the full response for additional handling
     } catch (err: any) {
       if (err.response && err.response.data && err.response.data.error) {
         setError(err.response.data.error);
       } else {
-        setError('An error occurred during login');
+        setError("An error occurred during login");
       }
+      setLoading(false); // Only set loading false on error
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -110,7 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (err.response && err.response.data && err.response.data.error) {
         setError(err.response.data.error);
       } else {
-        setError('An error occurred during registration');
+        setError("An error occurred during registration");
       }
       throw err;
     } finally {
@@ -124,14 +141,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       await authApi.logout();
       setUser(null);
-      
+
       // If a redirect path is provided, navigate to it after logout
-      if (redirectPath && typeof window !== 'undefined') {
+      if (redirectPath && typeof window !== "undefined") {
         window.location.href = redirectPath;
       }
     } catch (err: any) {
-      console.error('Logout error:', err);
-      setError('An error occurred during logout');
+      console.error("Logout error:", err);
+      setError("An error occurred during logout");
     } finally {
       setLoading(false);
     }
@@ -150,12 +167,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(data.user);
       }
     } catch (err) {
-      console.log('Failed to refetch user:', err);
+      console.log("Failed to refetch user:", err);
     }
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, clearError, refetchUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        login,
+        register,
+        logout,
+        clearError,
+        refetchUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
