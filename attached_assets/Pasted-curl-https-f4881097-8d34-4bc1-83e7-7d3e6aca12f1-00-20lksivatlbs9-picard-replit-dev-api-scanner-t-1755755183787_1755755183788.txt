@@ -1,0 +1,36 @@
+curl ^"https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/api/scanner/trigger/155^" ^
+  -X ^"POST^" ^
+  -H ^"Accept: application/json, text/plain, */*^" ^
+  -H ^"Accept-Language: en-US,en;q=0.9^" ^
+  -H ^"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3LCJpYXQiOjE3NTU3NTI1MDMsImV4cCI6MTc1NjM1NzMwM30.2xuGOIP3troaG5ja8zVCLG786-6GkoCaLrbkj9YdWe4^" ^
+  -H ^"Connection: keep-alive^" ^
+  -H ^"Content-Length: 0^" ^
+  -b ^"__stripe_mid=f58657ec-ac5e-4698-a753-a3e3b5a21fcf7f795b; __stripe_sid=1917181a-7f12-4c9a-9d80-d074ca32b68643842b; accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3LCJpYXQiOjE3NTU3NTI1MDMsImV4cCI6MTc1NjM1NzMwM30.2xuGOIP3troaG5ja8zVCLG786-6GkoCaLrbkj9YdWe4; csrf_token=gjHxEm770EoC2uOcSQd1KgleOQvVa8Ux^" ^
+  -H ^"DNT: 1^" ^
+  -H ^"Origin: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev^" ^
+  -H ^"Referer: https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/my-account/connections/wordpress/155^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36^" ^
+  -H ^"sec-ch-ua: ^\^"Not;A=Brand^\^";v=^\^"99^\^", ^\^"Google Chrome^\^";v=^\^"139^\^", ^\^"Chromium^\^";v=^\^"139^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" &
+curl ^"https://m.stripe.com/6^" ^
+  -H ^"accept: */*^" ^
+  -H ^"accept-language: en-US,en;q=0.9^" ^
+  -H ^"content-type: text/plain;charset=UTF-8^" ^
+  -b ^"m=87c1e850-67f6-4d20-b64b-422b77de33d1830ea5; private_machine_identifier=goGDBDU7mF1Nq1oIyh^%^2BtKwyfZz0XrTolsgdNFmArjpykU0j4wYNaD6yBtvw0EIkITX0^%^3D^" ^
+  -H ^"dnt: 1^" ^
+  -H ^"origin: https://m.stripe.network^" ^
+  -H ^"priority: u=1, i^" ^
+  -H ^"referer: https://m.stripe.network/^" ^
+  -H ^"sec-ch-ua: ^\^"Not;A=Brand^\^";v=^\^"99^\^", ^\^"Google Chrome^\^";v=^\^"139^\^", ^\^"Chromium^\^";v=^\^"139^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" ^
+  -H ^"sec-fetch-dest: empty^" ^
+  -H ^"sec-fetch-mode: cors^" ^
+  -H ^"sec-fetch-site: cross-site^" ^
+  -H ^"sec-fetch-storage-access: active^" ^
+  -H ^"user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36^" ^
+  --data-raw ^"JTdCJTIydjIlMjIlM0ExJTJDJTIyaWQlMjIlM0ElMjIyMjI5MDc1MTVhN2FlZWVlZTFmMGRkZTk2Zjg5MzQxOSUyMiUyQyUyMnQlMjIlM0EyMi40JTJDJTIydGFnJTIyJTNBJTIyJTI0bnBtX3BhY2thZ2VfdmVyc2lvbiUyMiUyQyUyMnNyYyUyMiUzQSUyMmpzJTIyJTJDJTIyYSUyMiUzQW51bGwlMkMlMjJiJTIyJTNBJTdCJTIyYSUyMiUzQSUyMmh0dHBzJTNBJTJGJTJGUklLSkxOc255MHhuVkc4RTU4OFFCQnh5cGVBMENaWkQzOWFLZ092elpZby4tbjU2XzlCZHhIbE4zczZiQlJYU3pwMnpvOWJEMC1udHgzWWdTZVlvTWhVLlZpSi1iNVU0dDFHeG9pUm9sM2xwUXM3aUhzcU15cHh1U1Fzd1VxaTNSRG8uRlB4LWxYSy1lY3FGZWdLazlUbmVmN3hVWHVnU2paMndpd3pKWmpvZmtGQSUyRk9WemVvTlE0RGVSWktZZlUtOEtGNHlWNE5vbFFzOExuUlVmMWVEU1Q3N0ElMjIlMkMlMjJiJTIyJTNBJTIyaHR0cHMlM0ElMkYlMkZSSUtKTE5zbnkweG5WRzhFNTg4UUJCeHlwZUEwQ1paRDM5YUtnT3Z6WllvLi1uNTZfOUJkeEhsTjNzNmJCUlhTenAyem85YkQwLW50eDNZZ1NlWW9NaFUuVmlKLWI1VTR0MUd4b2lSb2wzbHBRczdpSHNxTXlweHVTUXN3VXFpM1JEby5GUHgtbFhLLWVjcUZlZ0trOVRuZWY3eFVYdWdTaloyd2l3ekpaam9ma0ZBJTJGT1Z6ZW9OUTREZVJaS1lmVS04S0Y0eVY0Tm9sUXM4TG5SVWYxZURTVDc3QSUyRkhfZ19KTF9nZzFQTmJ2U2h0WTd1UVRKXzItNndhcVp5cE1QZm8tVHhJeTAlMkZndllfb2JkX1pwMEo0ZG93RXZkcVdCODJXYjFrNHBLX0Z5V3V3QjBuRnFBJTJGS1lMaGpybGRYTkNRMEdtUk1zQkdwcDF0ZmJRY25IQW15X2tnM0dHUzBsYyUyMiUyQyUyMmMlMjIlM0ElMjI3MS1vMlFEX0hDMGluMnUxZ2R6b0NMMUVSUGp6TElaMTdBYzZ0VHZYUS1BJTIyJTJDJTIyZCUyMiUzQSUyMmY1ODY1N2VjLWFjNWUtNDY5OC1hNzUzLWEzZTNiNWEyMWZjZjdmNzk1YiUyMiUyQyUyMmUlMjIlM0ElMjIxOTE3MTgxYS03ZjEyLTRjOWEtOWQ4MC1kMDc0Y2EzMmI2ODY0Mzg0MmIlMjIlMkMlMjJmJTIyJTNBZmFsc2UlMkMlMjJnJTIyJTNBdHJ1ZSUyQyUyMmglMjIlM0F0cnVlJTJDJTIyaSUyMiUzQSU1QiUyMmxvY2F0aW9uJTIyJTVEJTJDJTIyaiUyMiUzQSU1QiU1RCUyQyUyMm4lMjIlM0ExNTQuODk5OTk5OTc2MTU4MTQlMkMlMjJ1JTIyJTNBJTIyZjQ4ODEwOTctOGQzNC00YmMxLTgzZTctN2QzZTZhY2ExMmYxLTAwLTIwbGtzaXZhdGxiczkucGljYXJkLnJlcGxpdC5kZXYlMjIlMkMlMjJ2JTIyJTNBJTIyZjQ4ODEwOTctOGQzNC00YmMxLTgzZTctN2QzZTZhY2ExMmYxLTAwLTIwbGtzaXZhdGxiczkucGljYXJkLnJlcGxpdC5kZXYlMjIlMkMlMjJ3JTIyJTNBJTIyMTc1NTc1NTE1MjgwMSUzQTFiZjE1N2FlODJlMzU2OTUwNjYyNzI1NGU5YWRlNDY4Y2M1NWUwNzBhMzhkYmMxZTA0YWUwZjUzZmMwYjM3MDMlMjIlN0QlMkMlMjJoJTIyJTNBJTIyOTBmYjcwY2MyNDU2ZjY2MTdjOWUlMjIlN0Q=^"
