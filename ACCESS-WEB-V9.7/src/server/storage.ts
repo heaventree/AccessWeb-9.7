@@ -105,6 +105,11 @@ export interface IStorage {
   getPublicSettings(): Promise<Setting[]>;
   createOrUpdateSetting(key: string, value: string, group?: string, isPublic?: boolean): Promise<Setting>;
   deleteSetting(key: string): Promise<boolean>;
+  
+  // 2FA operations
+  updateUserTwoFactorSettings(id: number, settings: { isTwoFactorEnabled?: boolean; twoFactorCode?: string | null; twoFactorCodeExpiry?: Date | null }): Promise<User | undefined>;
+  generateAndStoreTwoFactorCode(id: number): Promise<string>;
+  verifyTwoFactorCode(id: number, code: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -537,6 +542,54 @@ export class DatabaseStorage implements IStorage {
   async deleteSetting(key: string): Promise<boolean> {
     const result = await db.delete(schema.settings).where(eq(schema.settings.key, key));
     return result.rowCount > 0;
+  }
+
+  // 2FA operations
+  async updateUserTwoFactorSettings(id: number, settings: { isTwoFactorEnabled?: boolean; twoFactorCode?: string | null; twoFactorCodeExpiry?: Date | null }): Promise<User | undefined> {
+    const [updatedUser] = await db.update(schema.users)
+      .set({ ...settings, updatedAt: new Date() })
+      .where(eq(schema.users.id, id))
+      .returning();
+    return updatedUser;
+  }
+
+  async generateAndStoreTwoFactorCode(id: number): Promise<string> {
+    // Generate a 6-digit OTP code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Set expiry to 5 minutes from now
+    const expiry = new Date();
+    expiry.setMinutes(expiry.getMinutes() + 5);
+    
+    // Store the code and expiry in the database
+    await this.updateUserTwoFactorSettings(id, {
+      twoFactorCode: code,
+      twoFactorCodeExpiry: expiry
+    });
+    
+    return code;
+  }
+
+  async verifyTwoFactorCode(id: number, code: string): Promise<boolean> {
+    const user = await this.getUser(id);
+    if (!user || !user.twoFactorCode || !user.twoFactorCodeExpiry) {
+      return false;
+    }
+    
+    // Check if code matches and hasn't expired
+    const isValidCode = user.twoFactorCode === code;
+    const isNotExpired = new Date() < user.twoFactorCodeExpiry;
+    
+    if (isValidCode && isNotExpired) {
+      // Clear the code after successful verification
+      await this.updateUserTwoFactorSettings(id, {
+        twoFactorCode: null,
+        twoFactorCodeExpiry: null
+      });
+      return true;
+    }
+    
+    return false;
   }
 }
 

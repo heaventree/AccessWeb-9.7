@@ -5,6 +5,7 @@ import { db } from '../db';
 import * as schema from '../../shared/schema';
 import { generateToken, hashPassword, comparePassword } from '../utils/auth';
 import { authenticate } from '../middleware/authMiddleware';
+import { emailService } from '../services/emailService';
 
 export function registerAuthRoutes(app: any, apiPrefix: string): void {
   const router = Router();
@@ -101,11 +102,56 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
+      // Check if 2FA is enabled
+      if (user.isTwoFactorEnabled) {
+        // Generate and send 2FA code
+        const code = await storage.generateAndStoreTwoFactorCode(user.id);
+        
+        // Send the code via email
+        const emailSent = await emailService.sendTwoFactorCode(
+          user.email,
+          code,
+          user.fullName || user.username
+        );
+
+        if (!emailSent) {
+          return res.status(500).json({ error: 'Failed to send verification code' });
+        }
+
+        // Create security log entry
+        await db.insert(schema.securityLogs).values({
+          userId: user.id,
+          eventType: '2fa_login_attempt',
+          description: 'Two-factor authentication required for login',
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
+          metadata: { email: user.email }
+        });
+
+        return res.json({
+          success: false,
+          requiresTwoFactor: true,
+          userId: user.id,
+          message: 'Please check your email for the verification code',
+          email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3') // Mask email for security
+        });
+      }
+
       // Generate token
       const token = generateToken(user);
 
+      // Create security log entry for successful login
+      await db.insert(schema.securityLogs).values({
+        userId: user.id,
+        eventType: 'login',
+        description: 'User logged in successfully',
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
       // Return user data and token
       res.json({
+        success: true,
         token,
         user: {
           id: user.id,
@@ -115,6 +161,7 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
           role: user.role,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
+          isTwoFactorEnabled: user.isTwoFactorEnabled
         }
       });
     } catch (error) {
@@ -233,6 +280,74 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
     } catch (error) {
       console.error('Reset password error:', error);
       res.status(500).json({ error: 'Failed to reset password' });
+    }
+  });
+
+  /**
+   * @route   POST /api/v1/auth/verify-2fa
+   * @desc    Verify 2FA code and complete login
+   * @access  Public
+   */
+  router.post('/verify-2fa', async (req: Request, res: Response) => {
+    try {
+      const { userId, code } = req.body;
+
+      if (!userId || !code) {
+        return res.status(400).json({ error: 'User ID and verification code are required' });
+      }
+
+      // Get user
+      const user = await storage.getUser(parseInt(userId));
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Verify the code
+      const isValid = await storage.verifyTwoFactorCode(parseInt(userId), code);
+      
+      if (!isValid) {
+        // Create security log for failed verification
+        await db.insert(schema.securityLogs).values({
+          userId: parseInt(userId),
+          eventType: '2fa_verification_failed',
+          description: 'Two-factor authentication verification failed during login',
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
+          metadata: { providedCode: code }
+        });
+
+        return res.status(400).json({ error: 'Invalid or expired verification code' });
+      }
+
+      // Generate token after successful 2FA verification
+      const token = generateToken(user);
+
+      // Create security log for successful login
+      await db.insert(schema.securityLogs).values({
+        userId: parseInt(userId),
+        eventType: 'login',
+        description: 'User logged in successfully with 2FA',
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({
+        success: true,
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          fullName: user.fullName,
+          role: user.role,
+          isVerified: user.isVerified,
+          createdAt: user.createdAt,
+          isTwoFactorEnabled: user.isTwoFactorEnabled
+        }
+      });
+    } catch (error) {
+      console.error('2FA verification error:', error);
+      res.status(500).json({ error: 'Failed to verify two-factor authentication' });
     }
   });
 

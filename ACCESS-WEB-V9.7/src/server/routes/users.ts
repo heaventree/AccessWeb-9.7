@@ -4,6 +4,7 @@ import { db } from '../db';
 import * as schema from '../../shared/schema';
 import { authenticate, authorize } from '../middleware/authMiddleware';
 import { hashPassword } from '../utils/auth';
+import { emailService } from '../services/emailService';
 
 export function registerUserRoutes(app: any, apiPrefix: string): void {
   const router = Router();
@@ -212,6 +213,167 @@ export function registerUserRoutes(app: any, apiPrefix: string): void {
     } catch (error) {
       console.error('Get profile error:', error);
       res.status(500).json({ error: 'Failed to get user profile' });
+    }
+  });
+
+  /**
+   * @route   PUT /api/v1/users/:id/two-factor
+   * @desc    Update user's two-factor authentication settings
+   * @access  Private (Self only)
+   */
+  router.put('/:id/two-factor', authenticate, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const currentUser = (req as any).user;
+      const { isTwoFactorEnabled } = req.body;
+
+      // Check if user is updating their own settings
+      if (currentUser.id !== userId) {
+        return res.status(403).json({ error: 'Unauthorized access' });
+      }
+
+      // Update 2FA settings
+      const updatedUser = await storage.updateUserTwoFactorSettings(userId, {
+        isTwoFactorEnabled: isTwoFactorEnabled
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Create security log entry
+      await db.insert(schema.securityLogs).values({
+        userId: userId,
+        eventType: isTwoFactorEnabled ? '2fa_enabled' : '2fa_disabled',
+        description: `Two-factor authentication ${isTwoFactorEnabled ? 'enabled' : 'disabled'}`,
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        metadata: { isTwoFactorEnabled }
+      });
+
+      res.json({
+        success: true,
+        message: `Two-factor authentication ${isTwoFactorEnabled ? 'enabled' : 'disabled'} successfully`,
+        isTwoFactorEnabled: updatedUser.isTwoFactorEnabled
+      });
+    } catch (error) {
+      console.error('Update 2FA settings error:', error);
+      res.status(500).json({ error: 'Failed to update two-factor authentication settings' });
+    }
+  });
+
+  /**
+   * @route   POST /api/v1/users/:id/two-factor/send-code
+   * @desc    Send two-factor authentication code via email
+   * @access  Private (Self only)
+   */
+  router.post('/:id/two-factor/send-code', authenticate, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const currentUser = (req as any).user;
+
+      // Check if user is requesting code for their own account
+      if (currentUser.id !== userId) {
+        return res.status(403).json({ error: 'Unauthorized access' });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      if (!user.isTwoFactorEnabled) {
+        return res.status(400).json({ error: 'Two-factor authentication is not enabled for this account' });
+      }
+
+      // Generate and store the 2FA code
+      const code = await storage.generateAndStoreTwoFactorCode(userId);
+      
+      // Send the code via email
+      const emailSent = await emailService.sendTwoFactorCode(
+        user.email,
+        code,
+        user.fullName || user.username
+      );
+
+      if (!emailSent) {
+        return res.status(500).json({ error: 'Failed to send verification code' });
+      }
+
+      // Create security log entry
+      await db.insert(schema.securityLogs).values({
+        userId: userId,
+        eventType: '2fa_code_sent',
+        description: 'Two-factor authentication code sent via email',
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        metadata: { email: user.email }
+      });
+
+      res.json({
+        success: true,
+        message: 'Verification code sent to your email address',
+        email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3') // Mask email for security
+      });
+    } catch (error) {
+      console.error('Send 2FA code error:', error);
+      res.status(500).json({ error: 'Failed to send verification code' });
+    }
+  });
+
+  /**
+   * @route   POST /api/v1/users/:id/two-factor/verify
+   * @desc    Verify two-factor authentication code
+   * @access  Private (Self only)
+   */
+  router.post('/:id/two-factor/verify', authenticate, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const currentUser = (req as any).user;
+      const { code } = req.body;
+
+      // Check if user is verifying code for their own account
+      if (currentUser.id !== userId) {
+        return res.status(403).json({ error: 'Unauthorized access' });
+      }
+
+      if (!code) {
+        return res.status(400).json({ error: 'Verification code is required' });
+      }
+
+      // Verify the code
+      const isValid = await storage.verifyTwoFactorCode(userId, code);
+      
+      if (!isValid) {
+        // Create security log for failed verification
+        await db.insert(schema.securityLogs).values({
+          userId: userId,
+          eventType: '2fa_verification_failed',
+          description: 'Two-factor authentication verification failed',
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
+          metadata: { providedCode: code }
+        });
+
+        return res.status(400).json({ error: 'Invalid or expired verification code' });
+      }
+
+      // Create security log for successful verification
+      await db.insert(schema.securityLogs).values({
+        userId: userId,
+        eventType: '2fa_verification_success',
+        description: 'Two-factor authentication verification successful',
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({
+        success: true,
+        message: 'Verification code confirmed successfully'
+      });
+    } catch (error) {
+      console.error('Verify 2FA code error:', error);
+      res.status(500).json({ error: 'Failed to verify code' });
     }
   });
 

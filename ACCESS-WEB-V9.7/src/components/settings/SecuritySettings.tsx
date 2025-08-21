@@ -15,8 +15,9 @@ interface SecurityLog {
 }
 
 export function SecuritySettings() {
-  const { user } = useAuth();
+  const { user, refetchUser } = useAuth();
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [isUpdatingTwoFactor, setIsUpdatingTwoFactor] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -122,7 +123,44 @@ export function SecuritySettings() {
 
   useEffect(() => {
     fetchSecurityLogs();
+    // Initialize 2FA state from user data
+    if (user && 'isTwoFactorEnabled' in user) {
+      setTwoFactorEnabled(user.isTwoFactorEnabled || false);
+    }
   }, [user]);
+
+  const handleTwoFactorToggle = async () => {
+    if (!user) {
+      toast.error('You must be logged in to change two-factor authentication settings');
+      return;
+    }
+
+    const newTwoFactorState = !twoFactorEnabled;
+    setIsUpdatingTwoFactor(true);
+
+    try {
+      await userApi.updateTwoFactorSettings(user.id, {
+        isTwoFactorEnabled: newTwoFactorState
+      });
+
+      setTwoFactorEnabled(newTwoFactorState);
+      toast.success(
+        `Two-factor authentication ${newTwoFactorState ? 'enabled' : 'disabled'} successfully!`
+      );
+      
+      // Refresh user data to get updated 2FA status
+      await refetchUser();
+      
+      // Refresh security logs to show the new entry
+      fetchSecurityLogs();
+    } catch (error: any) {
+      console.error('Error updating two-factor authentication:', error);
+      const errorMessage = error.response?.data?.error || 'Failed to update two-factor authentication settings';
+      toast.error(errorMessage);
+    } finally {
+      setIsUpdatingTwoFactor(false);
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-sm">
@@ -220,10 +258,11 @@ export function SecuritySettings() {
               type="button"
               role="switch"
               aria-checked={twoFactorEnabled}
-              onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
+              onClick={handleTwoFactorToggle}
+              disabled={isUpdatingTwoFactor}
               className={`${
                 twoFactorEnabled ? 'bg-blue-600' : 'bg-gray-200'
-              } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+              } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <span
                 aria-hidden="true"

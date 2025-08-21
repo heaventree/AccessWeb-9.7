@@ -74,6 +74,21 @@ export const authApi = {
       // Return null if user is not authenticated
       return { user: null };
     }
+  },
+
+  // Verify 2FA code
+  verify2FA: async (userId: number, code: string) => {
+    const response = await apiClient.post('/auth/verify-2fa', {
+      userId,
+      code
+    });
+    
+    // Store tokens in localStorage after successful 2FA verification
+    if (response.data && response.data.success && response.data.token) {
+      localStorage.setItem('accessToken', response.data.token);
+    }
+    
+    return response.data;
   }
 };
 
@@ -100,6 +115,22 @@ export const userApi = {
   // Get security logs
   getSecurityLogs: async (userId: number) => {
     const response = await apiClient.get(`/v1/users/${userId}/security-logs`);
+    return response.data;
+  },
+
+  // 2FA operations
+  updateTwoFactorSettings: async (userId: number, settings: { isTwoFactorEnabled: boolean }) => {
+    const response = await apiClient.put(`/v1/users/${userId}/two-factor`, settings);
+    return response.data;
+  },
+
+  sendTwoFactorCode: async (userId: number) => {
+    const response = await apiClient.post(`/v1/users/${userId}/two-factor/send-code`);
+    return response.data;
+  },
+
+  verifyTwoFactorCode: async (userId: number, code: string) => {
+    const response = await apiClient.post(`/v1/users/${userId}/two-factor/verify`, { code });
     return response.data;
   }
 };
