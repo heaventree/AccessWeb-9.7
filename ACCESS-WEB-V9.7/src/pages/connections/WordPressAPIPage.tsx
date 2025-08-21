@@ -210,9 +210,10 @@ export function WordPressAPIPage() {
     
     setPeriodicScanLoading(true);
     try {
-      const result = await callWordPressScheduleAPI('schedule-status');
+      const result = await callWordPressScheduleAPI('status');
       if (result?.status) {
         setScheduleStatus(result.status);
+        setRunStatus(result.status); // Both use the same status endpoint
       }
     } catch (error) {
       setShowPluginErrorModal(true);
@@ -225,7 +226,7 @@ export function WordPressAPIPage() {
     if (!connection?.apiToken) return;
     
     try {
-      const result = await callWordPressScheduleAPI('run-status');
+      const result = await callWordPressScheduleAPI('status');
       if (result?.status) {
         setRunStatus(result.status);
       }
@@ -279,7 +280,7 @@ export function WordPressAPIPage() {
     setPeriodicScanLoading(true);
     try {
       const result = await callWordPressScheduleAPI('run');
-      if (result?.status === 'run-action') {
+      if (result?.status === 'run-schedule') {
         toast.success('One-time scan initiated successfully');
         // Refresh run status after a short delay
         setTimeout(fetchRunStatus, 2000);
