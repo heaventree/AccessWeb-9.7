@@ -25,10 +25,8 @@ export function AccountSettings() {
     }
   }, [user]);
 
-  // Refetch user data when component mounts to ensure fresh data
-  useEffect(() => {
-    refetchUser();
-  }, [refetchUser]);
+  // Remove automatic refetch on mount to prevent continuous API calls
+  // We'll only refetch after successful saves
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

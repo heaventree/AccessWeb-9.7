@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { authApi } from '../lib/apiClient';
 
 // User type from our auth system
@@ -135,8 +135,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
   };
 
-  // Refetch user data
-  const refetchUser = async () => {
+  // Refetch user data - memoized to prevent infinite loops
+  const refetchUser = useCallback(async () => {
     try {
       const data = await authApi.getCurrentUser();
       if (data && data.user) {
@@ -145,7 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err) {
       console.log('Failed to refetch user:', err);
     }
-  };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading, error, login, register, logout, clearError, refetchUser }}>
