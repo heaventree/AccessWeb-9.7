@@ -71,8 +71,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const data = await authApi.login(email, password, options);
 
-      if (data && data.user) {
+      // Handle successful login with user data
+      if (data && data.success && data.user) {
         setUser(data.user);
+      }
+      // Handle 2FA requirement - don't set user yet, but return the response
+      else if (data && data.requiresTwoFactor) {
+        // Don't set user yet, let LoginForm handle 2FA flow
+        console.log('2FA required, returning response to LoginForm');
       }
       
       return data; // Return the full response for additional handling
