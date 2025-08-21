@@ -453,7 +453,7 @@ export function WordPressAPIPage() {
             
             <div className="p-6">
               <p className="text-gray-600 mb-6">
-                Before connecting your WordPress site, you'll need to install our WordPress plugin. Follow our comprehensive documentation to get started.????
+                Before connecting your WordPress site, you'll need to install our WordPress plugin. Follow our comprehensive documentation to get started.
               </p>
               
               <div className="flex flex-wrap gap-4">

@@ -1,0 +1,132 @@
+# WCAG Compliance Plugin -Documentation
+
+=======================================================================================
+## 1. REST API Endpoint: /wcag/v2/detect-changes
+=======================================================================================
+- Method: POST
+- Description: Detect file changes manually, Update ignore list,initial scan . 
+- Request (JSON):
+  {
+    "ignore_list": [
+        "/wp-content/plugins/my-plugin/",
+        "/wp-content/cache/" ,
+        "wp-conten/plugins/wcag-compliance/wcag-compliance.php"
+    ]
+  }
+
+- Response (JSON):
+  {
+    "success": true|false, ['bool']
+    "message": "Description of operation result",
+    "status": "init"|"update"|"no-update"|"ignore-list-update",  //[string]
+    "old_ignore_list": [ ... ],       // previous ignore list [array]
+    "new_ignore_list": [ ... ],       // current ignore list [array]
+    "count": 1234,                   // total scanned files count[int]
+    "modified_at": "YYYY-MM-DD HH:MM:SS"  // timestamp of latest file modification
+  }
+
+- Explaination for Request: 
+    > ignore_list: (optional) Array of relative directory and files paths to exclude from scanning.
+- Explaination for Response:
+    > status : 
+        ["init"]               : First time scan,
+        ["ignore-list-update"] : If ignore list different from previous,
+        ["update"]             : If any file updated,
+        ["no-update"]          : If file has no update,
+
+=======================================================================================
+
+
+
+=======================================================================================
+## 2. REST API Endpoint: /wcag/v2/schedule
+=======================================================================================
+- Method: POST
+- Description: Manage the scheduled scanning event.
+- Request Payload (JSON):
+  {
+    "action": "start"|"stop"|"run"|"status"
+  }
+  - start: Schedule hourly scanning event if not scheduled.
+  - stop: Clear scheduled scanning event.
+  - run: Trigger scan immediately.
+  - status: Return whether the scan is currently running.
+
+- Response Payload (JSON):
+  {
+    "success": true|false,
+    "status": "start-schedule" | "schedule-found" | "stop-schedule" | "run-schedule" | "schedule-running" | "schedule-not-running" | "invalid-action" | "invalid-request"
+  }
+
+- Explaination for Request:
+    - Explaination for Response:
+    > action : 
+        ["start"]           : Start Schedule Cycle['Hourly'],
+        ["stop"]            : Stop Schedule Cucle,
+        ["run"]             : Run Once schedule,
+        ["status"]          : Get Current Status,
+- Explaination for Response:
+    > status : 
+        ["start-schedule"]          : Start schedule [action => "start"],
+        ["schedule-found"]          : If schedule already running [action => "start"],
+        ["stop-schedule"]           : Stop schedule [action => "stop"],
+        ["run-schedule"]            : Run schedule instently for 1 time [action => "run"],
+        ["schedule-running"]        : Retutn live schedule status if running  [action => "status"],
+        ["schedule-not-running"]    : Retutn live schedule status if not running  [action => "status"],
+        ["invalid-action"]          : if action in not proper,
+        ["invalid-request"]         : if request have not action,
+
+=======================================================================================
+
+
+
+=======================================================================================
+## 3. Scheduled Hook Event: compliance_scheduled_hook
+=======================================================================================
+- Trigger: Hourly by WP Cron (or manually via /schedule?action=run)
+
+- Action:
+  - Scans the WordPress root directory with the ignore list.
+  - Compares current file count and last modified time .
+  - can changes detected or first run.
+  - Sends JSON payload to external server endpoint: {wcag_server_url}/wp-json/wp/v2/accessibility-auth/debug via POST.
+
+- Payload sent to external server (JSON):
+  {
+    "token": "stored_wcag_token",
+    "domain": "example.com",
+    "run_time": "YYYY-MM-DD HH:MM:SS",
+    "success": true|false,
+    "message": "Files are scanned for the first time" | "Files are modified" | "No changes detected",
+    "status": "init" | "update" | "no-update",
+    "ignore_list": [ ... ],
+    "count": 1234,
+    "modified_at": "YYYY-MM-DD HH:MM:SS"
+  }
+
+- Explaination for Payload:
+    > status : 
+        ["init"]               : First time scan,
+        ["update"]             : If any file updated,
+        ["no-update"]          : If file has no update,
+
+=======================================================================================
+
+
+
+
+=======================================================================================
+## 4. Token Verification Event (via wp_remote_post to /accessibility-auth/verify)
+=======================================================================================
+- Trigger: When the WCAG token is updated in site options (e.g., via admin settings).
+- Action:
+  - Sends a verification POST request to the external server's `/accessibility-auth/verify` endpoint.
+  - Passes the token and current site Domain.
+
+- Payload sent to external server (JSON):
+    {
+    "token": "xxxxxxxxxxxxxxxxxxxxxxx",
+    "site_url": "https://example.com"
+    }
+=======================================================================================
+
