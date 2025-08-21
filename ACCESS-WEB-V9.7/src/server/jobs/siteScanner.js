@@ -105,7 +105,7 @@ class SiteScannerJobQueue {
       throw new Error('Job data is missing or malformed');
     }
     
-    const { connectionId, userId, siteName, siteUrl, platform } = jobData;
+    const { connectionId, userId, siteName, siteUrl, platform, frequency } = jobData;
     
     console.log(`
 ╔════════════════════════════════════════════════════════════════╗
@@ -129,7 +129,7 @@ class SiteScannerJobQueue {
       });
 
       // Perform accessibility scanning process
-      await this.performAccessibilityScan(connectionId, siteUrl, platform);
+      await this.performAccessibilityScan(connectionId, siteUrl, platform, frequency || 'schedule');
       
       console.log(`
 ╔════════════════════════════════════════════════════════════════╗
