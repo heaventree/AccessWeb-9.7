@@ -1,0 +1,23 @@
+:9778)
+    at async file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/server.js:304:27
+[2025-08-21T09:14:42.963Z] [ERROR] Details: {
+  "stack": "PrismaClientValidationError: \nInvalid `prisma.user.update()` invocation:\n\n{\n  where: {\n    id: 17\n  },\n  data: {\n    firstName: \"Dhananjay k\",\n    timezone: \"UTC\",\n    ~~~~~~~~\n?   email?: String | StringFieldUpdateOperationsInput,\n?   password?: String | StringFieldUpdateOperationsInput,\n?   name?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n?   currentPeriodEnd?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n?   isAdmin?: Boolean | BoolFieldUpdateOperationsInput,\n?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   profileImageUrl?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   stripeCustomerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   stripeSubscriptionId?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   subscriptionPlan?: String | StringFieldUpdateOperationsInput,\n?   subscriptionStatus?: String | StringFieldUpdateOperationsInput,\n?   updatedAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n?   cancellationReason?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   cancelledAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n?   paymentHistory?: PaymentHistoryUpdateManyWithoutUserNestedInput,\n?   siteConnections?: SiteConnectionUpdateManyWithoutUserNestedInput\n  }\n}\n\nUnknown argument `timezone`. Available options are marked with ?.\n    at kn (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:29:1363)\n    at Zn.handleRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:7102)\n    at Zn.handleAndLogRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6784)\n    at Zn.request (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6491)\n    at async l (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:130:9778)\n    at async file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/server.js:304:27",
+  "message": "\nInvalid `prisma.user.update()` invocation:\n\n{\n  where: {\n    id: 17\n  },\n  data: {\n    firstName: \"Dhananjay k\",\n    timezone: \"UTC\",\n    ~~~~~~~~\n?   email?: String | StringFieldUpdateOperationsInput,\n?   password?: String | StringFieldUpdateOperationsInput,\n?   name?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n?   currentPeriodEnd?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n?   isAdmin?: Boolean | BoolFieldUpdateOperationsInput,\n?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   profileImageUrl?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   stripeCustomerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   stripeSubscriptionId?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   subscriptionPlan?: String | StringFieldUpdateOperationsInput,\n?   subscriptionStatus?: String | StringFieldUpdateOperationsInput,\n?   updatedAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n?   cancellationReason?: String | NullableStringFieldUpdateOperationsInput | Null,\n?   cancelledAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n?   paymentHistory?: PaymentHistoryUpdateManyWithoutUserNestedInput,\n?   siteConnections?: SiteConnectionUpdateManyWithoutUserNestedInput\n  }\n}\n\nUnknown argument `timezone`. Available options are marked with ?.",
+  "name": "PrismaClientValidationError",
+  "clientVersion": "6.8.2"
+}
+[2025-08-21T09:14:42.963Z] [INFO] PUT /api/v1/users/17 - 500 {
+  "duration": "347ms",
+  "statusCode": 500
+}
+[2025-08-21T09:14:42.963Z] [ERROR] Request failed: PUT /api/v1/users/17
+[2025-08-21T09:14:42.963Z] [ERROR] Stack: {
+  statusCode: 500,
+  body: '{"error":"Failed to update user"}',
+  duration: '347ms'
+}
+[2025-08-21T09:14:42.963Z] [ERROR] Details: {
+  "statusCode": 500,
+  "body": "{\"error\":\"Failed to update user\"}",
+  "duration": "347ms"
+}

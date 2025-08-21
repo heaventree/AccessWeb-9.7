@@ -279,7 +279,7 @@ app.put('/api/v1/users/:id', requireAuth, async (req, res) => {
     const updateData = {};
     
     if (name !== undefined) {
-      updateData.firstName = name; // Map 'name' to 'firstName' field
+      updateData.name = name; // Use 'name' field that exists in schema
     }
     
     if (email !== undefined && email !== user.email) {
@@ -293,11 +293,8 @@ app.put('/api/v1/users/:id', requireAuth, async (req, res) => {
       updateData.email = email;
     }
     
-    // Note: timezone field may not exist in the current user model
-    // Adding it to updateData anyway for future compatibility
-    if (timezone !== undefined) {
-      updateData.timezone = timezone;
-    }
+    // Skip timezone for now since it doesn't exist in the user model
+    // We can add it to the database schema later if needed
     
     // Update user if there are changes
     if (Object.keys(updateData).length > 0) {
