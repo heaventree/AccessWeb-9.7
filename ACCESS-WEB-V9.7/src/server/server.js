@@ -253,6 +253,75 @@ app.get('/api/subscription/payment-history', requireAuth, getPaymentHistory);
 app.post('/api/subscription/verify-payment', requireAuth, verifyPayment);
 app.post('/api/subscription/cancel', requireAuth, cancelSubscription);
 
+// User Profile Routes
+app.put('/api/v1/users/:id', requireAuth, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const currentUser = req.user;
+    
+    // Check if user is updating their own data or is an admin
+    if (currentUser.id !== userId && !currentUser.isAdmin) {
+      return res.status(403).json({ error: 'Unauthorized access' });
+    }
+
+    const { name, email, timezone } = req.body;
+    
+    // Get current user data
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Build update object
+    const updateData = {};
+    
+    if (name !== undefined) {
+      updateData.firstName = name; // Map 'name' to 'firstName' field
+    }
+    
+    if (email !== undefined && email !== user.email) {
+      // Check if email is already in use
+      const existingUser = await prisma.user.findUnique({
+        where: { email: email }
+      });
+      if (existingUser && existingUser.id !== userId) {
+        return res.status(400).json({ error: 'Email already in use' });
+      }
+      updateData.email = email;
+    }
+    
+    // Note: timezone field may not exist in the current user model
+    // Adding it to updateData anyway for future compatibility
+    if (timezone !== undefined) {
+      updateData.timezone = timezone;
+    }
+    
+    // Update user if there are changes
+    if (Object.keys(updateData).length > 0) {
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: updateData
+      });
+      
+      // Don't return sensitive data
+      const { password, ...userData } = updatedUser;
+      
+      res.json({ user: userData, message: 'User updated successfully' });
+    } else {
+      // Don't return sensitive data
+      const { password, ...userData } = user;
+      
+      res.json({ user: userData, message: 'No changes were made' });
+    }
+  } catch (error) {
+    logger.error('Update user error:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
 // Site Scanner Job Queue Routes (temporarily disabled)
 // app.get('/api/scanner/stats', requireAuth, async (req, res) => {
 //   try {
