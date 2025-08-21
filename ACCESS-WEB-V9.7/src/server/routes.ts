@@ -90,7 +90,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // registerMenuRoutes(app, apiPrefix);
   // registerScanRoutes(app, apiPrefix);
   // registerSettingRoutes(app, apiPrefix);
-  // registerNotificationRoutes(app, apiPrefix);
+  // Register notification routes
+  const notificationRouter = require('./routes/notifications');
+  app.use('/', notificationRouter);
 
   return httpServer;
 }

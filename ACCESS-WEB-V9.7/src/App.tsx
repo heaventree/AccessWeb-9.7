@@ -47,6 +47,7 @@ import { WCAGCheckerPage } from './pages/WCAGCheckerPage';
 import { WCAGStandardsTable } from './pages/WCAGStandardsTable';
 import WCAGColorPalette from './pages/tools/WCAGColorPalette';
 import ImageAltScannerPage from './pages/tools/ImageAltScannerPage';
+import { AlertsPage } from './pages/tools/AlertsPage';
 import { WordPressDashboard } from './components/integrations/WordPressDashboard';
 import SiteConnectionsPage from './pages/SiteConnectionsPage';
 import { CustomAPISetup } from './components/integrations/CustomAPISetup';
@@ -157,7 +158,7 @@ function AppContent() {
             <Route index element={<SubscriptionDashboard />} />
             <Route path="monitoring" element={<MonitoringPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
-            <Route path="alerts" element={<CompliancePage />} />
+            <Route path="alerts" element={<AlertsPage />} />
             <Route path="connections" element={<ConnectionsPage />} />
             <Route path="site-connections" element={<SiteConnectionsPage />} />
             <Route path="connections/custom-api" element={<CustomAPIPage />} />
