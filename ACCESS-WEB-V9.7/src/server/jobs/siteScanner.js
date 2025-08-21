@@ -90,13 +90,28 @@ class SiteScannerJobQueue {
   }
 
   async processScanJob(job) {
-    const { connectionId, userId, siteName, siteUrl, platform } = job.data;
+    // Handle case where job is an array (which it appears to be)
+    const actualJob = Array.isArray(job) ? job[0] : job;
+    
+    console.log('🐛 [DEBUG] Processed job object:', JSON.stringify(actualJob, null, 2));
+    
+    // Extract job data from the actual job object
+    let jobData;
+    if (actualJob.data && typeof actualJob.data === 'object') {
+      jobData = actualJob.data;
+      console.log('✅ [DEBUG] Successfully extracted job data');
+    } else {
+      console.error('❌ [SITE-SCANNER] Job data is missing or malformed. Job object:', JSON.stringify(actualJob, null, 2));
+      throw new Error('Job data is missing or malformed');
+    }
+    
+    const { connectionId, userId, siteName, siteUrl, platform } = jobData;
     
     console.log(`
 ╔════════════════════════════════════════════════════════════════╗
 ║                    🔍 ACCESSIBILITY SCAN STARTED               ║
 ╠════════════════════════════════════════════════════════════════╣
-║ Job ID:        ${job.id.padEnd(45)} ║
+║ Job ID:        ${actualJob.id.padEnd(45)} ║
 ║ Connection ID: ${String(connectionId).padEnd(45)} ║
 ║ User ID:       ${String(userId).padEnd(45)} ║
 ║ Site Name:     ${siteName.padEnd(45)} ║
@@ -120,7 +135,7 @@ class SiteScannerJobQueue {
 ╔════════════════════════════════════════════════════════════════╗
 ║                    ✅ ACCESSIBILITY SCAN COMPLETED             ║
 ╠════════════════════════════════════════════════════════════════╣
-║ Job ID:        ${job.id.padEnd(45)} ║
+║ Job ID:        ${actualJob.id.padEnd(45)} ║
 ║ Site:          ${siteName.padEnd(45)} ║
 ║ Status:        ${'SUCCESS'.padEnd(45)} ║
 ║ Completed At:  ${new Date().toISOString().padEnd(45)} ║
@@ -132,7 +147,7 @@ class SiteScannerJobQueue {
 ╔════════════════════════════════════════════════════════════════╗
 ║                    ❌ ACCESSIBILITY SCAN FAILED                ║
 ╠════════════════════════════════════════════════════════════════╣
-║ Job ID:        ${job.id.padEnd(45)} ║
+║ Job ID:        ${actualJob.id.padEnd(45)} ║
 ║ Site:          ${siteName.padEnd(45)} ║
 ║ Error:         ${error.message.padEnd(45)} ║
 ║ Failed At:     ${new Date().toISOString().padEnd(45)} ║
