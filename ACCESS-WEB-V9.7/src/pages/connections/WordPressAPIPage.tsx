@@ -264,7 +264,7 @@ export function WordPressAPIPage() {
       const result = await callWordPressScheduleAPI('stop');
       if (result?.status === 'stop-schedule') {
         toast.success('Periodic scan schedule stopped successfully');
-        setScheduleStatus('schedule-stoped');
+        setScheduleStatus('schedule-not-running');
       }
     } catch (error) {
       setShowPluginErrorModal(true);
@@ -773,14 +773,14 @@ export function WordPressAPIPage() {
                   <div className="flex items-center">
                     <div className={`w-3 h-3 rounded-full mr-2 ${
                       scheduleStatus === 'schedule-running' ? 'bg-green-500' : 
-                      scheduleStatus === 'schedule-stoped' ? 'bg-red-500' : 'bg-gray-400'
+                      scheduleStatus === 'schedule-not-running' ? 'bg-red-500' : 'bg-gray-400'
                     }`} />
                     <span className={`text-sm font-medium ${
                       scheduleStatus === 'schedule-running' ? 'text-green-700' : 
-                      scheduleStatus === 'schedule-stoped' ? 'text-red-700' : 'text-gray-700'
+                      scheduleStatus === 'schedule-not-running' ? 'text-red-700' : 'text-gray-700'
                     }`}>
                       {scheduleStatus === 'schedule-running' ? 'Running' : 
-                       scheduleStatus === 'schedule-stoped' ? 'Stopped' : 'Unknown'}
+                       scheduleStatus === 'schedule-not-running' ? 'Stopped' : 'Unknown'}
                     </span>
                   </div>
 
@@ -800,7 +800,7 @@ export function WordPressAPIPage() {
 
                 {/* Control Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4">
-                  {scheduleStatus === 'schedule-stoped' || !scheduleStatus ? (
+                  {scheduleStatus === 'schedule-not-running' || !scheduleStatus ? (
                     <button
                       onClick={handleStartSchedule}
                       disabled={periodicScanLoading}
