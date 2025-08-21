@@ -1,4 +1,4 @@
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { db } from './db';
 import * as schema from '../shared/schema';
 import type { 
@@ -94,12 +94,10 @@ export interface IStorage {
   
   // Notification operations
   getNotification(id: number): Promise<Notification | undefined>;
-  getUserNotifications(userId: number, limit?: number, offset?: number, unreadOnly?: boolean): Promise<Notification[]>;
-  getUserNotificationCount(userId: number, unreadOnly?: boolean): Promise<number>;
+  getUserNotifications(userId: number, isRead?: boolean): Promise<Notification[]>;
   createNotification(notification: InsertNotification): Promise<Notification>;
-  markNotificationAsRead(id: number, userId: number): Promise<Notification | undefined>;
-  markAllNotificationsAsRead(userId: number): Promise<number>;
-  deleteNotification(id: number, userId: number): Promise<boolean>;
+  markNotificationAsRead(id: number): Promise<Notification | undefined>;
+  deleteNotification(id: number): Promise<boolean>;
   
   // Setting operations
   getSetting(key: string): Promise<Setting | undefined>;
@@ -461,32 +459,16 @@ export class DatabaseStorage implements IStorage {
     return notification;
   }
 
-  async getUserNotifications(userId: number, limit = 20, offset = 0, unreadOnly = false): Promise<Notification[]> {
+  async getUserNotifications(userId: number, isRead?: boolean): Promise<Notification[]> {
     let query = db.select()
       .from(schema.notifications)
       .where(eq(schema.notifications.userId, userId));
     
-    if (unreadOnly) {
-      query = query.where(eq(schema.notifications.isRead, false));
+    if (isRead !== undefined) {
+      query = query.where(eq(schema.notifications.isRead, isRead));
     }
     
-    return query
-      .orderBy(schema.notifications.createdAt)
-      .limit(limit)
-      .offset(offset);
-  }
-
-  async getUserNotificationCount(userId: number, unreadOnly = false): Promise<number> {
-    let query = db.select({ count: sql`count(*)`.mapWith(Number) })
-      .from(schema.notifications)
-      .where(eq(schema.notifications.userId, userId));
-    
-    if (unreadOnly) {
-      query = query.where(eq(schema.notifications.isRead, false));
-    }
-    
-    const [result] = await query;
-    return result.count;
+    return query.orderBy(schema.notifications.createdAt);
   }
 
   async createNotification(notification: InsertNotification): Promise<Notification> {
@@ -494,24 +476,16 @@ export class DatabaseStorage implements IStorage {
     return newNotification;
   }
 
-  async markNotificationAsRead(id: number, userId: number): Promise<Notification | undefined> {
+  async markNotificationAsRead(id: number): Promise<Notification | undefined> {
     const [updatedNotification] = await db.update(schema.notifications)
       .set({ isRead: true })
-      .where(and(eq(schema.notifications.id, id), eq(schema.notifications.userId, userId)))
+      .where(eq(schema.notifications.id, id))
       .returning();
     return updatedNotification;
   }
 
-  async markAllNotificationsAsRead(userId: number): Promise<number> {
-    const result = await db.update(schema.notifications)
-      .set({ isRead: true })
-      .where(and(eq(schema.notifications.userId, userId), eq(schema.notifications.isRead, false)));
-    return result.rowCount;
-  }
-
-  async deleteNotification(id: number, userId: number): Promise<boolean> {
-    const result = await db.delete(schema.notifications)
-      .where(and(eq(schema.notifications.id, id), eq(schema.notifications.userId, userId)));
+  async deleteNotification(id: number): Promise<boolean> {
+    const result = await db.delete(schema.notifications).where(eq(schema.notifications.id, id));
     return result.rowCount > 0;
   }
 
