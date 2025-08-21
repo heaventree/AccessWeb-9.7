@@ -95,6 +95,12 @@ export const userApi = {
   changePassword: async (userId: number, passwordData: { currentPassword: string; newPassword: string }) => {
     const response = await apiClient.put(`/v1/users/${userId}/change-password`, passwordData);
     return response.data;
+  },
+
+  // Get security logs
+  getSecurityLogs: async (userId: number) => {
+    const response = await apiClient.get(`/v1/users/${userId}/security-logs`);
+    return response.data;
   }
 };
 

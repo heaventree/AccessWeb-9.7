@@ -406,6 +406,21 @@ app.put("/api/v1/users/:id/change-password", requireAuth, async (req, res) => {
       data: { password: hashedNewPassword },
     });
 
+    // Create security log entry
+    await prisma.securityLog.create({
+      data: {
+        userId: userId,
+        eventType: "password_change",
+        description: "Password changed successfully",
+        ipAddress: req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'],
+        userAgent: req.get("User-Agent"),
+        metadata: {
+          timestamp: new Date().toISOString(),
+          success: true
+        }
+      }
+    });
+
     logger.info(`Password changed successfully for user ${userId}`);
     res.json({ message: "Password changed successfully" });
   } catch (error) {
@@ -462,6 +477,32 @@ app.put("/api/v1/users/:id/change-password", requireAuth, async (req, res) => {
 //     res.status(500).json({ success: false, error: 'Failed to trigger scan' });
 //   }
 // });
+
+// Get security logs endpoint
+app.get("/api/v1/users/:id/security-logs", requireAuth, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const currentUser = req.user;
+    
+    // Check if user is accessing their own security logs
+    if (currentUser.id !== userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    // Get security logs for the user
+    const securityLogs = await prisma.securityLog.findMany({
+      where: { userId: userId },
+      orderBy: { createdAt: 'desc' },
+      take: 50, // Limit to last 50 entries
+    });
+
+    logger.info(`Retrieved ${securityLogs.length} security logs for user ${userId}`);
+    res.json({ securityLogs });
+  } catch (error) {
+    logger.error("Get security logs error:", error);
+    res.status(500).json({ error: "Failed to retrieve security logs" });
+  }
+});
 
 // Global error handler with enhanced logging
 app.use((err, req, res, next) => {

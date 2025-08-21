@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Lock, Key, Shield, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { userApi } from '../../lib/apiClient';
 import toast from 'react-hot-toast';
+
+interface SecurityLog {
+  id: number;
+  eventType: string;
+  description: string;
+  ipAddress?: string;
+  userAgent?: string;
+  metadata?: any;
+  createdAt: string;
+}
 
 export function SecuritySettings() {
   const { user } = useAuth();
@@ -13,6 +23,8 @@ export function SecuritySettings() {
     confirmPassword: ''
   });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [securityLogs, setSecurityLogs] = useState<SecurityLog[]>([]);
+  const [isLoadingLogs, setIsLoadingLogs] = useState(false);
 
   const handlePasswordChange = async () => {
     if (!user) {
@@ -57,6 +69,9 @@ export function SecuritySettings() {
         newPassword: '',
         confirmPassword: ''
       });
+
+      // Refresh security logs to show the new entry
+      fetchSecurityLogs();
     } catch (error: any) {
       console.error('Error changing password:', error);
       const errorMessage = error.response?.data?.error || 'Failed to change password';
@@ -65,6 +80,49 @@ export function SecuritySettings() {
       setIsChangingPassword(false);
     }
   };
+
+  const fetchSecurityLogs = async () => {
+    if (!user) return;
+
+    setIsLoadingLogs(true);
+    try {
+      const response = await userApi.getSecurityLogs(user.id);
+      setSecurityLogs(response.securityLogs || []);
+    } catch (error: any) {
+      console.error('Failed to fetch security logs:', error);
+      toast.error('Failed to load security logs');
+    } finally {
+      setIsLoadingLogs(false);
+    }
+  };
+
+  const formatEventType = (eventType: string) => {
+    switch (eventType) {
+      case 'password_change':
+        return 'Password Changed';
+      case 'login':
+        return 'Login';
+      case 'logout':
+        return 'Logout';
+      default:
+        return eventType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  useEffect(() => {
+    fetchSecurityLogs();
+  }, [user]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm">
@@ -181,24 +239,41 @@ export function SecuritySettings() {
         <div className="pt-6 border-t border-gray-200">
           <h3 className="text-sm font-medium text-gray-900">Security Log</h3>
           <div className="mt-4 bg-gray-50 rounded-lg overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Password Changed</p>
-                  <p className="text-xs text-gray-500">March 15, 2024 at 2:30 PM</p>
-                </div>
-                <Shield className="h-5 w-5 text-gray-400" />
+            {isLoadingLogs ? (
+              <div className="px-4 py-6 text-center">
+                <Loader2 className="w-6 h-6 mx-auto animate-spin text-gray-400" />
+                <p className="mt-2 text-sm text-gray-500">Loading security logs...</p>
               </div>
-            </div>
-            <div className="px-4 py-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">New Login from Chrome</p>
-                  <p className="text-xs text-gray-500">March 14, 2024 at 10:15 AM</p>
-                </div>
-                <Shield className="h-5 w-5 text-gray-400" />
+            ) : securityLogs.length === 0 ? (
+              <div className="px-4 py-6 text-center">
+                <Shield className="w-8 h-8 mx-auto text-gray-300" />
+                <p className="mt-2 text-sm text-gray-500">No security events recorded yet</p>
               </div>
-            </div>
+            ) : (
+              securityLogs.map((log, index) => (
+                <div
+                  key={log.id}
+                  className={`px-4 py-3 ${
+                    index < securityLogs.length - 1 ? 'border-b border-gray-200' : ''
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {formatEventType(log.eventType)}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {formatDate(log.createdAt)}
+                      </p>
+                      {log.description && (
+                        <p className="text-xs text-gray-400 mt-1">{log.description}</p>
+                      )}
+                    </div>
+                    <Shield className="h-5 w-5 text-gray-400" />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
