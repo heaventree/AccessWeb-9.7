@@ -1,69 +1,81 @@
-import 'dotenv/config';
-import express from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-import authRouter from '../api/auth.js';
-import accessibilityRouter from '../api/accessibility.js';
+import authRouter from "../api/auth.js";
+import accessibilityRouter from "../api/accessibility.js";
 
 // Enhanced logging utility
 const logger = {
   info: (message, data = null) => {
     const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] [INFO] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+    console.log(
+      `[${timestamp}] [INFO] ${message}`,
+      data ? JSON.stringify(data, null, 2) : "",
+    );
   },
   error: (message, error = null) => {
     const timestamp = new Date().toISOString();
     console.error(`[${timestamp}] [ERROR] ${message}`);
     if (error) {
       console.error(`[${timestamp}] [ERROR] Stack:`, error.stack || error);
-      console.error(`[${timestamp}] [ERROR] Details:`, JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      console.error(
+        `[${timestamp}] [ERROR] Details:`,
+        JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
+      );
     }
   },
   warn: (message, data = null) => {
     const timestamp = new Date().toISOString();
-    console.warn(`[${timestamp}] [WARN] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+    console.warn(
+      `[${timestamp}] [WARN] ${message}`,
+      data ? JSON.stringify(data, null, 2) : "",
+    );
   },
   debug: (message, data = null) => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       const timestamp = new Date().toISOString();
-      console.log(`[${timestamp}] [DEBUG] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+      console.log(
+        `[${timestamp}] [DEBUG] ${message}`,
+        data ? JSON.stringify(data, null, 2) : "",
+      );
     }
-  }
+  },
 };
-import { 
-  getAllPricingPlans, 
-  getAdminPricingPlans, 
-  getPricingPlan, 
-  createPricingPlan, 
-  updatePricingPlan, 
-  deletePricingPlan 
-} from '../api/pricing-plans.js';
+import {
+  getAllPricingPlans,
+  getAdminPricingPlans,
+  getPricingPlan,
+  createPricingPlan,
+  updatePricingPlan,
+  deletePricingPlan,
+} from "../api/pricing-plans.js";
 import {
   createAdminPricingPlan,
   updateAdminPricingPlan,
-  deleteAdminPricingPlan
-} from '../api/admin-pricing.js';
+  deleteAdminPricingPlan,
+} from "../api/admin-pricing.js";
 import {
   getUserSubscription,
   createPaymentIntent,
   getPaymentHistory,
-  verifyPayment
-} from '../api/subscriptions.js';
+  verifyPayment,
+} from "../api/subscriptions.js";
 // import siteScannerQueue from './jobs/siteScanner.js';
-import { PrismaClient } from '@prisma/client';
-import { cancelSubscription } from '../api/subscription-cancel.js';
-import { handleStripeWebhook } from '../api/webhooks.js';
-import { requireAdmin } from '../middleware/adminAuth.js';
-import { requireAuth } from '../middleware/userAuth.js';
-import { startSubscriptionExpiryChecker } from '../utils/subscriptionExpiry.js';
+import { PrismaClient } from "@prisma/client";
+import { cancelSubscription } from "../api/subscription-cancel.js";
+import { handleStripeWebhook } from "../api/webhooks.js";
+import { requireAdmin } from "../middleware/adminAuth.js";
+import { requireAuth } from "../middleware/userAuth.js";
+import { startSubscriptionExpiryChecker } from "../utils/subscriptionExpiry.js";
 
 // Create Prisma client
 const prisma = new PrismaClient();
@@ -73,58 +85,74 @@ const app = express();
 const PORT = process.env.SERVER_PORT || 3001;
 
 // Validate critical environment variables
-const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
-const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+const requiredEnvVars = ["JWT_SECRET", "DATABASE_URL"];
+const missingEnvVars = requiredEnvVars.filter(
+  (varName) => !process.env[varName],
+);
 
 if (missingEnvVars.length > 0) {
-  logger.error('Missing required environment variables', { missing: missingEnvVars });
-  logger.error('Please set these environment variables in production');
+  logger.error("Missing required environment variables", {
+    missing: missingEnvVars,
+  });
+  logger.error("Please set these environment variables in production");
 }
 
 // More permissive CORS for production debugging
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? true // Allow all origins temporarily for debugging
-    : [`http://localhost:${process.env.PORT || 5000}`, 'http://localhost:3001', 'http://localhost:5001', '*'],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === "production"
+        ? true // Allow all origins temporarily for debugging
+        : [
+            `http://localhost:${process.env.PORT || 5000}`,
+            "http://localhost:3001",
+            "http://localhost:5001",
+            "*",
+          ],
+    credentials: true,
+  }),
+);
 
 // Enhanced request logging middleware
 app.use((req, res, next) => {
   const startTime = Date.now();
-  
+
   // Log incoming request
   logger.info(`${req.method} ${req.url}`, {
     ip: req.ip,
-    userAgent: req.get('User-Agent'),
-    body: req.method === 'POST' || req.method === 'PUT' ? req.body : undefined
+    userAgent: req.get("User-Agent"),
+    body: req.method === "POST" || req.method === "PUT" ? req.body : undefined,
   });
-  
+
   // Log response
   const originalSend = res.send;
-  res.send = function(body) {
+  res.send = function (body) {
     const duration = Date.now() - startTime;
     logger.info(`${req.method} ${req.url} - ${res.statusCode}`, {
       duration: `${duration}ms`,
-      statusCode: res.statusCode
+      statusCode: res.statusCode,
     });
-    
+
     if (res.statusCode >= 400) {
       logger.error(`Request failed: ${req.method} ${req.url}`, {
         statusCode: res.statusCode,
         body: body,
-        duration: `${duration}ms`
+        duration: `${duration}ms`,
       });
     }
-    
+
     return originalSend.call(this, body);
   };
-  
+
   next();
 });
 
 // Stripe webhook endpoint (must be before express.json() middleware)
-app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), handleStripeWebhook);
+app.post(
+  "/api/webhooks/stripe",
+  express.raw({ type: "application/json" }),
+  handleStripeWebhook,
+);
 
 // Parse JSON and URL-encoded form data
 app.use(express.json());
@@ -132,192 +160,204 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Database connection test
-app.get('/api/health', async (req, res) => {
+app.get("/api/health", async (req, res) => {
   try {
     // Test database connection
     await prisma.$queryRaw`SELECT 1`;
-    logger.info('Health check passed - database connected');
-    res.json({ status: 'ok', database: 'connected' });
+    logger.info("Health check passed - database connected");
+    res.json({ status: "ok", database: "connected" });
   } catch (error) {
-    logger.error('Database connection error during health check', error);
-    res.status(500).json({ status: 'error', database: 'disconnected', error: String(error) });
+    logger.error("Database connection error during health check", error);
+    res.status(500).json({
+      status: "error",
+      database: "disconnected",
+      error: String(error),
+    });
   }
 });
 
 // Import site connections router at the top
-import siteConnectionsRouter from './routes/siteConnections.js';
+import siteConnectionsRouter from "./routes/siteConnections.js";
 
 // Import scanner routes
-import scannerRouter from './routes/scanner.js';
+import scannerRouter from "./routes/scanner.js";
 
 // Import WordPress routes
-import wordpressRouter from './routes/wordpress.js';
+import wordpressRouter from "./routes/wordpress.js";
 
 // Import and initialize job queue system
-import siteScannerQueue from './jobs/siteScanner.js';
+import siteScannerQueue from "./jobs/siteScanner.js";
 
 // Import admin routes
-import adminRouter from './routes/admin.js';
+import adminRouter from "./routes/admin.js";
 
 // Import API key and public API routes
-import apiKeysRouter from './routes/apiKeys.js';
-import publicApiRouter from './routes/publicApi.js';
-
-
+import apiKeysRouter from "./routes/apiKeys.js";
+import publicApiRouter from "./routes/publicApi.js";
 
 // API Routes - Move AI suggestions before accessibility router to avoid conflicts
-app.use('/api/auth', authRouter);
+app.use("/api/auth", authRouter);
 
 // Debug: Add logging to verify accessibility router mounting
-console.log('Mounting accessibility router at /api/accessibility');
-app.use('/api/accessibility', accessibilityRouter);
-console.log('Accessibility router mounted successfully');
-app.use('/api/site-connections', siteConnectionsRouter);
-app.use('/api/scanner', scannerRouter);
-app.use('/api/wordpress', wordpressRouter);
-app.use('/api/admin', requireAuth, adminRouter);
+console.log("Mounting accessibility router at /api/accessibility");
+app.use("/api/accessibility", accessibilityRouter);
+console.log("Accessibility router mounted successfully");
+app.use("/api/site-connections", siteConnectionsRouter);
+app.use("/api/scanner", scannerRouter);
+app.use("/api/wordpress", wordpressRouter);
+app.use("/api/admin", requireAuth, adminRouter);
 
 // API Key management routes (protected)
-app.use('/api/user', requireAuth, apiKeysRouter);
+app.use("/api/user", requireAuth, apiKeysRouter);
 
 // Public API routes (API key authenticated)
-app.use('/api/public', publicApiRouter);
+app.use("/api/public", publicApiRouter);
 
 // WordPress Plugin Download Route
-app.get('/api/wordpress/plugin/download', (req, res) => {
-  const pluginPath = path.join(__dirname, '../../server/assets/plugins/wordpress-plugin.zip');
-  
+app.get("/api/wordpress/plugin/download", (req, res) => {
+  const pluginPath = path.join(
+    __dirname,
+    "../../server/assets/plugins/wordpress-plugin.zip",
+  );
+
   // Check if file exists
   if (!fs.existsSync(pluginPath)) {
-    logger.error('WordPress plugin file not found', { path: pluginPath });
-    return res.status(404).json({ 
-      success: false, 
-      error: 'Plugin file not found. Please contact support.' 
+    logger.error("WordPress plugin file not found", { path: pluginPath });
+    return res.status(404).json({
+      success: false,
+      error: "Plugin file not found. Please contact support.",
     });
   }
-  
+
   try {
     // Set appropriate headers for file download
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', 'attachment; filename="wordpress-accessibility-plugin.zip"');
-    res.setHeader('Cache-Control', 'no-cache');
-    
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="wordpress-accessibility-plugin.zip"',
+    );
+    res.setHeader("Cache-Control", "no-cache");
+
     // Get file stats for content length
     const stats = fs.statSync(pluginPath);
-    res.setHeader('Content-Length', stats.size);
-    
-    logger.info('WordPress plugin download initiated', { 
+    res.setHeader("Content-Length", stats.size);
+
+    logger.info("WordPress plugin download initiated", {
       fileSize: stats.size,
       ip: req.ip,
-      userAgent: req.get('User-Agent')
+      userAgent: req.get("User-Agent"),
     });
-    
+
     // Stream the file
     const fileStream = fs.createReadStream(pluginPath);
     fileStream.pipe(res);
-    
-    fileStream.on('error', (error) => {
-      logger.error('Error streaming plugin file', error);
+
+    fileStream.on("error", (error) => {
+      logger.error("Error streaming plugin file", error);
       if (!res.headersSent) {
-        res.status(500).json({ success: false, error: 'Error downloading file' });
+        res
+          .status(500)
+          .json({ success: false, error: "Error downloading file" });
       }
     });
-    
-    fileStream.on('end', () => {
-      logger.info('WordPress plugin download completed successfully');
+
+    fileStream.on("end", () => {
+      logger.info("WordPress plugin download completed successfully");
     });
-    
   } catch (error) {
-    logger.error('Error serving plugin download', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+    logger.error("Error serving plugin download", error);
+    res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
 // Pricing Plans Routes
-app.get('/api/pricing-plans', getAllPricingPlans); // Public endpoint - no auth needed
-app.get('/api/pricing-plans/:id', getPricingPlan); // Public endpoint - no auth needed
-app.post('/api/pricing-plans', createAdminPricingPlan); // Admin create endpoint - matches your payload
-app.put('/api/pricing-plans/:id', updateAdminPricingPlan); // Admin update endpoint
-app.delete('/api/pricing-plans/:id', deleteAdminPricingPlan); // Admin delete endpoint
+app.get("/api/pricing-plans", getAllPricingPlans); // Public endpoint - no auth needed
+app.get("/api/pricing-plans/:id", getPricingPlan); // Public endpoint - no auth needed
+app.post("/api/pricing-plans", createAdminPricingPlan); // Admin create endpoint - matches your payload
+app.put("/api/pricing-plans/:id", updateAdminPricingPlan); // Admin update endpoint
+app.delete("/api/pricing-plans/:id", deleteAdminPricingPlan); // Admin delete endpoint
 
 // Protected Admin-only pricing plan endpoints
-app.get('/api/admin/pricing-plans', requireAdmin, getAdminPricingPlans);
-app.post('/api/admin/pricing-plans', requireAdmin, createPricingPlan);
-app.put('/api/admin/pricing-plans/:id', requireAdmin, updatePricingPlan);
-app.delete('/api/admin/pricing-plans/:id', requireAdmin, deletePricingPlan);
+app.get("/api/admin/pricing-plans", requireAdmin, getAdminPricingPlans);
+app.post("/api/admin/pricing-plans", requireAdmin, createPricingPlan);
+app.put("/api/admin/pricing-plans/:id", requireAdmin, updatePricingPlan);
+app.delete("/api/admin/pricing-plans/:id", requireAdmin, deletePricingPlan);
 
 // Subscription Routes (protected for authenticated users)
-app.get('/api/subscription', requireAuth, getUserSubscription);
-app.post('/api/subscription/payment-intent', requireAuth, createPaymentIntent);
-app.get('/api/subscription/payment-history', requireAuth, getPaymentHistory);
-app.post('/api/subscription/verify-payment', requireAuth, verifyPayment);
-app.post('/api/subscription/cancel', requireAuth, cancelSubscription);
+app.get("/api/subscription", requireAuth, getUserSubscription);
+app.post("/api/subscription/payment-intent", requireAuth, createPaymentIntent);
+app.get("/api/subscription/payment-history", requireAuth, getPaymentHistory);
+app.post("/api/subscription/verify-payment", requireAuth, verifyPayment);
+app.post("/api/subscription/cancel", requireAuth, cancelSubscription);
 
 // User Profile Routes
-app.put('/api/v1/users/:id', requireAuth, async (req, res) => {
+app.put("/api/v1/users/:id", requireAuth, async (req, res) => {
   try {
     const userId = parseInt(req.params.id);
     const currentUser = req.user;
-    
+    console.log(
+      "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>",
+    );
+
     // Check if user is updating their own data or is an admin
     if (currentUser.id !== userId && !currentUser.isAdmin) {
-      return res.status(403).json({ error: 'Unauthorized access' });
+      return res.status(403).json({ error: "Unauthorized access" });
     }
 
     const { name, email, timezone } = req.body;
-    
+
     // Get current user data
     const user = await prisma.user.findUnique({
-      where: { id: userId }
+      where: { id: userId },
     });
-    
+
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     // Build update object
     const updateData = {};
-    
+
     if (name !== undefined) {
       updateData.name = name; // Use 'name' field that exists in schema
     }
-    
+
     if (email !== undefined && email !== user.email) {
       // Check if email is already in use
       const existingUser = await prisma.user.findUnique({
-        where: { email: email }
+        where: { email: email },
       });
       if (existingUser && existingUser.id !== userId) {
-        return res.status(400).json({ error: 'Email already in use' });
+        return res.status(400).json({ error: "Email already in use" });
       }
       updateData.email = email;
     }
-    
+
     // Handle timezone updates
     if (timezone !== undefined) {
       updateData.timezone = timezone;
     }
-    
+
     // Update user if there are changes
     if (Object.keys(updateData).length > 0) {
       const updatedUser = await prisma.user.update({
         where: { id: userId },
-        data: updateData
+        data: updateData,
       });
-      
+
       // Don't return sensitive data
       const { password, ...userData } = updatedUser;
-      
-      res.json({ user: userData, message: 'User updated successfully' });
+
+      res.json({ user: userData, message: "User updated successfully" });
     } else {
       // Don't return sensitive data
       const { password, ...userData } = user;
-      
-      res.json({ user: userData, message: 'No changes were made' });
+
+      res.json({ user: userData, message: "No changes were made" });
     }
   } catch (error) {
-    logger.error('Update user error:', error);
-    res.status(500).json({ error: 'Failed to update user' });
+    logger.error("Update user error:", error);
+    res.status(500).json({ error: "Failed to update user" });
   }
 });
 
@@ -336,16 +376,16 @@ app.put('/api/v1/users/:id', requireAuth, async (req, res) => {
 //   try {
 //     const connectionId = parseInt(req.params.connectionId);
 //     const userId = req.user.id;
-    
+
 //     // Verify connection belongs to user
 //     const connection = await prisma.siteConnection.findFirst({
 //       where: { id: connectionId, userId: userId }
 //     });
-    
+
 //     if (!connection) {
 //       return res.status(404).json({ success: false, error: 'Site connection not found' });
 //     }
-    
+
 //     // Trigger immediate scan
 //     const jobData = {
 //       connectionId: connection.id,
@@ -355,15 +395,15 @@ app.put('/api/v1/users/:id', requireAuth, async (req, res) => {
 //       platform: connection.platform,
 //       frequency: 'manual'
 //     };
-    
+
 //     await siteScannerQueue.boss.send('site-accessibility-scan', jobData);
-    
-//     res.json({ 
-//       success: true, 
+
+//     res.json({
+//       success: true,
 //       message: 'Manual scan triggered successfully',
 //       data: { connectionId, siteName: connection.siteName }
 //     });
-    
+
 //   } catch (error) {
 //     logger.error('Failed to trigger manual scan', error);
 //     res.status(500).json({ success: false, error: 'Failed to trigger scan' });
@@ -372,78 +412,83 @@ app.put('/api/v1/users/:id', requireAuth, async (req, res) => {
 
 // Global error handler with enhanced logging
 app.use((err, req, res, next) => {
-  logger.error('Unhandled application error', {
+  logger.error("Unhandled application error", {
     error: err.message,
     stack: err.stack,
     request: {
       method: req.method,
       url: req.url,
       ip: req.ip,
-      userAgent: req.get('User-Agent'),
+      userAgent: req.get("User-Agent"),
       headers: req.headers,
       body: req.body,
       params: req.params,
-      query: req.query
-    }
+      query: req.query,
+    },
   });
-  
+
   res.status(500).json({
     success: false,
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
-    timestamp: new Date().toISOString()
+    message: "Internal server error",
+    error:
+      process.env.NODE_ENV === "development"
+        ? err.message
+        : "Something went wrong",
+    timestamp: new Date().toISOString(),
   });
 });
 
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (reason, promise) => {
-  logger.error('Unhandled Promise Rejection', {
+process.on("unhandledRejection", (reason, promise) => {
+  logger.error("Unhandled Promise Rejection", {
     reason: reason,
     promise: promise,
-    stack: reason?.stack
+    stack: reason?.stack,
   });
 });
 
 // Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-  logger.error('Uncaught Exception', {
+process.on("uncaughtException", (error) => {
+  logger.error("Uncaught Exception", {
     error: error.message,
-    stack: error.stack
+    stack: error.stack,
   });
-  
+
   // Graceful shutdown
   process.exit(1);
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', async () => {
+app.listen(PORT, "0.0.0.0", async () => {
   logger.info(`API Server running on port ${PORT}`, {
-    environment: process.env.NODE_ENV || 'development',
+    environment: process.env.NODE_ENV || "development",
     port: PORT,
-    host: '0.0.0.0',
-    timestamp: new Date().toISOString()
+    host: "0.0.0.0",
+    timestamp: new Date().toISOString(),
   });
-  
-  logger.info('Environment configuration', {
-    nodeEnv: process.env.NODE_ENV || 'development',
+
+  logger.info("Environment configuration", {
+    nodeEnv: process.env.NODE_ENV || "development",
     jwtSecretPresent: !!process.env.JWT_SECRET,
     databaseUrlPresent: !!process.env.DATABASE_URL,
-    stripeKeysPresent: !!(process.env.STRIPE_SECRET_KEY && process.env.VITE_STRIPE_PUBLIC_KEY)
+    stripeKeysPresent: !!(
+      process.env.STRIPE_SECRET_KEY && process.env.VITE_STRIPE_PUBLIC_KEY
+    ),
   });
-  
+
   // Start automatic subscription expiry checker
   try {
     startSubscriptionExpiryChecker();
-    logger.info('Subscription expiry checker started successfully');
+    logger.info("Subscription expiry checker started successfully");
   } catch (error) {
-    logger.error('Failed to start subscription expiry checker', error);
+    logger.error("Failed to start subscription expiry checker", error);
   }
-  
+
   // Initialize site scanner job queue
   try {
     await siteScannerQueue.initialize();
-    logger.info('Site scanner job queue initialized successfully');
+    logger.info("Site scanner job queue initialized successfully");
   } catch (error) {
-    logger.error('Failed to initialize site scanner job queue', error);
+    logger.error("Failed to initialize site scanner job queue", error);
   }
 });
