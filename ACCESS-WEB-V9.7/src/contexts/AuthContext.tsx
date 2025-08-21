@@ -8,6 +8,7 @@ interface User {
   name?: string;
   profileImageUrl?: string;
   isAdmin: boolean;
+  timezone?: string;
 }
 
 // Login options interface

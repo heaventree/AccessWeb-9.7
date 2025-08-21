@@ -20,7 +20,7 @@ export function AccountSettings() {
       setFormData({
         name: user.name || '',
         email: user.email || '',
-        timezone: 'UTC' // Default timezone since it's not in user object
+        timezone: user.timezone || 'UTC' // Use user's timezone or default to UTC
       });
     }
   }, [user]);
