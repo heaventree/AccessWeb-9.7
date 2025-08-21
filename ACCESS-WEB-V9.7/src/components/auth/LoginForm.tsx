@@ -11,6 +11,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
+  const [pendingUserId, setPendingUserId] = useState<number | null>(null);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [maskedEmail, setMaskedEmail] = useState('');
   const { login, error, clearError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -127,7 +131,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
           <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
             {typeof error === 'string' 
               ? error 
-              : error.message || 'An error occurred during login. Please try again.'}
+              : (error as any)?.message || 'An error occurred during login. Please try again.'}
           </div>
         )}
         

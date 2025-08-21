@@ -1,10 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { storage } from '../storage';
-import { db } from '../db';
-import * as schema from '../../shared/schema';
 import { authenticate, authorize } from '../middleware/authMiddleware';
 import { hashPassword } from '../utils/auth';
 import { emailService } from '../services/emailService';
+import { prisma } from '../../lib/prisma';
+import crypto from 'crypto';
 
 export function registerUserRoutes(app: any, apiPrefix: string): void {
   const router = Router();

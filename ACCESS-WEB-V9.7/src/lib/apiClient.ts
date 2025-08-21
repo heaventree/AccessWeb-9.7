@@ -120,17 +120,17 @@ export const userApi = {
 
   // 2FA operations
   updateTwoFactorSettings: async (userId: number, settings: { isTwoFactorEnabled: boolean }) => {
-    const response = await apiClient.put(`/v1/users/${userId}/two-factor`, settings);
+    const response = await apiClient.put(`/auth/users/${userId}/two-factor`, settings);
     return response.data;
   },
 
   sendTwoFactorCode: async (userId: number) => {
-    const response = await apiClient.post(`/v1/users/${userId}/two-factor/send-code`);
+    const response = await apiClient.post(`/auth/users/${userId}/two-factor/send-code`);
     return response.data;
   },
 
   verifyTwoFactorCode: async (userId: number, code: string) => {
-    const response = await apiClient.post(`/v1/users/${userId}/two-factor/verify`, { code });
+    const response = await apiClient.post(`/auth/users/${userId}/two-factor/verify`, { code });
     return response.data;
   }
 };

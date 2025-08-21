@@ -27,6 +27,10 @@ model User {
   cancellationReason   String?          @map("cancellation_reason")
   cancelledAt          DateTime?        @map("cancelled_at")
   timezone             String           @default("UTC") @map("timezone")
+  isTwoFactorEnabled   Boolean          @default(false) @map("is_two_factor_enabled")
+  twoFactorSecret      String?          @map("two_factor_secret")
+  twoFactorCode        String?          @map("two_factor_code")
+  twoFactorCodeExpiry  DateTime?        @map("two_factor_code_expiry")
   paymentHistory       PaymentHistory[]
   siteConnections      SiteConnection[]
   apiKeys              ApiKey[]

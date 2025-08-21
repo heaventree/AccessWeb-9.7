@@ -1,11 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { and, eq, gt } from 'drizzle-orm';
-import { storage } from '../storage';
-import { db } from '../db';
-import * as schema from '../../shared/schema';
 import { generateToken, hashPassword, comparePassword } from '../utils/auth';
 import { authenticate } from '../middleware/authMiddleware';
 import { emailService } from '../services/emailService';
+import { prisma } from '../../lib/prisma';
+import crypto from 'crypto';
 
 export function registerAuthRoutes(app: any, apiPrefix: string): void {
   const router = Router();
@@ -86,7 +84,7 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
       }
 
       // Find user by email
-      const user = await storage.getUserByEmail(email);
+      const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
@@ -104,14 +102,23 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
 
       // Check if 2FA is enabled
       if (user.isTwoFactorEnabled) {
-        // Generate and send 2FA code
-        const code = await storage.generateAndStoreTwoFactorCode(user.id);
+        // Generate and store 2FA code
+        const code = crypto.randomInt(100000, 999999).toString();
+        const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+        
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            twoFactorCode: code,
+            twoFactorCodeExpiry: expiry
+          }
+        });
         
         // Send the code via email
         const emailSent = await emailService.sendTwoFactorCode(
           user.email,
           code,
-          user.fullName || user.username
+          user.name || user.email
         );
 
         if (!emailSent) {
@@ -119,13 +126,15 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
         }
 
         // Create security log entry
-        await db.insert(schema.securityLogs).values({
-          userId: user.id,
-          eventType: '2fa_login_attempt',
-          description: 'Two-factor authentication required for login',
-          ipAddress: req.ip,
-          userAgent: req.get('User-Agent'),
-          metadata: { email: user.email }
+        await prisma.securityLog.create({
+          data: {
+            userId: user.id,
+            eventType: '2fa_login_attempt',
+            description: 'Two-factor authentication required for login',
+            ipAddress: req.ip,
+            userAgent: req.get('User-Agent') || '',
+            metadata: { email: user.email }
+          }
         });
 
         return res.json({
@@ -141,12 +150,14 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
       const token = generateToken(user);
 
       // Create security log entry for successful login
-      await db.insert(schema.securityLogs).values({
-        userId: user.id,
-        eventType: 'login',
-        description: 'User logged in successfully',
-        ipAddress: req.ip,
-        userAgent: req.get('User-Agent')
+      await prisma.securityLog.create({
+        data: {
+          userId: user.id,
+          eventType: 'login',
+          description: 'User logged in successfully',
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent') || ''
+        }
       });
 
       // Return user data and token
@@ -156,10 +167,10 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
         user: {
           id: user.id,
           email: user.email,
-          username: user.username,
-          fullName: user.fullName,
-          role: user.role,
-          isVerified: user.isVerified,
+          name: user.name,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isAdmin: user.isAdmin,
           createdAt: user.createdAt,
           isTwoFactorEnabled: user.isTwoFactorEnabled
         }
@@ -297,38 +308,54 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
       }
 
       // Get user
-      const user = await storage.getUser(parseInt(userId));
+      const user = await prisma.user.findUnique({ where: { id: parseInt(userId) } });
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
 
       // Verify the code
-      const isValid = await storage.verifyTwoFactorCode(parseInt(userId), code);
+      const now = new Date();
+      const isValid = user.twoFactorCode === code && 
+                     user.twoFactorCodeExpiry && 
+                     user.twoFactorCodeExpiry > now;
       
       if (!isValid) {
         // Create security log for failed verification
-        await db.insert(schema.securityLogs).values({
-          userId: parseInt(userId),
-          eventType: '2fa_verification_failed',
-          description: 'Two-factor authentication verification failed during login',
-          ipAddress: req.ip,
-          userAgent: req.get('User-Agent'),
-          metadata: { providedCode: code }
+        await prisma.securityLog.create({
+          data: {
+            userId: parseInt(userId),
+            eventType: '2fa_verification_failed',
+            description: 'Two-factor authentication verification failed during login',
+            ipAddress: req.ip,
+            userAgent: req.get('User-Agent') || '',
+            metadata: { providedCode: code }
+          }
         });
 
         return res.status(400).json({ error: 'Invalid or expired verification code' });
       }
 
+      // Clear the 2FA code after successful verification
+      await prisma.user.update({
+        where: { id: parseInt(userId) },
+        data: {
+          twoFactorCode: null,
+          twoFactorCodeExpiry: null
+        }
+      });
+
       // Generate token after successful 2FA verification
       const token = generateToken(user);
 
       // Create security log for successful login
-      await db.insert(schema.securityLogs).values({
-        userId: parseInt(userId),
-        eventType: 'login',
-        description: 'User logged in successfully with 2FA',
-        ipAddress: req.ip,
-        userAgent: req.get('User-Agent')
+      await prisma.securityLog.create({
+        data: {
+          userId: parseInt(userId),
+          eventType: 'login',
+          description: 'User logged in successfully with 2FA',
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent') || ''
+        }
       });
 
       res.json({
@@ -337,10 +364,10 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
         user: {
           id: user.id,
           email: user.email,
-          username: user.username,
-          fullName: user.fullName,
-          role: user.role,
-          isVerified: user.isVerified,
+          name: user.name,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isAdmin: user.isAdmin,
           createdAt: user.createdAt,
           isTwoFactorEnabled: user.isTwoFactorEnabled
         }
@@ -375,7 +402,10 @@ export function registerAuthRoutes(app: any, apiPrefix: string): void {
       const hashedPassword = await hashPassword(newPassword);
 
       // Update user password
-      await storage.updateUser(user.id, { password: hashedPassword });
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashedPassword }
+      });
 
       res.json({ message: 'Password changed successfully' });
     } catch (error) {

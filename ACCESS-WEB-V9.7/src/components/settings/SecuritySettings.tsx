@@ -124,8 +124,8 @@ export function SecuritySettings() {
   useEffect(() => {
     fetchSecurityLogs();
     // Initialize 2FA state from user data
-    if (user && 'isTwoFactorEnabled' in user) {
-      setTwoFactorEnabled(user.isTwoFactorEnabled || false);
+    if (user && (user as any).isTwoFactorEnabled !== undefined) {
+      setTwoFactorEnabled((user as any).isTwoFactorEnabled);
     }
   }, [user]);
 
