@@ -89,6 +89,12 @@ export const userApi = {
   getUser: async (userId: number) => {
     const response = await apiClient.get(`/v1/users/${userId}`);
     return response.data;
+  },
+
+  // Change user password
+  changePassword: async (userId: number, passwordData: { currentPassword: string; newPassword: string }) => {
+    const response = await apiClient.put(`/v1/users/${userId}/change-password`, passwordData);
+    return response.data;
   }
 };
 

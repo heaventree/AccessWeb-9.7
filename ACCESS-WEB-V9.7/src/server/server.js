@@ -76,6 +76,7 @@ import { handleStripeWebhook } from "../api/webhooks.js";
 import { requireAdmin } from "../middleware/adminAuth.js";
 import { requireAuth } from "../middleware/userAuth.js";
 import { startSubscriptionExpiryChecker } from "../utils/subscriptionExpiry.js";
+import { hashPassword, verifyPassword } from "../utils/passwordUtils.js";
 
 // Create Prisma client
 const prisma = new PrismaClient();
@@ -358,6 +359,58 @@ app.put("/api/v1/users/:id", requireAuth, async (req, res) => {
   } catch (error) {
     logger.error("Update user error:", error);
     res.status(500).json({ error: "Failed to update user" });
+  }
+});
+
+// Change password endpoint
+app.put("/api/v1/users/:id/change-password", requireAuth, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const currentUser = req.user;
+    
+    // Check if user is updating their own password
+    if (currentUser.id !== userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    // Validate input
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ 
+        error: "Current password and new password are required" 
+      });
+    }
+
+    // Get current user data
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await verifyPassword(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    // Hash new password
+    const hashedNewPassword = await hashPassword(newPassword);
+
+    // Update password in database
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedNewPassword },
+    });
+
+    logger.info(`Password changed successfully for user ${userId}`);
+    res.json({ message: "Password changed successfully" });
+  } catch (error) {
+    logger.error("Change password error:", error);
+    res.status(500).json({ error: "Failed to change password" });
   }
 });
 
