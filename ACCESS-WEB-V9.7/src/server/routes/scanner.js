@@ -490,7 +490,7 @@ router.get('/recent-scans', logRequest, async (req, res) => {
         id: scan.id,
         url: scan.scanUrl,
         siteName: siteName,
-        score: Math.round(scan.score * 100), // Convert decimal to percentage
+        score: Math.round(scan.score || 0), // Score is already stored as percentage
         errorCount: scan.errorCount,
         warningCount: scan.warningCount,
         noticeCount: scan.noticeCount,
