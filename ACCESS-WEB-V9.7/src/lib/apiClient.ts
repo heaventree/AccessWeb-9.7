@@ -86,6 +86,9 @@ export const authApi = {
     // Store tokens in localStorage after successful 2FA verification
     if (response.data && response.data.success && response.data.token) {
       localStorage.setItem('accessToken', response.data.token);
+      if (response.data.refreshToken) {
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+      }
     }
     
     return response.data;

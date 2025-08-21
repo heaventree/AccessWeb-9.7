@@ -15,7 +15,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const [pendingUserId, setPendingUserId] = useState<number | null>(null);
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [maskedEmail, setMaskedEmail] = useState('');
-  const { login, error, clearError } = useAuth();
+  const { login, error, clearError, refetchUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -87,6 +87,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
       const result = await authApi.verify2FA(pendingUserId, twoFactorCode);
       
       if (result.success) {
+        // Update authentication context with user data
+        await refetchUser();
+        
         // Clear form and redirect
         setEmail('');
         setPassword('');
