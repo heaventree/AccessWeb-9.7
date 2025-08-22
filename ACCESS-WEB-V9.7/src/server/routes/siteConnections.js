@@ -227,7 +227,10 @@ router.get("/:id", requireAuth, async (req, res) => {
     const userId = req.user.id;
     const connectionId = parseInt(req.params.id);
 
-    logger.info("Fetching individual site connection", { userId, connectionId });
+    logger.info("Fetching individual site connection", {
+      userId,
+      connectionId,
+    });
 
     // Verify connection belongs to user
     const connection = await prisma.siteConnection.findFirst({
@@ -359,7 +362,11 @@ router.patch("/:id", requireAuth, async (req, res) => {
     const connectionId = parseInt(req.params.id);
     const { scanFrequency, autoScanEnabled, siteName, siteUrl } = req.body;
 
-    logger.info("Updating site connection", { userId, connectionId, updateData: req.body });
+    logger.info("Updating site connection", {
+      userId,
+      connectionId,
+      updateData: req.body,
+    });
 
     // Verify connection belongs to user
     const connection = await prisma.siteConnection.findFirst({
@@ -389,7 +396,7 @@ router.patch("/:id", requireAuth, async (req, res) => {
       },
       data: {
         ...(scanFrequency && { scanFrequency }),
-        ...(typeof autoScanEnabled === 'boolean' && { autoScanEnabled }),
+        ...(typeof autoScanEnabled === "boolean" && { autoScanEnabled }),
         ...(siteName && { siteName }),
         ...(siteUrl && { siteUrl }),
         updatedAt: new Date(),
@@ -448,13 +455,13 @@ router.patch("/:id/toggle", requireAuth, async (req, res) => {
       });
     }
 
-    // Check if trying to activate without API key
-    if (!connection.isActive && !connection.apiToken) {
-      return res.status(400).json({
-        success: false,
-        error: "Cannot activate connection without an API key. Please generate an API key first.",
-      });
-    }
+    // // Check if trying to activate without API key
+    // if (!connection.isActive && !connection.apiToken) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     error: "Cannot activate connection without an API key. Please generate an API key first.",
+    //   });
+    // }
 
     // Toggle active status
     const newStatus = !connection.isActive;
