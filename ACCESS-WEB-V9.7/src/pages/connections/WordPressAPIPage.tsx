@@ -434,12 +434,131 @@ export function WordPressAPIPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Setup Instructions */}
+        {/* Schedule Configuration */}
         <div className="lg:col-span-2 space-y-8">
+          {/* Schedule Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl shadow-sm border border-gray-200"
+          >
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                  <Settings className="w-6 h-6 text-blue-600 mr-3" />
+                  Schedule Configuration
+                </h2>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="scanFrequency" className="block text-sm font-medium text-gray-700 mb-2">
+                      Scan Frequency
+                    </label>
+                    <select
+                      id="scanFrequency"
+                      value={settings.scanFrequency}
+                      onChange={(e) => setSettings({ ...settings, scanFrequency: e.target.value })}
+                      className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="testing">Testing (15 seconds)</option>
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="monthly">Monthly</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-start">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="autoScan"
+                          type="checkbox"
+                          checked={settings.autoScanEnabled}
+                          onChange={(e) => setSettings({ ...settings, autoScanEnabled: e.target.checked })}
+                          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="ml-3 text-sm">
+                        <label htmlFor="autoScan" className="font-medium text-gray-700">
+                          Auto-scan Enabled
+                        </label>
+                        <p className="text-gray-500">Automatically scan for accessibility issues</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="notifyAdmin"
+                          type="checkbox"
+                          checked={settings.notifyAdmin}
+                          onChange={(e) => setSettings({ ...settings, notifyAdmin: e.target.checked })}
+                          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="ml-3 text-sm">
+                        <label htmlFor="notifyAdmin" className="font-medium text-gray-700">
+                          Notify Admin
+                        </label>
+                        <p className="text-gray-500">Send notifications when issues are found</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="autoFix"
+                          type="checkbox"
+                          checked={settings.autoFix}
+                          onChange={(e) => setSettings({ ...settings, autoFix: e.target.checked })}
+                          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="ml-3 text-sm">
+                        <label htmlFor="autoFix" className="font-medium text-gray-700">
+                          Auto-fix Issues
+                        </label>
+                        <p className="text-gray-500">Automatically apply fixes when possible</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleUpdateSettings}
+                    disabled={updating}
+                    className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {updating ? (
+                      <>
+                        <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                        Saving...
+                      </>
+                    ) : (
+                      'Save Settings'
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Plugin Integration Section */}
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Plugin Integration</h2>
+            <p className="text-gray-600 mb-6">Set up and manage your WordPress plugin integration for accessibility monitoring.</p>
+          </div>
+
           {/* WordPress Plugin Setup */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
             className="bg-white rounded-xl shadow-sm border border-gray-200"
           >
             <div className="p-6 border-b border-gray-200">
@@ -497,7 +616,7 @@ export function WordPressAPIPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.2 }}
             className="bg-white rounded-xl shadow-sm border border-gray-200"
           >
             <div className="p-6 border-b border-gray-200">
@@ -616,120 +735,6 @@ export function WordPressAPIPage() {
             </div>
           </motion.div>
 
-          {/* WordPress Configuration */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-200"
-          >
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                  <Settings className="w-6 h-6 text-blue-600 mr-3" />
-                  Configuration Settings
-                </h2>
-                <span className="text-sm text-gray-500">Step 3</span>
-              </div>
-            </div>
-
-            <div className="p-6">
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="scanFrequency" className="block text-sm font-medium text-gray-700 mb-2">
-                      Scan Frequency
-                    </label>
-                    <select
-                      id="scanFrequency"
-                      value={settings.scanFrequency}
-                      onChange={(e) => setSettings({ ...settings, scanFrequency: e.target.value })}
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="testing">Testing (15 seconds)</option>
-                      <option value="daily">Daily</option>
-                      <option value="weekly">Weekly</option>
-                      <option value="monthly">Monthly</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-start">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="autoScan"
-                          type="checkbox"
-                          checked={settings.autoScanEnabled}
-                          onChange={(e) => setSettings({ ...settings, autoScanEnabled: e.target.checked })}
-                          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                      </div>
-                      <div className="ml-3 text-sm">
-                        <label htmlFor="autoScan" className="font-medium text-gray-700">
-                          Auto-scan Enabled
-                        </label>
-                        <p className="text-gray-500">Automatically scan for accessibility issues</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="notifyAdmin"
-                          type="checkbox"
-                          checked={settings.notifyAdmin}
-                          onChange={(e) => setSettings({ ...settings, notifyAdmin: e.target.checked })}
-                          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                      </div>
-                      <div className="ml-3 text-sm">
-                        <label htmlFor="notifyAdmin" className="font-medium text-gray-700">
-                          Notify Admin
-                        </label>
-                        <p className="text-gray-500">Send notifications when issues are found</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="autoFix"
-                          type="checkbox"
-                          checked={settings.autoFix}
-                          onChange={(e) => setSettings({ ...settings, autoFix: e.target.checked })}
-                          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                      </div>
-                      <div className="ml-3 text-sm">
-                        <label htmlFor="autoFix" className="font-medium text-gray-700">
-                          Auto-fix Issues
-                        </label>
-                        <p className="text-gray-500">Automatically apply fixes when possible</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    onClick={handleUpdateSettings}
-                    disabled={updating}
-                    className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    {updating ? (
-                      <>
-                        <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
-                        Saving...
-                      </>
-                    ) : (
-                      'Save Settings'
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
           {/* WordPress Periodic Scan Control */}
           {connection.apiToken && (
             <motion.div
@@ -744,7 +749,7 @@ export function WordPressAPIPage() {
                     <Clock className="w-6 h-6 text-blue-600 mr-3" />
                     WordPress Code Change Detection
                   </h2>
-                  <span className="text-sm text-gray-500">Step 4</span>
+                  <span className="text-sm text-gray-500">Step 3</span>
                 </div>
               </div>
 
