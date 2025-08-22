@@ -329,7 +329,7 @@ export function SubscriptionDashboard() {
                       </p>
                       <div className="mt-6">
                         <Link
-                          to="/my-account/monitoring"
+                          to="/my-account/connections"
                           className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
                         >
                           <Globe className="mr-1.5 h-4 w-4" />
