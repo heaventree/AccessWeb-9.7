@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Code, Store, Globe, ArrowRight, Plus, PlugZap, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import apiClient from '../../lib/apiClient';
@@ -31,6 +31,7 @@ interface UnifiedConnection {
 }
 
 export function ConnectionsPage() {
+  const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
   const [userConnections, setUserConnections] = useState<SiteConnection[]>([]);
   const [formData, setFormData] = useState({
@@ -85,7 +86,10 @@ export function ConnectionsPage() {
         setShowAddModal(false);
         setFormData({ type: '', name: '', url: '' });
         fetchUserConnections();
-        alert('Connection added successfully!');
+        
+        // Navigate to the configuration page for the newly added connection
+        const newConnection = response.data.data;
+        navigate(`/my-account/connections/${formData.type}/${newConnection.id}`);
       }
     } catch (error: any) {
       console.error('Error adding connection:', error);
