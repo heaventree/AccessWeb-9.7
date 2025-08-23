@@ -1,6 +1,7 @@
 import PgBoss from 'pg-boss';
 import { PrismaClient } from '@prisma/client';
 import { accessibilityScanner } from '../services/accessibilityScanner.js';
+import { notificationService } from '../services/notificationService.js';
 import nodemailer from 'nodemailer';
 
 // Inline notification service instead of dynamic loading
@@ -22,7 +23,7 @@ class SiteScannerJobQueue {
   async initialize() {
     try {
       // Notification service is now inline - no loading required
-      console.log('📧 [NOTIFICATION] Notification service ready (inline)');
+      console.log('📧 [NOTIFICATION] Notification service ready (with in-app notifications)');
 
       // Initialize pg-boss with database connection
       this.boss = new PgBoss({
@@ -162,11 +163,24 @@ class SiteScannerJobQueue {
           if (siteConnection) {
             console.log(`📧 [NOTIFICATION] Found site connection, sending notification for: ${siteConnection.siteName}`);
             
-            const result = await this.sendScanCompletionNotification(
-              userId, 
-              scanResult, 
-              siteConnection
-            );
+            // Use the new notification service for consistent notifications
+            try {
+              await notificationService.createScanCompletedNotification(userId, {
+                siteUrl: siteConnection.siteUrl,
+                issuesFound: scanResult.errorCount || 0,
+                criticalIssues: scanResult.errorCount > 10 ? Math.floor(scanResult.errorCount * 0.3) : 0,
+                scanId: scanResult.scanResultId
+              });
+              console.log(`✅ [NOTIFICATION] New notification service used for scan completion`);
+            } catch (notificationError) {
+              console.log(`⚠️ [NOTIFICATION] New service failed, falling back to old method`);
+              // Fallback to old method if new service fails
+              const result = await this.sendScanCompletionNotification(
+                userId, 
+                scanResult, 
+                siteConnection
+              );
+            }
             
             if (result) {
               console.log(`✅ [NOTIFICATION] Scan completion notification sent successfully for site: ${siteName}`);
@@ -404,11 +418,22 @@ class SiteScannerJobQueue {
           // Send notification for testing scans as well
           if (scanResult && scanResult.scanResultId) {
             try {
-              await this.sendScanCompletionNotification(
-                connection.userId, 
-                scanResult, 
-                connection
-              );
+              // Use the new notification service for testing scan notifications too
+              try {
+                await notificationService.createScanCompletedNotification(connection.userId, {
+                  siteUrl: connection.siteUrl,
+                  issuesFound: scanResult.errorCount || 0,
+                  criticalIssues: scanResult.errorCount > 10 ? Math.floor(scanResult.errorCount * 0.3) : 0,
+                  scanId: scanResult.scanResultId
+                });
+              } catch (notificationError) {
+                // Fallback to old method
+                await this.sendScanCompletionNotification(
+                  connection.userId, 
+                  scanResult, 
+                  connection
+                );
+              }
               console.log(`📧 [NOTIFICATION] Testing scan notification sent for site: ${connection.siteName}`);
             } catch (notificationError) {
               console.error(`❌ [NOTIFICATION] Failed to send testing scan notification:`, notificationError);
@@ -517,7 +542,7 @@ class SiteScannerJobQueue {
   }
 
   /**
-   * Send scan completion notification email (inline implementation)
+   * Send scan completion notification (both email and in-app)
    */
   async sendScanCompletionNotification(userId, scanResult, siteConnection) {
     try {
@@ -536,41 +561,113 @@ class SiteScannerJobQueue {
         return false;
       }
 
-      if (!user.email) {
-        console.log(`⚠️ [NOTIFICATION] User ${userId} has no email address, skipping notification`);
-        return false;
-      }
-
       // Check notification preferences - default to enabled if not set
       const preferences = user.notificationPreferences;
       const emailNotificationsEnabled = preferences?.emailNotifications !== false;
+      const browserNotificationsEnabled = preferences?.browserNotifications !== false;
       const scanCompletionEnabled = preferences?.scanCompletion !== false;
 
-      console.log(`📧 [NOTIFICATION] User preferences - email: ${emailNotificationsEnabled}, scanCompletion: ${scanCompletionEnabled}`);
+      console.log(`📧 [NOTIFICATION] User preferences - email: ${emailNotificationsEnabled}, browser: ${browserNotificationsEnabled}, scanCompletion: ${scanCompletionEnabled}`);
 
-      if (!emailNotificationsEnabled || !scanCompletionEnabled) {
-        console.log(`🔕 [NOTIFICATION] User ${userId} has disabled notifications, skipping`);
+      if (!scanCompletionEnabled) {
+        console.log(`🔕 [NOTIFICATION] User ${userId} has disabled scan completion notifications, skipping`);
         return false;
       }
 
-      // Send email notification
-      const emailSent = await this.sendScanCompletionEmail(
-        user.email,
-        user.firstName || 'User',
-        scanResult,
-        siteConnection
-      );
+      let emailSent = false;
+      let inAppCreated = false;
 
-      if (emailSent) {
-        console.log(`✅ [NOTIFICATION] Scan completion notification sent successfully to ${user.email}`);
+      // Create in-app notification if browser notifications are enabled
+      if (browserNotificationsEnabled) {
+        inAppCreated = await this.createInAppNotification(userId, scanResult, siteConnection);
+      }
+
+      // Send email notification if email notifications are enabled and user has email
+      if (emailNotificationsEnabled && user.email) {
+        emailSent = await this.sendScanCompletionEmail(
+          user.email,
+          user.firstName || 'User',
+          scanResult,
+          siteConnection
+        );
+      }
+
+      const success = emailSent || inAppCreated;
+      if (success) {
+        console.log(`✅ [NOTIFICATION] Scan completion notification sent successfully (email: ${emailSent}, in-app: ${inAppCreated})`);
         return true;
       } else {
-        console.log(`❌ [NOTIFICATION] Failed to send scan completion notification to ${user.email}`);
+        console.log(`❌ [NOTIFICATION] Failed to send scan completion notification`);
         return false;
       }
 
     } catch (error) {
       console.error('❌ [NOTIFICATION] Error in sendScanCompletionNotification:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Create in-app notification record
+   */
+  async createInAppNotification(userId, scanResult, siteConnection) {
+    try {
+      const { errorCount, warningCount, noticeCount, score, scanStatus } = scanResult;
+      
+      let priority = 'normal';
+      if (scanStatus === 'failed' || errorCount > 50) {
+        priority = 'critical';
+      } else if (errorCount > 20) {
+        priority = 'high';
+      } else if (errorCount <= 5) {
+        priority = 'low';
+      }
+
+      let title = '';
+      let message = '';
+
+      if (scanStatus === 'failed') {
+        title = `Accessibility scan failed`;
+        message = `The accessibility scan for ${siteConnection.siteName} failed to complete. Please check your site configuration and try again.`;
+      } else if (errorCount === 0) {
+        title = `🎉 Perfect accessibility score!`;
+        message = `Your site ${siteConnection.siteName} passed all accessibility tests with a score of ${score}%.`;
+      } else if (errorCount <= 5) {
+        title = `Minor accessibility issues found`;
+        message = `Your site ${siteConnection.siteName} scored ${score}% with ${errorCount} minor accessibility issues.`;
+      } else {
+        title = `Accessibility scan completed`;
+        message = `Your site ${siteConnection.siteName} scored ${score}% with ${errorCount} accessibility issues found.`;
+      }
+
+      const actionUrl = `/dashboard/reports/${scanResult.scanResultId}`;
+
+      const notification = await prisma.notification.create({
+        data: {
+          userId,
+          type: 'accessibility_scan',
+          category: 'scan_completed',
+          title,
+          message,
+          actionUrl,
+          actionLabel: 'View Report',
+          priority,
+          metadata: {
+            siteConnectionId: siteConnection.id,
+            scanResultId: scanResult.scanResultId,
+            siteName: siteConnection.siteName,
+            score,
+            errorCount,
+            warningCount,
+            noticeCount
+          }
+        }
+      });
+
+      console.log(`📱 [NOTIFICATION] In-app notification created with ID: ${notification.id}`);
+      return true;
+    } catch (error) {
+      console.error('❌ [NOTIFICATION] Failed to create in-app notification:', error);
       return false;
     }
   }

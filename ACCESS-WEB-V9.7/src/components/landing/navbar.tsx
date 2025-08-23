@@ -15,6 +15,7 @@ import {
 import NavDropdown from "./navbar-dropdown";
 import NavigationIcons from "../navigation/NavigationIconGuide";
 import { useAuth } from "../../contexts/AuthContext";
+import { NotificationBell } from "../notifications/NotificationBell";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -310,7 +311,8 @@ export default function Navbar() {
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0fae96] border-t-transparent"></div>
           ) : user ? (
             <>
-              <div className="hidden md:flex items-center space-x-2">
+              <div className="hidden md:flex items-center space-x-3">
+                <NotificationBell />
                 <span className="text-muted-foreground dark:text-gray-300">
                   {user.email}
                 </span>

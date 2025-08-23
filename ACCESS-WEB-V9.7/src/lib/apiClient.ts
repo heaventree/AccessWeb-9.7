@@ -151,6 +151,34 @@ export const userApi = {
   updateNotificationPreferences: async (userId: number, preferences: any) => {
     const response = await apiClient.put(`/v1/users/${userId}/notification-preferences`, preferences);
     return response.data;
+  },
+
+  // In-app notifications
+  getNotifications: async (page = 1, limit = 20, unreadOnly = false) => {
+    const response = await apiClient.get('/v1/users/notifications', {
+      params: { page, limit, unreadOnly }
+    });
+    return response.data;
+  },
+
+  getUnreadNotificationCount: async () => {
+    const response = await apiClient.get('/v1/users/notifications/unread-count');
+    return response.data;
+  },
+
+  markNotificationAsRead: async (notificationId: number) => {
+    const response = await apiClient.patch(`/v1/users/notifications/${notificationId}/read`);
+    return response.data;
+  },
+
+  markAllNotificationsAsRead: async () => {
+    const response = await apiClient.patch('/v1/users/notifications/mark-all-read');
+    return response.data;
+  },
+
+  deleteNotification: async (notificationId: number) => {
+    const response = await apiClient.delete(`/v1/users/notifications/${notificationId}`);
+    return response.data;
   }
 };
 

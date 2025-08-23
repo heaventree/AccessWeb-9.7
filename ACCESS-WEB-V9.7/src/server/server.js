@@ -209,6 +209,9 @@ import publicApiRouter from "./routes/publicApi.js";
 // API Routes - Move AI suggestions before accessibility router to avoid conflicts
 app.use("/api/auth", authRouter);
 
+// Notification routes (before accessibility to avoid conflicts)
+app.use("/api/notifications", (await import('./routes/notifications.ts')).default);
+
 // Debug: Add logging to verify accessibility router mounting
 console.log("Mounting accessibility router at /api/accessibility");
 app.use("/api/accessibility", accessibilityRouter);
