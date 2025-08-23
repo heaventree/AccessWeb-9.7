@@ -1,4 +1,4 @@
-import { emailService } from './emailService';
+import nodemailer from 'nodemailer';
 import { prisma } from '../../lib/prisma';
 import { storage } from '../storage';
 
@@ -293,18 +293,14 @@ export class NotificationService {
    * Send custom HTML email (extending the email service)
    */
   async sendCustomEmail(to, subject, htmlContent, userName) {
-    // Use existing email service transporter or create Gmail transporter if needed
-    const transporter = emailService.transporter;
-    
-    if (!transporter) {
-      // Create Gmail transporter if email service isn't configured
-      if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
-        console.error('[NOTIFICATION] Gmail credentials not configured');
-        return false;
-      }
+    // Create Gmail transporter directly
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
+      console.error('[NOTIFICATION] Gmail credentials not configured');
+      return false;
+    }
 
-      const nodemailer = await import('nodemailer');
-      const gmailTransporter = nodemailer.default.createTransporter({
+    try {
+      const gmailTransporter = nodemailer.createTransporter({
         service: 'gmail',
         auth: {
           user: process.env.GMAIL_USER,
@@ -312,28 +308,8 @@ export class NotificationService {
         }
       });
 
-      try {
-        const mailOptions = {
-          from: `"Access Checker" <${process.env.GMAIL_USER}>`,
-          to,
-          subject,
-          html: htmlContent,
-          // Generate text version from HTML
-          text: this.htmlToText(htmlContent)
-        };
-
-        const info = await gmailTransporter.sendMail(mailOptions);
-        console.log(`[NOTIFICATION] Email sent successfully via Gmail: ${info.messageId}`);
-        return true;
-      } catch (error) {
-        console.error('[NOTIFICATION] Failed to send email via Gmail:', error);
-        return false;
-      }
-    }
-
-    try {
       const mailOptions = {
-        from: `"Access Checker" <${process.env.GMAIL_USER || 'noreply@accesschecker.com'}>`,
+        from: `"Access Checker" <${process.env.GMAIL_USER}>`,
         to,
         subject,
         html: htmlContent,
@@ -341,11 +317,11 @@ export class NotificationService {
         text: this.htmlToText(htmlContent)
       };
 
-      const info = await transporter.sendMail(mailOptions);
-      console.log(`[NOTIFICATION] Email sent successfully: ${info.messageId}`);
+      const info = await gmailTransporter.sendMail(mailOptions);
+      console.log(`[NOTIFICATION] Email sent successfully via Gmail: ${info.messageId}`);
       return true;
     } catch (error) {
-      console.error('[NOTIFICATION] Failed to send email:', error);
+      console.error('[NOTIFICATION] Failed to send email via Gmail:', error);
       return false;
     }
   }
