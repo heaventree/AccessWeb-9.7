@@ -181,12 +181,6 @@ class SiteScannerJobQueue {
                 siteConnection
               );
             }
-            
-            if (result) {
-              console.log(`✅ [NOTIFICATION] Scan completion notification sent successfully for site: ${siteName}`);
-            } else {
-              console.log(`❌ [NOTIFICATION] Scan completion notification failed for site: ${siteName}`);
-            }
           } else {
             console.log(`❌ [NOTIFICATION] Site connection not found for ID: ${connectionId}`);
           }

@@ -29,7 +29,7 @@ const notificationApi = {
     
     const response = await fetch(`/api/notifications?${queryParams}`, {
       headers: { 
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         'Content-Type': 'application/json'
       }
     });
@@ -39,7 +39,7 @@ const notificationApi = {
   async getNotificationStats() {
     const response = await fetch('/api/notifications/stats', {
       headers: { 
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         'Content-Type': 'application/json'
       }
     });
@@ -50,7 +50,7 @@ const notificationApi = {
     const response = await fetch(`/api/notifications/${id}/read`, {
       method: 'PATCH',
       headers: { 
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         'Content-Type': 'application/json'
       }
     });
@@ -61,7 +61,7 @@ const notificationApi = {
     const response = await fetch('/api/notifications/mark-all-read', {
       method: 'PATCH',
       headers: { 
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         'Content-Type': 'application/json'
       }
     });
@@ -72,7 +72,7 @@ const notificationApi = {
     const response = await fetch(`/api/notifications/${id}`, {
       method: 'DELETE',
       headers: { 
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         'Content-Type': 'application/json'
       }
     });
