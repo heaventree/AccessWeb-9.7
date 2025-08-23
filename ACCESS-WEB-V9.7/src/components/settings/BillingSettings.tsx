@@ -426,155 +426,19 @@ export function BillingSettings() {
               )}
             </div>
             <div className="flex gap-3">
-              {(subscription.plan === 'free' || subscription.status === 'expired') && (
-                <button 
-                  onClick={handleChangePlan}
-                  className={`px-6 py-3 rounded-full font-semibold transition-all transform hover:scale-105 ${
-                    subscription.status === 'expired'
-                      ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg hover:shadow-xl animate-pulse'
-                      : 'bg-[#0fae96] text-white hover:bg-[#0fae96]/90'
-                  }`}
-                >
-                  {subscription.status === 'expired' ? 'Reactivate Now!' : 'Upgrade Plan'}
-                </button>
-              )}
-              {subscription.plan !== 'free' && subscription.status === 'active' && (
-                <button 
-                  onClick={() => setShowCancelModal(true)}
-                  className="text-red-600 hover:text-red-700 text-sm font-medium transition-colors border border-red-200 hover:border-red-300 px-4 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10"
-                >
-                  Cancel Subscription
-                </button>
-              )}
+              <button 
+                onClick={() => navigate('/billing')}
+                className="px-4 py-2 bg-[#0fae96] text-white text-sm font-medium rounded-lg hover:bg-[#0fae96]/90 transition-colors"
+                title="Go to billing page to manage your subscription"
+              >
+                Manage in Billing
+              </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Show available plans if user has free plan, no subscription, or expired subscription */}
-      {(subscription?.plan === 'free' || !subscription || subscription?.status === 'expired') && subscription?.status !== 'canceled' && (
-        <div id="billing-plans-section" className="mx-6 mb-6">
-          {subscription?.status === 'expired' && (
-            <div className="mb-8 p-6 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 border-2 border-orange-300 dark:border-orange-700 rounded-xl">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-orange-800 dark:text-orange-200 mb-2">
-                  Reactivate Your Subscription
-                </h2>
-                <p className="text-orange-700 dark:text-orange-300 text-lg">
-                  Choose a plan below to restore full access to all premium features
-                </p>
-              </div>
-            </div>
-          )}
-          
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            {subscription?.status === 'expired' ? 'Choose Your Plan' : 'Choose Your Plan'}
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {plans.filter(plan => plan.name !== 'Free').map((plan) => (
-              <div key={plan.id} className={`bg-white dark:bg-slate-800 rounded-xl shadow-sm border p-6 relative transition-all hover:shadow-lg ${
-                plan.isPopular 
-                  ? subscription?.status === 'expired'
-                    ? 'ring-4 ring-orange-400 shadow-xl transform scale-105 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20'
-                    : 'ring-2 ring-[#0fae96] border-[#0fae96]'
-                  : 'border-gray-200 dark:border-slate-700'
-              }`}>
-                {plan.isPopular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className={`px-4 py-1 rounded-full text-sm font-medium ${
-                      subscription?.status === 'expired'
-                        ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg animate-pulse'
-                        : 'bg-[#0fae96] text-white'
-                    }`}>
-                      {subscription?.status === 'expired' ? 'BEST VALUE' : 'Most Popular'}
-                    </span>
-                  </div>
-                )}
-                
-                <div className="text-center">
-                  <h4 className="text-xl font-bold text-gray-900 dark:text-white">{plan.name}</h4>
-                  <p className="text-gray-600 dark:text-gray-300 mt-2">{plan.description}</p>
-                  
-                  <div className="mt-4">
-                    <span className="text-4xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
-                    <span className="text-gray-600 dark:text-gray-300">/{plan.period}</span>
-                  </div>
-                  
-                  <ul className="mt-6 space-y-3">
-                    {plan.features?.map((feature, index) => (
-                      <li key={index} className="flex items-center">
-                        <span className="mr-3 text-green-500">✓</span>
-                        <span className="text-sm text-gray-900 dark:text-white">
-                          {typeof feature === 'string' ? feature : feature.text || feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <button
-                    onClick={() => handleUpgradePlan(plan.id)}
-                    className={`mt-6 w-full py-3 px-4 rounded-full font-medium transition-all transform hover:scale-105 ${
-                      subscription?.status === 'expired' && plan.isPopular
-                        ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg hover:shadow-xl animate-pulse'
-                        : plan.isPopular 
-                          ? 'bg-[#0fae96] text-white hover:bg-[#0fae96]/90' 
-                          : 'border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    {subscription?.status === 'expired' && plan.isPopular 
-                      ? 'Reactivate Now!' 
-                      : subscription?.status === 'expired' 
-                        ? 'Choose This Plan' 
-                        : plan.cta || 'Get Started'}
-                  </button>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       )}
 
       <div className="p-6 space-y-6">
-        {/* Payment Method */}
-        <div className="pt-6 border-t border-gray-200 dark:border-slate-700">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white">Payment Method</h3>
-          {!paymentMethod ? (
-            <div className="mt-2">
-              <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-slate-700 rounded-lg bg-gray-50 dark:bg-slate-700">
-                <div className="text-sm text-gray-500 dark:text-gray-400">No payment method on file</div>
-                <button 
-                  onClick={handleUpdatePaymentMethod}
-                  className="text-[#0fae96] hover:text-[#0fae96]/90 font-medium text-sm"
-                >
-                  Add Method
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="mt-2">
-              <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
-                <div className="flex items-center">
-                  <CreditCard className="h-5 w-5 text-gray-400" />
-                  <div className="ml-3">
-                    <p className="text-sm text-gray-900 dark:text-white">
-                      {paymentMethod.brand.charAt(0).toUpperCase() + paymentMethod.brand.slice(1)} •••• {paymentMethod.last4}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Expires {paymentMethod.expMonth}/{paymentMethod.expYear}
-                    </p>
-                  </div>
-                </div>
-                <button 
-                  onClick={handleUpdatePaymentMethod}
-                  className="text-[#0fae96] hover:text-[#0fae96]/90 font-medium text-sm"
-                >
-                  Update
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* Recent Transactions (Limited) */}
         <div className="pt-6 border-t border-gray-200 dark:border-slate-700">
