@@ -13,17 +13,12 @@ router.get('/', authenticateToken, async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const unreadOnly = req.query.unreadOnly === 'true';
     
-    console.log('🔔 [NOTIFICATIONS] Fetching notifications for user:', userId);
-    console.log('🔔 [NOTIFICATIONS] Query params:', { page, limit, unreadOnly });
-    
     const skip = (page - 1) * limit;
     
     const where = {
       userId,
       ...(unreadOnly ? { isRead: false } : {})
     };
-    
-    console.log('🔔 [NOTIFICATIONS] Where condition:', where);
     
     const [notifications, totalCount, unreadCount] = await Promise.all([
       prisma.notification.findMany({
@@ -48,9 +43,6 @@ router.get('/', authenticateToken, async (req, res) => {
       prisma.notification.count({ where: { userId, isRead: false } })
     ]);
 
-    console.log('🔔 [NOTIFICATIONS] Found notifications:', notifications.length);
-    console.log('🔔 [NOTIFICATIONS] Sample notification:', notifications[0] || 'none');
-    console.log('🔔 [NOTIFICATIONS] Total count:', totalCount, 'Unread count:', unreadCount);
 
     res.json({
       success: true,

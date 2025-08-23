@@ -17,7 +17,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
     if (loadNotifications) {
       loadNotifications({ limit: 20 });
     }
-  }, [loadNotifications]);
+  }, []); // Empty dependency array - only run once when component mounts
 
   const handleNotificationClick = async (notification: any) => {
     // Mark as read when clicked
