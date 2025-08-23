@@ -12,6 +12,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 import authRouter from "../api/auth.js";
 import accessibilityRouter from "../api/accessibility.js";
+import nodemailer from 'nodemailer';
+
+// Configure email transporter for 2FA codes
+const transporter = nodemailer.createTransporter({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS
+  }
+});
 
 // Enhanced logging utility
 const logger = {
@@ -512,9 +522,45 @@ app.put("/api/v1/users/:id/two-factor", requireAuth, async (req, res) => {
         }
       });
       
-      // Send setup confirmation email (you'll need to implement email service)
-      // For now, just log the code for testing
-      console.log(`2FA Setup Code for user ${userId}: ${code}`);
+      // Send setup confirmation email
+      const mailOptions = {
+        from: process.env.GMAIL_USER,
+        to: user.email,
+        subject: 'Verify Two-Factor Authentication Setup',
+        html: `
+          <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
+            <h2 style="color: #0fae96;">🔒 Two-Factor Authentication Setup</h2>
+            <p>Hello ${user.name || user.email},</p>
+            <p>You've requested to <strong>enable two-factor authentication</strong> on your Access Checker account. To confirm this action and protect against accidental lockouts, please enter the verification code below:</p>
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+              <span style="font-size: 32px; font-weight: bold; color: #0fae96; letter-spacing: 8px;">${code}</span>
+            </div>
+            <div style="background: #e0f2fe; border: 1px solid #0369a1; border-radius: 6px; padding: 15px; margin: 20px 0;">
+              <p style="margin: 0; color: #0369a1; font-size: 14px;">
+                <strong>ℹ️ Important:</strong> Once enabled, you'll need a verification code sent to this email address each time you log in. Make sure you have access to this email account.
+              </p>
+            </div>
+            <p>This code will expire in 5 minutes.</p>
+            <p style="color: #666; font-size: 14px;">If you didn't request this change, please ignore this email and check your account security.</p>
+          </div>
+        `
+      };
+
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log(`2FA Setup email sent successfully to ${user.email}`);
+      } catch (emailError) {
+        console.error('Failed to send 2FA setup email:', emailError);
+        // If email failed to send, clear the code from database and return error
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            twoFactorCode: null,
+            twoFactorCodeExpiry: null
+          }
+        });
+        return res.status(500).json({ error: 'Failed to send verification email. Please try again.' });
+      }
       
       // Return success but don't update 2FA status yet
       return res.json({
