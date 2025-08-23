@@ -1,12 +1,12 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { requireAuth } from '../middleware/auth.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Get user notifications with pagination
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
     const userId = req.user?.id;
     const page = parseInt(req.query.page) || 1;
@@ -65,7 +65,7 @@ router.get('/', requireAuth, async (req, res) => {
 });
 
 // Mark notification as read
-router.patch('/:id/read', requireAuth, async (req, res) => {
+router.patch('/:id/read', authenticateToken, async (req, res) => {
   try {
     const userId = req.user?.id;
     const notificationId = parseInt(req.params.id);
@@ -98,7 +98,7 @@ router.patch('/:id/read', requireAuth, async (req, res) => {
 });
 
 // Mark all notifications as read
-router.patch('/mark-all-read', requireAuth, async (req, res) => {
+router.patch('/mark-all-read', authenticateToken, async (req, res) => {
   try {
     const userId = req.user?.id;
 
@@ -119,7 +119,7 @@ router.patch('/mark-all-read', requireAuth, async (req, res) => {
 });
 
 // Delete notification
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const userId = req.user?.id;
     const notificationId = parseInt(req.params.id);
@@ -151,7 +151,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
 });
 
 // Get notification stats
-router.get('/stats', requireAuth, async (req, res) => {
+router.get('/stats', authenticateToken, async (req, res) => {
   try {
     const userId = req.user?.id;
 
