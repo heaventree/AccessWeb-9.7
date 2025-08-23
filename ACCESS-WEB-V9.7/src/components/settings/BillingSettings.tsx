@@ -576,17 +576,20 @@ export function BillingSettings() {
           )}
         </div>
 
-        {/* Billing History */}
+        {/* Recent Transactions (Limited) */}
         <div className="pt-6 border-t border-gray-200 dark:border-slate-700">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white">Billing History</h3>
-            <button className="text-[#0fae96] hover:text-[#0fae96]/90 font-medium text-sm">
+            <h3 className="text-sm font-medium text-gray-900 dark:text-white">Recent Transactions</h3>
+            <button 
+              onClick={() => navigate('/billing')}
+              className="text-[#0fae96] hover:text-[#0fae96]/90 font-medium text-sm"
+            >
               View All
             </button>
           </div>
           <div className="bg-gray-50 dark:bg-slate-700 rounded-lg overflow-hidden">
             {paymentHistory.length > 0 ? (
-              paymentHistory.map((payment) => (
+              paymentHistory.slice(0, 3).map((payment) => (
                 <div key={payment.id} className="px-4 py-3 border-b border-gray-200 dark:border-slate-600 last:border-0">
                   <div className="flex items-center justify-between">
                     <div>
@@ -620,6 +623,36 @@ export function BillingSettings() {
                 No billing history available
               </div>
             )}
+          </div>
+          {paymentHistory.length > 3 && (
+            <div className="mt-2 text-center">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Showing {Math.min(3, paymentHistory.length)} of {paymentHistory.length} transactions
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Full Billing Management */}
+        <div className="pt-6 border-t border-gray-200 dark:border-slate-700">
+          <div className="bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-700/50 dark:to-slate-600/50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                  Need More Billing Options?
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  View complete billing history, update payment methods, and manage invoices
+                </p>
+              </div>
+              <button 
+                onClick={() => navigate('/billing')}
+                className="px-4 py-2 bg-[#0fae96] text-white text-sm font-medium rounded-lg hover:bg-[#0fae96]/90 transition-colors flex items-center gap-2"
+              >
+                <CreditCard className="h-4 w-4" />
+                Manage Billing
+              </button>
+            </div>
           </div>
         </div>
       </div>
