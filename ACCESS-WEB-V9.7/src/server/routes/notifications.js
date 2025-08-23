@@ -16,14 +16,14 @@ router.get('/', authenticateToken, async (req, res) => {
     const skip = (page - 1) * limit;
     
     const where = {
-      user_id: userId,
-      ...(unreadOnly ? { is_read: false } : {})
+      userId,
+      ...(unreadOnly ? { isRead: false } : {})
     };
     
     const [notifications, totalCount, unreadCount] = await Promise.all([
       prisma.notification.findMany({
         where,
-        orderBy: { created_at: 'desc' },
+        orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
         select: {
@@ -33,33 +33,19 @@ router.get('/', authenticateToken, async (req, res) => {
           title: true,
           message: true,
           priority: true,
-          is_read: true,
-          action_url: true,
+          isRead: true,
+          actionUrl: true,
           metadata: true,
-          created_at: true
+          createdAt: true
         }
       }),
       prisma.notification.count({ where }),
-      prisma.notification.count({ where: { user_id: userId, is_read: false } })
+      prisma.notification.count({ where: { userId, isRead: false } })
     ]);
-
-    // Convert snake_case to camelCase for frontend compatibility
-    const formattedNotifications = notifications.map(notification => ({
-      id: notification.id,
-      type: notification.type,
-      category: notification.category,
-      title: notification.title,
-      message: notification.message,
-      priority: notification.priority,
-      isRead: notification.is_read,
-      actionUrl: notification.action_url,
-      metadata: notification.metadata,
-      createdAt: notification.created_at
-    }));
 
     res.json({
       success: true,
-      notifications: formattedNotifications,
+      notifications,
       pagination: {
         page,
         limit,
@@ -85,7 +71,7 @@ router.patch('/:id/read', authenticateToken, async (req, res) => {
     const notificationId = parseInt(req.params.id);
 
     const notification = await prisma.notification.findFirst({
-      where: { id: notificationId, user_id: userId }
+      where: { id: notificationId, userId }
     });
 
     if (!notification) {
@@ -97,7 +83,7 @@ router.patch('/:id/read', authenticateToken, async (req, res) => {
 
     await prisma.notification.update({
       where: { id: notificationId },
-      data: { is_read: true, read_at: new Date() }
+      data: { isRead: true, readAt: new Date() }
     });
 
     res.json({ success: true });
@@ -117,8 +103,8 @@ router.patch('/mark-all-read', authenticateToken, async (req, res) => {
     const userId = req.user?.id;
 
     await prisma.notification.updateMany({
-      where: { user_id: userId, is_read: false },
-      data: { is_read: true, read_at: new Date() }
+      where: { userId, isRead: false },
+      data: { isRead: true, readAt: new Date() }
     });
 
     res.json({ success: true });
@@ -139,7 +125,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     const notificationId = parseInt(req.params.id);
 
     const notification = await prisma.notification.findFirst({
-      where: { id: notificationId, user_id: userId }
+      where: { id: notificationId, userId }
     });
 
     if (!notification) {
@@ -170,8 +156,8 @@ router.get('/stats', authenticateToken, async (req, res) => {
     const userId = req.user?.id;
 
     const [unreadCount, totalCount] = await Promise.all([
-      prisma.notification.count({ where: { user_id: userId, is_read: false } }),
-      prisma.notification.count({ where: { user_id: userId } })
+      prisma.notification.count({ where: { userId, isRead: false } }),
+      prisma.notification.count({ where: { userId } })
     ]);
 
     res.json({
