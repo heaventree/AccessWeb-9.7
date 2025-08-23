@@ -1,0 +1,32 @@
+
+    at BillingSettings (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/settings/BillingSettings.tsx?t=1755932373375:31:37)
+    at div
+    at div
+    at SettingsPage (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/pages/settings/SettingsPage.tsx?t=1755932373375:27:37)
+    at RenderedRoute (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=c91930b1:3537:5)
+    at Outlet (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=c91930b1:3908:26)
+    at div
+    at div
+    at main
+    at div
+    at DashboardLayout (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/layouts/DashboardLayout.tsx:31:3)
+    at AccountLayout (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/layouts/AccountLayout.tsx:33:20)
+    at ProtectedRoute (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/layouts/AuthLayout.tsx:21:3)
+    at SubscriberRoute (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/layouts/AuthLayout.tsx:76:35)
+    at RenderedRoute (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=c91930b1:3537:5)
+    at Routes (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=c91930b1:3972:5)
+    at div
+    at ErrorBoundary (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/ErrorBoundary.tsx:11:5)
+    at AppContent (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/App.tsx?t=1755932373375:100:35)
+    at ThemeProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/ThemeProvider.tsx:20:33)
+    at FloatingToolsProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/contexts/FloatingToolsContext.tsx:29:41)
+    at AccessibilityTipsProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/contexts/AccessibilityTipsContext.tsx:40:45)
+    at AuthProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/contexts/AuthContext.tsx:42:3)
+    at Router (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=c91930b1:3915:15)
+    at BrowserRouter (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=c91930b1:4655:5)
+    at SecurityProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/SecurityProvider.tsx:25:36)
+    at QueryClientProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=c91930b1:2587:3)
+    at _a (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/node_modules/.vite/deps/react-helmet-async.js?v=c91930b1:642:5)
+    at ErrorBoundary (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/components/ErrorBoundary.tsx:11:5)
+    at AppProvider (https://f4881097-8d34-4bc1-83e7-7d3e6aca12f1-00-20lksivatlbs9.picard.replit.dev/src/providers/AppProvider.tsx:42:31)
+    at App
