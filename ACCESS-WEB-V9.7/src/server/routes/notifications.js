@@ -6,11 +6,11 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // Get user notifications with pagination
-router.get('/', requireAuth, async (req: any, res: any) => {
+router.get('/', requireAuth, async (req, res) => {
   try {
     const userId = req.user?.id;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
     const unreadOnly = req.query.unreadOnly === 'true';
     
     const skip = (page - 1) * limit;
@@ -65,7 +65,7 @@ router.get('/', requireAuth, async (req: any, res: any) => {
 });
 
 // Mark notification as read
-router.patch('/:id/read', requireAuth, async (req: any, res: any) => {
+router.patch('/:id/read', requireAuth, async (req, res) => {
   try {
     const userId = req.user?.id;
     const notificationId = parseInt(req.params.id);
@@ -98,7 +98,7 @@ router.patch('/:id/read', requireAuth, async (req: any, res: any) => {
 });
 
 // Mark all notifications as read
-router.patch('/mark-all-read', requireAuth, async (req: any, res: any) => {
+router.patch('/mark-all-read', requireAuth, async (req, res) => {
   try {
     const userId = req.user?.id;
 
@@ -119,7 +119,7 @@ router.patch('/mark-all-read', requireAuth, async (req: any, res: any) => {
 });
 
 // Delete notification
-router.delete('/:id', requireAuth, async (req: any, res: any) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const userId = req.user?.id;
     const notificationId = parseInt(req.params.id);
@@ -151,7 +151,7 @@ router.delete('/:id', requireAuth, async (req: any, res: any) => {
 });
 
 // Get notification stats
-router.get('/stats', requireAuth, async (req: any, res: any) => {
+router.get('/stats', requireAuth, async (req, res) => {
   try {
     const userId = req.user?.id;
 

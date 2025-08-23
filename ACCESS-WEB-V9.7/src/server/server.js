@@ -210,7 +210,7 @@ import publicApiRouter from "./routes/publicApi.js";
 app.use("/api/auth", authRouter);
 
 // Notification routes (before accessibility to avoid conflicts)
-app.use("/api/notifications", (await import('./routes/notifications.ts')).default);
+app.use("/api/notifications", (await import('./routes/notifications.js')).default);
 
 // Debug: Add logging to verify accessibility router mounting
 console.log("Mounting accessibility router at /api/accessibility");
