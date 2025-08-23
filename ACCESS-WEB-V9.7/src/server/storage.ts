@@ -1,6 +1,7 @@
 import { eq, and } from 'drizzle-orm';
 import { db } from './db';
 import * as schema from '../shared/schema';
+import { prisma } from '../lib/prisma';
 import type { 
   User, InsertUser, 
   Content, InsertContent,
@@ -15,6 +16,61 @@ import type {
   Notification, InsertNotification,
   Setting, InsertSetting
 } from '../shared/schema';
+
+// Prisma types for notifications
+export type PrismaNotificationPreferences = {
+  id?: number;
+  userId: number;
+  emailNotifications?: boolean;
+  browserNotifications?: boolean;
+  scanCompleted?: boolean;
+  criticalIssues?: boolean;
+  weeklyDigest?: boolean;
+  monthlyReports?: boolean;
+  usageAlerts?: boolean;
+  teamUpdates?: boolean;
+  renewalReminders?: boolean;
+  paymentNotifications?: boolean;
+  securityAlerts?: boolean;
+  usageThreshold?: number;
+  digestFrequency?: string;
+  quietHoursStart?: string | null;
+  quietHoursEnd?: string | null;
+  timezone?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+export type PrismaNotification = {
+  id?: number;
+  userId: number;
+  type: string;
+  category: string;
+  title: string;
+  message: string;
+  actionUrl?: string | null;
+  actionLabel?: string | null;
+  priority?: string;
+  isRead?: boolean;
+  readAt?: Date | null;
+  metadata?: any;
+  expiresAt?: Date | null;
+  createdAt?: Date;
+};
+
+export type PrismaNotificationTemplate = {
+  id?: number;
+  name: string;
+  type: string;
+  channel: string;
+  subject?: string | null;
+  content: string;
+  variables?: any;
+  isActive?: boolean;
+  version?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
 
 // Interface for all storage operations
 export interface IStorage {
@@ -92,12 +148,26 @@ export interface IStorage {
   createScanIssue(scanIssue: InsertScanIssue): Promise<ScanIssue>;
   updateScanIssue(id: number, scanIssue: Partial<ScanIssue>): Promise<ScanIssue | undefined>;
   
-  // Notification operations
-  getNotification(id: number): Promise<Notification | undefined>;
-  getUserNotifications(userId: number, isRead?: boolean): Promise<Notification[]>;
-  createNotification(notification: InsertNotification): Promise<Notification>;
-  markNotificationAsRead(id: number): Promise<Notification | undefined>;
+  // Notification operations (using Prisma)
+  getNotification(id: number): Promise<PrismaNotification | null>;
+  getUserNotifications(userId: number, isRead?: boolean, limit?: number, offset?: number): Promise<PrismaNotification[]>;
+  createNotification(notification: Omit<PrismaNotification, 'id' | 'createdAt'>): Promise<PrismaNotification>;
+  markNotificationAsRead(id: number): Promise<PrismaNotification | null>;
+  markNotificationAsReadByUserId(userId: number, notificationId: number): Promise<PrismaNotification | null>;
   deleteNotification(id: number): Promise<boolean>;
+  bulkMarkNotificationsAsRead(userId: number, notificationIds: number[]): Promise<number>;
+  deleteExpiredNotifications(): Promise<number>;
+  
+  // Notification Preferences operations (using Prisma)
+  getNotificationPreferences(userId: number): Promise<PrismaNotificationPreferences | null>;
+  createNotificationPreferences(preferences: Omit<PrismaNotificationPreferences, 'id' | 'createdAt' | 'updatedAt'>): Promise<PrismaNotificationPreferences>;
+  updateNotificationPreferences(userId: number, preferences: Partial<PrismaNotificationPreferences>): Promise<PrismaNotificationPreferences | null>;
+  
+  // Notification Templates operations (using Prisma)
+  getNotificationTemplate(name: string): Promise<PrismaNotificationTemplate | null>;
+  getNotificationTemplatesByType(type: string, channel?: string): Promise<PrismaNotificationTemplate[]>;
+  createNotificationTemplate(template: Omit<PrismaNotificationTemplate, 'id' | 'createdAt' | 'updatedAt'>): Promise<PrismaNotificationTemplate>;
+  updateNotificationTemplate(name: string, template: Partial<PrismaNotificationTemplate>): Promise<PrismaNotificationTemplate | null>;
   
   // Setting operations
   getSetting(key: string): Promise<Setting | undefined>;
@@ -458,40 +528,144 @@ export class DatabaseStorage implements IStorage {
     return updatedScanIssue;
   }
 
-  // Notification operations
-  async getNotification(id: number): Promise<Notification | undefined> {
-    const [notification] = await db.select().from(schema.notifications).where(eq(schema.notifications.id, id));
-    return notification;
+  // Notification operations (using Prisma)
+  async getNotification(id: number): Promise<PrismaNotification | null> {
+    return await prisma.notification.findUnique({
+      where: { id }
+    });
   }
 
-  async getUserNotifications(userId: number, isRead?: boolean): Promise<Notification[]> {
-    let query = db.select()
-      .from(schema.notifications)
-      .where(eq(schema.notifications.userId, userId));
-    
+  async getUserNotifications(userId: number, isRead?: boolean, limit = 50, offset = 0): Promise<PrismaNotification[]> {
+    const where: any = { userId };
     if (isRead !== undefined) {
-      query = query.where(eq(schema.notifications.isRead, isRead));
+      where.isRead = isRead;
     }
-    
-    return query.orderBy(schema.notifications.createdAt);
+
+    return await prisma.notification.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      skip: offset
+    });
   }
 
-  async createNotification(notification: InsertNotification): Promise<Notification> {
-    const [newNotification] = await db.insert(schema.notifications).values(notification).returning();
-    return newNotification;
+  async createNotification(notification: Omit<PrismaNotification, 'id' | 'createdAt'>): Promise<PrismaNotification> {
+    return await prisma.notification.create({
+      data: notification
+    });
   }
 
-  async markNotificationAsRead(id: number): Promise<Notification | undefined> {
-    const [updatedNotification] = await db.update(schema.notifications)
-      .set({ isRead: true })
-      .where(eq(schema.notifications.id, id))
-      .returning();
-    return updatedNotification;
+  async markNotificationAsRead(id: number): Promise<PrismaNotification | null> {
+    return await prisma.notification.update({
+      where: { id },
+      data: { 
+        isRead: true,
+        readAt: new Date()
+      }
+    });
+  }
+
+  async markNotificationAsReadByUserId(userId: number, notificationId: number): Promise<PrismaNotification | null> {
+    return await prisma.notification.updateMany({
+      where: { 
+        id: notificationId,
+        userId 
+      },
+      data: { 
+        isRead: true,
+        readAt: new Date()
+      }
+    }).then(() => this.getNotification(notificationId));
   }
 
   async deleteNotification(id: number): Promise<boolean> {
-    const result = await db.delete(schema.notifications).where(eq(schema.notifications.id, id));
-    return result.rowCount > 0;
+    try {
+      await prisma.notification.delete({ where: { id } });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async bulkMarkNotificationsAsRead(userId: number, notificationIds: number[]): Promise<number> {
+    const result = await prisma.notification.updateMany({
+      where: {
+        id: { in: notificationIds },
+        userId
+      },
+      data: {
+        isRead: true,
+        readAt: new Date()
+      }
+    });
+    return result.count;
+  }
+
+  async deleteExpiredNotifications(): Promise<number> {
+    const result = await prisma.notification.deleteMany({
+      where: {
+        expiresAt: {
+          lte: new Date()
+        }
+      }
+    });
+    return result.count;
+  }
+
+  // Notification Preferences operations (using Prisma)
+  async getNotificationPreferences(userId: number): Promise<PrismaNotificationPreferences | null> {
+    return await prisma.notificationPreferences.findUnique({
+      where: { userId }
+    });
+  }
+
+  async createNotificationPreferences(preferences: Omit<PrismaNotificationPreferences, 'id' | 'createdAt' | 'updatedAt'>): Promise<PrismaNotificationPreferences> {
+    return await prisma.notificationPreferences.create({
+      data: preferences
+    });
+  }
+
+  async updateNotificationPreferences(userId: number, preferences: Partial<PrismaNotificationPreferences>): Promise<PrismaNotificationPreferences | null> {
+    return await prisma.notificationPreferences.upsert({
+      where: { userId },
+      create: {
+        userId,
+        ...preferences
+      },
+      update: preferences
+    });
+  }
+
+  // Notification Templates operations (using Prisma)
+  async getNotificationTemplate(name: string): Promise<PrismaNotificationTemplate | null> {
+    return await prisma.notificationTemplate.findUnique({
+      where: { name }
+    });
+  }
+
+  async getNotificationTemplatesByType(type: string, channel?: string): Promise<PrismaNotificationTemplate[]> {
+    const where: any = { type, isActive: true };
+    if (channel) {
+      where.channel = channel;
+    }
+
+    return await prisma.notificationTemplate.findMany({
+      where,
+      orderBy: { version: 'desc' }
+    });
+  }
+
+  async createNotificationTemplate(template: Omit<PrismaNotificationTemplate, 'id' | 'createdAt' | 'updatedAt'>): Promise<PrismaNotificationTemplate> {
+    return await prisma.notificationTemplate.create({
+      data: template
+    });
+  }
+
+  async updateNotificationTemplate(name: string, template: Partial<PrismaNotificationTemplate>): Promise<PrismaNotificationTemplate | null> {
+    return await prisma.notificationTemplate.update({
+      where: { name },
+      data: template
+    });
   }
 
   // Setting operations
