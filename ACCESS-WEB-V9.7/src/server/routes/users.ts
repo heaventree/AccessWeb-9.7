@@ -492,5 +492,95 @@ export function registerUserRoutes(app: any, apiPrefix: string): void {
   });
 
   // Register routes
+  /**
+   * @route   GET /api/v1/users/:id/notification-preferences
+   * @desc    Get user notification preferences
+   * @access  Private/Self
+   */
+  router.get('/:id/notification-preferences', authenticate, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const currentUser = (req as any).user;
+
+      // Check if user is requesting their own data
+      if (currentUser.id !== userId && currentUser.role !== 'admin') {
+        return res.status(403).json({ error: 'Unauthorized access' });
+      }
+
+      const preferences = await storage.getNotificationPreferences(userId);
+      
+      // If no preferences exist, return defaults
+      if (!preferences) {
+        const defaultPreferences = {
+          userId,
+          emailNotifications: true,
+          browserNotifications: true,
+          scanCompleted: true,
+          criticalIssues: true,
+          weeklyDigest: true,
+          usageAlerts: true,
+          teamUpdates: false,
+          marketingEmails: false
+        };
+        return res.json({ preferences: defaultPreferences });
+      }
+
+      res.json({ preferences });
+    } catch (error) {
+      console.error('Get notification preferences error:', error);
+      res.status(500).json({ error: 'Failed to get notification preferences' });
+    }
+  });
+
+  /**
+   * @route   PUT /api/v1/users/:id/notification-preferences
+   * @desc    Update user notification preferences
+   * @access  Private/Self
+   */
+  router.put('/:id/notification-preferences', authenticate, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const currentUser = (req as any).user;
+
+      // Check if user is updating their own data
+      if (currentUser.id !== userId && currentUser.role !== 'admin') {
+        return res.status(403).json({ error: 'Unauthorized access' });
+      }
+
+      const {
+        emailNotifications,
+        browserNotifications,
+        scanCompleted,
+        criticalIssues,
+        weeklyDigest,
+        usageAlerts,
+        teamUpdates,
+        marketingEmails
+      } = req.body;
+
+      // Build update object with only defined values
+      const updateData: any = {};
+      
+      if (emailNotifications !== undefined) updateData.emailNotifications = emailNotifications;
+      if (browserNotifications !== undefined) updateData.browserNotifications = browserNotifications;
+      if (scanCompleted !== undefined) updateData.scanCompleted = scanCompleted;
+      if (criticalIssues !== undefined) updateData.criticalIssues = criticalIssues;
+      if (weeklyDigest !== undefined) updateData.weeklyDigest = weeklyDigest;
+      if (usageAlerts !== undefined) updateData.usageAlerts = usageAlerts;
+      if (teamUpdates !== undefined) updateData.teamUpdates = teamUpdates;
+      if (marketingEmails !== undefined) updateData.marketingEmails = marketingEmails;
+
+      const updatedPreferences = await storage.updateNotificationPreferences(userId, updateData);
+
+      res.json({ 
+        preferences: updatedPreferences, 
+        message: 'Notification preferences updated successfully' 
+      });
+    } catch (error) {
+      console.error('Update notification preferences error:', error);
+      res.status(500).json({ error: 'Failed to update notification preferences' });
+    }
+  });
+
   app.use(`${apiPrefix}/users`, router);
 }

@@ -140,6 +140,17 @@ export const userApi = {
   verifyTwoFactorCode: async (userId: number, code: string) => {
     const response = await apiClient.post(`/auth/users/${userId}/two-factor/verify`, { code });
     return response.data;
+  },
+
+  // Notification preferences
+  getNotificationPreferences: async (userId: number) => {
+    const response = await apiClient.get(`/v1/users/${userId}/notification-preferences`);
+    return response.data;
+  },
+
+  updateNotificationPreferences: async (userId: number, preferences: any) => {
+    const response = await apiClient.put(`/v1/users/${userId}/notification-preferences`, preferences);
+    return response.data;
   }
 };
 

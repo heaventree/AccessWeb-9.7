@@ -1,15 +1,45 @@
-import React, { useState } from 'react';
-import { Bell } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, Save, Loader2 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { userApi } from '../../lib/apiClient';
+import toast from 'react-hot-toast';
 
 export function NotificationSettings() {
+  const { user } = useAuth();
   const [notifications, setNotifications] = useState({
     emailNotifications: true,
+    browserNotifications: true,
     scanCompleted: true,
     criticalIssues: true,
     weeklyDigest: true,
     usageAlerts: true,
-    teamUpdates: false
+    teamUpdates: false,
+    marketingEmails: false
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Load user notification preferences when component mounts
+  useEffect(() => {
+    const loadPreferences = async () => {
+      if (!user) return;
+      
+      try {
+        setIsLoading(true);
+        const response = await userApi.getNotificationPreferences(user.id);
+        if (response.preferences) {
+          setNotifications(response.preferences);
+        }
+      } catch (error) {
+        console.error('Error loading notification preferences:', error);
+        toast.error('Failed to load notification preferences');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPreferences();
+  }, [user]);
 
   const handleChange = (key: keyof typeof notifications) => {
     setNotifications(prev => ({
@@ -17,6 +47,40 @@ export function NotificationSettings() {
       [key]: !prev[key]
     }));
   };
+
+  const handleSave = async () => {
+    if (!user) {
+      toast.error('You must be logged in to save preferences');
+      return;
+    }
+
+    setIsSaving(true);
+    
+    try {
+      await userApi.updateNotificationPreferences(user.id, notifications);
+      toast.success('Notification preferences saved successfully!');
+    } catch (error: any) {
+      console.error('Error saving notification preferences:', error);
+      const errorMessage = error.response?.data?.error || 'Failed to save preferences';
+      toast.error(errorMessage);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-lg font-medium text-gray-900">Notification Preferences</h2>
+          <p className="mt-1 text-sm text-gray-500">Choose when and how you want to be notified.</p>
+        </div>
+        <div className="p-6 flex justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-sm">
@@ -44,6 +108,29 @@ export function NotificationSettings() {
               aria-hidden="true"
               className={`${
                 notifications.emailNotifications ? 'translate-x-5' : 'translate-x-0'
+              } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+            />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-medium text-gray-900">Browser Notifications</h3>
+            <p className="text-sm text-gray-500">Show notifications in your browser</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={notifications.browserNotifications}
+            onClick={() => handleChange('browserNotifications')}
+            className={`${
+              notifications.browserNotifications ? 'bg-blue-600' : 'bg-gray-200'
+            } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+          >
+            <span
+              aria-hidden="true"
+              className={`${
+                notifications.browserNotifications ? 'translate-x-5' : 'translate-x-0'
               } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
             />
           </button>
@@ -119,6 +206,41 @@ export function NotificationSettings() {
               <p className="text-sm text-gray-500">Receive notifications about team activity</p>
             </label>
           </div>
+
+          <div className="flex items-center">
+            <input
+              id="marketingEmails"
+              type="checkbox"
+              checked={notifications.marketingEmails}
+              onChange={() => handleChange('marketingEmails')}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label htmlFor="marketingEmails" className="ml-3">
+              <span className="text-sm font-medium text-gray-900">Marketing Emails</span>
+              <p className="text-sm text-gray-500">Receive product updates and accessibility tips</p>
+            </label>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-200 pt-6">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                Save Preferences
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>
