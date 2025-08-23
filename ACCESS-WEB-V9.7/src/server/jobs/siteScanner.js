@@ -1,9 +1,9 @@
 import PgBoss from 'pg-boss';
 import { PrismaClient } from '@prisma/client';
 import { accessibilityScanner } from '../services/accessibilityScanner.js';
+import nodemailer from 'nodemailer';
 
-// Dynamic import for TypeScript module
-let notificationService = null;
+// Inline notification service instead of dynamic loading
 
 const prisma = new PrismaClient();
 
@@ -21,14 +21,8 @@ class SiteScannerJobQueue {
 
   async initialize() {
     try {
-      // Load notification service dynamically
-      try {
-        const notificationModule = await import('../services/notificationService.js');
-        notificationService = notificationModule.notificationService;
-        console.log('📧 [NOTIFICATION] Notification service loaded successfully');
-      } catch (error) {
-        console.warn('⚠️ [NOTIFICATION] Failed to load notification service:', error.message);
-      }
+      // Notification service is now inline - no loading required
+      console.log('📧 [NOTIFICATION] Notification service ready (inline)');
 
       // Initialize pg-boss with database connection
       this.boss = new PgBoss({
@@ -155,9 +149,9 @@ class SiteScannerJobQueue {
       `);
 
       // Send notification when scan is completed successfully
-      console.log(`🔍 [DEBUG] Notification check: scanResult=${!!scanResult}, scanResultId=${scanResult?.scanResultId}, notificationService=${!!notificationService}`);
+      console.log(`🔍 [DEBUG] Notification check: scanResult=${!!scanResult}, scanResultId=${scanResult?.scanResultId}, notificationService=true`);
       
-      if (scanResult && scanResult.scanResultId && notificationService) {
+      if (scanResult && scanResult.scanResultId) {
         try {
           console.log(`📧 [NOTIFICATION] Attempting to send scan completion notification for user ${userId}`);
           
@@ -168,7 +162,7 @@ class SiteScannerJobQueue {
           if (siteConnection) {
             console.log(`📧 [NOTIFICATION] Found site connection, sending notification for: ${siteConnection.siteName}`);
             
-            const result = await notificationService.sendScanCompletionNotification(
+            const result = await this.sendScanCompletionNotification(
               userId, 
               scanResult, 
               siteConnection
@@ -408,9 +402,9 @@ class SiteScannerJobQueue {
           console.log(`✅ [SITE-SCANNER] Direct scan completed for ${connection.siteName}`);
 
           // Send notification for testing scans as well
-          if (scanResult && scanResult.scanResultId && notificationService) {
+          if (scanResult && scanResult.scanResultId) {
             try {
-              await notificationService.sendScanCompletionNotification(
+              await this.sendScanCompletionNotification(
                 connection.userId, 
                 scanResult, 
                 connection
@@ -520,6 +514,176 @@ class SiteScannerJobQueue {
   // Utility method for delays
   delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Send scan completion notification email (inline implementation)
+   */
+  async sendScanCompletionNotification(userId, scanResult, siteConnection) {
+    try {
+      console.log(`📧 [NOTIFICATION] Attempting to send scan completion notification for user ${userId}`);
+
+      // Check user notification preferences
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          notificationPreferences: true
+        }
+      });
+
+      if (!user) {
+        console.log(`⚠️ [NOTIFICATION] User ${userId} not found, skipping notification`);
+        return false;
+      }
+
+      if (!user.email) {
+        console.log(`⚠️ [NOTIFICATION] User ${userId} has no email address, skipping notification`);
+        return false;
+      }
+
+      // Check notification preferences - default to enabled if not set
+      const preferences = user.notificationPreferences;
+      const emailNotificationsEnabled = preferences?.emailNotifications !== false;
+      const scanCompletionEnabled = preferences?.scanCompletion !== false;
+
+      console.log(`📧 [NOTIFICATION] User preferences - email: ${emailNotificationsEnabled}, scanCompletion: ${scanCompletionEnabled}`);
+
+      if (!emailNotificationsEnabled || !scanCompletionEnabled) {
+        console.log(`🔕 [NOTIFICATION] User ${userId} has disabled notifications, skipping`);
+        return false;
+      }
+
+      // Send email notification
+      const emailSent = await this.sendScanCompletionEmail(
+        user.email,
+        user.firstName || 'User',
+        scanResult,
+        siteConnection
+      );
+
+      if (emailSent) {
+        console.log(`✅ [NOTIFICATION] Scan completion notification sent successfully to ${user.email}`);
+        return true;
+      } else {
+        console.log(`❌ [NOTIFICATION] Failed to send scan completion notification to ${user.email}`);
+        return false;
+      }
+
+    } catch (error) {
+      console.error('❌ [NOTIFICATION] Error in sendScanCompletionNotification:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Send scan completion email using Gmail
+   */
+  async sendScanCompletionEmail(email, userName, scanResult, siteConnection) {
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
+      console.error('❌ [NOTIFICATION] Gmail credentials not configured');
+      return false;
+    }
+
+    try {
+      const transporter = nodemailer.createTransporter({
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_PASS
+        }
+      });
+
+      const { errorCount, warningCount, noticeCount, score, scanStatus } = scanResult;
+      
+      let statusMessage = '';
+      if (scanStatus === 'failed') {
+        statusMessage = `The accessibility scan for ${siteConnection.siteName} failed to complete. Please check your site configuration and try again.`;
+      } else if (errorCount === 0) {
+        statusMessage = `🎉 Great news! Your site ${siteConnection.siteName} passed all accessibility tests with a perfect score of ${score}%.`;
+      } else if (errorCount <= 5) {
+        statusMessage = `Your site ${siteConnection.siteName} scored ${score}% with ${errorCount} accessibility issues found. These are minor issues that can be easily fixed.`;
+      } else {
+        statusMessage = `Your site ${siteConnection.siteName} scored ${score}% with ${errorCount} accessibility issues found. We recommend addressing these to improve user experience.`;
+      }
+
+      const actionUrl = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/dashboard/reports/${scanResult.scanResultId}`;
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Accessibility Scan Complete</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 8px; color: white; text-align: center;">
+            <h1 style="margin: 0; font-size: 24px;">🔍 Accessibility Scan Complete</h1>
+          </div>
+          
+          <div style="padding: 20px; background-color: #f9f9f9; border-radius: 8px; margin: 20px 0;">
+            <p style="font-size: 16px; margin: 0 0 15px 0;">Hello ${userName},</p>
+            <p style="font-size: 14px; line-height: 1.6; margin: 0 0 15px 0;">${statusMessage}</p>
+            
+            <div style="background: white; padding: 15px; border-radius: 5px; margin: 15px 0;">
+              <h3 style="margin: 0 0 10px 0; color: #333;">📊 Scan Results Summary</h3>
+              <p><strong>Site:</strong> ${siteConnection.siteName}</p>
+              <p><strong>Score:</strong> ${score}%</p>
+              <p><strong>Errors:</strong> ${errorCount}</p>
+              <p><strong>Warnings:</strong> ${warningCount}</p>
+              <p><strong>Notices:</strong> ${noticeCount}</p>
+            </div>
+            
+            <div style="text-align: center; margin: 25px 0;">
+              <a href="${actionUrl}" style="display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                View Detailed Report →
+              </a>
+            </div>
+          </div>
+          
+          <div style="text-align: center; font-size: 12px; color: #666; margin-top: 20px;">
+            <p>This scan was automatically generated by your Access Checker dashboard.</p>
+            <p>To manage your notification preferences, visit your account settings.</p>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const textContent = `
+Accessibility Scan Complete
+
+Hello ${userName},
+
+${statusMessage}
+
+Scan Results Summary:
+- Site: ${siteConnection.siteName}
+- Score: ${score}%
+- Errors: ${errorCount}
+- Warnings: ${warningCount}
+- Notices: ${noticeCount}
+
+View your detailed report: ${actionUrl}
+
+This scan was automatically generated by your Access Checker dashboard.
+To manage your notification preferences, visit your account settings.
+      `;
+
+      const mailOptions = {
+        from: `"Access Checker" <${process.env.GMAIL_USER}>`,
+        to: email,
+        subject: `🔍 Accessibility scan completed for ${siteConnection.siteName}`,
+        html: htmlContent,
+        text: textContent
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`✅ [NOTIFICATION] Email sent successfully via Gmail: ${info.messageId}`);
+      return true;
+
+    } catch (error) {
+      console.error('❌ [NOTIFICATION] Failed to send email via Gmail:', error);
+      return false;
+    }
   }
 }
 

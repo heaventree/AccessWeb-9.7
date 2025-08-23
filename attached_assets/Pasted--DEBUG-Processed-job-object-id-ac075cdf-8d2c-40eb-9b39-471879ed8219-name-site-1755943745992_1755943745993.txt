@@ -1,0 +1,56 @@
+🐛 [DEBUG] Processed job object: {
+  "id": "ac075cdf-8d2c-40eb-9b39-471879ed8219",
+  "name": "site-accessibility-scan",
+  "data": {
+    "userId": 17,
+    "siteUrl": "https://google.com/",
+    "platform": "wordpress",
+    "siteName": "Google",
+    "frequency": "manual",
+    "triggeredBy": "user",
+    "connectionId": 156
+  },
+  "expireInSeconds": "300.000000"
+}
+✅ [DEBUG] Successfully extracted job data
+
+╔════════════════════════════════════════════════════════════════╗
+║                    🔍 ACCESSIBILITY SCAN STARTED               ║
+╠════════════════════════════════════════════════════════════════╣
+║ Job ID:        ac075cdf-8d2c-40eb-9b39-471879ed8219          ║
+║ Connection ID: 156                                           ║
+║ User ID:       17                                            ║
+║ Site Name:     Google                                        ║
+║ Site URL:      https://google.com/                           ║
+║ Platform:      wordpress                                     ║
+║ Started At:    2025-08-23T10:08:16.430Z                      ║
+╚════════════════════════════════════════════════════════════════╝
+    
+🔍 [SCAN-156] Starting WCAG accessibility scan for: https://google.com/ (Reason: manual)
+🔍 [ACCESSIBILITY] Starting WCAG scan for: https://google.com/ (manual)
+✅ [ACCESSIBILITY] Scan completed in 467ms - Errors: 2, Warnings: 1, Notices: 2
+💾 [ACCESSIBILITY] Scan results saved with ID: 999
+⏰ [ACCESSIBILITY] Updated last scan time for connection 156
+
+╔═══════════════════ SCAN RESULTS ═══════════════════╗
+║ Connection ID: 156                              ║
+║ Accessibility Score: 95                         ║
+║ Total Errors: 2                              ║
+║ Total Warnings: 1                            ║
+║ Total Notices: 2                             ║
+║ Scan Duration: 467ms                         ║
+║ Scan Status: completed                       ║
+╚════════════════════════════════════════════════════╝
+      
+
+╔════════════════════════════════════════════════════════════════╗
+║                    ✅ ACCESSIBILITY SCAN COMPLETED             ║
+╠════════════════════════════════════════════════════════════════╣
+║ Job ID:        ac075cdf-8d2c-40eb-9b39-471879ed8219          ║
+║ Site:          Google                                        ║
+║ Status:        SUCCESS                                       ║
+║ Completed At:  2025-08-23T10:08:17.028Z                      ║
+╚════════════════════════════════════════════════════════════════╝
+      
+🔍 [DEBUG] Notification check: scanResult=true, scanResultId=999, notificationService=false
+⚠️ [NOTIFICATION] Skipping notification - missing requirements
