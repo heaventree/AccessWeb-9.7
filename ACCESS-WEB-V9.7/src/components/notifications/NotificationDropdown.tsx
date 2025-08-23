@@ -1,8 +1,8 @@
 import React from 'react';
-import { CheckCheck, Trash2, ExternalLink, Clock, AlertTriangle, Info, CheckCircle, XCircle } from 'lucide-react';
+import { CheckCheck, Trash2, ExternalLink, Clock, AlertTriangle, Info, CheckCircle, XCircle, Bell } from 'lucide-react';
 import { useNotifications } from '../../hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
-import { useRouter } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 
 interface NotificationDropdownProps {
   onClose: () => void;
@@ -10,7 +10,7 @@ interface NotificationDropdownProps {
 
 export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
   const { notifications, loading, markAsRead, markAllAsRead, deleteNotification, loadMore, pagination } = useNotifications();
-  const [, setLocation] = useRouter();
+  const navigate = useNavigate();
 
   const handleNotificationClick = async (notification: any) => {
     // Mark as read when clicked
@@ -20,7 +20,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
 
     // Navigate to action URL if available
     if (notification.actionUrl) {
-      setLocation(notification.actionUrl);
+      navigate(notification.actionUrl);
       onClose();
     }
   };
