@@ -15,7 +15,7 @@ import accessibilityRouter from "../api/accessibility.js";
 import nodemailer from 'nodemailer';
 
 // Configure email transporter for 2FA codes
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.GMAIL_USER,
