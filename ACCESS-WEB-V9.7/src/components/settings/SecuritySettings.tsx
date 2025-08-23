@@ -392,7 +392,7 @@ export function SecuritySettings() {
         {/* Security Log */}
         <div className="pt-6 border-t border-gray-200">
           <h3 className="text-sm font-medium text-gray-900">Security Log</h3>
-          <div className="mt-4 bg-gray-50 rounded-lg overflow-hidden">
+          <div className="mt-4 bg-gray-50 rounded-lg overflow-hidden max-h-96 overflow-y-auto">
             {isLoadingLogs ? (
               <div className="px-4 py-6 text-center">
                 <Loader2 className="w-6 h-6 mx-auto animate-spin text-gray-400" />
