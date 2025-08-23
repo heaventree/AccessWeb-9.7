@@ -18,6 +18,10 @@ export function SecuritySettings() {
   const { user, refetchUser } = useAuth();
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [isUpdatingTwoFactor, setIsUpdatingTwoFactor] = useState(false);
+  const [showTwoFactorVerification, setShowTwoFactorVerification] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [maskedEmail, setMaskedEmail] = useState('');
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -139,20 +143,26 @@ export function SecuritySettings() {
     setIsUpdatingTwoFactor(true);
 
     try {
-      await userApi.updateTwoFactorSettings(user.id, {
+      const response = await userApi.updateTwoFactorSettings(user.id, {
         isTwoFactorEnabled: newTwoFactorState
       });
 
-      setTwoFactorEnabled(newTwoFactorState);
-      toast.success(
-        `Two-factor authentication ${newTwoFactorState ? 'enabled' : 'disabled'} successfully!`
-      );
-      
-      // Refresh user data to get updated 2FA status
-      await refetchUser();
-      
-      // Refresh security logs to show the new entry
-      fetchSecurityLogs();
+      // If enabling 2FA and requires verification, show OTP dialog
+      if (response.requiresVerification) {
+        setMaskedEmail(response.email || user.email);
+        setShowTwoFactorVerification(true);
+        toast.success('Verification code sent to your email. Please check your inbox.');
+      } else {
+        // If disabling 2FA or if it's already enabled/disabled
+        setTwoFactorEnabled(response.isTwoFactorEnabled);
+        toast.success(response.message);
+        
+        // Refresh user data to get updated 2FA status
+        await refetchUser();
+        
+        // Refresh security logs to show the new entry
+        fetchSecurityLogs();
+      }
     } catch (error: any) {
       console.error('Error updating two-factor authentication:', error);
       const errorMessage = error.response?.data?.error || 'Failed to update two-factor authentication settings';
@@ -160,6 +170,42 @@ export function SecuritySettings() {
     } finally {
       setIsUpdatingTwoFactor(false);
     }
+  };
+
+  const handleTwoFactorVerification = async () => {
+    if (!user || !twoFactorCode) {
+      toast.error('Please enter the verification code');
+      return;
+    }
+
+    setIsVerifyingCode(true);
+
+    try {
+      const response = await userApi.verifyTwoFactorSetup(user.id, twoFactorCode);
+      
+      setTwoFactorEnabled(true);
+      setShowTwoFactorVerification(false);
+      setTwoFactorCode('');
+      toast.success(response.message);
+      
+      // Refresh user data to get updated 2FA status
+      await refetchUser();
+      
+      // Refresh security logs to show the new entry
+      fetchSecurityLogs();
+    } catch (error: any) {
+      console.error('Error verifying two-factor setup:', error);
+      const errorMessage = error.response?.data?.error || 'Invalid or expired verification code';
+      toast.error(errorMessage);
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  };
+
+  const handleCancelTwoFactorVerification = () => {
+    setShowTwoFactorVerification(false);
+    setTwoFactorCode('');
+    setMaskedEmail('');
   };
 
   return (
@@ -259,7 +305,7 @@ export function SecuritySettings() {
               role="switch"
               aria-checked={twoFactorEnabled}
               onClick={handleTwoFactorToggle}
-              disabled={isUpdatingTwoFactor}
+              disabled={isUpdatingTwoFactor || showTwoFactorVerification}
               className={`${
                 twoFactorEnabled ? 'bg-blue-600' : 'bg-gray-200'
               } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed`}
@@ -272,6 +318,75 @@ export function SecuritySettings() {
               />
             </button>
           </div>
+
+          {/* Two-Factor Verification Dialog */}
+          {showTwoFactorVerification && (
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center mb-3">
+                <div className="flex-shrink-0">
+                  <Key className="h-5 w-5 text-blue-400" />
+                </div>
+                <div className="ml-3">
+                  <h4 className="text-sm font-medium text-blue-900">Verify Two-Factor Authentication Setup</h4>
+                  <p className="text-sm text-blue-700">
+                    We've sent a verification code to {maskedEmail}. Please enter it below to complete the setup.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div>
+                  <label htmlFor="twoFactorCode" className="block text-sm font-medium text-blue-900 mb-1">
+                    Verification Code
+                  </label>
+                  <input
+                    id="twoFactorCode"
+                    type="text"
+                    value={twoFactorCode}
+                    onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className="w-full px-3 py-2 border border-blue-300 rounded-md text-center text-lg font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="000000"
+                    maxLength={6}
+                    autoComplete="one-time-code"
+                  />
+                  <p className="text-xs text-blue-600 mt-1 text-center">
+                    Enter the 6-digit code sent to your email
+                  </p>
+                </div>
+                
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleTwoFactorVerification}
+                    disabled={isVerifyingCode || twoFactorCode.length !== 6}
+                    className="flex-1 flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isVerifyingCode ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Verifying...
+                      </>
+                    ) : (
+                      'Verify & Enable 2FA'
+                    )}
+                  </button>
+                  
+                  <button
+                    onClick={handleCancelTwoFactorVerification}
+                    disabled={isVerifyingCode}
+                    className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+              
+              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <p className="text-xs text-yellow-700">
+                  <strong>Important:</strong> Once enabled, you'll need a verification code sent to this email address each time you log in. Make sure you have access to this email.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Security Log */}

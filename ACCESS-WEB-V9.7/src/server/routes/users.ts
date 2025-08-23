@@ -3,6 +3,10 @@ import { authenticate, authorize } from '../middleware/authMiddleware';
 import { hashPassword } from '../utils/auth';
 import { emailService } from '../services/emailService';
 import { prisma } from '../../lib/prisma';
+import { storage } from '../storage';
+import { db } from '../../lib/db';
+import * as schema from '../../shared/schema';
+import { eq, and, not } from 'drizzle-orm';
 import crypto from 'crypto';
 
 export function registerUserRoutes(app: any, apiPrefix: string): void {
@@ -231,33 +235,144 @@ export function registerUserRoutes(app: any, apiPrefix: string): void {
         return res.status(403).json({ error: 'Unauthorized access' });
       }
 
-      // Update 2FA settings
-      const updatedUser = await storage.updateUserTwoFactorSettings(userId, {
-        isTwoFactorEnabled: isTwoFactorEnabled
-      });
-
-      if (!updatedUser) {
+      const user = await storage.getUser(userId);
+      if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      // Create security log entry
-      await db.insert(schema.securityLogs).values({
-        userId: userId,
-        eventType: isTwoFactorEnabled ? '2fa_enabled' : '2fa_disabled',
-        description: `Two-factor authentication ${isTwoFactorEnabled ? 'enabled' : 'disabled'}`,
-        ipAddress: req.ip,
-        userAgent: req.get('User-Agent'),
-        metadata: { isTwoFactorEnabled }
-      });
+      // If enabling 2FA, send confirmation email first (don't update database yet)
+      if (isTwoFactorEnabled && !user.isTwoFactorEnabled) {
+        // Generate and store verification code for 2FA setup
+        const code = await storage.generateAndStoreTwoFactorCode(userId);
+        
+        // Send setup confirmation email
+        const emailSent = await emailService.sendTwoFactorSetupCode(
+          user.email,
+          code,
+          user.name || user.firstName || user.email
+        );
 
+        if (!emailSent) {
+          return res.status(500).json({ error: 'Failed to send verification email' });
+        }
+
+        // Return success but don't update 2FA status yet
+        return res.json({
+          success: true,
+          requiresVerification: true,
+          message: 'Verification code sent to your email. Please check your inbox and confirm to enable two-factor authentication.',
+          email: user.email.replace(/(.{2}).*(@.*)/, '$1***$2') // Mask email for security
+        });
+      }
+
+      // If disabling 2FA, update directly (no email confirmation needed)
+      if (!isTwoFactorEnabled && user.isTwoFactorEnabled) {
+        const updatedUser = await storage.updateUserTwoFactorSettings(userId, {
+          isTwoFactorEnabled: false,
+          twoFactorCode: null,
+          twoFactorCodeExpiry: null
+        });
+
+        // Create security log entry
+        await db.insert(schema.securityLogs).values({
+          userId: userId,
+          eventType: '2fa_disabled',
+          description: 'Two-factor authentication disabled',
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
+          metadata: { isTwoFactorEnabled: false }
+        });
+
+        return res.json({
+          success: true,
+          message: 'Two-factor authentication disabled successfully',
+          isTwoFactorEnabled: false
+        });
+      }
+
+      // If trying to enable when already enabled, or disable when already disabled
       res.json({
         success: true,
-        message: `Two-factor authentication ${isTwoFactorEnabled ? 'enabled' : 'disabled'} successfully`,
-        isTwoFactorEnabled: updatedUser.isTwoFactorEnabled
+        message: `Two-factor authentication is already ${isTwoFactorEnabled ? 'enabled' : 'disabled'}`,
+        isTwoFactorEnabled: user.isTwoFactorEnabled
       });
     } catch (error) {
       console.error('Update 2FA settings error:', error);
       res.status(500).json({ error: 'Failed to update two-factor authentication settings' });
+    }
+  });
+
+  /**
+   * @route   POST /api/v1/users/:id/two-factor/verify-setup
+   * @desc    Verify and complete two-factor authentication setup
+   * @access  Private (Self only)
+   */
+  router.post('/:id/two-factor/verify-setup', authenticate, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const currentUser = (req as any).user;
+      const { code } = req.body;
+
+      // Check if user is verifying their own account
+      if (currentUser.id !== userId) {
+        return res.status(403).json({ error: 'Unauthorized access' });
+      }
+
+      if (!code) {
+        return res.status(400).json({ error: 'Verification code is required' });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Don't allow verification if 2FA is already enabled
+      if (user.isTwoFactorEnabled) {
+        return res.status(400).json({ error: 'Two-factor authentication is already enabled' });
+      }
+
+      // Verify the code
+      const isValid = await storage.verifyTwoFactorCode(userId, code);
+      if (!isValid) {
+        // Create security log for failed verification attempt
+        await db.insert(schema.securityLogs).values({
+          userId: userId,
+          eventType: '2fa_setup_failed',
+          description: 'Failed attempt to verify two-factor authentication setup',
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
+          metadata: { providedCode: code }
+        });
+
+        return res.status(400).json({ error: 'Invalid or expired verification code' });
+      }
+
+      // Code is valid, now enable 2FA
+      const updatedUser = await storage.updateUserTwoFactorSettings(userId, {
+        isTwoFactorEnabled: true,
+        twoFactorCode: null,  // Clear the setup code
+        twoFactorCodeExpiry: null
+      });
+
+      // Create security log entry for successful 2FA enablement
+      await db.insert(schema.securityLogs).values({
+        userId: userId,
+        eventType: '2fa_enabled',
+        description: 'Two-factor authentication enabled successfully',
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        metadata: { isTwoFactorEnabled: true }
+      });
+
+      res.json({
+        success: true,
+        message: 'Two-factor authentication has been successfully enabled for your account',
+        isTwoFactorEnabled: true
+      });
+    } catch (error) {
+      console.error('Verify 2FA setup error:', error);
+      res.status(500).json({ error: 'Failed to verify two-factor authentication setup' });
     }
   });
 

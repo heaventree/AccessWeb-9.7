@@ -129,6 +129,90 @@ This is an automated message from Access Checker.
       return false;
     }
   }
+
+  async sendTwoFactorSetupCode(email: string, code: string, userName?: string): Promise<boolean> {
+    if (!this.transporter) {
+      console.error('Email service not configured');
+      return false;
+    }
+
+    try {
+      const mailOptions = {
+        from: `"${process.env.SMTP_FROM_NAME || 'Access Checker'}" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: 'Verify Two-Factor Authentication Setup',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #0fae96 0%, #0d9a85 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">🔒 Two-Factor Authentication Setup</h1>
+            </div>
+            
+            <div style="background: #ffffff; padding: 40px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+              <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">
+                ${userName ? `Hi ${userName},` : 'Hello,'}
+              </p>
+              
+              <p style="font-size: 16px; color: #374151; margin-bottom: 30px;">
+                You've requested to <strong>enable two-factor authentication</strong> on your Access Checker account. To confirm this action and protect against accidental lockouts, please enter the verification code below:
+              </p>
+              
+              <div style="background: #f9fafb; border: 2px dashed #0fae96; border-radius: 8px; padding: 30px; text-align: center; margin: 30px 0;">
+                <h2 style="font-size: 36px; font-weight: bold; color: #0fae96; margin: 0; letter-spacing: 8px;">
+                  ${code}
+                </h2>
+              </div>
+              
+              <div style="background: #e0f2fe; border: 1px solid #0369a1; border-radius: 6px; padding: 15px; margin: 30px 0;">
+                <p style="margin: 0; color: #0369a1; font-size: 14px;">
+                  <strong>ℹ️ Important:</strong> Once enabled, you'll need a verification code sent to this email address each time you log in. Make sure you have access to this email account.
+                </p>
+              </div>
+              
+              <div style="background: #fef3cd; border: 1px solid #fbbf24; border-radius: 6px; padding: 15px; margin: 30px 0;">
+                <p style="margin: 0; color: #92400e; font-size: 14px;">
+                  <strong>⚠️ Security Notice:</strong> This code will expire in 5 minutes. If you didn't request this change, please ignore this email and check your account security.
+                </p>
+              </div>
+              
+              <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
+                For your security, never share this code with anyone. Our team will never ask for your verification code.
+              </p>
+              
+              <div style="border-top: 1px solid #e5e7eb; margin-top: 40px; padding-top: 20px;">
+                <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+                  This is an automated message from Access Checker. Please do not reply to this email.
+                </p>
+              </div>
+            </div>
+          </div>
+        `,
+        text: `
+Two-Factor Authentication Setup Verification
+
+Hi ${userName || 'there'},
+
+You've requested to enable two-factor authentication on your Access Checker account. To confirm this action and protect against accidental lockouts, please enter the verification code below:
+
+Verification Code: ${code}
+
+Important: Once enabled, you'll need a verification code sent to this email address each time you log in. Make sure you have access to this email account.
+
+This code will expire in 5 minutes. If you didn't request this change, please ignore this email and check your account security.
+
+For your security, never share this code with anyone.
+
+This is an automated message from Access Checker.
+        `
+      };
+
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('2FA setup email sent successfully:', info.messageId);
+      return true;
+    } catch (error) {
+      console.error('Failed to send 2FA setup email:', error);
+      return false;
+    }
+  }
 }
 
 // Export a singleton instance
