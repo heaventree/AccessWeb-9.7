@@ -613,6 +613,96 @@ app.put("/api/v1/users/:id/two-factor", requireAuth, async (req, res) => {
   }
 });
 
+// Notification Preferences Routes
+app.get("/api/v1/users/:id/notification-preferences", requireAuth, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const currentUser = req.user;
+
+    // Check if user is requesting their own data
+    if (currentUser.id !== userId && !currentUser.isAdmin) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    const preferences = await prisma.notificationPreferences.findUnique({
+      where: { userId }
+    });
+    
+    // If no preferences exist, return defaults
+    if (!preferences) {
+      const defaultPreferences = {
+        userId,
+        emailNotifications: true,
+        browserNotifications: true,
+        scanCompleted: true,
+        criticalIssues: true,
+        weeklyDigest: true,
+        usageAlerts: true,
+        teamUpdates: false,
+        marketingEmails: false
+      };
+      return res.json({ preferences: defaultPreferences });
+    }
+
+    res.json({ preferences });
+  } catch (error) {
+    logger.error("Get notification preferences error:", error);
+    res.status(500).json({ error: "Failed to get notification preferences" });
+  }
+});
+
+app.put("/api/v1/users/:id/notification-preferences", requireAuth, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const currentUser = req.user;
+
+    // Check if user is updating their own data
+    if (currentUser.id !== userId && !currentUser.isAdmin) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    const {
+      emailNotifications,
+      browserNotifications,
+      scanCompleted,
+      criticalIssues,
+      weeklyDigest,
+      usageAlerts,
+      teamUpdates,
+      marketingEmails
+    } = req.body;
+
+    // Build update object with only defined values
+    const updateData = {};
+    
+    if (emailNotifications !== undefined) updateData.emailNotifications = emailNotifications;
+    if (browserNotifications !== undefined) updateData.browserNotifications = browserNotifications;
+    if (scanCompleted !== undefined) updateData.scanCompleted = scanCompleted;
+    if (criticalIssues !== undefined) updateData.criticalIssues = criticalIssues;
+    if (weeklyDigest !== undefined) updateData.weeklyDigest = weeklyDigest;
+    if (usageAlerts !== undefined) updateData.usageAlerts = usageAlerts;
+    if (teamUpdates !== undefined) updateData.teamUpdates = teamUpdates;
+    if (marketingEmails !== undefined) updateData.marketingEmails = marketingEmails;
+
+    const updatedPreferences = await prisma.notificationPreferences.upsert({
+      where: { userId },
+      create: {
+        userId,
+        ...updateData
+      },
+      update: updateData
+    });
+
+    res.json({ 
+      preferences: updatedPreferences, 
+      message: "Notification preferences updated successfully" 
+    });
+  } catch (error) {
+    logger.error("Update notification preferences error:", error);
+    res.status(500).json({ error: "Failed to update notification preferences" });
+  }
+});
+
 app.post("/api/v1/users/:id/two-factor/verify-setup", requireAuth, async (req, res) => {
   try {
     const userId = parseInt(req.params.id);
