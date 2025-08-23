@@ -140,12 +140,6 @@ export const userApi = {
   verifyTwoFactorCode: async (userId: number, code: string) => {
     const response = await apiClient.post(`/auth/users/${userId}/two-factor/verify`, { code });
     return response.data;
-  },
-
-  // Email change verification
-  verifyEmailChange: async (userId: number, code: string) => {
-    const response = await apiClient.post(`/v1/users/${userId}/email-change/verify`, { code });
-    return response.data;
   }
 };
 
