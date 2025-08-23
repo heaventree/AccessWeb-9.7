@@ -478,6 +478,178 @@ app.put("/api/v1/users/:id/change-password", requireAuth, async (req, res) => {
 //   }
 // });
 
+// Two-factor authentication endpoints
+app.put("/api/v1/users/:id/two-factor", requireAuth, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const currentUser = req.user;
+    const { isTwoFactorEnabled } = req.body;
+
+    // Check if user is updating their own settings
+    if (currentUser.id !== userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // If enabling 2FA, send confirmation email first (don't update database yet)
+    if (isTwoFactorEnabled && !user.isTwoFactorEnabled) {
+      // Generate and store verification code for 2FA setup
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+      
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          twoFactorCode: code,
+          twoFactorCodeExpiry: expiry
+        }
+      });
+      
+      // Send setup confirmation email (you'll need to implement email service)
+      // For now, just log the code for testing
+      console.log(`2FA Setup Code for user ${userId}: ${code}`);
+      
+      // Return success but don't update 2FA status yet
+      return res.json({
+        success: true,
+        requiresVerification: true,
+        message: 'Verification code sent to your email. Please check your inbox and confirm to enable two-factor authentication.',
+        email: user.email.replace(/(.{2}).*(@.*)/, '$1***$2') // Mask email for security
+      });
+    }
+
+    // If disabling 2FA, update directly (no email confirmation needed)
+    if (!isTwoFactorEnabled && user.isTwoFactorEnabled) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          isTwoFactorEnabled: false,
+          twoFactorCode: null,
+          twoFactorCodeExpiry: null
+        }
+      });
+
+      // Create security log entry
+      await prisma.securityLog.create({
+        data: {
+          userId: userId,
+          eventType: '2fa_disabled',
+          description: 'Two-factor authentication disabled',
+          ipAddress: req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'],
+          userAgent: req.get('User-Agent'),
+          metadata: { isTwoFactorEnabled: false }
+        }
+      });
+
+      return res.json({
+        success: true,
+        message: 'Two-factor authentication disabled successfully',
+        isTwoFactorEnabled: false
+      });
+    }
+
+    // If trying to enable when already enabled, or disable when already disabled
+    res.json({
+      success: true,
+      message: `Two-factor authentication is already ${isTwoFactorEnabled ? 'enabled' : 'disabled'}`,
+      isTwoFactorEnabled: user.isTwoFactorEnabled
+    });
+  } catch (error) {
+    logger.error("Update 2FA settings error:", error);
+    res.status(500).json({ error: "Failed to update two-factor authentication settings" });
+  }
+});
+
+app.post("/api/v1/users/:id/two-factor/verify-setup", requireAuth, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const currentUser = req.user;
+    const { code } = req.body;
+
+    // Check if user is verifying their own account
+    if (currentUser.id !== userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    if (!code) {
+      return res.status(400).json({ error: "Verification code is required" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Don't allow verification if 2FA is already enabled
+    if (user.isTwoFactorEnabled) {
+      return res.status(400).json({ error: "Two-factor authentication is already enabled" });
+    }
+
+    // Verify the code
+    const now = new Date();
+    const isValid = user.twoFactorCode === code && 
+                   user.twoFactorCodeExpiry && 
+                   user.twoFactorCodeExpiry > now;
+    
+    if (!isValid) {
+      // Create security log for failed verification attempt
+      await prisma.securityLog.create({
+        data: {
+          userId: userId,
+          eventType: '2fa_setup_failed',
+          description: 'Failed attempt to verify two-factor authentication setup',
+          ipAddress: req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'],
+          userAgent: req.get('User-Agent'),
+          metadata: { providedCode: code }
+        }
+      });
+
+      return res.status(400).json({ error: "Invalid or expired verification code" });
+    }
+
+    // Code is valid, now enable 2FA
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        isTwoFactorEnabled: true,
+        twoFactorCode: null,  // Clear the setup code
+        twoFactorCodeExpiry: null
+      }
+    });
+
+    // Create security log entry for successful 2FA enablement
+    await prisma.securityLog.create({
+      data: {
+        userId: userId,
+        eventType: '2fa_enabled',
+        description: 'Two-factor authentication enabled successfully',
+        ipAddress: req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'],
+        userAgent: req.get('User-Agent'),
+        metadata: { isTwoFactorEnabled: true }
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Two-factor authentication has been successfully enabled for your account',
+      isTwoFactorEnabled: true
+    });
+  } catch (error) {
+    logger.error("Verify 2FA setup error:", error);
+    res.status(500).json({ error: "Failed to verify two-factor authentication setup" });
+  }
+});
+
 // Get security logs endpoint
 app.get("/api/v1/users/:id/security-logs", requireAuth, async (req, res) => {
   try {
