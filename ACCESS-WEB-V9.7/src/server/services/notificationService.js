@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import nodemailer from 'nodemailer';
 
 const prisma = new PrismaClient();
 
@@ -186,20 +187,153 @@ class NotificationService {
         select: { email: true, name: true }
       });
 
-      if (!user) {
-        throw new Error('User not found');
+      if (!user || !user.email) {
+        throw new Error('User not found or email not available');
       }
 
-      // For now, skip email sending in the notification service
-      // The old system will handle emails as fallback
-      console.log(`📧 [NOTIFICATION] Email would be sent to ${user.email}: ${title}`);
+      // Create email transporter
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_PASS
+        }
+      });
 
-      console.log(`📧 [NOTIFICATION] Email sent to ${user.email}: ${title}`);
+      // Determine email content based on notification type
+      const emailContent = this.getEmailContent(type, title, message, actionUrl, metadata, user.name);
+      
+      const mailOptions = {
+        from: process.env.GMAIL_USER,
+        to: user.email,
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text
+      };
+
+      console.log(`📧 [NOTIFICATION] Sending email to ${user.email}: ${title}`);
+      
+      await transporter.sendMail(mailOptions);
+      
+      console.log(`✅ [NOTIFICATION] Email sent successfully to ${user.email}: ${title}`);
+
+      // Log email delivery
+      await prisma.notificationDeliveryLog.create({
+        data: {
+          userId,
+          channel: 'email',
+          status: 'delivered',
+          deliveredAt: new Date(),
+          metadata: {
+            type,
+            subject: emailContent.subject,
+            recipient: user.email
+          }
+        }
+      });
 
     } catch (error) {
       console.error('📧 [NOTIFICATION] Email sending failed:', error);
+      
+      // Log failed delivery
+      try {
+        await prisma.notificationDeliveryLog.create({
+          data: {
+            userId,
+            channel: 'email',
+            status: 'failed',
+            deliveredAt: new Date(),
+            metadata: {
+              type,
+              error: error.message
+            }
+          }
+        });
+      } catch (logError) {
+        console.error('📧 [NOTIFICATION] Failed to log email delivery failure:', logError);
+      }
+      
       throw error;
     }
+  }
+
+  /**
+   * Generate email content based on notification type
+   */
+  getEmailContent(type, title, message, actionUrl, metadata, userName) {
+    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
+    const fullActionUrl = actionUrl ? `${baseUrl}${actionUrl}` : null;
+    
+    const subject = title.replace(/[📧🚨⚠️❌✅🎉]/g, '').trim();
+    
+    const html = `
+      <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="background-color: #0fae96; padding: 20px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 24px;">ACCESS WEB</h1>
+        </div>
+        
+        <div style="padding: 30px 20px;">
+          <h2 style="color: #0fae96; margin-bottom: 20px;">${subject}</h2>
+          
+          <p>Hello ${userName || 'User'},</p>
+          
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0; font-size: 16px;">${message}</p>
+          </div>
+          
+          ${fullActionUrl ? `
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${fullActionUrl}" 
+                 style="background-color: #0fae96; color: white; padding: 12px 24px; 
+                        text-decoration: none; border-radius: 6px; display: inline-block;
+                        font-weight: bold;">
+                View Details
+              </a>
+            </div>
+          ` : ''}
+          
+          ${metadata && Object.keys(metadata).length > 0 ? `
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+              <h3 style="color: #666; font-size: 14px; margin-bottom: 10px;">Additional Details:</h3>
+              ${Object.entries(metadata).map(([key, value]) => 
+                `<p style="margin: 5px 0; color: #666; font-size: 14px;">
+                  <strong>${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong> ${value}
+                </p>`
+              ).join('')}
+            </div>
+          ` : ''}
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #eee;">
+          <p style="margin: 0; color: #666; font-size: 14px;">
+            This email was sent from your ACCESS WEB account. 
+            <a href="${baseUrl}/settings/notifications" style="color: #0fae96;">Manage your notification preferences</a>
+          </p>
+        </div>
+      </div>
+    `;
+    
+    const text = `
+${subject}
+
+Hello ${userName || 'User'},
+
+${message}
+
+${fullActionUrl ? `View Details: ${fullActionUrl}` : ''}
+
+${metadata && Object.keys(metadata).length > 0 ? 
+  '\nAdditional Details:\n' + 
+  Object.entries(metadata).map(([key, value]) => 
+    `${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}: ${value}`
+  ).join('\n') : ''}
+
+---
+This email was sent from your ACCESS WEB account.
+Manage your notification preferences: ${baseUrl}/settings/notifications
+    `.trim();
+
+    return { subject, html, text };
   }
 
   /**
