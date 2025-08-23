@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Save, Loader2 } from 'lucide-react';
+import { User, Mail, Save, Loader2, Key } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { userApi } from '../../lib/apiClient';
 import toast from 'react-hot-toast';
@@ -13,6 +13,13 @@ export function AccountSettings() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Email verification states
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [emailVerificationCode, setEmailVerificationCode] = useState('');
+  const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
+  const [maskedCurrentEmail, setMaskedCurrentEmail] = useState('');
+  const [maskedNewEmail, setMaskedNewEmail] = useState('');
 
   // Load user data when component mounts or user changes
   useEffect(() => {
@@ -39,17 +46,64 @@ export function AccountSettings() {
     setIsSaving(true);
     
     try {
-      await userApi.updateProfile(user.id, formData);
-      toast.success('Profile updated successfully!');
+      const response = await userApi.updateProfile(user.id, formData);
       
-      // Refetch user data to update the UI with latest changes
-      await refetchUser();
+      // If email change requires verification, show OTP dialog
+      if (response.requiresVerification) {
+        setMaskedCurrentEmail(response.currentEmail);
+        setMaskedNewEmail(response.newEmail);
+        setShowEmailVerification(true);
+        toast.success('Verification code sent to your current email. Please check your inbox.');
+      } else {
+        toast.success('Profile updated successfully!');
+        
+        // Refetch user data to update the UI with latest changes
+        await refetchUser();
+      }
     } catch (error: any) {
       console.error('Error updating profile:', error);
       const errorMessage = error.response?.data?.error || 'Failed to update profile';
       toast.error(errorMessage);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleEmailVerification = async () => {
+    if (!user || !emailVerificationCode) {
+      toast.error('Please enter the verification code');
+      return;
+    }
+
+    setIsVerifyingEmail(true);
+
+    try {
+      const response = await userApi.verifyEmailChange(user.id, emailVerificationCode);
+      
+      setShowEmailVerification(false);
+      setEmailVerificationCode('');
+      toast.success(response.message || 'Email address updated successfully!');
+      
+      // Refetch user data to get updated email
+      await refetchUser();
+    } catch (error: any) {
+      console.error('Error verifying email change:', error);
+      const errorMessage = error.response?.data?.error || 'Invalid or expired verification code';
+      toast.error(errorMessage);
+    } finally {
+      setIsVerifyingEmail(false);
+    }
+  };
+
+  const handleCancelEmailVerification = () => {
+    setShowEmailVerification(false);
+    setEmailVerificationCode('');
+    setMaskedCurrentEmail('');
+    setMaskedNewEmail('');
+    
+    // Reset email field to current user email
+    if (user) {
+      setFormData(prev => ({ ...prev, email: user.email || '' }));
     }
   };
 
@@ -139,6 +193,76 @@ export function AccountSettings() {
             {isSaving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
+
+        {/* Email Verification Dialog */}
+        {showEmailVerification && (
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center mb-3">
+              <div className="flex-shrink-0">
+                <Key className="h-5 w-5 text-blue-400" />
+              </div>
+              <div className="ml-3">
+                <h4 className="text-sm font-medium text-blue-900">Verify Email Address Change</h4>
+                <p className="text-sm text-blue-700">
+                  We've sent a verification code to <strong>{maskedCurrentEmail}</strong>. Please enter it below to confirm changing your email to <strong>{maskedNewEmail}</strong>.
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="emailVerificationCode" className="block text-sm font-medium text-blue-900 mb-1">
+                  Verification Code
+                </label>
+                <input
+                  id="emailVerificationCode"
+                  type="text"
+                  value={emailVerificationCode}
+                  onChange={(e) => setEmailVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="w-full px-3 py-2 border border-blue-300 rounded-md text-center text-lg font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="000000"
+                  maxLength={6}
+                  autoComplete="one-time-code"
+                />
+                <p className="text-xs text-blue-600 mt-1 text-center">
+                  Enter the 6-digit code sent to your current email
+                </p>
+              </div>
+              
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleEmailVerification}
+                  disabled={isVerifyingEmail || emailVerificationCode.length !== 6}
+                  className="flex-1 flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isVerifyingEmail ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    'Verify & Update Email'
+                  )}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={handleCancelEmailVerification}
+                  className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+            
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+              <p className="text-xs text-yellow-800">
+                <strong>Important:</strong> The verification code will expire in 5 minutes. If you don't receive it, please check your spam folder.
+              </p>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );

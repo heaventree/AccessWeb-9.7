@@ -591,6 +591,63 @@ export class DatabaseStorage implements IStorage {
     
     return false;
   }
+
+  // Email change operations
+  async updateUserEmailChangeSettings(id: number, settings: { pendingEmail?: string | null; emailChangeCode?: string | null; emailChangeCodeExpiry?: Date | null }): Promise<User | undefined> {
+    const [updatedUser] = await db.update(schema.users)
+      .set({ ...settings, updatedAt: new Date() })
+      .where(eq(schema.users.id, id))
+      .returning();
+    return updatedUser;
+  }
+
+  async generateAndStoreEmailChangeCode(id: number, newEmail: string): Promise<string> {
+    // Generate a 6-digit OTP code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Set expiry to 5 minutes from now
+    const expiry = new Date();
+    expiry.setMinutes(expiry.getMinutes() + 5);
+    
+    // Store the code, expiry, and pending email in the database
+    await this.updateUserEmailChangeSettings(id, {
+      pendingEmail: newEmail,
+      emailChangeCode: code,
+      emailChangeCodeExpiry: expiry
+    });
+    
+    return code;
+  }
+
+  async verifyAndCompleteEmailChange(id: number, code: string): Promise<{ success: boolean; newEmail?: string }> {
+    const user = await this.getUser(id);
+    if (!user || !user.emailChangeCode || !user.emailChangeCodeExpiry || !user.pendingEmail) {
+      return { success: false };
+    }
+    
+    // Check if code matches and hasn't expired
+    const isValidCode = user.emailChangeCode === code;
+    const isNotExpired = new Date() < user.emailChangeCodeExpiry;
+    
+    if (isValidCode && isNotExpired) {
+      // Update email and clear email change fields
+      const newEmail = user.pendingEmail;
+      const [updatedUser] = await db.update(schema.users)
+        .set({ 
+          email: newEmail,
+          pendingEmail: null,
+          emailChangeCode: null,
+          emailChangeCodeExpiry: null,
+          updatedAt: new Date()
+        })
+        .where(eq(schema.users.id, id))
+        .returning();
+      
+      return { success: true, newEmail: newEmail };
+    }
+    
+    return { success: false };
+  }
 }
 
 // Export a singleton instance of DatabaseStorage

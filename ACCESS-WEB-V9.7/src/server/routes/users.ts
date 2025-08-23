@@ -119,7 +119,30 @@ export function registerUserRoutes(app: any, apiPrefix: string): void {
         if (existingUser) {
           return res.status(400).json({ error: 'Email already in use' });
         }
-        updateData.email = email;
+        
+        // For email changes, require verification instead of directly updating
+        const code = await storage.generateAndStoreEmailChangeCode(userId, email);
+        
+        // Send verification email to current email address
+        const emailSent = await emailService.sendEmailChangeVerificationCode(
+          user.email,
+          email,
+          code,
+          user.fullName || user.username
+        );
+
+        if (!emailSent) {
+          return res.status(500).json({ error: 'Failed to send verification email' });
+        }
+
+        // Return success but don't update email yet
+        return res.json({
+          success: true,
+          requiresVerification: true,
+          message: 'Verification code sent to your current email address. Please check your inbox and confirm the change.',
+          currentEmail: user.email.replace(/(.{2}).*(@.*)/, '$1***$2'), // Mask email for security
+          newEmail: email.replace(/(.{2}).*(@.*)/, '$1***$2') // Mask new email too
+        });
       }
       
       if (username && username !== user.username) {
@@ -373,6 +396,54 @@ export function registerUserRoutes(app: any, apiPrefix: string): void {
     } catch (error) {
       console.error('Verify 2FA setup error:', error);
       res.status(500).json({ error: 'Failed to verify two-factor authentication setup' });
+    }
+  });
+
+  /**
+   * @route   POST /api/v1/users/:id/email-change/verify
+   * @desc    Verify and complete email address change
+   * @access  Private (Self only)
+   */
+  router.post('/:id/email-change/verify', authenticate, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const currentUser = (req as any).user;
+      const { code } = req.body;
+
+      // Check if user is verifying their own email change
+      if (currentUser.id !== userId) {
+        return res.status(403).json({ error: 'Unauthorized access' });
+      }
+
+      if (!code) {
+        return res.status(400).json({ error: 'Verification code is required' });
+      }
+
+      // Verify the email change code and complete the change
+      const result = await storage.verifyAndCompleteEmailChange(userId, code);
+
+      if (!result.success) {
+        return res.status(400).json({ error: 'Invalid or expired verification code' });
+      }
+
+      // Create security log entry
+      await db.insert(schema.securityLogs).values({
+        userId: userId,
+        eventType: 'email_changed',
+        description: `Email address changed to ${result.newEmail}`,
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        metadata: { newEmail: result.newEmail }
+      });
+
+      res.json({
+        success: true,
+        message: 'Email address updated successfully',
+        newEmail: result.newEmail
+      });
+    } catch (error) {
+      console.error('Verify email change error:', error);
+      res.status(500).json({ error: 'Failed to verify email change' });
     }
   });
 
