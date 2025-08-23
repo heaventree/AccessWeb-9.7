@@ -1,0 +1,61 @@
+model Notification {
+  id                Int                       @id @default(autoincrement())
+  userId            Int                       @map("user_id")
+  type              String                    @db.VarChar(50)
+  category          String                    @db.VarChar(50)
+  title             String                    @db.VarChar(255)
+  message           String
+  actionUrl         String?                   @map("action_url") @db.VarChar(500)
+  actionLabel       String?                   @map("action_label") @db.VarChar(100)
+  priority          String                    @default("normal") @db.VarChar(20)
+  isRead            Boolean                   @default(false) @map("is_read")
+  readAt            DateTime?                 @map("read_at")
+  metadata          Json?
+  expiresAt         DateTime?                 @map("expires_at")
+  createdAt         DateTime                  @default(now()) @map("created_at")
+  user              User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveryLogs      NotificationDeliveryLog[]
+
+  @@index([userId, isRead])
+  @@index([type])
+  @@index([category])
+  @@index([priority])
+  @@map("notifications")
+}
+
+model NotificationTemplate {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(100)
+  type        String   @db.VarChar(50)
+  channel     String   @db.VarChar(20)
+  subject     String?  @db.VarChar(255)
+  content     String
+  variables   Json?
+  isActive    Boolean  @default(true) @map("is_active")
+  version     Int      @default(1)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([type, channel])
+  @@map("notification_templates")
+}
+
+model NotificationDeliveryLog {
+  id             Int          @id @default(autoincrement())
+  notificationId Int          @map("notification_id")
+  userId         Int          @map("user_id")
+  channel        String       @db.VarChar(20)
+  status         String       @db.VarChar(20)
+  deliveredAt    DateTime?    @map("delivered_at")
+  failureReason  String?      @map("failure_reason") @db.VarChar(255)
+  retryCount     Int          @default(0) @map("retry_count")
+  metadata       Json?
+  createdAt      DateTime     @default(now()) @map("created_at")
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([notificationId])
+  @@index([userId, channel])
+  @@index([status])
+  @@map("notification_delivery_log")
+}
