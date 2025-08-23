@@ -1,0 +1,58 @@
+[2025-08-23T09:52:08.684Z] [INFO] POST /trigger/156 - 200 {
+  "duration": "98ms",
+  "statusCode": 200
+}
+🐛 [DEBUG] Processed job object: {
+  "id": "d9afb929-eced-4b4a-ba05-39c0c45d5d4d",
+  "name": "site-accessibility-scan",
+  "data": {
+    "userId": 17,
+    "siteUrl": "https://google.com/",
+    "platform": "wordpress",
+    "siteName": "Google",
+    "frequency": "manual",
+    "triggeredBy": "user",
+    "connectionId": 156
+  },
+  "expireInSeconds": "300.000000"
+}
+✅ [DEBUG] Successfully extracted job data
+
+╔════════════════════════════════════════════════════════════════╗
+║                    🔍 ACCESSIBILITY SCAN STARTED               ║
+╠════════════════════════════════════════════════════════════════╣
+║ Job ID:        d9afb929-eced-4b4a-ba05-39c0c45d5d4d          ║
+║ Connection ID: 156                                           ║
+║ User ID:       17                                            ║
+║ Site Name:     Google                                        ║
+║ Site URL:      https://google.com/                           ║
+║ Platform:      wordpress                                     ║
+║ Started At:    2025-08-23T09:52:09.796Z                      ║
+╚════════════════════════════════════════════════════════════════╝
+    
+🔍 [SCAN-156] Starting WCAG accessibility scan for: https://google.com/ (Reason: manual)
+🔍 [ACCESSIBILITY] Starting WCAG scan for: https://google.com/ (manual)
+✅ [ACCESSIBILITY] Scan completed in 445ms - Errors: 2, Warnings: 1, Notices: 2
+💾 [ACCESSIBILITY] Scan results saved with ID: 992
+⏰ [ACCESSIBILITY] Updated last scan time for connection 156
+
+╔═══════════════════ SCAN RESULTS ═══════════════════╗
+║ Connection ID: 156                              ║
+║ Accessibility Score: 95                         ║
+║ Total Errors: 2                              ║
+║ Total Warnings: 1                            ║
+║ Total Notices: 2                             ║
+║ Scan Duration: 445ms                         ║
+║ Scan Status: completed                       ║
+╚════════════════════════════════════════════════════╝
+      
+
+╔════════════════════════════════════════════════════════════════╗
+║                    ✅ ACCESSIBILITY SCAN COMPLETED             ║
+╠════════════════════════════════════════════════════════════════╣
+║ Job ID:        d9afb929-eced-4b4a-ba05-39c0c45d5d4d          ║
+║ Site:          Google                                        ║
+║ Status:        SUCCESS                                       ║
+║ Completed At:  2025-08-23T09:52:10.399Z                      ║
+╚════════════════════════════════════════════════════════════════╝
+      

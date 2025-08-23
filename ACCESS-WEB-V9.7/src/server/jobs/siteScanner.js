@@ -23,7 +23,7 @@ class SiteScannerJobQueue {
     try {
       // Load notification service dynamically
       try {
-        const notificationModule = await import('../services/notificationService.ts');
+        const notificationModule = await import('../services/notificationService.js');
         notificationService = notificationModule.notificationService;
         console.log('📧 [NOTIFICATION] Notification service loaded successfully');
       } catch (error) {
@@ -155,24 +155,39 @@ class SiteScannerJobQueue {
       `);
 
       // Send notification when scan is completed successfully
+      console.log(`🔍 [DEBUG] Notification check: scanResult=${!!scanResult}, scanResultId=${scanResult?.scanResultId}, notificationService=${!!notificationService}`);
+      
       if (scanResult && scanResult.scanResultId && notificationService) {
         try {
+          console.log(`📧 [NOTIFICATION] Attempting to send scan completion notification for user ${userId}`);
+          
           const siteConnection = await prisma.siteConnection.findUnique({
             where: { id: connectionId }
           });
 
           if (siteConnection) {
-            await notificationService.sendScanCompletionNotification(
+            console.log(`📧 [NOTIFICATION] Found site connection, sending notification for: ${siteConnection.siteName}`);
+            
+            const result = await notificationService.sendScanCompletionNotification(
               userId, 
               scanResult, 
               siteConnection
             );
-            console.log(`📧 [NOTIFICATION] Scan completion notification sent for site: ${siteName}`);
+            
+            if (result) {
+              console.log(`✅ [NOTIFICATION] Scan completion notification sent successfully for site: ${siteName}`);
+            } else {
+              console.log(`❌ [NOTIFICATION] Scan completion notification failed for site: ${siteName}`);
+            }
+          } else {
+            console.log(`❌ [NOTIFICATION] Site connection not found for ID: ${connectionId}`);
           }
         } catch (notificationError) {
           console.error(`❌ [NOTIFICATION] Failed to send scan completion notification:`, notificationError);
           // Don't fail the job if notification fails
         }
+      } else {
+        console.log(`⚠️ [NOTIFICATION] Skipping notification - missing requirements`);
       }
 
     } catch (error) {

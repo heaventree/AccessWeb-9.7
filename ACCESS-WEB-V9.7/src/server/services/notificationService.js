@@ -1,26 +1,13 @@
-import { emailService } from './emailService';
-import { prisma } from '../../lib/prisma';
-import { storage } from '../storage';
-
-interface NotificationData {
-  userId: number;
-  type: string;
-  category: string;
-  title: string;
-  message: string;
-  actionUrl?: string;
-  actionLabel?: string;
-  priority?: 'low' | 'normal' | 'high' | 'critical';
-  metadata?: any;
-  expiresAt?: Date;
-}
+import { emailService } from './emailService.js';
+import { prisma } from '../../lib/prisma.js';
+import { storage } from '../storage.js';
 
 export class NotificationService {
   /**
    * Main notification function that decides whether to send notifications
    * based on user preferences and notification type
    */
-  async sendNotification(notificationData: NotificationData, channels: ('email' | 'inapp')[] = ['email', 'inapp']): Promise<boolean> {
+  async sendNotification(notificationData, channels = ['email', 'inapp']) {
     try {
       const { userId, type, category } = notificationData;
 
@@ -37,7 +24,7 @@ export class NotificationService {
         return false;
       }
 
-      const results: boolean[] = [];
+      const results = [];
 
       // Create in-app notification if enabled
       if (channels.includes('inapp') && shouldNotify.inapp) {
@@ -61,7 +48,7 @@ export class NotificationService {
   /**
    * Send email notification with template support
    */
-  async sendEmailNotification(notificationData: NotificationData): Promise<boolean> {
+  async sendEmailNotification(notificationData) {
     try {
       const { userId } = notificationData;
 
@@ -75,8 +62,8 @@ export class NotificationService {
       // Try to get email template first
       const template = await this.getEmailTemplate(notificationData.type, notificationData.category);
       
-      let emailSubject: string;
-      let emailContent: string;
+      let emailSubject;
+      let emailContent;
 
       if (template) {
         // Use template and replace variables
@@ -114,7 +101,7 @@ export class NotificationService {
   /**
    * Create in-app notification
    */
-  async createInAppNotification(notificationData: NotificationData): Promise<number | null> {
+  async createInAppNotification(notificationData) {
     try {
       const notification = await storage.createNotification({
         userId: notificationData.userId,
@@ -140,7 +127,7 @@ export class NotificationService {
   /**
    * Check user preferences and determine if notification should be sent
    */
-  private shouldSendNotification(preferences: any, type: string, category: string): { email: boolean, inapp: boolean } {
+  shouldSendNotification(preferences, type, category) {
     const result = { email: false, inapp: false };
 
     // Default to true if preferences don't exist
@@ -190,7 +177,7 @@ export class NotificationService {
   /**
    * Get user notification preferences
    */
-  private async getUserNotificationPreferences(userId: number) {
+  async getUserNotificationPreferences(userId) {
     try {
       return await storage.getNotificationPreferences(userId);
     } catch (error) {
@@ -202,7 +189,7 @@ export class NotificationService {
   /**
    * Get email template for notification type and category
    */
-  private async getEmailTemplate(type: string, category: string) {
+  async getEmailTemplate(type, category) {
     try {
       // For now, return null as templates are not implemented yet
       // This will be enhanced later when notification templates are fully implemented
@@ -216,7 +203,7 @@ export class NotificationService {
   /**
    * Replace template variables with actual values
    */
-  private replaceTemplateVariables(template: string, variables: any): string {
+  replaceTemplateVariables(template, variables) {
     let result = template;
     
     // Replace user variables
@@ -248,7 +235,7 @@ export class NotificationService {
   /**
    * Generate default email content when no template exists
    */
-  private generateDefaultEmailContent(notificationData: NotificationData, user: any): string {
+  generateDefaultEmailContent(notificationData, user) {
     const userName = user.fullName || 'User';
     
     return `
@@ -292,7 +279,7 @@ export class NotificationService {
   /**
    * Send email using the email service
    */
-  private async sendEmail(to: string, subject: string, htmlContent: string, userName?: string): Promise<boolean> {
+  async sendEmail(to, subject, htmlContent, userName) {
     try {
       // For now, we'll use a generic method. You can extend emailService to support custom HTML content
       return await this.sendCustomEmail(to, subject, htmlContent, userName);
@@ -305,17 +292,48 @@ export class NotificationService {
   /**
    * Send custom HTML email (extending the email service)
    */
-  private async sendCustomEmail(to: string, subject: string, htmlContent: string, userName?: string): Promise<boolean> {
-    const transporter = (emailService as any).transporter;
+  async sendCustomEmail(to, subject, htmlContent, userName) {
+    // Use existing email service transporter or create Gmail transporter if needed
+    const transporter = emailService.transporter;
     
     if (!transporter) {
-      console.error('[NOTIFICATION] Email service not configured');
-      return false;
+      // Create Gmail transporter if email service isn't configured
+      if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
+        console.error('[NOTIFICATION] Gmail credentials not configured');
+        return false;
+      }
+
+      const nodemailer = await import('nodemailer');
+      const gmailTransporter = nodemailer.default.createTransporter({
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_PASS
+        }
+      });
+
+      try {
+        const mailOptions = {
+          from: `"Access Checker" <${process.env.GMAIL_USER}>`,
+          to,
+          subject,
+          html: htmlContent,
+          // Generate text version from HTML
+          text: this.htmlToText(htmlContent)
+        };
+
+        const info = await gmailTransporter.sendMail(mailOptions);
+        console.log(`[NOTIFICATION] Email sent successfully via Gmail: ${info.messageId}`);
+        return true;
+      } catch (error) {
+        console.error('[NOTIFICATION] Failed to send email via Gmail:', error);
+        return false;
+      }
     }
 
     try {
       const mailOptions = {
-        from: `"${process.env.SMTP_FROM_NAME || 'Access Checker'}" <${process.env.SMTP_USER}>`,
+        from: `"Access Checker" <${process.env.GMAIL_USER || 'noreply@accesschecker.com'}>`,
         to,
         subject,
         html: htmlContent,
@@ -335,7 +353,7 @@ export class NotificationService {
   /**
    * Convert HTML to plain text (basic implementation)
    */
-  private htmlToText(html: string): string {
+  htmlToText(html) {
     return html
       .replace(/<[^>]*>/g, '') // Remove HTML tags
       .replace(/\s+/g, ' ') // Normalize whitespace
@@ -345,13 +363,7 @@ export class NotificationService {
   /**
    * Log delivery attempt in the database
    */
-  private async logDeliveryAttempt(
-    notificationId: number,
-    userId: number,
-    channel: string,
-    status: string,
-    failureReason?: string
-  ): Promise<void> {
+  async logDeliveryAttempt(notificationId, userId, channel, status, failureReason) {
     try {
       // For now, just log to console. This can be enhanced later with proper delivery logging
       console.log(`[NOTIFICATION] Delivery attempt logged: ${channel} -> ${status} for notification ${notificationId}`);
@@ -366,15 +378,11 @@ export class NotificationService {
   /**
    * Convenience method for scan completion notifications
    */
-  async sendScanCompletionNotification(
-    userId: number,
-    scanResult: any,
-    siteConnection: any
-  ): Promise<boolean> {
+  async sendScanCompletionNotification(userId, scanResult, siteConnection) {
     const actionUrl = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/dashboard/reports/${scanResult.id}`;
     
     // Determine priority based on scan results
-    let priority: 'low' | 'normal' | 'high' | 'critical' = 'normal';
+    let priority = 'normal';
     if (scanResult.errorCount > 50) {
       priority = 'critical';
     } else if (scanResult.errorCount > 20) {
@@ -385,7 +393,7 @@ export class NotificationService {
       priority = 'low';
     }
 
-    const notificationData: NotificationData = {
+    const notificationData = {
       userId,
       type: 'accessibility_scan',
       category: 'scan_completed',
@@ -413,7 +421,7 @@ export class NotificationService {
   /**
    * Generate scan completion message
    */
-  private generateScanCompletionMessage(scanResult: any, siteConnection: any): string {
+  generateScanCompletionMessage(scanResult, siteConnection) {
     const { errorCount, warningCount, noticeCount, score, scanStatus } = scanResult;
     
     if (scanStatus === 'failed') {
