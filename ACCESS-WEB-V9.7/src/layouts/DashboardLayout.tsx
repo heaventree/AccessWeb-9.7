@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { useAuth } from '../contexts/AuthContext';
+import { NotificationBell } from '../components/notifications/NotificationBell';
 import {
-  Bell,
   Settings,
   LogOut,
   Menu,
@@ -124,15 +124,7 @@ export function DashboardLayout({
               />
             </div>
 
-            <button 
-              className="p-2 text-gray-500 rounded-full hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-700 relative transition-colors"
-              aria-label="Notifications"
-            >
-              <Bell className="w-5 h-5" />
-              {notifications > 0 && (
-                <span className="absolute top-1 right-1 inline-block w-2 h-2 bg-[#0fae96] dark:bg-[#5eead4] rounded-full"></span>
-              )}
-            </button>
+            <NotificationBell />
 
             <button 
               className="p-2 text-gray-500 rounded-full hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-700 transition-colors"
