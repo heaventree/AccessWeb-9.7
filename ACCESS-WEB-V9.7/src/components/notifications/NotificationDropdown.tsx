@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CheckCheck, Trash2, ExternalLink, Clock, AlertTriangle, Info, CheckCircle, XCircle, Bell } from 'lucide-react';
 import { useNotifications } from '../../hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
@@ -9,8 +9,15 @@ interface NotificationDropdownProps {
 }
 
 export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
-  const { notifications, loading, markAsRead, markAllAsRead, deleteNotification, loadMore, pagination } = useNotifications();
+  const { notifications, loadNotifications, isLoading, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
   const navigate = useNavigate();
+  
+  // Load notifications when dropdown opens
+  useEffect(() => {
+    if (loadNotifications) {
+      loadNotifications({ limit: 20 });
+    }
+  }, [loadNotifications]);
 
   const handleNotificationClick = async (notification: any) => {
     // Mark as read when clicked
@@ -87,7 +94,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
 
       {/* Notification List */}
       <div className="flex-1 overflow-y-auto">
-        {loading && notifications.length === 0 ? (
+        {isLoading && notifications.length === 0 ? (
           <div className="p-4 text-center text-gray-500">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-2">Loading notifications...</p>
@@ -165,14 +172,14 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
         )}
 
         {/* Load More Button */}
-        {pagination && pagination.hasNext && (
+        {notifications.length > 0 && notifications.length >= 20 && (
           <div className="p-4 border-t border-gray-100">
             <button
-              onClick={loadMore}
-              disabled={loading}
+              onClick={() => loadNotifications({ limit: 20, page: Math.floor(notifications.length / 20) + 1 })}
+              disabled={isLoading}
               className="w-full py-2 px-4 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Loading...' : 'Load More'}
+              {isLoading ? 'Loading...' : 'Load More'}
             </button>
           </div>
         )}
