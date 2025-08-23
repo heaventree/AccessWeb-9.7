@@ -510,7 +510,7 @@ export function BillingSettings() {
               Recent Transactions
             </h3>
             <button
-              onClick={() => navigate("/billing")}
+              onClick={() => navigate("/my-account/billing")}
               className="text-[#0fae96] hover:text-[#0fae96]/90 font-medium text-sm"
             >
               View All
@@ -582,7 +582,7 @@ export function BillingSettings() {
                 </p>
               </div>
               <button
-                onClick={() => navigate("/billing")}
+                onClick={() => navigate("/my-account/billing")}
                 className="px-4 py-2 bg-[#0fae96] text-white text-sm font-medium rounded-lg hover:bg-[#0fae96]/90 transition-colors flex items-center gap-2"
               >
                 <CreditCard className="h-4 w-4" />
