@@ -12,9 +12,12 @@ export function NotificationSettings() {
     scanCompleted: true,
     criticalIssues: true,
     weeklyDigest: true,
+    monthlyReports: false,
     usageAlerts: true,
     teamUpdates: false,
-    marketingEmails: false
+    renewalReminders: true,
+    paymentNotifications: true,
+    securityAlerts: true
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -209,15 +212,57 @@ export function NotificationSettings() {
 
           <div className="flex items-center">
             <input
-              id="marketingEmails"
+              id="monthlyReports"
               type="checkbox"
-              checked={notifications.marketingEmails}
-              onChange={() => handleChange('marketingEmails')}
+              checked={notifications.monthlyReports}
+              onChange={() => handleChange('monthlyReports')}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label htmlFor="marketingEmails" className="ml-3">
-              <span className="text-sm font-medium text-gray-900">Marketing Emails</span>
-              <p className="text-sm text-gray-500">Receive product updates and accessibility tips</p>
+            <label htmlFor="monthlyReports" className="ml-3">
+              <span className="text-sm font-medium text-gray-900">Monthly Reports</span>
+              <p className="text-sm text-gray-500">Receive monthly accessibility reports</p>
+            </label>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              id="renewalReminders"
+              type="checkbox"
+              checked={notifications.renewalReminders}
+              onChange={() => handleChange('renewalReminders')}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label htmlFor="renewalReminders" className="ml-3">
+              <span className="text-sm font-medium text-gray-900">Renewal Reminders</span>
+              <p className="text-sm text-gray-500">Get notified about subscription renewals</p>
+            </label>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              id="paymentNotifications"
+              type="checkbox"
+              checked={notifications.paymentNotifications}
+              onChange={() => handleChange('paymentNotifications')}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label htmlFor="paymentNotifications" className="ml-3">
+              <span className="text-sm font-medium text-gray-900">Payment Notifications</span>
+              <p className="text-sm text-gray-500">Get notified about payments and billing</p>
+            </label>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              id="securityAlerts"
+              type="checkbox"
+              checked={notifications.securityAlerts}
+              onChange={() => handleChange('securityAlerts')}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label htmlFor="securityAlerts" className="ml-3">
+              <span className="text-sm font-medium text-gray-900">Security Alerts</span>
+              <p className="text-sm text-gray-500">Receive important security notifications</p>
             </label>
           </div>
         </div>

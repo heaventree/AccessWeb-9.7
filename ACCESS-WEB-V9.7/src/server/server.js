@@ -637,9 +637,12 @@ app.get("/api/v1/users/:id/notification-preferences", requireAuth, async (req, r
         scanCompleted: true,
         criticalIssues: true,
         weeklyDigest: true,
+        monthlyReports: false,
         usageAlerts: true,
         teamUpdates: false,
-        marketingEmails: false
+        renewalReminders: true,
+        paymentNotifications: true,
+        securityAlerts: true
       };
       return res.json({ preferences: defaultPreferences });
     }
@@ -667,9 +670,12 @@ app.put("/api/v1/users/:id/notification-preferences", requireAuth, async (req, r
       scanCompleted,
       criticalIssues,
       weeklyDigest,
+      monthlyReports,
       usageAlerts,
       teamUpdates,
-      marketingEmails
+      renewalReminders,
+      paymentNotifications,
+      securityAlerts
     } = req.body;
 
     // Build update object with only defined values
@@ -680,9 +686,12 @@ app.put("/api/v1/users/:id/notification-preferences", requireAuth, async (req, r
     if (scanCompleted !== undefined) updateData.scanCompleted = scanCompleted;
     if (criticalIssues !== undefined) updateData.criticalIssues = criticalIssues;
     if (weeklyDigest !== undefined) updateData.weeklyDigest = weeklyDigest;
+    if (monthlyReports !== undefined) updateData.monthlyReports = monthlyReports;
     if (usageAlerts !== undefined) updateData.usageAlerts = usageAlerts;
     if (teamUpdates !== undefined) updateData.teamUpdates = teamUpdates;
-    if (marketingEmails !== undefined) updateData.marketingEmails = marketingEmails;
+    if (renewalReminders !== undefined) updateData.renewalReminders = renewalReminders;
+    if (paymentNotifications !== undefined) updateData.paymentNotifications = paymentNotifications;
+    if (securityAlerts !== undefined) updateData.securityAlerts = securityAlerts;
 
     const updatedPreferences = await prisma.notificationPreferences.upsert({
       where: { userId },

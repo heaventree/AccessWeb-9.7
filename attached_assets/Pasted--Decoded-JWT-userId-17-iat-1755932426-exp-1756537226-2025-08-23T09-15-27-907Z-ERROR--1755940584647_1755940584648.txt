@@ -1,0 +1,74 @@
+}
+Decoded JWT: { userId: 17, iat: 1755932426, exp: 1756537226 }
+[2025-08-23T09:15:27.907Z] [ERROR] Update notification preferences error:
+[2025-08-23T09:15:27.907Z] [ERROR] Stack: PrismaClientValidationError: 
+Invalid `prisma.notificationPreferences.upsert()` invocation:
+
+{
+  where: {
+    userId: 17
+  },
+  create: {
+    userId: 17,
+    emailNotifications: true,
+    browserNotifications: true,
+    scanCompleted: false,
+    criticalIssues: false,
+    weeklyDigest: false,
+    usageAlerts: false,
+    teamUpdates: false,
+    marketingEmails: false,
+    ~~~~~~~~~~~~~~~
+?   id?: Int,
+?   monthlyReports?: Boolean,
+?   renewalReminders?: Boolean,
+?   paymentNotifications?: Boolean,
+?   securityAlerts?: Boolean,
+?   usageThreshold?: Int,
+?   digestFrequency?: String,
+?   quietHoursStart?: String | Null,
+?   quietHoursEnd?: String | Null,
+?   timezone?: String,
+?   createdAt?: DateTime,
+?   updatedAt?: DateTime
+  },
+  update: {
+    emailNotifications: true,
+    browserNotifications: true,
+    scanCompleted: false,
+    criticalIssues: false,
+    weeklyDigest: false,
+    usageAlerts: false,
+    teamUpdates: false,
+    marketingEmails: false
+  }
+}
+
+Unknown argument `marketingEmails`. Available options are marked with ?.
+    at kn (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:29:1363)
+    at Zn.handleRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:7102)
+    at Zn.handleAndLogRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6784)
+    at Zn.request (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6491)
+    at async l (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:130:9778)
+    at async file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/server.js:687:32
+[2025-08-23T09:15:27.907Z] [ERROR] Details: {
+  "stack": "PrismaClientValidationError: \nInvalid `prisma.notificationPreferences.upsert()` invocation:\n\n{\n  where: {\n    userId: 17\n  },\n  create: {\n    userId: 17,\n    emailNotifications: true,\n    browserNotifications: true,\n    scanCompleted: false,\n    criticalIssues: false,\n    weeklyDigest: false,\n    usageAlerts: false,\n    teamUpdates: false,\n    marketingEmails: false,\n    ~~~~~~~~~~~~~~~\n?   id?: Int,\n?   monthlyReports?: Boolean,\n?   renewalReminders?: Boolean,\n?   paymentNotifications?: Boolean,\n?   securityAlerts?: Boolean,\n?   usageThreshold?: Int,\n?   digestFrequency?: String,\n?   quietHoursStart?: String | Null,\n?   quietHoursEnd?: String | Null,\n?   timezone?: String,\n?   createdAt?: DateTime,\n?   updatedAt?: DateTime\n  },\n  update: {\n    emailNotifications: true,\n    browserNotifications: true,\n    scanCompleted: false,\n    criticalIssues: false,\n    weeklyDigest: false,\n    usageAlerts: false,\n    teamUpdates: false,\n    marketingEmails: false\n  }\n}\n\nUnknown argument `marketingEmails`. Available options are marked with ?.\n    at kn (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:29:1363)\n    at Zn.handleRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:7102)\n    at Zn.handleAndLogRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6784)\n    at Zn.request (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6491)\n    at async l (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:130:9778)\n    at async file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/server.js:687:32",
+  "message": "\nInvalid `prisma.notificationPreferences.upsert()` invocation:\n\n{\n  where: {\n    userId: 17\n  },\n  create: {\n    userId: 17,\n    emailNotifications: true,\n    browserNotifications: true,\n    scanCompleted: false,\n    criticalIssues: false,\n    weeklyDigest: false,\n    usageAlerts: false,\n    teamUpdates: false,\n    marketingEmails: false,\n    ~~~~~~~~~~~~~~~\n?   id?: Int,\n?   monthlyReports?: Boolean,\n?   renewalReminders?: Boolean,\n?   paymentNotifications?: Boolean,\n?   securityAlerts?: Boolean,\n?   usageThreshold?: Int,\n?   digestFrequency?: String,\n?   quietHoursStart?: String | Null,\n?   quietHoursEnd?: String | Null,\n?   timezone?: String,\n?   createdAt?: DateTime,\n?   updatedAt?: DateTime\n  },\n  update: {\n    emailNotifications: true,\n    browserNotifications: true,\n    scanCompleted: false,\n    criticalIssues: false,\n    weeklyDigest: false,\n    usageAlerts: false,\n    teamUpdates: false,\n    marketingEmails: false\n  }\n}\n\nUnknown argument `marketingEmails`. Available options are marked with ?.",
+  "name": "PrismaClientValidationError",
+  "clientVersion": "6.8.2"
+}
+[2025-08-23T09:15:27.908Z] [INFO] PUT /api/v1/users/17/notification-preferences - 500 {
+  "duration": "361ms",
+  "statusCode": 500
+}
+[2025-08-23T09:15:27.908Z] [ERROR] Request failed: PUT /api/v1/users/17/notification-preferences
+[2025-08-23T09:15:27.908Z] [ERROR] Stack: {
+  statusCode: 500,
+  body: '{"error":"Failed to update notification preferences"}',
+  duration: '361ms'
+}
+[2025-08-23T09:15:27.908Z] [ERROR] Details: {
+  "statusCode": 500,
+  "body": "{\"error\":\"Failed to update notification preferences\"}",
+  "duration": "361ms"
+}
