@@ -2,6 +2,9 @@ import PgBoss from 'pg-boss';
 import { PrismaClient } from '@prisma/client';
 import { accessibilityScanner } from '../services/accessibilityScanner.js';
 
+// Dynamic import for TypeScript module
+let notificationService = null;
+
 const prisma = new PrismaClient();
 
 // Environment configuration
@@ -18,6 +21,15 @@ class SiteScannerJobQueue {
 
   async initialize() {
     try {
+      // Load notification service dynamically
+      try {
+        const notificationModule = await import('../services/notificationService.ts');
+        notificationService = notificationModule.notificationService;
+        console.log('📧 [NOTIFICATION] Notification service loaded successfully');
+      } catch (error) {
+        console.warn('⚠️ [NOTIFICATION] Failed to load notification service:', error.message);
+      }
+
       // Initialize pg-boss with database connection
       this.boss = new PgBoss({
         connectionString: process.env.DATABASE_URL,
@@ -129,7 +141,7 @@ class SiteScannerJobQueue {
       });
 
       // Perform accessibility scanning process
-      await this.performAccessibilityScan(connectionId, siteUrl, platform, frequency || 'schedule');
+      const scanResult = await this.performAccessibilityScan(connectionId, siteUrl, platform, frequency || 'schedule');
       
       console.log(`
 ╔════════════════════════════════════════════════════════════════╗
@@ -141,6 +153,27 @@ class SiteScannerJobQueue {
 ║ Completed At:  ${new Date().toISOString().padEnd(45)} ║
 ╚════════════════════════════════════════════════════════════════╝
       `);
+
+      // Send notification when scan is completed successfully
+      if (scanResult && scanResult.scanResultId && notificationService) {
+        try {
+          const siteConnection = await prisma.siteConnection.findUnique({
+            where: { id: connectionId }
+          });
+
+          if (siteConnection) {
+            await notificationService.sendScanCompletionNotification(
+              userId, 
+              scanResult, 
+              siteConnection
+            );
+            console.log(`📧 [NOTIFICATION] Scan completion notification sent for site: ${siteName}`);
+          }
+        } catch (notificationError) {
+          console.error(`❌ [NOTIFICATION] Failed to send scan completion notification:`, notificationError);
+          // Don't fail the job if notification fails
+        }
+      }
 
     } catch (error) {
       console.error(`
@@ -355,9 +388,23 @@ class SiteScannerJobQueue {
           console.log(`🔍 [SITE-SCANNER] Executing direct scan for ${connection.siteName}`);
           
           // Execute scan immediately instead of queuing
-          await this.performAccessibilityScan(connection.id, connection.siteUrl, connection.platform);
+          const scanResult = await this.performAccessibilityScan(connection.id, connection.siteUrl, connection.platform);
           
           console.log(`✅ [SITE-SCANNER] Direct scan completed for ${connection.siteName}`);
+
+          // Send notification for testing scans as well
+          if (scanResult && scanResult.scanResultId && notificationService) {
+            try {
+              await notificationService.sendScanCompletionNotification(
+                connection.userId, 
+                scanResult, 
+                connection
+              );
+              console.log(`📧 [NOTIFICATION] Testing scan notification sent for site: ${connection.siteName}`);
+            } catch (notificationError) {
+              console.error(`❌ [NOTIFICATION] Failed to send testing scan notification:`, notificationError);
+            }
+          }
           
         } catch (error) {
           console.error(`❌ [SITE-SCANNER] Failed to execute direct scan for connection ${connection.id}:`, error);
