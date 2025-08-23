@@ -1,6 +1,6 @@
-import { emailService } from './emailService.js';
-import { prisma } from '../../lib/prisma.js';
-import { storage } from '../storage.js';
+import { emailService } from './emailService';
+import { prisma } from '../../lib/prisma';
+import { storage } from '../storage';
 
 export class NotificationService {
   /**
