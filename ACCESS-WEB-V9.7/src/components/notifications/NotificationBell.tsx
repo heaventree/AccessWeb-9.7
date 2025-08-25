@@ -9,6 +9,11 @@ export function NotificationBell() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const bellRef = useRef<HTMLButtonElement>(null);
 
+  // Debug log to track unread count changes
+  useEffect(() => {
+    console.log('🔔 [NOTIFICATION-BELL] Received unreadCount:', unreadCount);
+  }, [unreadCount]);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

@@ -90,14 +90,18 @@ export function useNotifications() {
 
   const loadNotificationStats = async () => {
     try {
+      console.log('🔄 [NOTIFICATIONS-HOOK] Loading notification stats...');
       // Use notifications API with minimal limit to get just the counts
       const response = await notificationApi.getNotifications({ limit: 1 });
+      console.log('📊 [NOTIFICATIONS-HOOK] Stats response:', response);
       if (response.success) {
+        console.log(`📈 [NOTIFICATIONS-HOOK] Setting unreadCount: ${unreadCount} -> ${response.unreadCount}`);
+        console.log(`📊 [NOTIFICATIONS-HOOK] Setting totalCount: ${totalCount} -> ${response.pagination.total}`);
         setUnreadCount(response.unreadCount);
         setTotalCount(response.pagination.total);
       }
     } catch (error) {
-      console.error('Error loading notification stats:', error);
+      console.error('❌ [NOTIFICATIONS-HOOK] Error loading notification stats:', error);
     }
   };
 
@@ -121,7 +125,9 @@ export function useNotifications() {
 
   const markAsRead = async (notificationId: number) => {
     try {
+      console.log(`🔴 [NOTIFICATIONS-HOOK] Marking notification ${notificationId} as read. Current unreadCount: ${unreadCount}`);
       const response = await notificationApi.markAsRead(notificationId);
+      console.log('🔴 [NOTIFICATIONS-HOOK] MarkAsRead response:', response);
       if (response.success) {
         setNotifications(prev => 
           prev.map(notification => 
@@ -130,31 +136,37 @@ export function useNotifications() {
               : notification
           )
         );
+        console.log(`🔴 [NOTIFICATIONS-HOOK] Updating unreadCount locally: ${unreadCount} -> ${Math.max(0, unreadCount - 1)}`);
         setUnreadCount(prev => Math.max(0, prev - 1));
         // Refresh stats to ensure consistency with server
+        console.log('🔴 [NOTIFICATIONS-HOOK] Calling loadNotificationStats to refresh...');
         loadNotificationStats();
       }
       return response;
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      console.error('❌ [NOTIFICATIONS-HOOK] Error marking notification as read:', error);
       return { success: false, error: 'Failed to mark as read' };
     }
   };
 
   const markAllAsRead = async () => {
     try {
+      console.log(`🟡 [NOTIFICATIONS-HOOK] Marking all notifications as read. Current unreadCount: ${unreadCount}`);
       const response = await notificationApi.markAllAsRead();
+      console.log('🟡 [NOTIFICATIONS-HOOK] MarkAllAsRead response:', response);
       if (response.success) {
         setNotifications(prev => 
           prev.map(notification => ({ ...notification, isRead: true }))
         );
+        console.log('🟡 [NOTIFICATIONS-HOOK] Setting unreadCount to 0');
         setUnreadCount(0);
         // Refresh stats to ensure consistency with server
+        console.log('🟡 [NOTIFICATIONS-HOOK] Calling loadNotificationStats to refresh...');
         loadNotificationStats();
       }
       return response;
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      console.error('❌ [NOTIFICATIONS-HOOK] Error marking all notifications as read:', error);
       return { success: false, error: 'Failed to mark all as read' };
     }
   };
