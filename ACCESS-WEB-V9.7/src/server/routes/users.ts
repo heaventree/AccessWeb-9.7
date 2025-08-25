@@ -585,7 +585,7 @@ export function registerUserRoutes(app: any, apiPrefix: string): void {
 // In-app notifications endpoints
 router.get('/notifications', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     const { page = 1, limit = 20, unreadOnly = false } = req.query;
     
     const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
@@ -637,7 +637,7 @@ router.get('/notifications', authenticateToken, async (req, res) => {
 
 router.get('/notifications/unread-count', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     
     const count = await prisma.notification.count({
       where: {
