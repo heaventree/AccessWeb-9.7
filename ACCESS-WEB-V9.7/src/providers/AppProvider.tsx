@@ -10,6 +10,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '../contexts/AuthContext';
+import { NotificationProvider } from '../contexts/NotificationContext';
 import { SecurityProvider } from './SecurityProvider';
 import { ThemeProvider } from './ThemeProvider';
 import { AccessibilityTipsProvider } from '../contexts/AccessibilityTipsContext';
@@ -56,13 +57,15 @@ export function AppProvider({ children }: AppProviderProps): JSX.Element {
           <SecurityProvider>
             <BrowserRouter>
               <AuthProvider>
-                <AccessibilityTipsProvider>
-                  <FloatingToolsProvider>
-                    <ThemeProvider>
-                      {children}
-                    </ThemeProvider>
-                  </FloatingToolsProvider>
-                </AccessibilityTipsProvider>
+                <NotificationProvider>
+                  <AccessibilityTipsProvider>
+                    <FloatingToolsProvider>
+                      <ThemeProvider>
+                        {children}
+                      </ThemeProvider>
+                    </FloatingToolsProvider>
+                  </AccessibilityTipsProvider>
+                </NotificationProvider>
               </AuthProvider>
             </BrowserRouter>
           </SecurityProvider>

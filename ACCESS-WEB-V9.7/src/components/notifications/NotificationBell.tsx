@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bell, X } from 'lucide-react';
-import { useNotifications } from '../../hooks/useNotifications';
+import { useNotificationContext } from '../../contexts/NotificationContext';
 import { NotificationDropdown } from './NotificationDropdown';
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
-  const { unreadCount } = useNotifications();
+  const { unreadCount } = useNotificationContext();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const bellRef = useRef<HTMLButtonElement>(null);
 

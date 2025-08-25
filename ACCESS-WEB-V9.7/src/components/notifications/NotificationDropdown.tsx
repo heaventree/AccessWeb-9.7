@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { CheckCheck, Trash2, ExternalLink, Clock, AlertTriangle, Info, CheckCircle, XCircle, Bell } from 'lucide-react';
-import { useNotifications } from '../../hooks/useNotifications';
+import { useNotificationContext } from '../../contexts/NotificationContext';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ interface NotificationDropdownProps {
 }
 
 export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
-  const { notifications, loadNotifications, isLoading, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
+  const { notifications, loadNotifications, isLoading, markAsRead, markAllAsRead, deleteNotification } = useNotificationContext();
   const navigate = useNavigate();
   
   // Load notifications when dropdown opens
