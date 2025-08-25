@@ -53,30 +53,63 @@ export function useAuth() {
       // Get stored role or default to subscriber
       const storedRole = localStorage.getItem('dev_role') || 'subscriber';
       
-      // Create development user based on role
-      const userRole: 'admin' | 'subscriber' = (storedRole === 'admin' ? 'admin' : 'subscriber');
-      const devUser: User = {
-        id: userRole === 'admin' ? 'dev-admin-1' : 'dev-subscriber-1',
-        email: userRole === 'admin' ? 'admin@accessweb.dev' : 'subscriber@accessweb.dev',
-        name: userRole === 'admin' ? 'Development Admin' : 'Development Subscriber',
-        role: userRole,
-        isAdmin: userRole === 'admin', // Set isAdmin flag based on role
-        emailVerified: true,
-        createdAt: new Date().toISOString(),
-        subscription: {
-          plan: userRole === 'admin' ? 'enterprise' : 'professional',
-          status: 'active',
-          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        }
-      };
+      // Check if we have existing user data in localStorage (from previous login)
+      const existingUserData = localStorage.getItem('user');
+      let finalUser: User;
       
-      // Store user data in localStorage
-      if (!localStorage.getItem('user')) {
-        localStorage.setItem('user', JSON.stringify(devUser));
+      if (existingUserData) {
+        try {
+          // Parse existing user data and use it
+          const parsedUser = JSON.parse(existingUserData);
+          finalUser = {
+            ...parsedUser,
+            // Ensure the role matches what's set in dev_role for consistency
+            role: storedRole as 'admin' | 'subscriber',
+            isAdmin: storedRole === 'admin'
+          };
+        } catch (error) {
+          // If parsing fails, fall back to creating new dev user
+          console.warn('Failed to parse existing user data, creating new dev user');
+          const userRole: 'admin' | 'subscriber' = (storedRole === 'admin' ? 'admin' : 'subscriber');
+          finalUser = {
+            id: userRole === 'admin' ? 'dev-admin-1' : 'dev-subscriber-1',
+            email: userRole === 'admin' ? 'admin@accessweb.dev' : 'subscriber@accessweb.dev',
+            name: userRole === 'admin' ? 'Development Admin' : 'Development Subscriber',
+            role: userRole,
+            isAdmin: userRole === 'admin',
+            emailVerified: true,
+            createdAt: new Date().toISOString(),
+            subscription: {
+              plan: userRole === 'admin' ? 'enterprise' : 'professional',
+              status: 'active',
+              currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            }
+          };
+        }
+      } else {
+        // Create development user based on role (only if no existing user data)
+        const userRole: 'admin' | 'subscriber' = (storedRole === 'admin' ? 'admin' : 'subscriber');
+        finalUser = {
+          id: userRole === 'admin' ? 'dev-admin-1' : 'dev-subscriber-1',
+          email: userRole === 'admin' ? 'admin@accessweb.dev' : 'subscriber@accessweb.dev',
+          name: userRole === 'admin' ? 'Development Admin' : 'Development Subscriber',
+          role: userRole,
+          isAdmin: userRole === 'admin',
+          emailVerified: true,
+          createdAt: new Date().toISOString(),
+          subscription: {
+            plan: userRole === 'admin' ? 'enterprise' : 'professional',
+            status: 'active',
+            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          }
+        };
+        
+        // Store the new dev user data in localStorage
+        localStorage.setItem('user', JSON.stringify(finalUser));
       }
       
       setIsAuthenticated(true);
-      setUser(devUser);
+      setUser(finalUser);
       setLoading(false);
       
       // Create a notification in the UI that we're in dev mode
