@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import type { TestResult, AccessibilityIssue } from '../../types';
+import logoImage from '../../assets/logo.png';
 
 export async function exportToPDF(results: TestResult) {
   const pdf = new jsPDF('p', 'mm', 'a4');
@@ -19,26 +20,10 @@ export async function exportToPDF(results: TestResult) {
     pdf.setFillColor(lightBrandColor[0], lightBrandColor[1], lightBrandColor[2]);
     pdf.rect(0, 0, pageWidth, 35, 'F');
     
-    // Heaventree brand name with accent styling
-    pdf.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-    pdf.setFontSize(20);
-    pdf.setFont("helvetica", "bold");
-    pdf.text('Heaven', 20, 18);
-    
-    // Calculate proper spacing for "tree" part
-    const heavenWidth = pdf.getTextWidth('Heaven');
-    
-    // Accent "tree" part with brand color
-    pdf.setTextColor(brandColor[0], brandColor[1], brandColor[2]);
-    pdf.text('tree', 20 + heavenWidth, 18);
-    
-    // Calculate total brand name width for decorative line
-    const totalWidth = heavenWidth + pdf.getTextWidth('tree');
-    
-    // Decorative accent line
-    pdf.setDrawColor(brandColor[0], brandColor[1], brandColor[2]);
-    pdf.setLineWidth(2);
-    pdf.line(20, 22, 20 + totalWidth, 22);
+    // Add logo image
+    const logoWidth = 50; // Width in mm (scaled from 303px)
+    const logoHeight = 12.4; // Height in mm (scaled from 75px, maintaining aspect ratio)
+    pdf.addImage(logoImage, 'PNG', 20, 8, logoWidth, logoHeight);
     
     // Report title
     pdf.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
