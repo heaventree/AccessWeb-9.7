@@ -36,6 +36,31 @@ class NotificationService {
       type, category, title, sendEmail
     });
     try {
+      // Check for recent duplicate notifications (within 5 minutes)
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      const duplicateCheck = await prisma.notification.findFirst({
+        where: {
+          userId,
+          type,
+          title,
+          createdAt: {
+            gte: fiveMinutesAgo
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      if (duplicateCheck) {
+        console.log(`📧 [NOTIFICATION-SERVICE] ⚠️ Duplicate notification detected for user ${userId}:`, {
+          type, 
+          title, 
+          duplicateId: duplicateCheck.id,
+          duplicateCreated: duplicateCheck.createdAt
+        });
+        console.log(`📧 [NOTIFICATION-SERVICE] ❌ Skipping duplicate notification creation`);
+        return duplicateCheck; // Return the existing notification instead of creating a new one
+      }
+
       // Get user notification preferences
       const preferences = await prisma.notificationPreferences.findUnique({
         where: { userId }
