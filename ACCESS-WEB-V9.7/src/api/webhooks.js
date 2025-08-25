@@ -113,12 +113,15 @@ async function handlePaymentSuccess(paymentIntent) {
     const newPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
 
     // Update user subscription fields
+    // Note: For one-time payments, we don't store the payment intent ID as subscription ID
+    // Only store actual subscription IDs (starting with 'sub_') in stripeSubscriptionId
     await prisma.user.update({
       where: { id: parseInt(userIdFromMetadata) },
       data: {
         subscriptionPlan: newPlan,
         subscriptionStatus: "active",
-        stripeSubscriptionId: paymentIntent.id,
+        // Don't store payment intent ID as subscription ID for one-time payments
+        // stripeSubscriptionId should only contain actual subscription IDs
         currentPeriodEnd: newPeriodEnd,
         updatedAt: new Date(),
       },
