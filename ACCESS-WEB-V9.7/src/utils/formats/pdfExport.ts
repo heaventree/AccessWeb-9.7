@@ -16,27 +16,68 @@ export async function exportToPDF(results: TestResult) {
 
   // Helper function to add header to each page
   const addHeader = () => {
-    // Header background with gradient effect
+    const headerHeight = 50;
+    
+    // Main header background with subtle gradient effect
+    pdf.setFillColor(255, 255, 255); // White background
+    pdf.rect(0, 0, pageWidth, headerHeight, 'F');
+    
+    // Top accent bar
+    pdf.setFillColor(brandColor[0], brandColor[1], brandColor[2]);
+    pdf.rect(0, 0, pageWidth, 3, 'F');
+    
+    // Light background panel for logo area
     pdf.setFillColor(lightBrandColor[0], lightBrandColor[1], lightBrandColor[2]);
-    pdf.rect(0, 0, pageWidth, 35, 'F');
+    pdf.roundedRect(15, 8, pageWidth - 30, 32, 2, 2, 'F');
     
-    // Add logo image
-    const logoWidth = 50; // Width in mm (scaled from 303px)
-    const logoHeight = 12.4; // Height in mm (scaled from 75px, maintaining aspect ratio)
-    pdf.addImage(logoImage, 'PNG', 20, 8, logoWidth, logoHeight);
+    // Add subtle shadow effect with dark border
+    pdf.setDrawColor(200, 200, 200);
+    pdf.setLineWidth(0.2);
+    pdf.roundedRect(15, 8, pageWidth - 30, 32, 2, 2, 'S');
     
-    // Report title
+    // Add logo image with better positioning
+    const logoWidth = 45;
+    const logoHeight = 11.15; // Maintaining aspect ratio
+    pdf.addImage(logoImage, 'PNG', 25, 12, logoWidth, logoHeight);
+    
+    // Vertical separator line
+    pdf.setDrawColor(brandColor[0], brandColor[1], brandColor[2]);
+    pdf.setLineWidth(1);
+    pdf.line(85, 12, 85, 35);
+    
+    // Report title with improved typography
     pdf.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-    pdf.setFontSize(12);
-    pdf.setFont("helvetica", "normal");
-    pdf.text('WCAG Accessibility Report', 20, 30);
+    pdf.setFontSize(16);
+    pdf.setFont("helvetica", "bold");
+    pdf.text('ACCESSIBILITY REPORT', 95, 20);
     
-    // Date
+    // Subtitle
     pdf.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
-    pdf.setFontSize(9);
-    pdf.text(new Date(results.timestamp).toLocaleDateString(), pageWidth - 45, 18);
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "normal");
+    pdf.text('WCAG 2.2 Compliance Analysis', 95, 28);
     
-    yOffset = 45;
+    // Date with better styling
+    pdf.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+    pdf.setFontSize(9);
+    pdf.setFont("helvetica", "normal");
+    const dateText = `Generated: ${new Date(results.timestamp).toLocaleDateString()}`;
+    const dateWidth = pdf.getTextWidth(dateText);
+    pdf.text(dateText, pageWidth - dateWidth - 25, 18);
+    
+    // Time
+    pdf.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
+    pdf.setFontSize(8);
+    const timeText = new Date(results.timestamp).toLocaleTimeString();
+    const timeWidth = pdf.getTextWidth(timeText);
+    pdf.text(timeText, pageWidth - timeWidth - 25, 25);
+    
+    // Bottom border for header
+    pdf.setDrawColor(230, 230, 230);
+    pdf.setLineWidth(0.5);
+    pdf.line(0, headerHeight, pageWidth, headerHeight);
+    
+    yOffset = headerHeight + 10;
   };
 
   // Helper function to add footer
