@@ -32,15 +32,22 @@ class NotificationService {
     metadata = {},
     sendEmail = true 
   }) {
+    console.log(`[NOTIFICATION-SERVICE] Creating notification for user ${userId}:`, {
+      type, category, title, sendEmail
+    });
     try {
       // Get user notification preferences
       const preferences = await prisma.notificationPreferences.findUnique({
         where: { userId }
       });
+      console.log(`[NOTIFICATION-SERVICE] User ${userId} preferences:`, preferences);
 
       // Create in-app notification if user has them enabled (default: true)
       let inAppNotification = null;
-      if (!preferences || preferences.browserNotifications) {
+      const shouldCreateInApp = !preferences || preferences.browserNotifications;
+      console.log(`[NOTIFICATION-SERVICE] Should create in-app for user ${userId}: ${shouldCreateInApp}`);
+      
+      if (shouldCreateInApp) {
         inAppNotification = await prisma.notification.create({
           data: {
             userId,
@@ -54,12 +61,24 @@ class NotificationService {
           }
         });
 
-        console.log(`📧 [NOTIFICATION] Created in-app notification: ${title} for user ${userId}`);
+        console.log(`📧 [NOTIFICATION-SERVICE] ✅ Created in-app notification ID ${inAppNotification.id}: ${title} for user ${userId}`);
+      } else {
+        console.log(`📧 [NOTIFICATION-SERVICE] ❌ Skipped in-app notification for user ${userId} - browser notifications disabled`);
       }
 
       // Send email notification if enabled and user has email notifications on
-      if (sendEmail && preferences && preferences.emailNotifications && this.shouldSendEmailForType(type, preferences)) {
+      const shouldSendEmail = sendEmail && preferences && preferences.emailNotifications && this.shouldSendEmailForType(type, preferences);
+      console.log(`[NOTIFICATION-SERVICE] Should send email for user ${userId}:`, {
+        sendEmail,
+        hasPreferences: !!preferences,
+        emailNotifications: preferences?.emailNotifications,
+        shouldSendEmailForType: this.shouldSendEmailForType(type, preferences),
+        finalDecision: shouldSendEmail
+      });
+      
+      if (shouldSendEmail) {
         try {
+          console.log(`📧 [NOTIFICATION-SERVICE] 📨 Attempting to send email for user ${userId}...`);
           await this.sendEmailNotification({
             userId,
             type,
@@ -68,10 +87,13 @@ class NotificationService {
             actionUrl,
             metadata
           });
+          console.log(`📧 [NOTIFICATION-SERVICE] ✅ Email sent successfully for user ${userId}`);
         } catch (emailError) {
-          console.error('📧 [NOTIFICATION] Email notification failed:', emailError);
+          console.error(`📧 [NOTIFICATION-SERVICE] ❌ Email notification failed for user ${userId}:`, emailError);
           // Don't throw - in-app notification is still created
         }
+      } else {
+        console.log(`📧 [NOTIFICATION-SERVICE] ❌ Skipped email notification for user ${userId}`);
       }
 
       // Log delivery if notification was created
@@ -278,6 +300,8 @@ class NotificationService {
    * Check if email should be sent for this notification type based on user preferences
    */
   shouldSendEmailForType(type, preferences) {
+    console.log(`[NOTIFICATION-SERVICE] Checking if should send email for type '${type}' with preferences:`, preferences);
+    const result = (() => {
     switch (type) {
       case 'scan_completed':
         return preferences.scanCompleted;
@@ -300,24 +324,34 @@ class NotificationService {
       default:
         return true; // Default to sending email
     }
+    })();
+    console.log(`[NOTIFICATION-SERVICE] Should send email for type '${type}': ${result}`);
+    return result;
   }
 
   /**
    * Send email notification
    */
   async sendEmailNotification({ userId, type, title, message, actionUrl, metadata }) {
+    console.log(`[NOTIFICATION-SERVICE] 📧 Starting email send process for user ${userId}...`);
     try {
       // Get user details
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { email: true, name: true }
       });
+      console.log(`[NOTIFICATION-SERVICE] 📧 User details for ${userId}:`, { email: user?.email, name: user?.name });
 
       if (!user || !user.email) {
+        console.error(`[NOTIFICATION-SERVICE] 📧 ❌ User ${userId} not found or email not available`);
         throw new Error('User not found or email not available');
       }
 
       // Create email transporter
+      console.log(`[NOTIFICATION-SERVICE] 📧 Creating email transporter with Gmail config...`);
+      console.log(`[NOTIFICATION-SERVICE] 📧 Gmail user configured: ${!!process.env.GMAIL_USER}`);
+      console.log(`[NOTIFICATION-SERVICE] 📧 Gmail password configured: ${!!process.env.GMAIL_PASS}`);
+      
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -337,11 +371,16 @@ class NotificationService {
         text: emailContent.text
       };
 
-      console.log(`📧 [NOTIFICATION] Sending email to ${user.email}: ${title}`);
+      console.log(`📧 [NOTIFICATION-SERVICE] 📨 Sending email to ${user.email}: ${title}`);
+      console.log(`📧 [NOTIFICATION-SERVICE] 📨 Email options:`, {
+        from: mailOptions.from,
+        to: mailOptions.to,
+        subject: mailOptions.subject
+      });
       
       await transporter.sendMail(mailOptions);
       
-      console.log(`✅ [NOTIFICATION] Email sent successfully to ${user.email}: ${title}`);
+      console.log(`✅ [NOTIFICATION-SERVICE] 📧 Email sent successfully to ${user.email}: ${title}`);
 
       // Log email delivery
       await prisma.notificationDeliveryLog.create({
@@ -359,7 +398,7 @@ class NotificationService {
       });
 
     } catch (error) {
-      console.error('📧 [NOTIFICATION] Email sending failed:', error);
+      console.error(`📧 [NOTIFICATION-SERVICE] ❌ Email sending failed for user ${userId}:`, error);
       
       // Log failed delivery
       try {
