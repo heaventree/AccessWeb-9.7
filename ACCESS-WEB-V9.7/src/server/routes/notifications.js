@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 // Get user notifications with pagination
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     console.log(`[NOTIFICATIONS-API] /api/notifications - User ID: ${userId}, User object:`, req.user);
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
@@ -72,7 +72,7 @@ router.get("/", authenticateToken, async (req, res) => {
 // Mark notification as read
 router.patch("/:id/read", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     const notificationId = parseInt(req.params.id);
 
     const notification = await prisma.notification.findFirst({
@@ -104,7 +104,7 @@ router.patch("/:id/read", authenticateToken, async (req, res) => {
 // Mark all notifications as read
 router.patch("/mark-all-read", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
 
     await prisma.notification.updateMany({
       where: { userId, isRead: false },
@@ -124,7 +124,7 @@ router.patch("/mark-all-read", authenticateToken, async (req, res) => {
 // Delete notification
 router.delete("/:id", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     const notificationId = parseInt(req.params.id);
 
     const notification = await prisma.notification.findFirst({
@@ -155,7 +155,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 // Get notification stats
 router.get("/stats", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     console.log(`[NOTIFICATIONS-API] /api/notifications/stats - User ID: ${userId}, User object:`, req.user);
 
     const [unreadCount, totalCount] = await Promise.all([

@@ -1,0 +1,71 @@
+}
+[NOTIFICATIONS-API] Fetched 18 notifications for user undefined: [
+  { id: 20, title: '📋 Subscription Cancelled', userId: 'N/A' },
+  { id: 19, title: '🎉 Subscription Upgraded to basic', userId: 'N/A' },
+  { id: 18, title: '🎉 Subscription Upgraded to basic', userId: 'N/A' },
+  { id: 17, title: '🎉 Subscription Upgraded to basic', userId: 'N/A' },
+  { id: 16, title: '📋 Subscription Cancelled', userId: 'N/A' },
+  { id: 15, title: '🎉 Subscription Upgraded to basic', userId: 'N/A' },
+  { id: 14, title: '🎉 Subscription Upgraded to basic', userId: 'N/A' },
+  { id: 13, title: '🎉 Subscription Upgraded to basic', userId: 'N/A' },
+  {
+    id: 12,
+    title: '⚠️ Accessibility Issues Found - https://www.google.com',
+    userId: 'N/A'
+  },
+  {
+    id: 11,
+    title: '⚠️ Accessibility Issues Found - https://www.google.com',
+    userId: 'N/A'
+  },
+  {
+    id: 10,
+    title: '⚠️ Accessibility Issues Found - https://www.google.com',
+    userId: 'N/A'
+  },
+  {
+    id: 9,
+    title: '⚠️ Accessibility Issues Found - https://www.google.com',
+    userId: 'N/A'
+  },
+  {
+    id: 8,
+    title: '⚠️ Accessibility Issues Found - https://www.google.com',
+    userId: 'N/A'
+  },
+  {
+    id: 7,
+    title: '⚠️ Accessibility Issues Found - https://google.com/',
+    userId: 'N/A'
+  },
+  {
+    id: 6,
+    title: '⚠️ Accessibility Issues Found - https://google.com/',
+    userId: 'N/A'
+  },
+  {
+    id: 5,
+    title: '⚠️ Accessibility Issues Found - https://google.com/',
+    userId: 'N/A'
+  },
+  {
+    id: 4,
+    title: '⚠️ Accessibility Issues Found - https://google.com/',
+    userId: 'N/A'
+  },
+  {
+    id: 3,
+    title: '⚠️ Accessibility Issues Found - https://google.com/',
+    userId: 'N/A'
+  }
+]
+[NOTIFICATIONS-API] Total count: 18, Unread count: 0
+[2025-08-25T05:44:49.387Z] [INFO] GET /?limit=20 - 200 {
+  "duration": "38ms",
+  "statusCode": 200
+}
+[2025-08-25T05:44:49.422Z] [INFO] GET /api/notifications/stats {
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+}
+[2025-08-25T05:44:49.422Z] [INFO] GE
