@@ -1,0 +1,108 @@
+}
+✅ [NOTIFICATION-SERVICE] 📧 Email sent successfully to dhananjay5502@yopmail.com: 🎉 Subscription Upgraded to basic
+📧 [NOTIFICATION-SERVICE] ❌ Email sending failed for user 26: PrismaClientValidationError: 
+Invalid `prisma.notificationDeliveryLog.create()` invocation:
+
+{
+  data: {
+    userId: 26,
+    channel: "email",
+    status: "delivered",
+    deliveredAt: new Date("2025-08-25T05:55:08.117Z"),
+    metadata: {
+      type: "subscription_upgrade",
+      subject: "Subscription Upgraded to basic",
+      recipient: "dhananjay5502@yopmail.com"
+    },
++   notification: {
++     create: NotificationCreateWithoutDeliveryLogsInput | NotificationUncheckedCreateWithoutDeliveryLogsInput,
++     connectOrCreate: NotificationCreateOrConnectWithoutDeliveryLogsInput,
++     connect: NotificationWhereUniqueInput
++   }
+  }
+}
+
+Argument `notification` is missing.
+    at kn (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:29:1363)
+    at Zn.handleRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:7102)
+    at Zn.handleAndLogRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6784)
+    at Zn.request (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6491)
+    at async l (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:130:9778)
+    at async NotificationService.sendEmailNotification (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/services/notificationService.js:386:7)
+    at async NotificationService.createNotification (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/services/notificationService.js:82:11)
+    at async NotificationService.createSubscriptionUpgradeNotification (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/services/notificationService.js:186:12)
+    at async handlePaymentSuccess (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/api/webhooks.js:132:7)
+    at async handleStripeWebhook (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/api/webhooks.js:49:9) {
+  clientVersion: '6.8.2'
+}
+📧 [NOTIFICATION] Failed to log email delivery failure: PrismaClientValidationError: 
+Invalid `prisma.notificationDeliveryLog.create()` invocation:
+
+{
+  data: {
+    userId: 26,
+    channel: "email",
+    status: "failed",
+    deliveredAt: new Date("2025-08-25T05:55:08.122Z"),
+    metadata: {
+      type: "subscription_upgrade",
+      error: "\nInvalid `prisma.notificationDeliveryLog.create()` invocation:\n\n{\n  data: {\n    userId: 26,\n    channel: \"email\",\n    status: \"delivered\",\n    deliveredAt: new Date(\"2025-08-25T05:55:08.117Z\"),\n    metadata: {\n      type: \"subscription_upgrade\",\n      subject: \"Subscription Upgraded to basic\",\n      recipient: \"dhananjay5502@yopmail.com\"\n    },\n+   notification: {\n+     create: NotificationCreateWithoutDeliveryLogsInput | NotificationUncheckedCreateWithoutDeliveryLogsInput,\n+     connectOrCreate: NotificationCreateOrConnectWithoutDeliveryLogsInput,\n+     connect: NotificationWhereUniqueInput\n+   }\n  }\n}\n\nArgument `notification` is missing."
+    },
++   notification: {
++     create: NotificationCreateWithoutDeliveryLogsInput | NotificationUncheckedCreateWithoutDeliveryLogsInput,
++     connectOrCreate: NotificationCreateOrConnectWithoutDeliveryLogsInput,
++     connect: NotificationWhereUniqueInput
++   }
+  }
+}
+
+Argument `notification` is missing.
+    at kn (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:29:1363)
+    at Zn.handleRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:7102)
+    at Zn.handleAndLogRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6784)
+    at Zn.request (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6491)
+    at async l (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:130:9778)
+    at async NotificationService.sendEmailNotification (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/services/notificationService.js:405:9)
+    at async NotificationService.createNotification (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/services/notificationService.js:82:11)
+    at async NotificationService.createSubscriptionUpgradeNotification (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/services/notificationService.js:186:12)
+    at async handlePaymentSuccess (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/api/webhooks.js:132:7)
+    at async handleStripeWebhook (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/api/webhooks.js:49:9) {
+  clientVersion: '6.8.2'
+}
+📧 [NOTIFICATION-SERVICE] ❌ Email notification failed for user 26: PrismaClientValidationError: 
+Invalid `prisma.notificationDeliveryLog.create()` invocation:
+
+{
+  data: {
+    userId: 26,
+    channel: "email",
+    status: "delivered",
+    deliveredAt: new Date("2025-08-25T05:55:08.117Z"),
+    metadata: {
+      type: "subscription_upgrade",
+      subject: "Subscription Upgraded to basic",
+      recipient: "dhananjay5502@yopmail.com"
+    },
++   notification: {
++     create: NotificationCreateWithoutDeliveryLogsInput | NotificationUncheckedCreateWithoutDeliveryLogsInput,
++     connectOrCreate: NotificationCreateOrConnectWithoutDeliveryLogsInput,
++     connect: NotificationWhereUniqueInput
++   }
+  }
+}
+
+Argument `notification` is missing.
+    at kn (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:29:1363)
+    at Zn.handleRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:7102)
+    at Zn.handleAndLogRequestError (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6784)
+    at Zn.request (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:121:6491)
+    at async l (/home/runner/workspace/node_modules/@prisma/client/runtime/library.js:130:9778)
+    at async NotificationService.sendEmailNotification (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/services/notificationService.js:386:7)
+    at async NotificationService.createNotification (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/services/notificationService.js:82:11)
+    at async NotificationService.createSubscriptionUpgradeNotification (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/server/services/notificationService.js:186:12)
+    at async handlePaymentSuccess (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/api/webhooks.js:132:7)
+    at async handleStripeWebhook (file:///home/runner/workspace/ACCESS-WEB-V9.7/src/api/webhooks.js:49:9) {
+  clientVersion: '6.8.2'
+}
+📧 [SUBSCRIPTION] Webhook upgrade notification sent for user 26
+✅ Successfully processed payment for user 26: Basic plan

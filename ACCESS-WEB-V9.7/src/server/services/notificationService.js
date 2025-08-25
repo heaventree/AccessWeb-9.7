@@ -85,7 +85,8 @@ class NotificationService {
             title,
             message,
             actionUrl,
-            metadata
+            metadata,
+            notificationId: inAppNotification?.id
           });
           console.log(`📧 [NOTIFICATION-SERVICE] ✅ Email sent successfully for user ${userId}`);
         } catch (emailError) {
@@ -332,7 +333,7 @@ class NotificationService {
   /**
    * Send email notification
    */
-  async sendEmailNotification({ userId, type, title, message, actionUrl, metadata }) {
+  async sendEmailNotification({ userId, type, title, message, actionUrl, metadata, notificationId = null }) {
     console.log(`[NOTIFICATION-SERVICE] 📧 Starting email send process for user ${userId}...`);
     try {
       // Get user details
@@ -383,18 +384,24 @@ class NotificationService {
       console.log(`✅ [NOTIFICATION-SERVICE] 📧 Email sent successfully to ${user.email}: ${title}`);
 
       // Log email delivery
-      await prisma.notificationDeliveryLog.create({
-        data: {
-          userId,
-          channel: 'email',
-          status: 'delivered',
-          deliveredAt: new Date(),
-          metadata: {
-            type,
-            subject: emailContent.subject,
-            recipient: user.email
-          }
+      const logData = {
+        userId,
+        channel: 'email',
+        status: 'delivered',
+        deliveredAt: new Date(),
+        metadata: {
+          type,
+          subject: emailContent.subject,
+          recipient: user.email
         }
+      };
+      
+      if (notificationId) {
+        logData.notificationId = notificationId;
+      }
+      
+      await prisma.notificationDeliveryLog.create({
+        data: logData
       });
 
     } catch (error) {
@@ -402,17 +409,23 @@ class NotificationService {
       
       // Log failed delivery
       try {
-        await prisma.notificationDeliveryLog.create({
-          data: {
-            userId,
-            channel: 'email',
-            status: 'failed',
-            deliveredAt: new Date(),
-            metadata: {
-              type,
-              error: error.message
-            }
+        const failedLogData = {
+          userId,
+          channel: 'email',
+          status: 'failed',
+          deliveredAt: new Date(),
+          metadata: {
+            type,
+            error: error.message
           }
+        };
+        
+        if (notificationId) {
+          failedLogData.notificationId = notificationId;
+        }
+        
+        await prisma.notificationDeliveryLog.create({
+          data: failedLogData
         });
       } catch (logError) {
         console.error('📧 [NOTIFICATION] Failed to log email delivery failure:', logError);
