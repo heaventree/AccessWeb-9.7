@@ -314,7 +314,7 @@ export default function Navbar() {
               <div className="hidden md:flex items-center space-x-3">
                 <NotificationBell />
                 <span className="text-muted-foreground dark:text-gray-300">
-                  {user.email}
+                  {user.name || user.email}
                 </span>
                 <Button
                   onClick={handleLogout}
@@ -475,7 +475,7 @@ export default function Navbar() {
                 <div className="py-3">
                   <div className="flex items-center mb-3">
                     <User className="h-5 w-5 mr-2 text-[#0fae96] dark:text-[#5eead4]" />
-                    <span className="text-foreground dark:text-white truncate">{user.email}</span>
+                    <span className="text-foreground dark:text-white truncate">{user.name || user.email}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <Link 
