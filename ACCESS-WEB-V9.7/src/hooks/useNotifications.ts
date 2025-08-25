@@ -36,15 +36,6 @@ const notificationApi = {
     return response.json();
   },
   
-  async getNotificationStats() {
-    const response = await fetch('/api/notifications/stats', {
-      headers: { 
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    return response.json();
-  },
   
   async markAsRead(id: number) {
     const response = await fetch(`/api/notifications/${id}/read`, {
@@ -99,10 +90,11 @@ export function useNotifications() {
 
   const loadNotificationStats = async () => {
     try {
-      const response = await notificationApi.getNotificationStats();
+      // Use notifications API with minimal limit to get just the counts
+      const response = await notificationApi.getNotifications({ limit: 1 });
       if (response.success) {
         setUnreadCount(response.unreadCount);
-        setTotalCount(response.totalCount);
+        setTotalCount(response.pagination.total);
       }
     } catch (error) {
       console.error('Error loading notification stats:', error);
