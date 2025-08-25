@@ -1,29 +1,32 @@
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import { authenticateToken } from '../middleware/auth.js';
+import express from "express";
+import { PrismaClient } from "@prisma/client";
+import { authenticateToken } from "../middleware/auth.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Get user notifications with pagination
-router.get('/', authenticateToken, async (req, res) => {
+router.get("/", authenticateToken, async (req, res) => {
   try {
     const userId = req.user?.id;
+    console.log(`[NOTIFICATIONS-API] /api/notifications - User ID: ${userId}, User object:`, req.user);
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
-    const unreadOnly = req.query.unreadOnly === 'true';
-    
+    const unreadOnly = req.query.unreadOnly === "true";
+
     const skip = (page - 1) * limit;
-    
+
     const where = {
       userId,
-      ...(unreadOnly ? { isRead: false } : {})
+      ...(unreadOnly ? { isRead: false } : {}),
     };
     
+    console.log(`[NOTIFICATIONS-API] Query where clause:`, where);
+
     const [notifications, totalCount, unreadCount] = await Promise.all([
       prisma.notification.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit,
         select: {
@@ -36,13 +39,15 @@ router.get('/', authenticateToken, async (req, res) => {
           isRead: true,
           actionUrl: true,
           metadata: true,
-          createdAt: true
-        }
+          createdAt: true,
+        },
       }),
       prisma.notification.count({ where }),
-      prisma.notification.count({ where: { userId, isRead: false } })
+      prisma.notification.count({ where: { userId, isRead: false } }),
     ]);
 
+    console.log(`[NOTIFICATIONS-API] Fetched ${notifications.length} notifications for user ${userId}:`, notifications.map(n => ({ id: n.id, title: n.title, userId: 'N/A' })));
+    console.log(`[NOTIFICATIONS-API] Total count: ${totalCount}, Unread count: ${unreadCount}`);
 
     res.json({
       success: true,
@@ -51,127 +56,125 @@ router.get('/', authenticateToken, async (req, res) => {
         page,
         limit,
         total: totalCount,
-        pages: Math.ceil(totalCount / limit)
+        pages: Math.ceil(totalCount / limit),
       },
-      unreadCount
+      unreadCount,
     });
-
   } catch (error) {
-    console.error('Error fetching notifications:', error);
+    console.error("Error fetching notifications:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch notifications'
+      error: "Failed to fetch notifications",
     });
   }
 });
 
 // Mark notification as read
-router.patch('/:id/read', authenticateToken, async (req, res) => {
+router.patch("/:id/read", authenticateToken, async (req, res) => {
   try {
     const userId = req.user?.id;
     const notificationId = parseInt(req.params.id);
 
     const notification = await prisma.notification.findFirst({
-      where: { id: notificationId, userId }
+      where: { id: notificationId, userId },
     });
 
     if (!notification) {
       return res.status(404).json({
         success: false,
-        error: 'Notification not found'
+        error: "Notification not found",
       });
     }
 
     await prisma.notification.update({
       where: { id: notificationId },
-      data: { isRead: true, readAt: new Date() }
+      data: { isRead: true, readAt: new Date() },
     });
 
     res.json({ success: true });
-
   } catch (error) {
-    console.error('Error marking notification as read:', error);
+    console.error("Error marking notification as read:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to mark notification as read'
+      error: "Failed to mark notification as read",
     });
   }
 });
 
 // Mark all notifications as read
-router.patch('/mark-all-read', authenticateToken, async (req, res) => {
+router.patch("/mark-all-read", authenticateToken, async (req, res) => {
   try {
     const userId = req.user?.id;
 
     await prisma.notification.updateMany({
       where: { userId, isRead: false },
-      data: { isRead: true, readAt: new Date() }
+      data: { isRead: true, readAt: new Date() },
     });
 
     res.json({ success: true });
-
   } catch (error) {
-    console.error('Error marking all notifications as read:', error);
+    console.error("Error marking all notifications as read:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to mark all notifications as read'
+      error: "Failed to mark all notifications as read",
     });
   }
 });
 
 // Delete notification
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const userId = req.user?.id;
     const notificationId = parseInt(req.params.id);
 
     const notification = await prisma.notification.findFirst({
-      where: { id: notificationId, userId }
+      where: { id: notificationId, userId },
     });
 
     if (!notification) {
       return res.status(404).json({
         success: false,
-        error: 'Notification not found'
+        error: "Notification not found",
       });
     }
 
     await prisma.notification.delete({
-      where: { id: notificationId }
+      where: { id: notificationId },
     });
 
     res.json({ success: true });
-
   } catch (error) {
-    console.error('Error deleting notification:', error);
+    console.error("Error deleting notification:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to delete notification'
+      error: "Failed to delete notification",
     });
   }
 });
 
 // Get notification stats
-router.get('/stats', authenticateToken, async (req, res) => {
+router.get("/stats", authenticateToken, async (req, res) => {
   try {
     const userId = req.user?.id;
+    console.log(`[NOTIFICATIONS-API] /api/notifications/stats - User ID: ${userId}, User object:`, req.user);
 
     const [unreadCount, totalCount] = await Promise.all([
       prisma.notification.count({ where: { userId, isRead: false } }),
-      prisma.notification.count({ where: { userId } })
+      prisma.notification.count({ where: { userId } }),
     ]);
+    
+    console.log(`[NOTIFICATIONS-API] Stats for user ${userId} - Unread: ${unreadCount}, Total: ${totalCount}`);
 
     res.json({
       success: true,
       unreadCount,
-      totalCount
+      totalCount,
     });
-
   } catch (error) {
-    console.error('Error fetching notification stats:', error);
+    console.error("Error fetching notification stats:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch notification stats'
+      error: "Failed to fetch notification stats",
     });
   }
 });

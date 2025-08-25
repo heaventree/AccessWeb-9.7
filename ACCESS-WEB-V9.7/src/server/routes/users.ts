@@ -586,6 +586,7 @@ export function registerUserRoutes(app: any, apiPrefix: string): void {
 router.get('/notifications', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
+    console.log(`[USERS-API] /v1/users/notifications - User ID: ${userId}, User object:`, req.user);
     const { page = 1, limit = 20, unreadOnly = false } = req.query;
     
     const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
@@ -595,6 +596,8 @@ router.get('/notifications', authenticateToken, async (req, res) => {
       userId,
       ...(unreadOnly === 'true' ? { isRead: false } : {})
     };
+    
+    console.log(`[USERS-API] Query where clause:`, where);
     
     const [notifications, total] = await Promise.all([
       prisma.notification.findMany({
@@ -619,6 +622,9 @@ router.get('/notifications', authenticateToken, async (req, res) => {
       prisma.notification.count({ where })
     ]);
     
+    console.log(`[USERS-API] Fetched ${notifications.length} notifications for user ${userId}:`, notifications.map(n => ({ id: n.id, title: n.title })));
+    console.log(`[USERS-API] Total count: ${total}`);
+    
     res.json({
       success: true,
       notifications,
@@ -638,6 +644,7 @@ router.get('/notifications', authenticateToken, async (req, res) => {
 router.get('/notifications/unread-count', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
+    console.log(`[USERS-API] /v1/users/notifications/unread-count - User ID: ${userId}, User object:`, req.user);
     
     const count = await prisma.notification.count({
       where: {
@@ -645,6 +652,8 @@ router.get('/notifications/unread-count', authenticateToken, async (req, res) =>
         isRead: false
       }
     });
+    
+    console.log(`[USERS-API] Unread count for user ${userId}: ${count}`);
     
     res.json({ success: true, count });
   } catch (error) {
