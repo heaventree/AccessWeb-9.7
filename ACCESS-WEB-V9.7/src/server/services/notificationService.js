@@ -155,6 +155,126 @@ class NotificationService {
   }
 
   /**
+   * Create subscription upgrade notification
+   */
+  async createSubscriptionUpgradeNotification(userId, { fromPlan, toPlan, currentPeriodEnd }) {
+    const title = `🎉 Subscription Upgraded to ${toPlan}`;
+    const message = `Congratulations! Your subscription has been successfully upgraded from ${fromPlan} to ${toPlan}. You now have access to all the enhanced features of your new plan.`;
+    
+    return await this.createNotification({
+      userId,
+      type: 'subscription_upgrade',
+      category: 'billing',
+      title,
+      message,
+      priority: 'normal',
+      actionUrl: `/subscription-dashboard`,
+      metadata: {
+        fromPlan,
+        toPlan,
+        currentPeriodEnd,
+        upgradeDate: new Date().toISOString()
+      }
+    });
+  }
+
+  /**
+   * Create subscription cancellation notification
+   */
+  async createSubscriptionCancellationNotification(userId, { plan, currentPeriodEnd, reason }) {
+    const title = `📋 Subscription Cancelled`;
+    const message = `Your ${plan} subscription has been cancelled. Your access will continue until ${new Date(currentPeriodEnd).toLocaleDateString()}, and you can reactivate anytime before then.`;
+    
+    return await this.createNotification({
+      userId,
+      type: 'subscription_cancelled',
+      category: 'billing',
+      title,
+      message,
+      priority: 'normal',
+      actionUrl: `/subscription-dashboard`,
+      metadata: {
+        plan,
+        currentPeriodEnd,
+        cancellationDate: new Date().toISOString(),
+        reason: reason || 'No reason provided'
+      }
+    });
+  }
+
+  /**
+   * Create subscription expiration warning notification
+   */
+  async createSubscriptionExpirationWarningNotification(userId, { plan, daysUntilExpiration, currentPeriodEnd }) {
+    const title = `⚠️ Subscription Expiring Soon`;
+    const message = `Your ${plan} subscription will expire in ${daysUntilExpiration} day${daysUntilExpiration === 1 ? '' : 's'} (${new Date(currentPeriodEnd).toLocaleDateString()}). Renew now to continue enjoying premium features.`;
+    
+    return await this.createNotification({
+      userId,
+      type: 'subscription_expiring',
+      category: 'billing',
+      title,
+      message,
+      priority: 'high',
+      actionUrl: `/subscription-dashboard`,
+      metadata: {
+        plan,
+        daysUntilExpiration,
+        currentPeriodEnd,
+        warningDate: new Date().toISOString()
+      }
+    });
+  }
+
+  /**
+   * Create subscription expired notification
+   */
+  async createSubscriptionExpiredNotification(userId, { plan, expiredDate }) {
+    const title = `❌ Subscription Expired`;
+    const message = `Your ${plan} subscription expired on ${new Date(expiredDate).toLocaleDateString()}. You've been moved to the free plan. Upgrade anytime to restore premium features.`;
+    
+    return await this.createNotification({
+      userId,
+      type: 'subscription_expired',
+      category: 'billing',
+      title,
+      message,
+      priority: 'high',
+      actionUrl: `/subscription-dashboard`,
+      metadata: {
+        plan,
+        expiredDate,
+        notificationDate: new Date().toISOString()
+      }
+    });
+  }
+
+  /**
+   * Create payment failed notification
+   */
+  async createPaymentFailedNotification(userId, { plan, amount, currency = 'USD', retryDate }) {
+    const title = `💳 Payment Failed`;
+    const message = `We couldn't process your payment of $${amount} ${currency} for your ${plan} subscription. Please update your payment method to avoid service interruption.`;
+    
+    return await this.createNotification({
+      userId,
+      type: 'payment_failed',
+      category: 'billing',
+      title,
+      message,
+      priority: 'critical',
+      actionUrl: `/subscription-dashboard`,
+      metadata: {
+        plan,
+        amount,
+        currency,
+        retryDate,
+        failureDate: new Date().toISOString()
+      }
+    });
+  }
+
+  /**
    * Check if email should be sent for this notification type based on user preferences
    */
   shouldSendEmailForType(type, preferences) {
@@ -170,7 +290,13 @@ class NotificationService {
       case 'security_alert':
         return preferences.securityAlerts;
       case 'payment_notification':
+      case 'payment_failed':
         return preferences.paymentNotifications;
+      case 'subscription_upgrade':
+      case 'subscription_cancelled':
+      case 'subscription_expiring':
+      case 'subscription_expired':
+        return preferences.subscriptionNotifications || preferences.paymentNotifications;
       default:
         return true; // Default to sending email
     }

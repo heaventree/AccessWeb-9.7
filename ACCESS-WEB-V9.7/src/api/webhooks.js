@@ -1,6 +1,7 @@
 import { db } from "../server/db.js";
 import { pricingPlans, payments } from "../shared/schema.js";
 import { eq } from "drizzle-orm";
+import { notificationService } from '../server/services/notificationService.js';
 
 // Stripe webhook handler for payment events
 export async function handleStripeWebhook(req, res) {
@@ -106,17 +107,35 @@ async function handlePaymentSuccess(paymentIntent) {
       return;
     }
 
+    // Get user's current plan before updating
+    const currentPlan = user.subscriptionPlan;
+    const newPlan = plan.name.toLowerCase();
+    const newPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+
     // Update user subscription fields
     await prisma.user.update({
       where: { id: parseInt(userIdFromMetadata) },
       data: {
-        subscriptionPlan: plan.name.toLowerCase(),
+        subscriptionPlan: newPlan,
         subscriptionStatus: "active",
         stripeSubscriptionId: paymentIntent.id,
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        currentPeriodEnd: newPeriodEnd,
         updatedAt: new Date(),
       },
     });
+
+    // Send upgrade notification
+    try {
+      await notificationService.createSubscriptionUpgradeNotification(parseInt(userIdFromMetadata), {
+        fromPlan: currentPlan || 'free',
+        toPlan: newPlan,
+        currentPeriodEnd: newPeriodEnd
+      });
+      console.log(`📧 [SUBSCRIPTION] Webhook upgrade notification sent for user ${userIdFromMetadata}`);
+    } catch (notificationError) {
+      console.error('📧 [SUBSCRIPTION] Failed to send webhook upgrade notification:', notificationError);
+      // Don't fail the webhook if notification fails
+    }
 
     await prisma.$disconnect();
 
@@ -150,12 +169,29 @@ async function handlePaymentFailure(paymentIntent) {
     console.log("Processing failed payment:", paymentIntent.id);
 
     const userIdFromMetadata = paymentIntent.metadata.userId;
+    const planId = paymentIntent.metadata.planId;
 
     if (userIdFromMetadata) {
+      // Get plan details for notification
+      let planName = 'Unknown Plan';
+      if (planId) {
+        try {
+          const [plan] = await db
+            .select()
+            .from(pricingPlans)
+            .where(eq(pricingPlans.id, parseInt(planId)));
+          if (plan) {
+            planName = plan.name;
+          }
+        } catch (error) {
+          console.error("Error fetching plan for notification:", error);
+        }
+      }
+
       // Record failed payment in history
       await db.insert(payments).values({
         userId: parseInt(userIdFromMetadata),
-        planId: parseInt(paymentIntent.metadata.planId || 0),
+        planId: parseInt(planId || 0),
         amount: (paymentIntent.amount / 100).toString(), // Convert from cents
         currency: paymentIntent.currency.toUpperCase(),
         status: "failed",
@@ -164,6 +200,20 @@ async function handlePaymentFailure(paymentIntent) {
         createdAt: new Date(),
         updatedAt: new Date(),
       });
+
+      // Send payment failed notification
+      try {
+        await notificationService.createPaymentFailedNotification(parseInt(userIdFromMetadata), {
+          plan: planName,
+          amount: paymentIntent.amount / 100, // Convert from cents
+          currency: paymentIntent.currency.toUpperCase(),
+          retryDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days from now
+        });
+        console.log(`📧 [PAYMENT] Failed payment notification sent for user ${userIdFromMetadata}`);
+      } catch (notificationError) {
+        console.error('📧 [PAYMENT] Failed to send payment failure notification:', notificationError);
+        // Don't fail the webhook if notification fails
+      }
 
       console.log(`❌ Recorded failed payment for user ${userIdFromMetadata}`);
     }

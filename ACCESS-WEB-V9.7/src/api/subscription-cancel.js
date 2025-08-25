@@ -1,5 +1,6 @@
 // Cancel subscription functionality
 import { requireAuth } from '../middleware/userAuth.js';
+import { notificationService } from '../server/services/notificationService.js';
 
 // Cancel subscription
 async function cancelSubscription(req, res) {
@@ -63,6 +64,19 @@ async function cancelSubscription(req, res) {
       where: { id: userId },
       data: updateData
     });
+
+    // Send cancellation notification
+    try {
+      await notificationService.createSubscriptionCancellationNotification(userId, {
+        plan: user.subscriptionPlan,
+        currentPeriodEnd: updatedUser.currentPeriodEnd,
+        reason: reason
+      });
+      console.log(`📧 [SUBSCRIPTION] Cancellation notification sent for user ${userId}`);
+    } catch (notificationError) {
+      console.error('📧 [SUBSCRIPTION] Failed to send cancellation notification:', notificationError);
+      // Don't fail the cancellation if notification fails
+    }
 
     await prisma.$disconnect();
 

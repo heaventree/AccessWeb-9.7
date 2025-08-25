@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { notificationService } from '../server/services/notificationService.js';
 
 const prisma = new PrismaClient();
 
@@ -267,16 +268,38 @@ export async function verifyPayment(req, res) {
 
       console.log('Payment completed for user:', userId, 'Amount:', paymentIntent.amount);
 
+      // Get user's current plan before updating
+      const currentUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { subscriptionPlan: true }
+      });
+
       // Also update user subscription in the database
+      const newPlan = planName ? planName.toLowerCase() : plan?.name?.toLowerCase() || 'basic';
+      const newPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+      
       try {
         await prisma.user.update({
           where: { id: userId },
           data: {
-            subscriptionPlan: planName ? planName.toLowerCase() : plan?.name?.toLowerCase() || 'basic',
+            subscriptionPlan: newPlan,
             subscriptionStatus: 'active',
-            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+            currentPeriodEnd: newPeriodEnd
           }
         });
+
+        // Send upgrade notification
+        try {
+          await notificationService.createSubscriptionUpgradeNotification(userId, {
+            fromPlan: currentUser?.subscriptionPlan || 'free',
+            toPlan: newPlan,
+            currentPeriodEnd: newPeriodEnd
+          });
+          console.log(`📧 [SUBSCRIPTION] Upgrade notification sent for user ${userId}`);
+        } catch (notificationError) {
+          console.error('📧 [SUBSCRIPTION] Failed to send upgrade notification:', notificationError);
+          // Don't fail the upgrade if notification fails
+        }
       } catch (updateError) {
         console.error('Error updating user subscription:', updateError);
       }
