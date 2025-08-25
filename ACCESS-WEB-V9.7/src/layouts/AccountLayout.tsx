@@ -10,7 +10,7 @@ import {
   Key
 } from 'lucide-react';
 import { DashboardLayout } from './DashboardLayout';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../contexts/AuthContext';
 
 export function AccountLayout() {
   const { user } = useAuth();
