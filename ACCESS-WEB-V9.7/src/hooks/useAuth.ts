@@ -161,6 +161,11 @@ export function useAuth() {
       const isAdminLogin = options?.isAdminLogin || false;
       const response = await authApi.login(email, password, { isAdminLogin });
       
+      // Check if we have a valid response with token and user data
+      if (!response.token || !response.user) {
+        throw new Error('Invalid login response: missing token or user data');
+      }
+      
       // Save auth token to localStorage
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
@@ -174,8 +179,7 @@ export function useAuth() {
         isAdmin: Boolean(response.user.isAdmin), // Ensure the isAdmin flag is properly set as boolean
         emailVerified: true, // Assume verified if they can log in
         createdAt: new Date().toISOString(), // Default to now
-        // Add subscription info if available
-        subscription: response.user.subscription
+        // Note: subscription info is not available in LoginResponse, so we don't include it
       };
       
       setIsAuthenticated(true);
@@ -216,9 +220,9 @@ export function useAuth() {
       
       // In most cases, registration doesn't immediately log the user in
       // Instead, they need to verify their email first
+      // Note: The API response doesn't include verificationToken, just success message
       return { 
-        success: true,
-        verificationToken: response.verificationToken 
+        success: true
       };
     } catch (error: any) {
       const errorMsg = error.response?.data?.message || 'Registration failed';
@@ -249,12 +253,9 @@ export function useAuth() {
     try {
       const response = await authApi.verifyEmail(token);
       
-      // After email verification, we can log the user in automatically
-      localStorage.setItem('auth_token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      
-      setIsAuthenticated(true);
-      setUser(response.user);
+      // Email verification only confirms the email, it doesn't automatically log in
+      // The user will need to log in separately after verification
+      // So we don't set authentication state here
       
       return { success: true };
     } catch (error: any) {
