@@ -131,6 +131,8 @@ export function useNotifications() {
           )
         );
         setUnreadCount(prev => Math.max(0, prev - 1));
+        // Refresh stats to ensure consistency with server
+        loadNotificationStats();
       }
       return response;
     } catch (error) {
@@ -147,6 +149,8 @@ export function useNotifications() {
           prev.map(notification => ({ ...notification, isRead: true }))
         );
         setUnreadCount(0);
+        // Refresh stats to ensure consistency with server
+        loadNotificationStats();
       }
       return response;
     } catch (error) {
@@ -167,6 +171,8 @@ export function useNotifications() {
           setUnreadCount(prev => Math.max(0, prev - 1));
         }
         setTotalCount(prev => Math.max(0, prev - 1));
+        // Refresh stats to ensure consistency with server
+        loadNotificationStats();
       }
       return response;
     } catch (error) {
