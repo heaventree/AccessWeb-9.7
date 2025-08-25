@@ -302,6 +302,33 @@ class NotificationService {
    */
   shouldSendEmailForType(type, preferences) {
     console.log(`[NOTIFICATION-SERVICE] Checking if should send email for type '${type}' with preferences:`, preferences);
+    
+    // Handle null preferences for new users - provide sensible defaults
+    if (!preferences) {
+      console.log(`[NOTIFICATION-SERVICE] No preferences found - using defaults for new user`);
+      const result = (() => {
+        switch (type) {
+          case 'scan_completed':
+          case 'scan_failed':
+            return false; // Don't send scan notifications by default for new users
+          case 'critical_issues':
+          case 'security_alert':
+          case 'payment_notification':
+          case 'payment_failed':
+          case 'subscription_upgrade':
+          case 'subscription_cancelled':
+          case 'subscription_expiring':
+          case 'subscription_expired':
+          case 'usage_alert':
+            return true; // Send important notifications by default
+          default:
+            return true; // Default to sending email
+        }
+      })();
+      console.log(`[NOTIFICATION-SERVICE] Default decision for type '${type}': ${result}`);
+      return result;
+    }
+    
     const result = (() => {
     switch (type) {
       case 'scan_completed':
