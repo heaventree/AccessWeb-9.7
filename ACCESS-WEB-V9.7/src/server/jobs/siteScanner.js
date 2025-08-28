@@ -27,7 +27,7 @@ class SiteScannerJobQueue {
 
       // Initialize pg-boss with database connection
       this.boss = new PgBoss({
-        connectionString: process.env.DATABASE_URL,
+        connectionString: process.env.DATABASE_URL_PG_BOSS,
         retryLimit: 3,
         retryDelay: 5000,
         expireInHours: 1,
