@@ -105,7 +105,7 @@ Standard error codes:
 The primary authentication method is API key-based:
 
 ```
-Authorization: Bearer pk_live_abcdef123456
+Authorization: Bearer YOUR_STRIPE_PUBLISHABLE_KEY
 ```
 
 API keys have the following characteristics:

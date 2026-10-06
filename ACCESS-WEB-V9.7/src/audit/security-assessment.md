@@ -93,9 +93,9 @@ if (username === 'admin' && password === 'admin123') {
 Sensitive API keys and secrets are exposed in the client-side code:
 
 ```
-VITE_OPENAI_API_KEY=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
-VITE_STRIPE_PUBLISHABLE_KEY=pk_live_51LkB9pLpZ58pNWEfNwWu8VLNCsHJmjlFb1zru296vgCRyhNVuWlpN3zXnbyQQSy5VBgAAx7rnAPIwteTR9dxWQz400flDJzipd
-VITE_STRIPE_SECRET_KEY=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
+VITE_OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+VITE_STRIPE_PUBLISHABLE_KEY=YOUR_STRIPE_PUBLISHABLE_KEY
+VITE_STRIPE_SECRET_KEY=YOUR_STRIPE_SECRET_KEY
 ```
 
 **Impact**: Exposure of sensitive API keys that could be used to make unauthorized API calls, potentially resulting in financial charges (Stripe) or data breaches.
